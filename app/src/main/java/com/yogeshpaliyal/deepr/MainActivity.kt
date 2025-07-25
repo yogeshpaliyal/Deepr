@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -26,9 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
@@ -54,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         var isError by remember { mutableStateOf(false) }
                         val context = LocalContext.current
 
-                        AccountList(
+                        DeeprList(
                             modifier = Modifier.weight(1f),
                             accounts = accounts,
                             onItemClick = {
@@ -62,6 +68,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onRemoveClick = {
                                 viewModel.deleteAccount(it.id)
+                            },
+                            onShortcutClick = {
+                                createShortcut(context, it)
                             }
                         )
 
@@ -124,11 +133,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AccountList(
+fun DeeprList(
     modifier: Modifier = Modifier,
     accounts: List<Deepr>,
     onItemClick: (Deepr) -> Unit,
-    onRemoveClick: (Deepr) -> Unit
+    onRemoveClick: (Deepr) -> Unit,
+    onShortcutClick: (Deepr) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         if (accounts.isEmpty()) {
@@ -137,10 +147,11 @@ fun AccountList(
             }
         } else {
             items(accounts) { account ->
-                AccountItem(
+                DeeprItem(
                     account = account,
                     onItemClick = onItemClick,
-                    onRemoveClick = onRemoveClick
+                    onRemoveClick = onRemoveClick,
+                    onShortcutClick = onShortcutClick
                 )
             }
         }
@@ -148,12 +159,15 @@ fun AccountList(
 }
 
 @Composable
-fun AccountItem(
+fun DeeprItem(
     modifier: Modifier = Modifier,
     account: Deepr,
     onItemClick: (Deepr) -> Unit,
-    onRemoveClick: (Deepr) -> Unit
+    onRemoveClick: (Deepr) -> Unit,
+    onShortcutClick: (Deepr) -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -167,9 +181,48 @@ fun AccountItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = account.link, modifier = Modifier.weight(1f))
-            IconButton(onClick = { onRemoveClick(account) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Remove")
+            Text(
+                text = account.link,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Box {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Add shortcut") },
+                        onClick = {
+                            onShortcutClick(account)
+                            expanded = false
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Add shortcut"
+                            )
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        onClick = {
+                            onRemoveClick(account)
+                            expanded = false
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                    )
+                }
             }
         }
     }
