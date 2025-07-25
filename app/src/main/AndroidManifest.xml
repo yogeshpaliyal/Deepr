@@ -16,6 +16,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.Deepr">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

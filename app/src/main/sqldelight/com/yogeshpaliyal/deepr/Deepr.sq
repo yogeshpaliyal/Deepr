@@ -11,3 +11,6 @@ SELECT * FROM Deepr;
 
 getDeeprById:
 SELECT * FROM Deepr WHERE id = ?;
+
+deleteDeeprById:
+DELETE FROM Deepr WHERE id = ?;

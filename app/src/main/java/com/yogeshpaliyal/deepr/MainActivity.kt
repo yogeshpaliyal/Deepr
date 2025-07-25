@@ -4,11 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -18,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,9 +44,26 @@ class MainActivity : ComponentActivity() {
             DeeprTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val accounts by viewModel.accounts.collectAsState()
-                    Column(modifier = Modifier.padding(innerPadding)) {
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .padding(horizontal = 16.dp)
+                            .imePadding()
+                    ) {
                         val inputText = remember { mutableStateOf("") }
                         var isError by remember { mutableStateOf(false) }
+                        val context = LocalContext.current
+
+                        AccountList(
+                            modifier = Modifier.weight(1f),
+                            accounts = accounts,
+                            onItemClick = {
+                                openDeeplink(context, it.link)
+                            },
+                            onRemoveClick = {
+                                viewModel.deleteAccount(it.id)
+                            }
+                        )
 
                         TextField(
                             value = inputText.value,
@@ -59,7 +82,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         )
-                        val context = LocalContext.current
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -73,7 +95,7 @@ class MainActivity : ComponentActivity() {
                                     isError = true
                                 }
                             }) {
-                                Text("Add to DB")
+                                Text("Save")
                             }
                             Button(onClick = {
                                 isError = !openDeeplink(context, inputText.value)
@@ -90,13 +112,10 @@ class MainActivity : ComponentActivity() {
                                 } else {
                                     isError = true
                                 }
-                            }) {
-                                Text("Execute and Save")
+                            }){
+                                Text("Save & Execute")
                             }
                         }
-                        AccountList(
-                            accounts = accounts
-                        )
                     }
                 }
             }
@@ -105,29 +124,53 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AccountList(modifier: Modifier = Modifier, accounts: List<Deepr>) {
-    LazyColumn(modifier = modifier.padding(16.dp)) {
+fun AccountList(
+    modifier: Modifier = Modifier,
+    accounts: List<Deepr>,
+    onItemClick: (Deepr) -> Unit,
+    onRemoveClick: (Deepr) -> Unit
+) {
+    LazyColumn(modifier = modifier) {
         if (accounts.isEmpty()) {
             item {
                 Text(text = "No deeplinks found.")
             }
         } else {
             items(accounts) { account ->
-                AccountItem(account = account)
+                AccountItem(
+                    account = account,
+                    onItemClick = onItemClick,
+                    onRemoveClick = onRemoveClick
+                )
             }
         }
     }
 }
 
 @Composable
-fun AccountItem(modifier: Modifier = Modifier, account: Deepr) {
+fun AccountItem(
+    modifier: Modifier = Modifier,
+    account: Deepr,
+    onItemClick: (Deepr) -> Unit,
+    onRemoveClick: (Deepr) -> Unit
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .clickable { onItemClick(account) }
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = account.link)
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = account.link, modifier = Modifier.weight(1f))
+            IconButton(onClick = { onRemoveClick(account) }) {
+                Icon(Icons.Default.Delete, contentDescription = "Remove")
+            }
         }
     }
 }

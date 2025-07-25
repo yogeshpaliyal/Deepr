@@ -22,4 +22,10 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
             deeprQueries.insertDeepr(link = link)
         }
     }
+
+    fun deleteAccount(id: Long) {
+        viewModelScope.launch {
+            deeprQueries.deleteDeeprById(id)
+        }
+    }
 }

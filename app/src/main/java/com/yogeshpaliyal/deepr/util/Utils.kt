@@ -2,17 +2,14 @@ package com.yogeshpaliyal.deepr.util
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.core.net.toUri
 
 fun openDeeplink(context: Context, link: String): Boolean {
     if (!isValidDeeplink(link)) return false
     return try {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-        if (link.startsWith("deepr://")) {
-            intent.setPackage(context.packageName)
-        }
-        context.startActivity(intent)
+        val intent = Intent(Intent.ACTION_VIEW, link.toUri())
+        val chooser = Intent.createChooser(intent, /* title */ null)
+        context.startActivity(chooser)
         true
     } catch (e: Exception) {
         e.printStackTrace()
