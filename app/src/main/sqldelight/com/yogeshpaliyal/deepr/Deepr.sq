@@ -14,3 +14,6 @@ SELECT * FROM Deepr WHERE id = ?;
 
 deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
+
+searchDeepr:
+SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%';

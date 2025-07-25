@@ -10,18 +10,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,12 +51,49 @@ import android.widget.Toast
 class MainActivity : ComponentActivity() {
     private val viewModel: AccountViewModel by viewModel()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DeeprTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                var isSearchActive by remember { mutableStateOf(false) }
+                var searchQuery by remember { mutableStateOf("") }
+
+                Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+                    TopAppBar(
+                        title = {
+                            if (isSearchActive) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = {
+                                        searchQuery = it
+                                        viewModel.search(it)
+                                     },
+                                    placeholder = { Text("Search...") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            } else {
+                                Text("Deepr")
+                            }
+                        },
+                        actions = {
+                            if (isSearchActive) {
+                                IconButton(onClick = {
+                                    isSearchActive = false
+                                    searchQuery = ""
+                                    viewModel.search("")
+                                }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Close search")
+                                }
+                            } else {
+                                IconButton(onClick = { isSearchActive = true }) {
+                                    Icon(Icons.Default.Search, contentDescription = "Search")
+                                }
+                            }
+                        }
+                    )
+                }) { innerPadding ->
                     val accounts by viewModel.accounts.collectAsState()
                     Column(
                         modifier = Modifier
@@ -83,6 +125,7 @@ class MainActivity : ComponentActivity() {
                             },
                             onRemoveClick = {
                                 viewModel.deleteAccount(it.id)
+                                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
                             },
                             onShortcutClick = {
                                 showShortcutDialog = it
@@ -159,7 +202,7 @@ fun DeeprList(
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
         if (accounts.isEmpty()) {
             item {
                 Text(text = "No deeplinks found.")
@@ -195,7 +238,7 @@ fun DeeprItem(
     ) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
