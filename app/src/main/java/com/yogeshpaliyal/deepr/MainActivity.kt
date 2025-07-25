@@ -1,13 +1,24 @@
 package com.yogeshpaliyal.deepr
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -16,6 +27,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +58,6 @@ import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import android.widget.Toast
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AccountViewModel by viewModel()
@@ -69,7 +80,7 @@ class MainActivity : ComponentActivity() {
                                     onValueChange = {
                                         searchQuery = it
                                         viewModel.search(it)
-                                     },
+                                    },
                                     placeholder = { Text("Search...") },
                                     modifier = Modifier.fillMaxWidth()
                                 )
@@ -94,99 +105,122 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }) { innerPadding ->
-                    val accounts by viewModel.accounts.collectAsState()
                     Column(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .padding(horizontal = 16.dp)
+                            .consumeWindowInsets(innerPadding)
                             .imePadding()
                     ) {
-                        val inputText = remember { mutableStateOf("") }
-                        var isError by remember { mutableStateOf(false) }
-                        val context = LocalContext.current
-                        var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
+                        Content(viewModel)
+                    }
+                }
+            }
+        }
+    }
+}
 
-                        showShortcutDialog?.let { deepr ->
-                            CreateShortcutDialog(
-                                deepr = deepr,
-                                onDismiss = { showShortcutDialog = null },
-                                onCreate = { d, name ->
-                                    createShortcut(context, d, name)
-                                    showShortcutDialog = null
-                                }
-                            )
+@Composable
+fun Content(viewModel: AccountViewModel) {
+    val accounts by viewModel.accounts.collectAsState()
+    Column {
+        val inputText = remember { mutableStateOf("") }
+        var isError by remember { mutableStateOf(false) }
+        val context = LocalContext.current
+        var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
+
+        showShortcutDialog?.let { deepr ->
+            CreateShortcutDialog(
+                deepr = deepr,
+                onDismiss = { showShortcutDialog = null },
+                onCreate = { d, name ->
+                    createShortcut(context, d, name)
+                    showShortcutDialog = null
+                }
+            )
+        }
+
+        DeeprList(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp),
+            accounts = accounts,
+            onItemClick = {
+                openDeeplink(context, it.link)
+            },
+            onRemoveClick = {
+                viewModel.deleteAccount(it.id)
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+            },
+            onShortcutClick = {
+                showShortcutDialog = it
+            }
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 12.dp
+            )
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                TextField(
+                    value = inputText.value,
+                    onValueChange = {
+                        inputText.value = it
+                        isError = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    placeholder = { Text("Enter deeplink or command") },
+                    isError = isError,
+                    supportingText = {
+                        if (isError) {
+                            Text(text = "Invalid or empty deeplink.")
                         }
-
-                        DeeprList(
-                            modifier = Modifier.weight(1f),
-                            accounts = accounts,
-                            onItemClick = {
-                                openDeeplink(context, it.link)
-                            },
-                            onRemoveClick = {
-                                viewModel.deleteAccount(it.id)
-                                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                            },
-                            onShortcutClick = {
-                                showShortcutDialog = it
-                            }
-                        )
-
-                        TextField(
-                            value = inputText.value,
-                            onValueChange = {
-                                inputText.value = it
-                                isError = false
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            placeholder = { Text("Enter deeplink or command") },
-                            isError = isError,
-                            supportingText = {
-                                if (isError) {
-                                    Text(text = "Invalid or empty deeplink.")
-                                }
-                            }
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            OutlinedButton(onClick = {
-                                if (isValidDeeplink(inputText.value)) {
-                                    viewModel.insertAccount(inputText.value)
-                                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
-                                    inputText.value = ""
-                                } else {
-                                    isError = true
-                                }
-                            }) {
-                                Text("Save")
-                            }
-                            OutlinedButton(onClick = {
-                                isError = !openDeeplink(context, inputText.value)
-                            }) {
-                                Text("Execute")
-                            }
-                            Button(onClick = {
-                                if (isValidDeeplink(inputText.value)) {
-                                    val success = openDeeplink(context, inputText.value)
-                                    if (success) {
-                                        viewModel.insertAccount(inputText.value)
-                                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
-                                        inputText.value = ""
-                                    }
-                                    isError = !success
-                                } else {
-                                    isError = true
-                                }
-                            }){
-                                Text("Save & Execute")
-                            }
+                    }
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    OutlinedButton(onClick = {
+                        if (isValidDeeplink(inputText.value)) {
+                            viewModel.insertAccount(inputText.value)
+                            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT)
+                                .show()
+                            inputText.value = ""
+                        } else {
+                            isError = true
                         }
+                    }) {
+                        Text("Save")
+                    }
+                    OutlinedButton(onClick = {
+                        isError = !openDeeplink(context, inputText.value)
+                    }) {
+                        Text("Execute")
+                    }
+                    Button(onClick = {
+                        if (isValidDeeplink(inputText.value)) {
+                            val success = openDeeplink(context, inputText.value)
+                            if (success) {
+                                viewModel.insertAccount(inputText.value)
+                                Toast.makeText(
+                                    context,
+                                    "Saved",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                inputText.value = ""
+                            }
+                            isError = !success
+                        } else {
+                            isError = true
+                        }
+                    }) {
+                        Text("Save & Execute")
                     }
                 }
             }
