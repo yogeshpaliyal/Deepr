@@ -7,8 +7,11 @@ createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 insertDeepr:
 INSERT INTO Deepr (link) VALUES (?);
 
-listDeepr:
+listDeeprDesc:
 SELECT * FROM Deepr ORDER BY createdAt DESC;
+
+listDeeprAsc:
+SELECT * FROM Deepr ORDER BY createdAt ASC;
 
 getDeeprById:
 SELECT * FROM Deepr WHERE id = ?;
@@ -16,5 +19,8 @@ SELECT * FROM Deepr WHERE id = ?;
 deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
-searchDeepr:
+searchDeeprDesc:
 SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt DESC;
+
+searchDeeprAsc:
+SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt ASC;

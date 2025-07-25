@@ -21,12 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -60,6 +54,14 @@ import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.deepr.viewmodel.SortOrder
+import compose.icons.TablerIcons
+import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Filter
+import compose.icons.tablericons.Plus
+import compose.icons.tablericons.Search
+import compose.icons.tablericons.Trash
+import compose.icons.tablericons.X
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -102,12 +104,15 @@ class MainActivity : ComponentActivity() {
                                     searchQuery = ""
                                     viewModel.search("")
                                 }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Close search")
+                                    Icon(TablerIcons.X, contentDescription = "Close search")
                                 }
                             } else {
                                 IconButton(onClick = { isSearchActive = true }) {
-                                    Icon(Icons.Default.Search, contentDescription = "Search")
+                                    Icon(TablerIcons.Search, contentDescription = "Search")
                                 }
+                                FilterMenu(onSortOrderChange = {
+                                    viewModel.setSortOrder(it)
+                                })
                             }
                         }
                     )
@@ -122,6 +127,35 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FilterMenu(onSortOrderChange: (SortOrder) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(TablerIcons.Filter, contentDescription = "Filter")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Sort by Date Ascending") },
+                onClick = {
+                    onSortOrderChange(SortOrder.ASC)
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Date Descending") },
+                onClick = {
+                    onSortOrderChange(SortOrder.DESC)
+                    expanded = false
+                }
+            )
         }
     }
 }
@@ -300,7 +334,7 @@ fun DeeprItem(
             }
             Box {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    Icon(TablerIcons.DotsVertical, contentDescription = "More options")
                 }
 
                 DropdownMenu(
@@ -315,7 +349,7 @@ fun DeeprItem(
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Add,
+                                TablerIcons.Plus,
                                 contentDescription = "Add shortcut"
                             )
                         }
@@ -328,7 +362,7 @@ fun DeeprItem(
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Delete,
+                                TablerIcons.Trash,
                                 contentDescription = "Delete"
                             )
                         }
