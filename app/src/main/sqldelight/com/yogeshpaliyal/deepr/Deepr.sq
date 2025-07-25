@@ -1,13 +1,14 @@
 CREATE TABLE Deepr (
 id INTEGER PRIMARY KEY NOT NULL,
-link TEXT NOT NULL
+link TEXT NOT NULL,
+createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 insertDeepr:
 INSERT INTO Deepr (link) VALUES (?);
 
 listDeepr:
-SELECT * FROM Deepr;
+SELECT * FROM Deepr ORDER BY createdAt DESC;
 
 getDeeprById:
 SELECT * FROM Deepr WHERE id = ?;
@@ -16,4 +17,4 @@ deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
 searchDeepr:
-SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%';
+SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt DESC;
