@@ -4,6 +4,9 @@ Deepr is a native Android application designed to streamline the management and 
 
 ![./assets/deepr-cover.png](./assets/deepr-cover.png)
 
+## Download
+You can download the latest version of the application from the [releases page](https://github.com/yogeshpaliyal/Deepr/releases).
+
 ## Features
 
 - **Save and Organize Deeplinks:** Easily store and manage a list of frequently used deeplinks.
