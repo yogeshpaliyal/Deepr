@@ -8,8 +8,7 @@ fun openDeeplink(context: Context, link: String): Boolean {
     if (!isValidDeeplink(link)) return false
     return try {
         val intent = Intent(Intent.ACTION_VIEW, link.toUri())
-        val chooser = Intent.createChooser(intent, /* title */ null)
-        context.startActivity(chooser)
+        context.startActivity(intent)
         true
     } catch (e: Exception) {
         e.printStackTrace()
@@ -27,4 +26,3 @@ fun isValidDeeplink(link: String): Boolean {
         false
     }
 }
-
