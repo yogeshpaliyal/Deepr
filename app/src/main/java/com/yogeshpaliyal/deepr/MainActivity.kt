@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -65,7 +66,13 @@ class MainActivity : ComponentActivity() {
                                 .padding(bottom = 16.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            Button(onClick = { viewModel.insertAccount(inputText.value) }) {
+                            Button(onClick = {
+                                if (isValidDeeplink(inputText.value)) {
+                                    viewModel.insertAccount(inputText.value)
+                                } else {
+                                    isError = true
+                                }
+                            }) {
                                 Text("Add to DB")
                             }
                             Button(onClick = {
@@ -74,11 +81,15 @@ class MainActivity : ComponentActivity() {
                                 Text("Execute")
                             }
                             Button(onClick = {
-                                val success = openDeeplink(context, inputText.value)
-                                if (success) {
-                                    viewModel.insertAccount(inputText.value)
+                                if (isValidDeeplink(inputText.value)) {
+                                    val success = openDeeplink(context, inputText.value)
+                                    if (success) {
+                                        viewModel.insertAccount(inputText.value)
+                                    }
+                                    isError = !success
+                                } else {
+                                    isError = true
                                 }
-                                isError = !success
                             }) {
                                 Text("Execute and Save")
                             }
