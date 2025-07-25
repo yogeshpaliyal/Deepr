@@ -2,6 +2,8 @@ package com.yogeshpaliyal.deepr.util
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import androidx.core.net.toUri
 
 fun openDeeplink(context: Context, link: String): Boolean {

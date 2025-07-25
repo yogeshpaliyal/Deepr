@@ -9,11 +9,11 @@ import androidx.core.net.toUri
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.R
 
-fun createShortcut(context: Context, deepr: Deepr) {
+fun createShortcut(context: Context, deepr: Deepr, shortcutName: String) {
     if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
         val shortcutInfo = ShortcutInfoCompat.Builder(context, "deepr_${deepr.id}")
-            .setShortLabel(deepr.link)
-            .setLongLabel(deepr.link)
+            .setShortLabel(shortcutName)
+            .setLongLabel(shortcutName)
             .setIcon(IconCompat.createWithResource(context, R.mipmap.ic_launcher))
             .setIntent(Intent(Intent.ACTION_VIEW, deepr.link.toUri()).apply {
 
@@ -23,4 +23,3 @@ fun createShortcut(context: Context, deepr: Deepr) {
         ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
     }
 }
-

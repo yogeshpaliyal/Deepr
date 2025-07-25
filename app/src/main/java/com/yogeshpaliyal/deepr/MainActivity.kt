@@ -18,6 +18,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,12 +34,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import android.widget.Toast
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AccountViewModel by viewModel()
@@ -59,6 +62,18 @@ class MainActivity : ComponentActivity() {
                         val inputText = remember { mutableStateOf("") }
                         var isError by remember { mutableStateOf(false) }
                         val context = LocalContext.current
+                        var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
+
+                        showShortcutDialog?.let { deepr ->
+                            CreateShortcutDialog(
+                                deepr = deepr,
+                                onDismiss = { showShortcutDialog = null },
+                                onCreate = { d, name ->
+                                    createShortcut(context, d, name)
+                                    showShortcutDialog = null
+                                }
+                            )
+                        }
 
                         DeeprList(
                             modifier = Modifier.weight(1f),
@@ -70,7 +85,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel.deleteAccount(it.id)
                             },
                             onShortcutClick = {
-                                createShortcut(context, it)
+                                showShortcutDialog = it
                             }
                         )
 
@@ -97,16 +112,18 @@ class MainActivity : ComponentActivity() {
                                 .padding(bottom = 16.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            Button(onClick = {
+                            OutlinedButton(onClick = {
                                 if (isValidDeeplink(inputText.value)) {
                                     viewModel.insertAccount(inputText.value)
+                                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                                    inputText.value = ""
                                 } else {
                                     isError = true
                                 }
                             }) {
                                 Text("Save")
                             }
-                            Button(onClick = {
+                            OutlinedButton(onClick = {
                                 isError = !openDeeplink(context, inputText.value)
                             }) {
                                 Text("Execute")
@@ -116,6 +133,8 @@ class MainActivity : ComponentActivity() {
                                     val success = openDeeplink(context, inputText.value)
                                     if (success) {
                                         viewModel.insertAccount(inputText.value)
+                                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                                        inputText.value = ""
                                     }
                                     isError = !success
                                 } else {
