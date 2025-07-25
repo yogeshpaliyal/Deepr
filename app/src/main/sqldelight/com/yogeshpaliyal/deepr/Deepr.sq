@@ -1,0 +1,13 @@
+CREATE TABLE Deepr (
+id INTEGER PRIMARY KEY NOT NULL,
+link TEXT NOT NULL
+);
+
+insertDeepr:
+INSERT INTO Deepr (link) VALUES (?);
+
+listDeepr:
+SELECT * FROM Deepr;
+
+getDeeprById:
+SELECT * FROM Deepr WHERE id = ?;
