@@ -186,6 +186,7 @@ fun Content(viewModel: AccountViewModel) {
                 .padding(8.dp),
             accounts = accounts,
             onItemClick = {
+                viewModel.incrementOpenedCount(it.id)
                 openDeeplink(context, it.link)
             },
             onRemoveClick = {
@@ -229,7 +230,7 @@ fun Content(viewModel: AccountViewModel) {
                 ) {
                     OutlinedButton(onClick = {
                         if (isValidDeeplink(inputText.value)) {
-                            viewModel.insertAccount(inputText.value)
+                            viewModel.insertAccount(inputText.value, false)
                             Toast.makeText(context, "Saved", Toast.LENGTH_SHORT)
                                 .show()
                             inputText.value = ""
@@ -248,7 +249,7 @@ fun Content(viewModel: AccountViewModel) {
                         if (isValidDeeplink(inputText.value)) {
                             val success = openDeeplink(context, inputText.value)
                             if (success) {
-                                viewModel.insertAccount(inputText.value)
+                                viewModel.insertAccount(inputText.value, true)
                                 Toast.makeText(
                                     context,
                                     "Saved",
@@ -326,11 +327,19 @@ fun DeeprItem(
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatDateTime(account.createdAt),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = formatDateTime(account.createdAt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "Opened: ${account.openedCount}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             Box {
                 IconButton(onClick = { expanded = true }) {

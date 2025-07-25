@@ -48,15 +48,21 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
         sortOrder.value = order
     }
 
-    fun insertAccount(link: String) {
+    fun insertAccount(link: String, executed: Boolean) {
         viewModelScope.launch {
-            deeprQueries.insertDeepr(link = link)
+            deeprQueries.insertDeepr(link = link, if (executed) 1 else 0)
         }
     }
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch {
             deeprQueries.deleteDeeprById(id)
+        }
+    }
+
+    fun incrementOpenedCount(id: Long) {
+        viewModelScope.launch {
+            deeprQueries.incrementOpenedCount(id)
         }
     }
 }
