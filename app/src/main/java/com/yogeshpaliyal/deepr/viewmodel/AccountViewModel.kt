@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 enum class SortOrder {
-    ASC, DESC
+    ASC, DESC, OPENED_ASC, OPENED_DESC
 }
 
 class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
@@ -31,11 +31,15 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
                 when (order) {
                     SortOrder.ASC -> deeprQueries.listDeeprAsc()
                     SortOrder.DESC -> deeprQueries.listDeeprDesc()
+                    SortOrder.OPENED_ASC -> deeprQueries.listDeeprByOpenedCountAsc()
+                    SortOrder.OPENED_DESC -> deeprQueries.listDeeprByOpenedCountDesc()
                 }.asFlow().mapToList(viewModelScope.coroutineContext)
             } else {
                 when (order) {
                     SortOrder.ASC -> deeprQueries.searchDeeprAsc(query)
                     SortOrder.DESC -> deeprQueries.searchDeeprDesc(query)
+                    SortOrder.OPENED_ASC -> deeprQueries.searchDeeprByOpenedCountAsc(query)
+                    SortOrder.OPENED_DESC -> deeprQueries.searchDeeprByOpenedCountDesc(query)
                 }.asFlow().mapToList(viewModelScope.coroutineContext)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

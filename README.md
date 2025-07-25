@@ -12,7 +12,8 @@ You can download the latest version of the application from the [releases page](
 - **Save and Organize Deeplinks:** Easily store and manage a list of frequently used deeplinks.
 - **Launch Deeplinks:** Test and verify deeplink behavior by launching them directly from the app.
 - **Search:** Quickly find specific deeplinks from your saved list.
-- **Sort:** Organize your deeplinks by date in either ascending or descending order.
+- **Sort:** Organize your deeplinks by date or open counter in either ascending or descending order.
+- **Open Counter:** Keep track of how many times each deeplink has been opened.
 - **Home Screen Shortcuts:** Create shortcuts for your most-used deeplinks on your device's home screen for quick access.
 
 ## Architecture

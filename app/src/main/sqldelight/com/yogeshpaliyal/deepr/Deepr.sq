@@ -26,5 +26,17 @@ SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt DESC;
 searchDeeprAsc:
 SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt ASC;
 
+listDeeprByOpenedCountDesc:
+SELECT * FROM Deepr ORDER BY openedCount DESC;
+
+listDeeprByOpenedCountAsc:
+SELECT * FROM Deepr ORDER BY openedCount ASC;
+
+searchDeeprByOpenedCountDesc:
+SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY openedCount DESC;
+
+searchDeeprByOpenedCountAsc:
+SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY openedCount ASC;
+
 incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;

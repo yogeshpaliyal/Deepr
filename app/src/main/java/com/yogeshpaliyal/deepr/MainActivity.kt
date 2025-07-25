@@ -156,6 +156,20 @@ fun FilterMenu(onSortOrderChange: (SortOrder) -> Unit) {
                     expanded = false
                 }
             )
+            DropdownMenuItem(
+                text = { Text("Sort by Opened Ascending") },
+                onClick = {
+                    onSortOrderChange(SortOrder.OPENED_ASC)
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Opened Descending") },
+                onClick = {
+                    onSortOrderChange(SortOrder.OPENED_DESC)
+                    expanded = false
+                }
+            )
         }
     }
 }
