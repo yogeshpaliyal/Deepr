@@ -1,0 +1,45 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - 'fastlane/**'
+      - '.github/**'
+      - 'icons/**'
+      - 'images/**'
+      - 'scripts/**'
+      - 'whatsnew/**'
+      - '**.md'
+      - '**.MD'
+
+# If two events are triggered within a short time in the same PR, cancel the run of the oldest event
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-pr:
+    name: 'Tests and Build Production Debug Build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'jetbrains'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🏗 Build APK
+        run: bash ./gradlew assembleDebug
+
+      - name: 🚀 Upload APK to Artifacts 📱
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 3
