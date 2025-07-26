@@ -1,5 +1,8 @@
 package com.yogeshpaliyal.deepr
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -46,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
@@ -56,17 +58,18 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import com.yogeshpaliyal.deepr.viewmodel.SortOrder
 import compose.icons.TablerIcons
+import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Filter
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Trash
 import compose.icons.tablericons.X
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AccountViewModel by viewModel()
@@ -319,6 +322,7 @@ fun DeeprItem(
     onShortcutClick: (Deepr) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Card(
         modifier = modifier
@@ -333,7 +337,11 @@ fun DeeprItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+            ) {
                 Text(
                     text = account.link,
                     maxLines = 1,
@@ -364,6 +372,23 @@ fun DeeprItem(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+                    DropdownMenuItem(
+                        text = { Text("Copy link") },
+                        onClick = {
+                            val clipboard =
+                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = ClipData.newPlainText("Link copied", account.link)
+                            clipboard.setPrimaryClip(clip)
+                            Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
+                            expanded = false
+                        },
+                        leadingIcon = {
+                            Icon(
+                                TablerIcons.Copy,
+                                contentDescription = "Copy link"
+                            )
+                        }
+                    )
                     DropdownMenuItem(
                         text = { Text("Add shortcut") },
                         onClick = {
@@ -396,22 +421,6 @@ fun DeeprItem(
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DeeprTheme {
-        Greeting("Android")
-    }
-}
-
 private fun formatDateTime(dateTimeString: String): String {
     return try {
         val dbFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -420,7 +429,7 @@ private fun formatDateTime(dateTimeString: String): String {
         val displayFormatter =
             DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault())
         date?.let { displayFormatter.format(it) } ?: dateTimeString
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         dateTimeString // fallback to raw string
     }
 }
