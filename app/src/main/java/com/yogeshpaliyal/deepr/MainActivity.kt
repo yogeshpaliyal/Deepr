@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,41 +85,43 @@ class MainActivity : ComponentActivity() {
                 var searchQuery by remember { mutableStateOf("") }
 
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-                    TopAppBar(
-                        title = {
-                            if (isSearchActive) {
-                                OutlinedTextField(
-                                    value = searchQuery,
-                                    onValueChange = {
-                                        searchQuery = it
-                                        viewModel.search(it)
-                                    },
-                                    placeholder = { Text("Search...") },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            } else {
+                    Column {
+                        TopAppBar(
+                            title = {
                                 Text("Deepr")
-                            }
-                        },
-                        actions = {
-                            if (isSearchActive) {
+                            },
+                            actions = {
                                 IconButton(onClick = {
-                                    isSearchActive = false
-                                    searchQuery = ""
-                                    viewModel.search("")
+                                    isSearchActive = !isSearchActive
+                                    if (!isSearchActive) {
+                                        searchQuery = ""
+                                        viewModel.search("")
+                                    }
                                 }) {
-                                    Icon(TablerIcons.X, contentDescription = "Close search")
-                                }
-                            } else {
-                                IconButton(onClick = { isSearchActive = true }) {
-                                    Icon(TablerIcons.Search, contentDescription = "Search")
+                                    Icon(
+                                        if (isSearchActive) TablerIcons.X else TablerIcons.Search,
+                                        contentDescription = if (isSearchActive) "Close search" else "Search"
+                                    )
                                 }
                                 FilterMenu(onSortOrderChange = {
                                     viewModel.setSortOrder(it)
                                 })
                             }
+                        )
+                        AnimatedVisibility(visible = isSearchActive) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = {
+                                    searchQuery = it
+                                    viewModel.search(it)
+                                },
+                                placeholder = { Text("Search...") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                            )
                         }
-                    )
+                    }
                 }) { innerPadding ->
                     Column(
                         modifier = Modifier
