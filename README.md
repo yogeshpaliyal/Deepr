@@ -21,6 +21,7 @@ You can download the latest version of the application from the [releases page](
 The application is built using modern Android development practices and libraries:
 
 - **UI:** The user interface is built entirely with **Jetpack Compose**, providing a modern and declarative approach to UI development.
+- **Navigation:** **Jetpack Compose Navigation 3** is used for navigating between screens in the app.
 - **ViewModel:** **Android ViewModel** is used to manage UI-related data and handle the state of the application.
 - **Database:** **SQLDelight** is used for local data persistence, offering a lightweight and type-safe SQL database solution.
 - **Dependency Injection:** **Koin** is used for dependency injection to promote a modular and testable architecture.
