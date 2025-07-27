@@ -1,0 +1,101 @@
+name: Bump App Version
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'Bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      releaseNote:
+        description: 'Release Note'
+        required: true
+        type: string
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🏗 Bump App Version
+        id: bump-app-version
+        run: |
+          newVersion=$(bash ./scripts/versionBump.sh $TYPE "$RELEASE_NOTES")
+          echo "::newVersion::$newVersion"
+          echo "newVersion=$newVersion" >> "$GITHUB_OUTPUT"
+        env:
+          TYPE: ${{ inputs.type }}
+          RELEASE_NOTES: ${{ inputs.releaseNote }}
+
+      - name: Git Add and Commit
+        run: |
+          git config --global user.name 'Yogesh Choudhary Paliyal'
+          git config --global user.email 'yogeshpaliyal@users.noreply.github.com'
+          git add .
+          git commit -am "Github Actions: App version Bumped to ${{ steps.bump-app-version.outputs.newVersion }}"
+
+      - name: Print newVersion
+        run: echo "${{ steps.bump-app-version.outputs.newVersion }}"
+
+      - name: Build Release AAB
+        id: buildFreeRelease
+        run: ./gradlew bundleRelease
+
+      - name: Sign Release AAB
+        id: signPro
+        uses: r0adkll/sign-android-release@fix/bundle-signing
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Push to protected branch
+        uses: CasperWA/push-protected@v2
+        with:
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          branch: master
+          unprotect_reviews: true
+
+      - name: Git push tag
+        run: |
+          git tag -a ${{ steps.bump-app-version.outputs.newVersion }} -m "Release version ${{ steps.bump-app-version.outputs.newVersion }}"
+          git push origin ${{ steps.bump-app-version.outputs.newVersion }}
+
+      - name: Rename aab names
+        run: |
+          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/bundle/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.aab
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.16.0
+        with:
+          tag: "${{ steps.bump-app-version.outputs.newVersion }}"
+          generateReleaseNotes: true
+          commit: "master"
+          artifacts: "app/build/outputs/bundle/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.aab"
+          discussionCategory: "Release feedbacks"
+          makeLatest: true
+
+      - uses: snnaplab/universal-apk-generate-action@v1
+        id: apk-release-generate
+        with:
+          aab-path: 'app/build/outputs/bundle/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.aab'
+          keystore-base64: ${{ secrets.SIGNING_KEY }}
+          keystore-password: ${{ secrets.KEY_STORE_PASSWORD }}
+          key-alias: ${{ secrets.ALIAS }}
+          key-password: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload binaries to github release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ steps.apk-free-generate.outputs.apk-path }}
+          asset_name: 'deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk'
+          tag: ${{ steps.bump-app-version.outputs.newVersion }}
+          overwrite: true
