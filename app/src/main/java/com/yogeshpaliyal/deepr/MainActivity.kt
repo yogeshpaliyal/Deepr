@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
+import com.yogeshpaliyal.deepr.ui.screens.AboutUs
+import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
 import com.yogeshpaliyal.deepr.ui.screens.Home
 import com.yogeshpaliyal.deepr.ui.screens.HomeScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
@@ -52,6 +54,9 @@ fun Dashboard(viewModel: AccountViewModel) {
 
                 is Settings -> NavEntry(key) {
                     SettingsScreen(backStack)
+                }
+                is AboutUs -> NavEntry(key) {
+                    AboutUsScreen(backStack)
                 }
 
                 else -> NavEntry(Unit) { Text("Unknown route") }
