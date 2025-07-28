@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.yogeshpaliyal.deepr"
     compileSdk = 36
-    buildToolsVersion = "35.0.0"
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         applicationId = "com.yogeshpaliyal.deepr"
