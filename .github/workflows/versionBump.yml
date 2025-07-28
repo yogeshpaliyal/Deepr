@@ -59,7 +59,7 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
           # override default build-tools version (33.0.0) -- optional
-          BUILD_TOOLS_VERSION: "36.0.0"
+          BUILD_TOOLS_VERSION: "34.0.0"
 
       - name: Build Release AAB
         run: ./gradlew bundleRelease
