@@ -48,6 +48,6 @@ jobs:
           packageName: com.yogeshpaliyal.deepr
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: qa
-          userFraction: 1
+          userFraction: 1.0
           whatsNewDirectory: whatsnew/
 
