@@ -47,6 +47,6 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr
           releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: qa
+          track: alpha
           whatsNewDirectory: whatsnew/
 
