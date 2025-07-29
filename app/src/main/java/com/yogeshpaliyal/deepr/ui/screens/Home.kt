@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
+import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -62,6 +63,7 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import com.yogeshpaliyal.deepr.viewmodel.SortOrder
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Filter
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
@@ -191,6 +193,7 @@ fun Content(viewModel: AccountViewModel) {
         var isError by remember { mutableStateOf(false) }
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
+        var showEditDialog by remember { mutableStateOf<Deepr?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -199,6 +202,18 @@ fun Content(viewModel: AccountViewModel) {
                 onCreate = { d, name ->
                     createShortcut(context, d, name)
                     showShortcutDialog = null
+                }
+            )
+        }
+
+        showEditDialog?.let { deepr ->
+            EditDeeplinkDialog(
+                deepr = deepr,
+                onDismiss = { showEditDialog = null },
+                onSave = { newLink ->
+                    viewModel.updateDeeplink(deepr.id, newLink)
+                    Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
+                    showEditDialog = null
                 }
             )
         }
@@ -218,6 +233,9 @@ fun Content(viewModel: AccountViewModel) {
             },
             onShortcutClick = {
                 showShortcutDialog = it
+            },
+            onEditClick = {
+                showEditDialog = it
             },
             onItemLongClick = {
                 val clipboard =
@@ -307,6 +325,7 @@ fun DeeprList(
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
+    onEditClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit
 ) {
     if (accounts.isEmpty()) {
@@ -355,6 +374,7 @@ fun DeeprList(
                     onItemClick = onItemClick,
                     onRemoveClick = onRemoveClick,
                     onShortcutClick = onShortcutClick,
+                    onEditClick = onEditClick,
                     onItemLongClick = onItemLongClick
                 )
             }
@@ -370,6 +390,7 @@ fun DeeprItem(
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
+    onEditClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -452,6 +473,19 @@ fun DeeprItem(
                             Icon(
                                 TablerIcons.Plus,
                                 contentDescription = "Add shortcut"
+                            )
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        onClick = {
+                            onEditClick(account)
+                            expanded = false
+                        },
+                        leadingIcon = {
+                            Icon(
+                                TablerIcons.Edit,
+                                contentDescription = "Edit"
                             )
                         }
                     )

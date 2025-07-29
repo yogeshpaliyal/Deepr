@@ -14,9 +14,6 @@ SELECT * FROM Deepr ORDER BY createdAt DESC;
 listDeeprAsc:
 SELECT * FROM Deepr ORDER BY createdAt ASC;
 
-getDeeprById:
-SELECT * FROM Deepr WHERE id = ?;
-
 deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
@@ -40,3 +37,6 @@ SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY openedCount ASC;
 
 incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
+
+updateDeeplink:
+UPDATE Deepr SET link = ? WHERE id = ?;

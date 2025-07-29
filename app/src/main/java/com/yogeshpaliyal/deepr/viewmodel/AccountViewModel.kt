@@ -6,6 +6,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,7 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val sortOrder = MutableStateFlow(SortOrder.DESC)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
         combine(searchQuery, sortOrder) { query, order ->
             Pair(query, order)
@@ -67,6 +69,12 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel() {
     fun incrementOpenedCount(id: Long) {
         viewModelScope.launch {
             deeprQueries.incrementOpenedCount(id)
+        }
+    }
+
+    fun updateDeeplink(id: Long, newLink: String) {
+        viewModelScope.launch {
+            deeprQueries.updateDeeplink(newLink, id)
         }
     }
 }
