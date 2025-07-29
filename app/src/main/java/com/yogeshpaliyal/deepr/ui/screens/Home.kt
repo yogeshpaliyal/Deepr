@@ -53,7 +53,8 @@ import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
-import com.yogeshpaliyal.deepr.util.createShortcut
+import com.yogeshpaliyal.deepr.util.hasShortcut
+import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import compose.icons.TablerIcons
@@ -200,7 +201,6 @@ fun Content(viewModel: AccountViewModel) {
                 deepr = deepr,
                 onDismiss = { showShortcutDialog = null },
                 onCreate = { d, name ->
-                    createShortcut(context, d, name)
                     showShortcutDialog = null
                 }
             )
@@ -382,6 +382,28 @@ fun DeeprList(
     }
 }
 
+
+@Composable
+fun ShortcutMenuItem(account: Deepr, onShortcutClick: (Deepr) -> Unit) {
+    val context = LocalContext.current
+    val shortcutExists = remember(account.id) { hasShortcut(context, account.id) }
+
+    if (isShortcutSupported(LocalContext.current)) {
+        DropdownMenuItem(
+            text = { Text(if (shortcutExists) "Edit shortcut" else "Add shortcut") },
+            onClick = {
+                onShortcutClick(account)
+            },
+            leadingIcon = {
+                Icon(
+                    TablerIcons.Plus,
+                    contentDescription = if (shortcutExists) "Edit shortcut" else "Add shortcut"
+                )
+            }
+        )
+    }
+}
+
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
@@ -463,19 +485,10 @@ fun DeeprItem(
                             )
                         }
                     )
-                    DropdownMenuItem(
-                        text = { Text("Add shortcut") },
-                        onClick = {
-                            onShortcutClick(account)
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                TablerIcons.Plus,
-                                contentDescription = "Add shortcut"
-                            )
-                        }
-                    )
+                    ShortcutMenuItem(account) {
+                        onShortcutClick(it)
+                        expanded = false
+                    }
                     DropdownMenuItem(
                         text = { Text("Edit") },
                         onClick = {

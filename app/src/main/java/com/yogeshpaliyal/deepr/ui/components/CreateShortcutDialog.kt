@@ -9,34 +9,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.util.createShortcut
+import com.yogeshpaliyal.deepr.util.getShortcut
+import com.yogeshpaliyal.deepr.util.isShortcutSupported
 
 @Composable
 fun CreateShortcutDialog(deepr: Deepr, onDismiss: () -> Unit, onCreate: (Deepr, String) -> Unit) {
-    var shortcutName by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Create Shortcut") },
-        text = {
-            TextField(
-                value = shortcutName,
-                onValueChange = { shortcutName = it },
-                label = { Text("Shortcut Name") },
-                placeholder = { Text(text = deepr.link) }
+    val context = LocalContext.current
+    val existingShortcut = getShortcut(context, deepr.id)
+    if (isShortcutSupported(context)) {
+        var shortcutName by remember {
+            mutableStateOf(
+                existingShortcut?.shortLabel?.toString() ?: ""
             )
-        },
-        confirmButton = {
-            Button(
-                onClick = { onCreate(deepr, shortcutName) },
-                enabled = shortcutName.isNotBlank()
-            ) {
-                Text("Create")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
         }
-    )
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("${if (existingShortcut == null) "Create" else "Edit"} Shortcut") },
+            text = {
+                TextField(
+                    value = shortcutName,
+                    onValueChange = { shortcutName = it },
+                    label = { Text("Shortcut Name") },
+                    placeholder = { Text(text = deepr.link) }
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onCreate(deepr, shortcutName)
+                        createShortcut(context, deepr, shortcutName, existingShortcut != null)
+                    },
+                    enabled = shortcutName.isNotBlank()
+                ) {
+                    Text(if (existingShortcut == null) "Create" else "Edit")
+                }
+            },
+            dismissButton = {
+                Button(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
