@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
@@ -61,6 +63,7 @@ import com.yogeshpaliyal.deepr.viewmodel.SortOrder
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Filter
+import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Trash
@@ -306,12 +309,46 @@ fun DeeprList(
     onShortcutClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit
 ) {
-    LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
-        if (accounts.isEmpty()) {
-            item {
-                Text(text = "No deeplinks found.")
+    if (accounts.isEmpty()) {
+        // When empty, use a Column with weights to ensure vertical centering
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.weight(1f)) // Push content down
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(
+                    TablerIcons.Link,
+                    contentDescription = "No links",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(bottom = 16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "No deeplinks saved yet",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Save your frequently used deeplinks below to quickly access them later.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
             }
-        } else {
+
+            Spacer(modifier = Modifier.weight(1f)) // Push content up
+        }
+    } else {
+        LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
