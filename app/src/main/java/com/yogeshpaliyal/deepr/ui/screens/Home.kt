@@ -5,7 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -215,6 +215,13 @@ fun Content(viewModel: AccountViewModel) {
             },
             onShortcutClick = {
                 showShortcutDialog = it
+            },
+            onItemLongClick = {
+                val clipboard =
+                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Link copied", it.link)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -296,7 +303,8 @@ fun DeeprList(
     accounts: List<Deepr>,
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
-    onShortcutClick: (Deepr) -> Unit
+    onShortcutClick: (Deepr) -> Unit,
+    onItemLongClick: (Deepr) -> Unit
 ) {
     LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
         if (accounts.isEmpty()) {
@@ -309,20 +317,23 @@ fun DeeprList(
                     account = account,
                     onItemClick = onItemClick,
                     onRemoveClick = onRemoveClick,
-                    onShortcutClick = onShortcutClick
+                    onShortcutClick = onShortcutClick,
+                    onItemLongClick = onItemLongClick
                 )
             }
         }
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
     modifier: Modifier = Modifier,
     account: Deepr,
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
-    onShortcutClick: (Deepr) -> Unit
+    onShortcutClick: (Deepr) -> Unit,
+    onItemLongClick: (Deepr) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -331,7 +342,9 @@ fun DeeprItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable { onItemClick(account) }
+            .combinedClickable(onClick = { onItemClick(account) }, onLongClick = {
+                onItemLongClick(account)
+            })
     ) {
         Row(
             modifier = Modifier
