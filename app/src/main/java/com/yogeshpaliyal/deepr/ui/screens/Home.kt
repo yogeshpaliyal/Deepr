@@ -298,34 +298,6 @@ fun Content(viewModel: AccountViewModel) {
 }
 
 @Composable
-fun EmptyState() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = TablerIcons.Search,
-            contentDescription = "No deeplinks found",
-            modifier = Modifier.height(64.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "No deeplinks found",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Add a deeplink to get started.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
 fun DeeprList(
     modifier: Modifier = Modifier,
     accounts: List<Deepr>,
@@ -334,10 +306,12 @@ fun DeeprList(
     onShortcutClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit
 ) {
-    if (accounts.isEmpty()) {
-        EmptyState()
-    } else {
-        LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
+    LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
+        if (accounts.isEmpty()) {
+            item {
+                Text(text = "No deeplinks found.")
+            }
+        } else {
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
