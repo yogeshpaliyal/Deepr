@@ -8,12 +8,13 @@ import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -27,13 +28,10 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
 
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
-    private val sortOrder = MutableStateFlow(SortOrder.DESC)
-
-    init {
-        viewModelScope.launch {
-            sortOrder.value = SortOrder.valueOf(preferenceDataStore.getSortingOrder.first())
+    private val sortOrder: Flow<SortOrder> =
+        preferenceDataStore.getSortingOrder.map { sortOrderName ->
+            SortOrder.valueOf(sortOrderName)
         }
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
@@ -62,7 +60,6 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
     }
 
     fun setSortOrder(order: SortOrder) {
-        sortOrder.value = order
         viewModelScope.launch {
             preferenceDataStore.setSortingOrder(order.name)
         }
