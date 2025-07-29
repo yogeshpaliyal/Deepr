@@ -27,12 +27,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1.16.0
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          tag: "latest-master"
-          generateReleaseNotes: true
-          commit: "master"
-          allowUpdates: true
-          artifacts: "app/build/outputs/apk/debug/*.apk"
-          makeLatest: true
+          repo_token: "${{ github.token }}"
+          automatic_release_tag: "latest-master"
+          prerelease: true
+          title: "Latest Master Build"
+          files: app/build/outputs/apk/debug/*.apk
