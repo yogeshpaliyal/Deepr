@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr
 import android.app.Application
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -30,6 +31,8 @@ class DeeprApplication : Application() {
                 val database = get<DeeprDB>()
                 database.deeprQueries
             }
+
+            single { AppPreferenceDataStore(androidContext()) }
 
             viewModel { AccountViewModel(get()) }
         }
