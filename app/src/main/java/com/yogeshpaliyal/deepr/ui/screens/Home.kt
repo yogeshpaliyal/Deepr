@@ -53,23 +53,25 @@ import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
+import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.util.hasShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
-import compose.icons.TablerIcons
-import compose.icons.tablericons.Search
-import compose.icons.tablericons.X
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import com.yogeshpaliyal.deepr.viewmodel.SortOrder
+import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Filter
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
+import compose.icons.tablericons.Qrcode
+import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.X
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -194,6 +196,7 @@ fun Content(viewModel: AccountViewModel) {
         var isError by remember { mutableStateOf(false) }
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
+        var showQrCodeDialog by remember { mutableStateOf<Deepr?>(null) }
         var showEditDialog by remember { mutableStateOf<Deepr?>(null) }
 
         showShortcutDialog?.let { deepr ->
@@ -204,6 +207,12 @@ fun Content(viewModel: AccountViewModel) {
                     showShortcutDialog = null
                 }
             )
+        }
+
+        showQrCodeDialog?.let {
+            QrCodeDialog(it) {
+                showQrCodeDialog = null
+            }
         }
 
         showEditDialog?.let { deepr ->
@@ -243,6 +252,9 @@ fun Content(viewModel: AccountViewModel) {
                 val clip = ClipData.newPlainText("Link copied", it.link)
                 clipboard.setPrimaryClip(clip)
                 Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
+            },
+            onQrCodeCLick = {
+                showQrCodeDialog = it
             }
         )
 
@@ -326,7 +338,8 @@ fun DeeprList(
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
     onEditClick: (Deepr) -> Unit,
-    onItemLongClick: (Deepr) -> Unit
+    onItemLongClick: (Deepr) -> Unit,
+    onQrCodeCLick: (Deepr) -> Unit
 ) {
     if (accounts.isEmpty()) {
         // When empty, use a Column with weights to ensure vertical centering
@@ -375,13 +388,29 @@ fun DeeprList(
                     onRemoveClick = onRemoveClick,
                     onShortcutClick = onShortcutClick,
                     onEditClick = onEditClick,
-                    onItemLongClick = onItemLongClick
+                    onItemLongClick = onItemLongClick,
+                    onQrCodeClick = onQrCodeCLick
                 )
             }
         }
     }
 }
 
+@Composable
+fun ShowQRCodeMenuItem(account: Deepr, onQrCodeClick: (Deepr) -> Unit) {
+    DropdownMenuItem(
+        text = { Text("Show QR Code") },
+        onClick = {
+            onQrCodeClick(account)
+        },
+        leadingIcon = {
+            Icon(
+                TablerIcons.Qrcode,
+                contentDescription = "Show QR Code",
+            )
+        }
+    )
+}
 
 @Composable
 fun ShortcutMenuItem(account: Deepr, onShortcutClick: (Deepr) -> Unit) {
@@ -412,6 +441,7 @@ fun DeeprItem(
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
+    onQrCodeClick: (Deepr) -> Unit,
     onEditClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit
 ) {
@@ -487,6 +517,10 @@ fun DeeprItem(
                     )
                     ShortcutMenuItem(account) {
                         onShortcutClick(it)
+                        expanded = false
+                    }
+                    ShowQRCodeMenuItem(account) {
+                        onQrCodeClick(it)
                         expanded = false
                     }
                     DropdownMenuItem(
