@@ -2,8 +2,7 @@ package com.yogeshpaliyal.deepr.util
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
+import android.widget.Toast
 import androidx.core.net.toUri
 
 fun openDeeplink(context: Context, link: String): Boolean {
@@ -14,6 +13,7 @@ fun openDeeplink(context: Context, link: String): Boolean {
         true
     } catch (e: Exception) {
         e.printStackTrace()
+        Toast.makeText(context, "Invalid deeplink: $link", Toast.LENGTH_SHORT).show()
         // Optionally, show a toast or a dialog to the user that the link is invalid
         false
     }
@@ -22,8 +22,8 @@ fun openDeeplink(context: Context, link: String): Boolean {
 fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
     return try {
-        val uri = link.toUri()
-        uri.scheme != null
+        link.toUri()
+        return true
     } catch (e: Exception) {
         false
     }
