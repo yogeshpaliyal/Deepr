@@ -6,8 +6,10 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -24,7 +27,10 @@ enum class SortOrder {
     ASC, DESC, OPENED_ASC, OPENED_DESC
 }
 
-class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), KoinComponent {
+class AccountViewModel(
+    private val deeprQueries: DeeprQueries,
+    private val exportRepository: ExportRepository,
+) : ViewModel(), KoinComponent {
 
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
@@ -32,6 +38,9 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
         preferenceDataStore.getSortingOrder.map { sortOrderName ->
             SortOrder.valueOf(sortOrderName)
         }
+
+    private val _exportResultChannel = Channel<String>()
+    val exportResultFlow = _exportResultChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
@@ -86,6 +95,12 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
     fun updateDeeplink(id: Long, newLink: String) {
         viewModelScope.launch {
             deeprQueries.updateDeeplink(newLink, id)
+        }
+    }
+
+    fun exportData() {
+        viewModelScope.launch {
+            _exportResultChannel.send(exportRepository.exportToCsv())
         }
     }
 }

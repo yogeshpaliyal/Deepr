@@ -3,11 +3,13 @@ package com.yogeshpaliyal.deepr
 import android.app.Application
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.yogeshpaliyal.deepr.backup.ExportRepository
+import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 class DeeprApplication : Application() {
@@ -34,7 +36,9 @@ class DeeprApplication : Application() {
 
             single { AppPreferenceDataStore(androidContext()) }
 
-            viewModel { AccountViewModel(get()) }
+            single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
+
+            viewModel { AccountViewModel(get(), get()) }
         }
 
         startKoin {

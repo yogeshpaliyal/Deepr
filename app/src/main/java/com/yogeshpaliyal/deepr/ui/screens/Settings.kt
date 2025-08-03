@@ -1,5 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
+import android.Manifest
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,45 +21,73 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Upload
+import kotlinx.coroutines.flow.collectLatest
 
 data object Settings
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun SettingsScreen(backStack: SnapshotStateList<Any>) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        Column {
-            TopAppBar(
-                title = {
-                    Text("Settings")
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        backStack.removeLastOrNull()
-                    }) {
-                        Icon(
-                            TablerIcons.ArrowLeft,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
+fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+    LaunchedEffect(storagePermissionState.status) {
+        if (storagePermissionState.status.isGranted) {
+            viewModel.exportData()
         }
-    }) { innerPadding ->
+    }
+
+    LaunchedEffect(true) {
+        viewModel.exportResultFlow.collectLatest { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = {
+                        Text("Settings")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            backStack.removeLastOrNull()
+                        }) {
+                            Icon(
+                                TablerIcons.ArrowLeft,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
+                )
+            }
+        }) { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -89,6 +119,17 @@ fun SettingsScreen(backStack: SnapshotStateList<Any>) {
                     }
                 )
                 ListItem(
+                    modifier = Modifier.clickable {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            viewModel.exportData()
+                        } else {
+                            if (storagePermissionState.status.isGranted) {
+                                viewModel.exportData()
+                            } else {
+                                storagePermissionState.launchPermissionRequest()
+                            }
+                        }
+                    },
                     headlineContent = { Text("Export Deeplinks") },
                     supportingContent = { Text("Coming Soon") },
                     leadingContent = {

@@ -40,3 +40,6 @@ UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
 
 updateDeeplink:
 UPDATE Deepr SET link = ? WHERE id = ?;
+
+countDeepr:
+SELECT COUNT(*) FROM Deepr;

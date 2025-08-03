@@ -53,8 +53,9 @@ fun Dashboard(viewModel: AccountViewModel) {
                 }
 
                 is Settings -> NavEntry(key) {
-                    SettingsScreen(backStack)
+                    SettingsScreen(viewModel, backStack)
                 }
+
                 is AboutUs -> NavEntry(key) {
                     AboutUsScreen(backStack)
                 }
