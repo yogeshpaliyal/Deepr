@@ -5,6 +5,8 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
+import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.android.ext.koin.androidContext
@@ -38,7 +40,9 @@ class DeeprApplication : Application() {
 
             single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
 
-            viewModel { AccountViewModel(get(), get()) }
+            single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
+
+            viewModel { AccountViewModel(get(), get(), get()) }
         }
 
         startKoin {

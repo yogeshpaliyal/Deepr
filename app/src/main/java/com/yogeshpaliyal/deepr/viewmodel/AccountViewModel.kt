@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
@@ -7,6 +8,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ExportRepository
+import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +32,7 @@ enum class SortOrder {
 class AccountViewModel(
     private val deeprQueries: DeeprQueries,
     private val exportRepository: ExportRepository,
+    private val importRepository: ImportRepository,
 ) : ViewModel(), KoinComponent {
 
     private val preferenceDataStore: AppPreferenceDataStore = get()
@@ -41,6 +44,9 @@ class AccountViewModel(
 
     private val _exportResultChannel = Channel<String>()
     val exportResultFlow = _exportResultChannel.receiveAsFlow()
+
+    private val _importResultChannel = Channel<String>()
+    val importResultFlow = _importResultChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
@@ -98,9 +104,20 @@ class AccountViewModel(
         }
     }
 
-    fun exportData() {
+    fun exportCsvData() {
         viewModelScope.launch {
             _exportResultChannel.send(exportRepository.exportToCsv())
+        }
+    }
+
+    fun importCsvData(uri: Uri) {
+        viewModelScope.launch {
+            _importResultChannel.send("Importing, please wait...")
+            val result = importRepository.importFromCsv(uri)
+
+            val message =
+                "Import complete! Added: ${result.importedCount}, Skipped (duplicates): ${result.skippedCount}"
+            _importResultChannel.send(message)
         }
     }
 }

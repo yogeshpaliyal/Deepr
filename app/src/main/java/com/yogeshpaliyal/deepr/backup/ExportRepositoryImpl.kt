@@ -26,7 +26,7 @@ class ExportRepositoryImpl(
             return "No data found in the database to export."
         }
         val dataToExportInCsvFormat = deeprQueries.listDeeprAsc().executeAsList().map {
-            ExportCsv(
+            CsvSchema(
                 id = it.id,
                 link = it.link,
                 createdAt = it.createdAt,
@@ -82,7 +82,7 @@ class ExportRepositoryImpl(
         }
     }
 
-    private fun writeCsvData(outputStream: OutputStream, data: List<ExportCsv>) {
+    private fun writeCsvData(outputStream: OutputStream, data: List<CsvSchema>) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
             writer.write("Id,Link,CreatedAt,OpenedCount\n")
