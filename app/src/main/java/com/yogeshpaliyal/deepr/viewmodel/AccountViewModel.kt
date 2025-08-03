@@ -1,13 +1,19 @@
 package com.yogeshpaliyal.deepr.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.backup.ExportRepository
+import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.backup.ImportResult
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -24,7 +31,11 @@ enum class SortOrder {
     ASC, DESC, OPENED_ASC, OPENED_DESC
 }
 
-class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), KoinComponent {
+class AccountViewModel(
+    private val deeprQueries: DeeprQueries,
+    private val exportRepository: ExportRepository,
+    private val importRepository: ImportRepository,
+) : ViewModel(), KoinComponent {
 
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
@@ -32,6 +43,12 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
         preferenceDataStore.getSortingOrder.map { sortOrderName ->
             SortOrder.valueOf(sortOrderName)
         }
+
+    private val _exportResultChannel = Channel<String>()
+    val exportResultFlow = _exportResultChannel.receiveAsFlow()
+
+    private val _importResultChannel = Channel<String>()
+    val importResultFlow = _importResultChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
@@ -86,6 +103,38 @@ class AccountViewModel(private val deeprQueries: DeeprQueries) : ViewModel(), Ko
     fun updateDeeplink(id: Long, newLink: String) {
         viewModelScope.launch {
             deeprQueries.updateDeeplink(newLink, id)
+        }
+    }
+
+    fun exportCsvData() {
+        viewModelScope.launch {
+            val result = exportRepository.exportToCsv()
+            when (result) {
+                is RequestResult.Success<String> -> {
+                    _exportResultChannel.send("Export completed: ${result.data}")
+                }
+
+                is RequestResult.Error -> {
+                    _exportResultChannel.send("Export failed: ${result.message}")
+                }
+            }
+        }
+    }
+
+    fun importCsvData(uri: Uri) {
+        viewModelScope.launch {
+            _importResultChannel.send("Importing, please wait...")
+            val result = importRepository.importFromCsv(uri)
+
+            when (result) {
+                is RequestResult.Success<ImportResult> -> {
+                    _importResultChannel.send("Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}")
+                }
+
+                is RequestResult.Error -> {
+                    _importResultChannel.send("Import failed: ${result.message}")
+                }
+            }
         }
     }
 }

@@ -93,4 +93,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.compose.qr.code)
+    implementation(libs.accompanist)
+    implementation(libs.opencsv)
 }

@@ -1,5 +1,10 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
+import android.Manifest
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,42 +27,81 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Upload
+import kotlinx.coroutines.flow.collectLatest
 
 data object Settings
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun SettingsScreen(backStack: SnapshotStateList<Any>) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        Column {
-            TopAppBar(
-                title = {
-                    Text("Settings")
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        backStack.removeLastOrNull()
-                    }) {
-                        Icon(
-                            TablerIcons.ArrowLeft,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
+fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
+    val context = LocalContext.current
+    val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    val launcherActivityPickResult = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            viewModel.importCsvData(it)
         }
-    }) { innerPadding ->
+    }
+
+    LaunchedEffect(storagePermissionState.status) {
+        if (storagePermissionState.status.isGranted) {
+            viewModel.exportCsvData()
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.exportResultFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.importResultFlow.collectLatest { message ->
+            if (message.isNotBlank()) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = {
+                        Text("Settings")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            backStack.removeLastOrNull()
+                        }) {
+                            Icon(
+                                TablerIcons.ArrowLeft,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
+                )
+            }
+        }) { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -79,8 +123,17 @@ fun SettingsScreen(backStack: SnapshotStateList<Any>) {
                 )
                 HorizontalDivider()
                 ListItem(
+                    modifier = Modifier.clickable {
+                        launcherActivityPickResult.launch(
+                            arrayOf(
+                                "text/csv",
+                                "text/comma-separated-values",
+                                "application/csv"
+                            )
+                        )
+                    },
                     headlineContent = { Text("Import Deeplinks") },
-                    supportingContent = { Text("Coming Soon") },
+                    supportingContent = { Text("Live Now") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Download,
@@ -89,8 +142,19 @@ fun SettingsScreen(backStack: SnapshotStateList<Any>) {
                     }
                 )
                 ListItem(
+                    modifier = Modifier.clickable {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            viewModel.exportCsvData()
+                        } else {
+                            if (storagePermissionState.status.isGranted) {
+                                viewModel.exportCsvData()
+                            } else {
+                                storagePermissionState.launchPermissionRequest()
+                            }
+                        }
+                    },
                     headlineContent = { Text("Export Deeplinks") },
-                    supportingContent = { Text("Coming Soon") },
+                    supportingContent = { Text("Live Now") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Upload,

@@ -16,6 +16,8 @@ tablerIcons = "1.1.1"
 nav3Core = "1.0.0-alpha01"
 lifecycleViewmodelNav3 = "1.0.0-alpha01"
 dataStore = "1.1.7"
+accompanist = "0.34.0"
+opencsv = "4.6"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -40,6 +42,8 @@ koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 tabler-icons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "tablerIcons" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+opencsv = { group = "com.opencsv", name = "opencsv", version.ref = "opencsv" }
+accompanist = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 # Core Navigation 3 libraries
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
