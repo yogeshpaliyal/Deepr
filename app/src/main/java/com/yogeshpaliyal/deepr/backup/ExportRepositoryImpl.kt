@@ -5,7 +5,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.util.Constants
+import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -20,21 +23,14 @@ class ExportRepositoryImpl(
     private val deeprQueries: DeeprQueries,
 ) : ExportRepository {
 
-    override suspend fun exportToCsv(): String {
+    override suspend fun exportToCsv(): RequestResult<String> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
-            return "No data found in the database to export."
+            return RequestResult.Error("No data found in the database to export.")
         }
-        val dataToExportInCsvFormat = deeprQueries.listDeeprAsc().executeAsList().map {
-            CsvSchema(
-                id = it.id,
-                link = it.link,
-                createdAt = it.createdAt,
-                openedCount = it.openedCount
-            )
-        }
+        val dataToExportInCsvFormat = deeprQueries.listDeeprAsc().executeAsList()
         if (dataToExportInCsvFormat.isEmpty()) {
-            return "No data available to export after mapping."
+            return RequestResult.Error("No data available to export after mapping.")
         }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -60,9 +56,9 @@ class ExportRepositoryImpl(
                     resolver.openOutputStream(uri)?.use { outputStream ->
                         writeCsvData(outputStream, dataToExportInCsvFormat)
                     }
-                    "Successfully exported to ${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"
+                    RequestResult.Success("Successfully exported to ${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName")
                 } else {
-                    "Failed to create CSV file."
+                    RequestResult.Error("Failed to create CSV file.")
                 }
             } else {
                 val downloadsDir =
@@ -77,18 +73,18 @@ class ExportRepositoryImpl(
                 FileOutputStream(file).use { outputStream ->
                     writeCsvData(outputStream, dataToExportInCsvFormat)
                 }
-                "Successfully exported to ${downloadsDir}/${file.absolutePath}"
+                RequestResult.Success("Successfully exported to ${downloadsDir}/${file.absolutePath}")
             }
         }
     }
 
-    private fun writeCsvData(outputStream: OutputStream, data: List<CsvSchema>) {
+    private fun writeCsvData(outputStream: OutputStream, data: List<Deepr>) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
-            writer.write("Id,Link,CreatedAt,OpenedCount\n")
+            writer.write("${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT}\n")
             // Write Data
             data.forEach { item ->
-                val row = "${item.id},${item.link},${item.createdAt},${item.openedCount}\n"
+                val row = "${item.link},${item.createdAt},${item.openedCount}\n"
                 writer.write(row)
             }
         }

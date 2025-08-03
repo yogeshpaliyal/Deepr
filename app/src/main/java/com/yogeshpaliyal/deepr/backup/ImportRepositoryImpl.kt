@@ -5,6 +5,8 @@ import android.net.Uri
 import com.opencsv.CSVReaderBuilder
 import com.opencsv.exceptions.CsvException
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.util.Constants
+import com.yogeshpaliyal.deepr.util.RequestResult
 import java.io.IOException
 
 class ImportRepositoryImpl(
@@ -12,34 +14,39 @@ class ImportRepositoryImpl(
     private val deeprQueries: DeeprQueries
 ) : ImportRepository {
 
-    override suspend fun importFromCsv(uri: Uri): ImportResult {
-        val newRecords = mutableListOf<CsvSchema>()
+    override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> {
+        var updatedCount = 0
         var skippedCount = 0
 
         try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.reader().use { reader ->
                     val csvReader = CSVReaderBuilder(reader)
-                        .withSkipLines(1)
                         .build()
 
-                    csvReader.forEach { row ->
-                        if (row.size >= 4) {
-                            val id = row[0]
-                            val link = row[1]
-                            val createdAt = row[2].toLongOrNull() ?: System.currentTimeMillis()
-                            val openedCount = row[3].toLongOrNull() ?: 0L
+                    // verify header first
+                    val header = csvReader.readNext()
+                    if (header == null || header.size < 3 ||
+                        header[0] != Constants.Header.LINK ||
+                        header[1] != Constants.Header.CREATED_AT ||
+                        header[2] != Constants.Header.OPENED_COUNT
+                    ) {
+                        return RequestResult.Error("Invalid CSV header")
+                    }
 
+                    csvReader.forEach { row ->
+                        if (row.size >= 3) {
+                            val link = row[0]
+                            val openedCount = row[2].toLongOrNull() ?: 0L
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
-                                newRecords.add(
-                                    CsvSchema(
-                                        id.toLong(),
-                                        link,
-                                        createdAt.toString(),
-                                        openedCount
+                                updatedCount++
+                                deeprQueries.transaction {
+                                    deeprQueries.insertDeepr(
+                                        link = link,
+                                        openedCount = openedCount
                                     )
-                                )
+                                }
                             } else {
                                 skippedCount++
                             }
@@ -50,25 +57,14 @@ class ImportRepositoryImpl(
                 }
             }
 
-            if (newRecords.isNotEmpty()) {
-                deeprQueries.transaction {
-                    newRecords.forEach { record ->
-                        deeprQueries.insertDeepr(
-                            link = record.link,
-                            openedCount = record.openedCount
-                        )
-                    }
-                }
-            }
-
-            return ImportResult(newRecords.size, skippedCount)
+            return RequestResult.Success(ImportResult(updatedCount, skippedCount))
 
         } catch (e: IOException) {
-            return ImportResult(0, 0, "Error reading file: ${e.message}")
+            return RequestResult.Error("Error reading file: ${e.message}")
         } catch (e: CsvException) {
-            return ImportResult(0, 0, "Error parsing CSV file: ${e.message}")
+            return RequestResult.Error("Error parsing CSV file: ${e.message}")
         } catch (e: Exception) {
-            return ImportResult(0, 0, "An unexpected error occurred: ${e.message}")
+            return RequestResult.Error("An unexpected error occurred: ${e.message}")
         }
     }
 }

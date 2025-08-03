@@ -9,7 +9,9 @@ import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.backup.ImportResult
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -106,7 +108,16 @@ class AccountViewModel(
 
     fun exportCsvData() {
         viewModelScope.launch {
-            _exportResultChannel.send(exportRepository.exportToCsv())
+            val result = exportRepository.exportToCsv()
+            when (result) {
+                is RequestResult.Success<String> -> {
+                    _exportResultChannel.send("Export completed: ${result.data}")
+                }
+
+                is RequestResult.Error -> {
+                    _exportResultChannel.send("Export failed: ${result.message}")
+                }
+            }
         }
     }
 
@@ -115,9 +126,15 @@ class AccountViewModel(
             _importResultChannel.send("Importing, please wait...")
             val result = importRepository.importFromCsv(uri)
 
-            val message =
-                "Import complete! Added: ${result.importedCount}, Skipped (duplicates): ${result.skippedCount}"
-            _importResultChannel.send(message)
+            when (result) {
+                is RequestResult.Success<ImportResult> -> {
+                    _importResultChannel.send("Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}")
+                }
+
+                is RequestResult.Error -> {
+                    _importResultChannel.send("Import failed: ${result.message}")
+                }
+            }
         }
     }
 }
