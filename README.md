@@ -7,6 +7,7 @@ Deepr is a native Android application designed to streamline the management and 
 [![Android Weekly](https://img.shields.io/badge/Android%20Weekly-%23685-2CA3E6.svg?style=for-the-badge)](http://androidweekly.net/issues/issue-685)    
 [![BlueSky Follow](https://img.shields.io/badge/Bluesky-Follow-blue?style=for-the-badge&logo=bluesky&logoColor=%23fff&color=%23333&labelColor=%230285FF)](https://bsky.app/profile/yogeshpaliyal.com)
 [![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
+![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
 ![./assets/deepr-cover.png](./assets/deepr-cover.png)
 
