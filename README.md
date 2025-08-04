@@ -2,6 +2,10 @@
 
 Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
 
+![](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)
+[![](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/KeyPass/releases/download/latest-master/app-debug.apk)
+
+
 ![./assets/deepr-cover.png](./assets/deepr-cover.png)
 
 ## Download
