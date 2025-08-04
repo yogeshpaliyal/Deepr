@@ -9,23 +9,23 @@ You can download the latest version of the application from the [releases page](
 
 ## Features
 
-- **Save and Organize Deeplinks:** Easily store and manage a list of frequently used deeplinks.
-- **Launch Deeplinks:** Test and verify deeplink behavior by launching them directly from the app.
-- **Search:** Quickly find specific deeplinks from your saved list.
-- **Sort:** Organize your deeplinks by date or open counter in either ascending or descending order.
-- **Open Counter:** Keep track of how many times each deeplink has been opened.
-- **Home Screen Shortcuts:** Create shortcuts for your most-used deeplinks on your device's home screen for quick access.
+- Save and Organize Deeplinks
+- Launch Deeplinks
+- Search
+- Sort
+- Open Counter
+- Home Screen Shortcuts
 
 ## Architecture
 
 The application is built using modern Android development practices and libraries:
 
-- **UI:** The user interface is built entirely with **Jetpack Compose**, providing a modern and declarative approach to UI development.
-- **Navigation:** **Jetpack Compose Navigation 3** is used for navigating between screens in the app.
-- **ViewModel:** **Android ViewModel** is used to manage UI-related data and handle the state of the application.
-- **Database:** **SQLDelight** is used for local data persistence, offering a lightweight and type-safe SQL database solution.
-- **Dependency Injection:** **Koin** is used for dependency injection to promote a modular and testable architecture.
-- **Asynchronous Operations:** **Kotlin Coroutines** are used for managing background threads and handling asynchronous operations smoothly.
+- **UI:** Jetpack Compose
+- **Navigation:** Jetpack Compose Navigation 3
+- **ViewModel:** Android ViewModel
+- **Database:** SQLDelight
+- **Dependency Injection:** Koin
+- **Asynchronous Operations:** Kotlin Coroutines
 
 ## ✍️ Author
 
