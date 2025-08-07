@@ -45,7 +45,6 @@ koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose" }
 ktlint = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlint" }
-ktlint-compose = { module = "com.twitter.compose.rules:ktlint", version.ref = "ktlintCompose" }
 tabler-icons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "tablerIcons" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 opencsv = { group = "com.opencsv", name = "opencsv", version.ref = "opencsv" }
