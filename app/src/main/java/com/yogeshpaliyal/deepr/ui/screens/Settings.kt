@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -45,15 +46,16 @@ import compose.icons.tablericons.Download
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.androidx.compose.koinViewModel
 
 data object Settings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
-    viewModel: AccountViewModel,
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)

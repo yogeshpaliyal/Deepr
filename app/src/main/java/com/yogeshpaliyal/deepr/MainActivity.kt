@@ -11,8 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.yogeshpaliyal.deepr.ui.screens.AboutUs
 import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
 import com.yogeshpaliyal.deepr.ui.screens.Home
@@ -20,12 +23,8 @@ import com.yogeshpaliyal.deepr.ui.screens.HomeScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
-import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: AccountViewModel by viewModel()
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DeeprTheme {
                 Surface {
-                    Dashboard(viewModel)
+                    Dashboard()
                 }
             }
         }
@@ -41,26 +40,31 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Dashboard(
-    viewModel: AccountViewModel,
-    modifier: Modifier = Modifier,
-) {
+fun Dashboard(modifier: Modifier = Modifier) {
     val backStack = remember { mutableStateListOf<Any>(Home) }
 
     NavDisplay(
         backStack = backStack,
         modifier = modifier,
+        entryDecorators =
+            listOf(
+                // Add the default decorators for managing scenes and saving state
+                rememberSceneSetupNavEntryDecorator(),
+                rememberSavedStateNavEntryDecorator(),
+                // Then add the view model store decorator
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
         onBack = { backStack.removeLastOrNull() },
         entryProvider = { key ->
             when (key) {
                 is Home ->
                     NavEntry(key) {
-                        HomeScreen(viewModel, backStack)
+                        HomeScreen(backStack)
                     }
 
                 is Settings ->
                     NavEntry(key) {
-                        SettingsScreen(viewModel, backStack)
+                        SettingsScreen(backStack)
                     }
 
                 is AboutUs ->
