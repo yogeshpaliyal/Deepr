@@ -7,6 +7,7 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+ktlintCompose = "0.0.26"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
@@ -40,6 +41,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
+ktlint-compose = { module = "com.twitter.compose.rules:ktlint", version.ref = "ktlintCompose" }
 tabler-icons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "tablerIcons" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 opencsv = { group = "com.opencsv", name = "opencsv", version.ref = "opencsv" }

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sqldelight)
+    id("org.jmailen.kotlinter")
 }
 
 android {
@@ -31,7 +32,7 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -95,4 +96,16 @@ dependencies {
     implementation(libs.compose.qr.code)
     implementation(libs.accompanist)
     implementation(libs.opencsv)
+    ktlint("io.nlopez.compose.rules:ktlint:0.4.27")
+}
+
+kotlinter {
+    ktlintVersion = "1.5.0"
+    ignoreFormatFailures = true
+    ignoreLintFailures = false
+    reporters = arrayOf("checkstyle")
+}
+
+tasks.check {
+    dependsOn("installKotlinterPrePushHook")
 }

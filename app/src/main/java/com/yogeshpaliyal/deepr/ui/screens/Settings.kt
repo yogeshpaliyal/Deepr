@@ -50,16 +50,21 @@ data object Settings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
+fun SettingsScreen(
+    viewModel: AccountViewModel,
+    backStack: SnapshotStateList<Any>,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    val launcherActivityPickResult = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            viewModel.importCsvData(it)
+    val launcherActivityPickResult =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            uri?.let {
+                viewModel.importCsvData(it)
+            }
         }
-    }
 
     LaunchedEffect(storagePermissionState.status) {
         if (storagePermissionState.status.isGranted) {
@@ -82,7 +87,7 @@ fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             Column {
                 TopAppBar(
@@ -95,72 +100,77 @@ fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
-                                contentDescription = "Back"
+                                contentDescription = "Back",
                             )
                         }
-                    }
+                    },
                 )
             }
-        }) { innerPadding ->
+        },
+    ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize(),
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ListItem(
-                    modifier = Modifier.clickable(true) {
-                        backStack.add(AboutUs)
-                    },
+                    modifier =
+                        Modifier.clickable(true) {
+                            backStack.add(AboutUs)
+                        },
                     headlineContent = { Text("About Us") },
                     leadingContent = {
                         Icon(
                             TablerIcons.InfoCircle,
-                            contentDescription = "About Us"
+                            contentDescription = "About Us",
                         )
-                    }
+                    },
                 )
                 HorizontalDivider()
                 ListItem(
-                    modifier = Modifier.clickable {
-                        launcherActivityPickResult.launch(
-                            arrayOf(
-                                "text/csv",
-                                "text/comma-separated-values",
-                                "application/csv"
+                    modifier =
+                        Modifier.clickable {
+                            launcherActivityPickResult.launch(
+                                arrayOf(
+                                    "text/csv",
+                                    "text/comma-separated-values",
+                                    "application/csv",
+                                ),
                             )
-                        )
-                    },
+                        },
                     headlineContent = { Text("Import Deeplinks") },
                     supportingContent = { Text("Live Now") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Download,
-                            contentDescription = "Import Deeplinks"
+                            contentDescription = "Import Deeplinks",
                         )
-                    }
+                    },
                 )
                 ListItem(
-                    modifier = Modifier.clickable {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            viewModel.exportCsvData()
-                        } else {
-                            if (storagePermissionState.status.isGranted) {
+                    modifier =
+                        Modifier.clickable {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 viewModel.exportCsvData()
                             } else {
-                                storagePermissionState.launchPermissionRequest()
+                                if (storagePermissionState.status.isGranted) {
+                                    viewModel.exportCsvData()
+                                } else {
+                                    storagePermissionState.launchPermissionRequest()
+                                }
                             }
-                        }
-                    },
+                        },
                     headlineContent = { Text("Export Deeplinks") },
                     supportingContent = { Text("Live Now") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Upload,
-                            contentDescription = "Export Deeplinks"
+                            contentDescription = "Export Deeplinks",
                         )
-                    }
+                    },
                 )
                 ListItem(
                     headlineContent = { Text("Transfer Deeplinks") },
@@ -168,29 +178,29 @@ fun SettingsScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any
                     leadingContent = {
                         Icon(
                             TablerIcons.Upload,
-                            contentDescription = "Transfer Deeplinks"
+                            contentDescription = "Transfer Deeplinks",
                         )
-                    }
+                    },
                 )
             }
 
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     "App Version: ${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "Made with ❤️ in India",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }

@@ -43,8 +43,11 @@ data object AboutUs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutUsScreen(backStack: SnapshotStateList<Any>) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+fun AboutUsScreen(
+    backStack: SnapshotStateList<Any>,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Column {
             TopAppBar(
                 title = {
@@ -56,56 +59,58 @@ fun AboutUsScreen(backStack: SnapshotStateList<Any>) {
                     }) {
                         Icon(
                             TablerIcons.ArrowLeft,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
                         )
                     }
-                }
+                },
             )
         }
     }) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(32.dp))
             Image(
                 painter = painterResource(id = R.drawable.app_logo),
                 contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
+                modifier =
+                    Modifier
+                        .size(120.dp)
+                        .clip(CircleShape),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Deepr",
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
             )
             Text(
                 text = "Version ${BuildConfig.VERSION_NAME}",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "A simple app to save, organize, and launch deeplinks.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
             Spacer(modifier = Modifier.height(32.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Author",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Yogesh Choudhary",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -129,14 +134,12 @@ fun AboutUsScreen(backStack: SnapshotStateList<Any>) {
                 Icon(
                     TablerIcons.BrandGithub,
                     contentDescription = "GitHub",
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp),
                 )
                 Text("View on GitHub")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
         }
     }
-
 }

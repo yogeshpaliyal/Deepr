@@ -5,7 +5,10 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.core.net.toUri
 
-fun openDeeplink(context: Context, link: String): Boolean {
+fun openDeeplink(
+    context: Context,
+    link: String,
+): Boolean {
     if (!isValidDeeplink(link)) return false
     return try {
         val intent = Intent(Intent.ACTION_VIEW, link.toUri())

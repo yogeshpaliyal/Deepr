@@ -81,12 +81,15 @@ data object Home
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
-
+fun HomeScreen(
+    viewModel: AccountViewModel,
+    backStack: SnapshotStateList<Any>,
+    modifier: Modifier = Modifier,
+) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Column {
             TopAppBar(
                 title = {
@@ -102,7 +105,7 @@ fun HomeScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
                     }) {
                         Icon(
                             if (isSearchActive) TablerIcons.X else TablerIcons.Search,
-                            contentDescription = if (isSearchActive) "Close search" else "Search"
+                            contentDescription = if (isSearchActive) "Close search" else "Search",
                         )
                     }
                     FilterMenu(onSortOrderChange = {
@@ -114,10 +117,10 @@ fun HomeScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
                     }) {
                         Icon(
                             TablerIcons.Settings,
-                            contentDescription = "Settings"
+                            contentDescription = "Settings",
                         )
                     }
-                }
+                },
             )
             AnimatedVisibility(visible = isSearchActive) {
                 OutlinedTextField(
@@ -127,18 +130,20 @@ fun HomeScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
                         viewModel.search(it)
                     },
                     placeholder = { Text("Search...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                 )
             }
         }
     }) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
         ) {
             Content(viewModel)
         }
@@ -146,52 +151,58 @@ fun HomeScreen(viewModel: AccountViewModel, backStack: SnapshotStateList<Any>) {
 }
 
 @Composable
-fun FilterMenu(onSortOrderChange: (SortOrder) -> Unit) {
+fun FilterMenu(
+    onSortOrderChange: (SortOrder) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     var expanded by remember { mutableStateOf(false) }
-    Box {
+    Box(modifier) {
         IconButton(onClick = { expanded = true }) {
             Icon(TablerIcons.Filter, contentDescription = "Filter")
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
                 text = { Text("Sort by Date Ascending") },
                 onClick = {
                     onSortOrderChange(SortOrder.ASC)
                     expanded = false
-                }
+                },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Date Descending") },
                 onClick = {
                     onSortOrderChange(SortOrder.DESC)
                     expanded = false
-                }
+                },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Opened Ascending") },
                 onClick = {
                     onSortOrderChange(SortOrder.OPENED_ASC)
                     expanded = false
-                }
+                },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Opened Descending") },
                 onClick = {
                     onSortOrderChange(SortOrder.OPENED_DESC)
                     expanded = false
-                }
+                },
             )
         }
     }
 }
 
 @Composable
-fun Content(viewModel: AccountViewModel) {
+fun Content(
+    viewModel: AccountViewModel,
+    modifier: Modifier = Modifier,
+) {
     val accounts by viewModel.accounts.collectAsState()
-    Column {
+    Column(modifier) {
         val inputText = remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
         val context = LocalContext.current
@@ -205,7 +216,7 @@ fun Content(viewModel: AccountViewModel) {
                 onDismiss = { showShortcutDialog = null },
                 onCreate = { d, name ->
                     showShortcutDialog = null
-                }
+                },
             )
         }
 
@@ -223,14 +234,15 @@ fun Content(viewModel: AccountViewModel) {
                     viewModel.updateDeeplink(deepr.id, newLink)
                     Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
                     showEditDialog = null
-                }
+                },
             )
         }
 
         DeeprList(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(8.dp),
             accounts = accounts,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
@@ -255,15 +267,16 @@ fun Content(viewModel: AccountViewModel) {
             },
             onQrCodeCLick = {
                 showQrCodeDialog = it
-            }
+            },
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 12.dp
-            )
+            elevation =
+                CardDefaults.cardElevation(
+                    defaultElevation = 12.dp,
+                ),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 TextField(
@@ -272,26 +285,29 @@ fun Content(viewModel: AccountViewModel) {
                         inputText.value = it
                         isError = false
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
                     placeholder = { Text("Enter deeplink or command") },
                     isError = isError,
                     supportingText = {
                         if (isError) {
                             Text(text = "Invalid or empty deeplink.")
                         }
-                    }
+                    },
                 )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     OutlinedButton(onClick = {
                         if (isValidDeeplink(inputText.value)) {
                             viewModel.insertAccount(inputText.value, false)
-                            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT)
+                            Toast
+                                .makeText(context, "Saved", Toast.LENGTH_SHORT)
                                 .show()
                             inputText.value = ""
                         } else {
@@ -310,11 +326,12 @@ fun Content(viewModel: AccountViewModel) {
                             val success = openDeeplink(context, inputText.value)
                             if (success) {
                                 viewModel.insertAccount(inputText.value, true)
-                                Toast.makeText(
-                                    context,
-                                    "Saved",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Saved",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
                                 inputText.value = ""
                             }
                             isError = !success
@@ -332,40 +349,41 @@ fun Content(viewModel: AccountViewModel) {
 
 @Composable
 fun DeeprList(
-    modifier: Modifier = Modifier,
     accounts: List<Deepr>,
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
     onEditClick: (Deepr) -> Unit,
     onItemLongClick: (Deepr) -> Unit,
-    onQrCodeCLick: (Deepr) -> Unit
+    onQrCodeCLick: (Deepr) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (accounts.isEmpty()) {
         // When empty, use a Column with weights to ensure vertical centering
         Column(
             modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.weight(1f)) // Push content down
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Icon(
                     TablerIcons.Link,
                     contentDescription = "No links",
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(bottom = 16.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    modifier =
+                        Modifier
+                            .size(80.dp)
+                            .padding(bottom = 16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     text = "No deeplinks saved yet",
                     style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -373,7 +391,7 @@ fun DeeprList(
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 32.dp)
+                    modifier = Modifier.padding(horizontal = 32.dp),
                 )
             }
 
@@ -389,7 +407,7 @@ fun DeeprList(
                     onShortcutClick = onShortcutClick,
                     onEditClick = onEditClick,
                     onItemLongClick = onItemLongClick,
-                    onQrCodeClick = onQrCodeCLick
+                    onQrCodeClick = onQrCodeCLick,
                 )
             }
         }
@@ -397,8 +415,13 @@ fun DeeprList(
 }
 
 @Composable
-fun ShowQRCodeMenuItem(account: Deepr, onQrCodeClick: (Deepr) -> Unit) {
+fun ShowQRCodeMenuItem(
+    account: Deepr,
+    onQrCodeClick: (Deepr) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     DropdownMenuItem(
+        modifier = modifier,
         text = { Text("Show QR Code") },
         onClick = {
             onQrCodeClick(account)
@@ -408,17 +431,22 @@ fun ShowQRCodeMenuItem(account: Deepr, onQrCodeClick: (Deepr) -> Unit) {
                 TablerIcons.Qrcode,
                 contentDescription = "Show QR Code",
             )
-        }
+        },
     )
 }
 
 @Composable
-fun ShortcutMenuItem(account: Deepr, onShortcutClick: (Deepr) -> Unit) {
+fun ShortcutMenuItem(
+    account: Deepr,
+    onShortcutClick: (Deepr) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     val shortcutExists = remember(account.id) { hasShortcut(context, account.id) }
 
     if (isShortcutSupported(LocalContext.current)) {
         DropdownMenuItem(
+            modifier = modifier,
             text = { Text(if (shortcutExists) "Edit shortcut" else "Add shortcut") },
             onClick = {
                 onShortcutClick(account)
@@ -426,9 +454,9 @@ fun ShortcutMenuItem(account: Deepr, onShortcutClick: (Deepr) -> Unit) {
             leadingIcon = {
                 Icon(
                     TablerIcons.Plus,
-                    contentDescription = if (shortcutExists) "Edit shortcut" else "Add shortcut"
+                    contentDescription = if (shortcutExists) "Edit shortcut" else "Add shortcut",
                 )
-            }
+            },
         )
     }
 }
@@ -436,56 +464,59 @@ fun ShortcutMenuItem(account: Deepr, onShortcutClick: (Deepr) -> Unit) {
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
-    modifier: Modifier = Modifier,
     account: Deepr,
-    onItemClick: (Deepr) -> Unit,
-    onRemoveClick: (Deepr) -> Unit,
-    onShortcutClick: (Deepr) -> Unit,
-    onQrCodeClick: (Deepr) -> Unit,
-    onEditClick: (Deepr) -> Unit,
-    onItemLongClick: (Deepr) -> Unit
+    modifier: Modifier = Modifier,
+    onItemClick: ((Deepr) -> Unit)? = null,
+    onRemoveClick: ((Deepr) -> Unit)? = null,
+    onShortcutClick: ((Deepr) -> Unit)? = null,
+    onQrCodeClick: ((Deepr) -> Unit)? = null,
+    onEditClick: ((Deepr) -> Unit)? = null,
+    onItemLongClick: ((Deepr) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .combinedClickable(onClick = { onItemClick(account) }, onLongClick = {
-                onItemLongClick(account)
-            })
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .combinedClickable(onClick = { onItemClick?.invoke(account) }, onLongClick = {
+                    onItemLongClick?.invoke(account)
+                }),
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
             ) {
                 Text(
                     text = account.link,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = formatDateTime(account.createdAt),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "Opened: ${account.openedCount}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -496,7 +527,7 @@ fun DeeprItem(
 
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
                 ) {
                     DropdownMenuItem(
                         text = { Text("Copy link") },
@@ -511,43 +542,43 @@ fun DeeprItem(
                         leadingIcon = {
                             Icon(
                                 TablerIcons.Copy,
-                                contentDescription = "Copy link"
+                                contentDescription = "Copy link",
                             )
-                        }
+                        },
                     )
-                    ShortcutMenuItem(account) {
-                        onShortcutClick(it)
+                    ShortcutMenuItem(account, {
+                        onShortcutClick?.invoke(it)
                         expanded = false
-                    }
-                    ShowQRCodeMenuItem(account) {
-                        onQrCodeClick(it)
+                    })
+                    ShowQRCodeMenuItem(account, {
+                        onQrCodeClick?.invoke(it)
                         expanded = false
-                    }
+                    })
                     DropdownMenuItem(
                         text = { Text("Edit") },
                         onClick = {
-                            onEditClick(account)
+                            onEditClick?.invoke(account)
                             expanded = false
                         },
                         leadingIcon = {
                             Icon(
                                 TablerIcons.Edit,
-                                contentDescription = "Edit"
+                                contentDescription = "Edit",
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         text = { Text("Delete") },
                         onClick = {
-                            onRemoveClick(account)
+                            onRemoveClick?.invoke(account)
                             expanded = false
                         },
                         leadingIcon = {
                             Icon(
                                 TablerIcons.Trash,
-                                contentDescription = "Delete"
+                                contentDescription = "Delete",
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -555,8 +586,8 @@ fun DeeprItem(
     }
 }
 
-private fun formatDateTime(dateTimeString: String): String {
-    return try {
+private fun formatDateTime(dateTimeString: String): String =
+    try {
         val dbFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         dbFormatter.timeZone = TimeZone.getTimeZone("UTC")
         val date = dbFormatter.parse(dateTimeString)
@@ -566,4 +597,3 @@ private fun formatDateTime(dateTimeString: String): String {
     } catch (_: Exception) {
         dateTimeString // fallback to raw string
     }
-}

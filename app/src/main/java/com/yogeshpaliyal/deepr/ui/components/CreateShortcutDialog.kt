@@ -16,13 +16,17 @@ import com.yogeshpaliyal.deepr.util.getShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
 
 @Composable
-fun CreateShortcutDialog(deepr: Deepr, onDismiss: () -> Unit, onCreate: (Deepr, String) -> Unit) {
+fun CreateShortcutDialog(
+    deepr: Deepr,
+    onDismiss: () -> Unit,
+    onCreate: (Deepr, String) -> Unit,
+) {
     val context = LocalContext.current
     val existingShortcut = getShortcut(context, deepr.id)
     if (isShortcutSupported(context)) {
         var shortcutName by remember {
             mutableStateOf(
-                existingShortcut?.shortLabel?.toString() ?: ""
+                existingShortcut?.shortLabel?.toString() ?: "",
             )
         }
         AlertDialog(
@@ -33,7 +37,7 @@ fun CreateShortcutDialog(deepr: Deepr, onDismiss: () -> Unit, onCreate: (Deepr, 
                     value = shortcutName,
                     onValueChange = { shortcutName = it },
                     label = { Text("Shortcut Name") },
-                    placeholder = { Text(text = deepr.link) }
+                    placeholder = { Text(text = deepr.link) },
                 )
             },
             confirmButton = {
@@ -42,7 +46,7 @@ fun CreateShortcutDialog(deepr: Deepr, onDismiss: () -> Unit, onCreate: (Deepr, 
                         onCreate(deepr, shortcutName)
                         createShortcut(context, deepr, shortcutName, existingShortcut != null)
                     },
-                    enabled = shortcutName.isNotBlank()
+                    enabled = shortcutName.isNotBlank(),
                 ) {
                     Text(if (existingShortcut == null) "Create" else "Edit")
                 }
@@ -51,7 +55,7 @@ fun CreateShortcutDialog(deepr: Deepr, onDismiss: () -> Unit, onCreate: (Deepr, 
                 Button(onClick = onDismiss) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 }

@@ -18,32 +18,33 @@ class DeeprApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val appModule = module {
-            // Provide the Android-specific SqlDriver
-            single<SqlDriver> {
-                AndroidSqliteDriver(DeeprDB.Schema, this@DeeprApplication, "deepr.db")
+        val appModule =
+            module {
+                // Provide the Android-specific SqlDriver
+                single<SqlDriver> {
+                    AndroidSqliteDriver(DeeprDB.Schema, this@DeeprApplication, "deepr.db")
+                }
+
+                // Provide the Database instance
+                single {
+                    DeeprDB(get())
+                }
+
+                // Provide the generated queries from the database.
+                // Replace `accountQueries` if your table has a different name.
+                single<DeeprQueries> {
+                    val database = get<DeeprDB>()
+                    database.deeprQueries
+                }
+
+                single { AppPreferenceDataStore(androidContext()) }
+
+                single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
+
+                single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
+
+                viewModel { AccountViewModel(get(), get(), get()) }
             }
-
-            // Provide the Database instance
-            single {
-                DeeprDB(get())
-            }
-
-            // Provide the generated queries from the database.
-            // Replace `accountQueries` if your table has a different name.
-            single<DeeprQueries> {
-                val database = get<DeeprDB>()
-                database.deeprQueries
-            }
-
-            single { AppPreferenceDataStore(androidContext()) }
-
-            single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
-
-            single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
-
-            viewModel { AccountViewModel(get(), get(), get()) }
-        }
 
         startKoin {
             // Provide Android context to Koin

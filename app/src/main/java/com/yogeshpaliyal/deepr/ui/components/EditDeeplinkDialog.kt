@@ -25,7 +25,7 @@ import com.yogeshpaliyal.deepr.util.isValidDeeplink
 fun EditDeeplinkDialog(
     deepr: Deepr,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
 ) {
     var link by remember { mutableStateOf(deepr.link) }
     var isError by remember { mutableStateOf(false) }
@@ -47,11 +47,11 @@ fun EditDeeplinkDialog(
                         if (isError) {
                             Text(
                                 text = "Please enter a valid deeplink",
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.error,
                             )
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -59,7 +59,7 @@ fun EditDeeplinkDialog(
                 Text(
                     text = "Edit your deeplink URL",
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 )
             }
         },
@@ -71,7 +71,7 @@ fun EditDeeplinkDialog(
                     } else {
                         isError = true
                     }
-                }
+                },
             ) {
                 Text("Save")
             }
@@ -80,6 +80,6 @@ fun EditDeeplinkDialog(
             OutlinedButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
     )
 }

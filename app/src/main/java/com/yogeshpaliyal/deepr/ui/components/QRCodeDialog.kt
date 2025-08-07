@@ -30,9 +30,8 @@ import com.yogeshpaliyal.deepr.R
 @Composable
 fun QrCodeDialog(
     deepr: Deepr,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("QR Code") },
@@ -41,29 +40,30 @@ fun QrCodeDialog(
                 QrCodeView(
                     data = deepr.link,
                     modifier = Modifier.size(300.dp),
-                    colors = QrCodeColors(
-                        background = AlertDialogDefaults.containerColor,
-                        foreground = MaterialTheme.colorScheme.onSurface
-                    ),
-                    dotShape = DotShape.Circle
+                    colors =
+                        QrCodeColors(
+                            background = AlertDialogDefaults.containerColor,
+                            foreground = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    dotShape = DotShape.Circle,
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.Transparent)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Transparent),
                     ) {
-
                         Image(
                             painter = painterResource(id = R.drawable.app_logo),
                             contentDescription = "App Logo",
-                            modifier = Modifier
-                                .fillMaxSize(0.5f)
-                                .clip(CircleShape)
-                                .background(Color.White)
-
+                            modifier =
+                                Modifier
+                                    .fillMaxSize(0.5f)
+                                    .clip(CircleShape)
+                                    .background(Color.White),
                         )
                     }
                 }
@@ -73,6 +73,6 @@ fun QrCodeDialog(
             OutlinedButton(onClick = onDismiss) {
                 Text("Close")
             }
-        }
+        },
     )
 }
