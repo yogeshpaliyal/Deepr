@@ -12,14 +12,17 @@ import kotlinx.coroutines.flow.map
 
 private val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = "app_data_store")
 
-class AppPreferenceDataStore(private val context: Context) {
+class AppPreferenceDataStore(
+    private val context: Context,
+) {
     companion object {
         private val SORTING_ORDER = stringPreferencesKey("sorting_order")
     }
 
-    val getSortingOrder: Flow<String> = context.appDataStore.data.map { preferences ->
-        preferences[SORTING_ORDER] ?: SortOrder.DESC.name
-    }
+    val getSortingOrder: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SORTING_ORDER] ?: SortOrder.DESC.name
+        }
 
     suspend fun setSortingOrder(order: String) {
         context.appDataStore.edit { prefs ->

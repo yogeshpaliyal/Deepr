@@ -22,7 +22,6 @@ class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : ExportRepository {
-
     override suspend fun exportToCsv(): RequestResult<String> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
@@ -38,15 +37,15 @@ class ExportRepositoryImpl(
 
         return withContext(Dispatchers.IO) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
-                    put(
-                        MediaStore.MediaColumns.RELATIVE_PATH,
-                        "${Environment.DIRECTORY_DOWNLOADS}/Deepr"
-                    )
-                }
+                val contentValues =
+                    ContentValues().apply {
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                        put(
+                            MediaStore.MediaColumns.RELATIVE_PATH,
+                            "${Environment.DIRECTORY_DOWNLOADS}/Deepr",
+                        )
+                    }
 
                 val resolver = context.contentResolver
                 val uri =
@@ -73,12 +72,15 @@ class ExportRepositoryImpl(
                 FileOutputStream(file).use { outputStream ->
                     writeCsvData(outputStream, dataToExportInCsvFormat)
                 }
-                RequestResult.Success("Successfully exported to ${downloadsDir}/${file.absolutePath}")
+                RequestResult.Success("Successfully exported to $downloadsDir/${file.absolutePath}")
             }
         }
     }
 
-    private fun writeCsvData(outputStream: OutputStream, data: List<Deepr>) {
+    private fun writeCsvData(
+        outputStream: OutputStream,
+        data: List<Deepr>,
+    ) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
             writer.write("${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT}\n")

@@ -28,15 +28,18 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
 enum class SortOrder {
-    ASC, DESC, OPENED_ASC, OPENED_DESC
+    ASC,
+    DESC,
+    OPENED_ASC,
+    OPENED_DESC,
 }
 
 class AccountViewModel(
     private val deeprQueries: DeeprQueries,
     private val exportRepository: ExportRepository,
     private val importRepository: ImportRepository,
-) : ViewModel(), KoinComponent {
-
+) : ViewModel(),
+    KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
     private val sortOrder: Flow<SortOrder> =
@@ -44,11 +47,11 @@ class AccountViewModel(
             SortOrder.valueOf(sortOrderName)
         }
 
-    private val _exportResultChannel = Channel<String>()
-    val exportResultFlow = _exportResultChannel.receiveAsFlow()
+    private val exportResultChannel = Channel<String>()
+    val exportResultFlow = exportResultChannel.receiveAsFlow()
 
-    private val _importResultChannel = Channel<String>()
-    val importResultFlow = _importResultChannel.receiveAsFlow()
+    private val importResultChannel = Channel<String>()
+    val importResultFlow = importResultChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>> =
@@ -82,7 +85,10 @@ class AccountViewModel(
         }
     }
 
-    fun insertAccount(link: String, executed: Boolean) {
+    fun insertAccount(
+        link: String,
+        executed: Boolean,
+    ) {
         viewModelScope.launch {
             deeprQueries.insertDeepr(link = link, if (executed) 1 else 0)
         }
@@ -100,7 +106,10 @@ class AccountViewModel(
         }
     }
 
-    fun updateDeeplink(id: Long, newLink: String) {
+    fun updateDeeplink(
+        id: Long,
+        newLink: String,
+    ) {
         viewModelScope.launch {
             deeprQueries.updateDeeplink(newLink, id)
         }
@@ -111,11 +120,11 @@ class AccountViewModel(
             val result = exportRepository.exportToCsv()
             when (result) {
                 is RequestResult.Success<String> -> {
-                    _exportResultChannel.send("Export completed: ${result.data}")
+                    exportResultChannel.send("Export completed: ${result.data}")
                 }
 
                 is RequestResult.Error -> {
-                    _exportResultChannel.send("Export failed: ${result.message}")
+                    exportResultChannel.send("Export failed: ${result.message}")
                 }
             }
         }
@@ -123,16 +132,18 @@ class AccountViewModel(
 
     fun importCsvData(uri: Uri) {
         viewModelScope.launch {
-            _importResultChannel.send("Importing, please wait...")
+            importResultChannel.send("Importing, please wait...")
             val result = importRepository.importFromCsv(uri)
 
             when (result) {
                 is RequestResult.Success<ImportResult> -> {
-                    _importResultChannel.send("Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}")
+                    importResultChannel.send(
+                        "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
+                    )
                 }
 
                 is RequestResult.Error -> {
-                    _importResultChannel.send("Import failed: ${result.message}")
+                    importResultChannel.send("Import failed: ${result.message}")
                 }
             }
         }

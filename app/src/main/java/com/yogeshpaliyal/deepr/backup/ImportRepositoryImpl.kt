@@ -11,9 +11,8 @@ import java.io.IOException
 
 class ImportRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries
+    private val deeprQueries: DeeprQueries,
 ) : ImportRepository {
-
     override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> {
         var updatedCount = 0
         var skippedCount = 0
@@ -21,12 +20,14 @@ class ImportRepositoryImpl(
         try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.reader().use { reader ->
-                    val csvReader = CSVReaderBuilder(reader)
-                        .build()
+                    val csvReader =
+                        CSVReaderBuilder(reader)
+                            .build()
 
                     // verify header first
                     val header = csvReader.readNext()
-                    if (header == null || header.size < 3 ||
+                    if (header == null ||
+                        header.size < 3 ||
                         header[0] != Constants.Header.LINK ||
                         header[1] != Constants.Header.CREATED_AT ||
                         header[2] != Constants.Header.OPENED_COUNT
@@ -44,7 +45,7 @@ class ImportRepositoryImpl(
                                 deeprQueries.transaction {
                                     deeprQueries.insertDeepr(
                                         link = link,
-                                        openedCount = openedCount
+                                        openedCount = openedCount,
                                     )
                                 }
                             } else {
@@ -58,7 +59,6 @@ class ImportRepositoryImpl(
             }
 
             return RequestResult.Success(ImportResult(updatedCount, skippedCount))
-
         } catch (e: IOException) {
             return RequestResult.Error("Error reading file: ${e.message}")
         } catch (e: CsvException) {
