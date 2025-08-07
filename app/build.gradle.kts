@@ -92,13 +92,16 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.compose.qr.code)
     implementation(libs.accompanist)
     implementation(libs.opencsv)
-    ktlint("io.nlopez.compose.rules:ktlint:0.4.27")
+    implementation(libs.koin.compose)
+    ktlint(libs.ktlint)
     implementation("dev.chrisbanes.haze:haze:1.6.9")
     implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
+
 }
 
 kotlinter {
