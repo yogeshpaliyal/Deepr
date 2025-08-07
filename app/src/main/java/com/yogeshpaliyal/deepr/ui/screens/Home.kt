@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -160,7 +161,7 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            BottomContent(hazeState, viewModel)
+            BottomContent(hazeState)
         },
     ) { contentPadding ->
         Column(
@@ -176,8 +177,8 @@ fun HomeScreen(
 @Composable
 fun BottomContent(
     hazeState: HazeState,
-    viewModel: AccountViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val inputText = remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -197,6 +198,7 @@ fun BottomContent(
             modifier =
                 Modifier
                     .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
+                    .imePadding()
                     .padding(8.dp),
         ) {
             TextField(
