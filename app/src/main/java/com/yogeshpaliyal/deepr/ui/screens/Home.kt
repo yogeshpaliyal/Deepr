@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
@@ -72,6 +73,7 @@ import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Trash
 import compose.icons.tablericons.X
+import org.koin.androidx.compose.koinViewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -82,9 +84,9 @@ data object Home
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: AccountViewModel,
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -145,7 +147,7 @@ fun HomeScreen(
                     .consumeWindowInsets(innerPadding)
                     .imePadding(),
         ) {
-            Content(viewModel)
+            Content()
         }
     }
 }
@@ -198,8 +200,8 @@ fun FilterMenu(
 
 @Composable
 fun Content(
-    viewModel: AccountViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val accounts by viewModel.accounts.collectAsState()
     Column(modifier) {
