@@ -97,6 +97,8 @@ dependencies {
     implementation(libs.accompanist)
     implementation(libs.opencsv)
     ktlint("io.nlopez.compose.rules:ktlint:0.4.27")
+    implementation("dev.chrisbanes.haze:haze:1.6.9")
+    implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
 }
 
 kotlinter {
