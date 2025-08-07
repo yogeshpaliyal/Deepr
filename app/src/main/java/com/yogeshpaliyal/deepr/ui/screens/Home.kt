@@ -12,19 +12,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,6 +76,12 @@ import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Trash
 import compose.icons.tablericons.X
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -81,7 +90,7 @@ import java.util.TimeZone
 
 data object Home
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 fun HomeScreen(
     backStack: SnapshotStateList<Any>,
@@ -90,64 +99,171 @@ fun HomeScreen(
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    val hazeState = rememberHazeState()
 
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
-        Column {
-            TopAppBar(
-                title = {
-                    Text("Deepr")
-                },
-                actions = {
-                    IconButton(onClick = {
-                        isSearchActive = !isSearchActive
-                        if (!isSearchActive) {
-                            searchQuery = ""
-                            viewModel.search("")
-                        }
-                    }) {
-                        Icon(
-                            if (isSearchActive) TablerIcons.X else TablerIcons.Search,
-                            contentDescription = if (isSearchActive) "Close search" else "Search",
-                        )
-                    }
-                    FilterMenu(onSortOrderChange = {
-                        viewModel.setSortOrder(it)
-                    })
-
-                    IconButton(onClick = {
-                        backStack.add(Settings)
-                    }) {
-                        Icon(
-                            TablerIcons.Settings,
-                            contentDescription = "Settings",
-                        )
-                    }
-                },
-            )
-            AnimatedVisibility(visible = isSearchActive) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = {
-                        searchQuery = it
-                        viewModel.search(it)
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            Column(
+                modifier =
+                    Modifier
+                        .hazeEffect(
+                            state = hazeState,
+                            style = HazeMaterials.ultraThin(),
+                        ).fillMaxWidth(),
+            ) {
+                TopAppBar(
+                    colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
+                    title = {
+                        Text("Deepr")
                     },
-                    placeholder = { Text("Search...") },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    actions = {
+                        IconButton(onClick = {
+                            isSearchActive = !isSearchActive
+                            if (!isSearchActive) {
+                                searchQuery = ""
+                                viewModel.search("")
+                            }
+                        }) {
+                            Icon(
+                                if (isSearchActive) TablerIcons.X else TablerIcons.Search,
+                                contentDescription = if (isSearchActive) "Close search" else "Search",
+                            )
+                        }
+                        FilterMenu(onSortOrderChange = {
+                            viewModel.setSortOrder(it)
+                        })
+
+                        IconButton(onClick = {
+                            backStack.add(Settings)
+                        }) {
+                            Icon(
+                                TablerIcons.Settings,
+                                contentDescription = "Settings",
+                            )
+                        }
+                    },
                 )
+                AnimatedVisibility(visible = isSearchActive) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            searchQuery = it
+                            viewModel.search(it)
+                        },
+                        placeholder = { Text("Search...") },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    )
+                }
             }
-        }
-    }) { innerPadding ->
+        },
+        bottomBar = {
+            BottomContent(hazeState)
+        },
+    ) { contentPadding ->
         Column(
             modifier =
                 Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .imePadding(),
+                    .fillMaxSize(),
         ) {
-            Content()
+            Content(hazeState, contentPadding)
+        }
+    }
+}
+
+@Composable
+fun BottomContent(
+    hazeState: HazeState,
+    modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = koinViewModel(),
+) {
+    val inputText = remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Column(
+        modifier =
+            modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 12.dp,
+                    ),
+                ).hazeEffect(state = hazeState, style = HazeMaterials.thin())
+                .fillMaxWidth(),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
+                    .imePadding()
+                    .padding(8.dp),
+        ) {
+            TextField(
+                value = inputText.value,
+                onValueChange = {
+                    inputText.value = it
+                    isError = false
+                },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                placeholder = { Text("Enter deeplink or command") },
+                isError = isError,
+                supportingText = {
+                    if (isError) {
+                        Text(text = "Invalid or empty deeplink.")
+                    }
+                },
+            )
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                OutlinedButton(onClick = {
+                    if (isValidDeeplink(inputText.value)) {
+                        viewModel.insertAccount(inputText.value, false)
+                        Toast
+                            .makeText(context, "Saved", Toast.LENGTH_SHORT)
+                            .show()
+                        inputText.value = ""
+                    } else {
+                        isError = true
+                    }
+                }) {
+                    Text("Save")
+                }
+                OutlinedButton(onClick = {
+                    isError = !openDeeplink(context, inputText.value)
+                }) {
+                    Text("Execute")
+                }
+                Button(onClick = {
+                    if (isValidDeeplink(inputText.value)) {
+                        val success = openDeeplink(context, inputText.value)
+                        if (success) {
+                            viewModel.insertAccount(inputText.value, true)
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Saved",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            inputText.value = ""
+                        }
+                        isError = !success
+                    } else {
+                        isError = true
+                    }
+                }) {
+                    Text("Save & Execute")
+                }
+            }
         }
     }
 }
@@ -200,13 +316,13 @@ fun FilterMenu(
 
 @Composable
 fun Content(
+    hazeState: HazeState,
+    contentPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val accounts by viewModel.accounts.collectAsState()
-    Column(modifier) {
-        val inputText = remember { mutableStateOf("") }
-        var isError by remember { mutableStateOf(false) }
+    Column(modifier.fillMaxSize()) {
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
         var showQrCodeDialog by remember { mutableStateOf<Deepr?>(null) }
@@ -244,7 +360,9 @@ fun Content(
             modifier =
                 Modifier
                     .weight(1f)
+                    .hazeSource(state = hazeState)
                     .padding(8.dp),
+            contentPaddingValues = contentPaddingValues,
             accounts = accounts,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
@@ -271,87 +389,13 @@ fun Content(
                 showQrCodeDialog = it
             },
         )
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-            elevation =
-                CardDefaults.cardElevation(
-                    defaultElevation = 12.dp,
-                ),
-        ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                TextField(
-                    value = inputText.value,
-                    onValueChange = {
-                        inputText.value = it
-                        isError = false
-                    },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                    placeholder = { Text("Enter deeplink or command") },
-                    isError = isError,
-                    supportingText = {
-                        if (isError) {
-                            Text(text = "Invalid or empty deeplink.")
-                        }
-                    },
-                )
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    OutlinedButton(onClick = {
-                        if (isValidDeeplink(inputText.value)) {
-                            viewModel.insertAccount(inputText.value, false)
-                            Toast
-                                .makeText(context, "Saved", Toast.LENGTH_SHORT)
-                                .show()
-                            inputText.value = ""
-                        } else {
-                            isError = true
-                        }
-                    }) {
-                        Text("Save")
-                    }
-                    OutlinedButton(onClick = {
-                        isError = !openDeeplink(context, inputText.value)
-                    }) {
-                        Text("Execute")
-                    }
-                    Button(onClick = {
-                        if (isValidDeeplink(inputText.value)) {
-                            val success = openDeeplink(context, inputText.value)
-                            if (success) {
-                                viewModel.insertAccount(inputText.value, true)
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Saved",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                inputText.value = ""
-                            }
-                            isError = !success
-                        } else {
-                            isError = true
-                        }
-                    }) {
-                        Text("Save & Execute")
-                    }
-                }
-            }
-        }
     }
 }
 
 @Composable
 fun DeeprList(
     accounts: List<Deepr>,
+    contentPaddingValues: PaddingValues,
     onItemClick: (Deepr) -> Unit,
     onRemoveClick: (Deepr) -> Unit,
     onShortcutClick: (Deepr) -> Unit,
@@ -400,7 +444,7 @@ fun DeeprList(
             Spacer(modifier = Modifier.weight(1f)) // Push content up
         }
     } else {
-        LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
+        LazyColumn(modifier = modifier, contentPadding = contentPaddingValues) {
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
