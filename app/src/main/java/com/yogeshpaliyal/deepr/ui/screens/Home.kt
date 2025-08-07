@@ -168,7 +168,7 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize(),
         ) {
-            Content(hazeState, contentPadding, viewModel)
+            Content(hazeState, contentPadding)
         }
     }
 }
@@ -316,7 +316,6 @@ fun FilterMenu(
 fun Content(
     hazeState: HazeState,
     contentPaddingValues: PaddingValues,
-    viewModel: AccountViewModel,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
