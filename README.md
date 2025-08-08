@@ -9,7 +9,7 @@ Deepr is a native Android application designed to streamline the management and 
 [![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
-![./assets/deepr-cover.png](./assets/deepr-cover.png)
+![./assets/deepr-cover.png](./deepr-cover.png)
 
 ## Download
 You can download the latest version of the application from the [releases page](https://github.com/yogeshpaliyal/Deepr/releases).
