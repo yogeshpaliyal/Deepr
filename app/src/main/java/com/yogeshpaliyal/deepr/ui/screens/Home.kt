@@ -104,7 +104,7 @@ fun HomeScreen(
     val hazeState = rememberHazeState()
     val context = LocalContext.current
     val qrScanner = rememberLauncherForActivityResult(
-        QRScanner()
+        QRScanner(),
     ) { result ->
         if (result.contents == null) {
             Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
@@ -217,8 +217,9 @@ fun BottomContent(
                         topStart = 12.dp,
                     ),
                 )
-                .hazeEffect(state = hazeState, style = HazeMaterials.thin())
-                .fillMaxWidth(),
+                .hazeEffect(
+                    state = hazeState, style = HazeMaterials.thin()
+                ).fillMaxWidth(),
     ) {
         Column(
             modifier =
