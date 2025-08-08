@@ -1,6 +1,8 @@
 # Deepr 🔗
 
-Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
+![./fastlane/metadata/android/en-US/images/featureGraphic.png](./fastlane/metadata/android/en-US/images/featureGraphic.png)
+
+> Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
 
 [![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
@@ -8,8 +10,6 @@ Deepr is a native Android application designed to streamline the management and 
 [![BlueSky Follow](https://img.shields.io/badge/Bluesky-Follow-blue?style=for-the-badge&logo=bluesky&logoColor=%23fff&color=%23333&labelColor=%230285FF)](https://bsky.app/profile/yogeshpaliyal.com)
 [![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
-
-![./assets/deepr-cover.png](./assets/deepr-cover.png)
 
 ## Download
 You can download the latest version of the application from the [releases page](https://github.com/yogeshpaliyal/Deepr/releases).
