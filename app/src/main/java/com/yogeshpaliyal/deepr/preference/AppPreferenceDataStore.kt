@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr.preference
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -17,6 +18,7 @@ class AppPreferenceDataStore(
 ) {
     companion object {
         private val SORTING_ORDER = stringPreferencesKey("sorting_order")
+        private val USE_LINK_BASED_ICONS = booleanPreferencesKey("use_link_based_icons")
     }
 
     val getSortingOrder: Flow<String> =
@@ -24,9 +26,20 @@ class AppPreferenceDataStore(
             preferences[SORTING_ORDER] ?: SortOrder.DESC.name
         }
 
+    val getUseLinkBasedIcons: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[USE_LINK_BASED_ICONS] ?: true // Default to link-based icons
+        }
+
     suspend fun setSortingOrder(order: String) {
         context.appDataStore.edit { prefs ->
             prefs[SORTING_ORDER] = order
+        }
+    }
+
+    suspend fun setUseLinkBasedIcons(useLink: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[USE_LINK_BASED_ICONS] = useLink
         }
     }
 }

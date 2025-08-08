@@ -147,4 +147,15 @@ class AccountViewModel(
             }
         }
     }
+
+    // Shortcut icon preference methods
+    val useLinkBasedIcons =
+        preferenceDataStore.getUseLinkBasedIcons
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun setUseLinkBasedIcons(useLink: Boolean) {
+        viewModelScope.launch {
+            preferenceDataStore.setUseLinkBasedIcons(useLink)
+        }
+    }
 }

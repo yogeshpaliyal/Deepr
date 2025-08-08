@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,15 +15,20 @@ import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.getShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateShortcutDialog(
     deepr: Deepr,
     onDismiss: () -> Unit,
-    onCreate: (Deepr, String) -> Unit,
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val existingShortcut = getShortcut(context, deepr.id)
+    // Collect the shortcut icon preference state
+    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsState()
+
     if (isShortcutSupported(context)) {
         var shortcutName by remember {
             mutableStateOf(
@@ -43,8 +49,8 @@ fun CreateShortcutDialog(
             confirmButton = {
                 Button(
                     onClick = {
-                        onCreate(deepr, shortcutName)
-                        createShortcut(context, deepr, shortcutName, existingShortcut != null)
+                        onDismiss()
+                        createShortcut(context, deepr, shortcutName, existingShortcut != null, useLinkBasedIcons)
                     },
                     enabled = shortcutName.isNotBlank(),
                 ) {

@@ -24,10 +24,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +46,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.InfoCircle
+import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
@@ -66,6 +70,9 @@ fun SettingsScreen(
                 viewModel.importCsvData(it)
             }
         }
+
+    // Collect the shortcut icon preference state
+    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsState()
 
     LaunchedEffect(storagePermissionState.status) {
         if (storagePermissionState.status.isGranted) {
@@ -117,20 +124,8 @@ fun SettingsScreen(
                     .fillMaxSize(),
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                ListItem(
-                    modifier =
-                        Modifier.clickable(true) {
-                            backStack.add(AboutUs)
-                        },
-                    headlineContent = { Text("About Us") },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.InfoCircle,
-                            contentDescription = "About Us",
-                        )
-                    },
-                )
                 HorizontalDivider()
+
                 ListItem(
                     modifier =
                         Modifier.clickable {
@@ -143,7 +138,7 @@ fun SettingsScreen(
                             )
                         },
                     headlineContent = { Text("Import Deeplinks") },
-                    supportingContent = { Text("Live Now") },
+                    supportingContent = { Text("Import Deeplinks from CSV file") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Download,
@@ -165,7 +160,7 @@ fun SettingsScreen(
                             }
                         },
                     headlineContent = { Text("Export Deeplinks") },
-                    supportingContent = { Text("Live Now") },
+                    supportingContent = { Text("Export Deeplinks to CSV file") },
                     leadingContent = {
                         Icon(
                             TablerIcons.Upload,
@@ -173,13 +168,45 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                HorizontalDivider()
+
+                // Add Shortcut Icon Setting
                 ListItem(
-                    headlineContent = { Text("Transfer Deeplinks") },
-                    supportingContent = { Text("Coming Soon") },
+                    modifier =
+                        Modifier.clickable {
+                            // Toggle the preference
+                            viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
+                        },
+                    headlineContent = { Text("Shortcut Icon") },
+                    supportingContent = {
+                        Text(if (useLinkBasedIcons) "Use link supporting app icon" else "Use Deepr app icon")
+                    },
                     leadingContent = {
                         Icon(
-                            TablerIcons.Upload,
-                            contentDescription = "Transfer Deeplinks",
+                            TablerIcons.Settings,
+                            contentDescription = "Shortcut Icon Setting",
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = useLinkBasedIcons,
+                            onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
+                        )
+                    },
+                )
+                HorizontalDivider()
+
+                ListItem(
+                    modifier =
+                        Modifier.clickable(true) {
+                            backStack.add(AboutUs)
+                        },
+                    headlineContent = { Text("About Us") },
+                    leadingContent = {
+                        Icon(
+                            TablerIcons.InfoCircle,
+                            contentDescription = "About Us",
                         )
                     },
                 )
