@@ -9,7 +9,6 @@ import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
-import com.yogeshpaliyal.deepr.backup.ImportResult
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -119,7 +118,7 @@ class AccountViewModel(
         viewModelScope.launch {
             val result = exportRepository.exportToCsv()
             when (result) {
-                is RequestResult.Success<String> -> {
+                is RequestResult.Success -> {
                     exportResultChannel.send("Export completed: ${result.data}")
                 }
 
@@ -136,7 +135,7 @@ class AccountViewModel(
             val result = importRepository.importFromCsv(uri)
 
             when (result) {
-                is RequestResult.Success<ImportResult> -> {
+                is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
                     )
