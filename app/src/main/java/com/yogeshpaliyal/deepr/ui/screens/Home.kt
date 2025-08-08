@@ -103,20 +103,21 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     val hazeState = rememberHazeState()
     val context = LocalContext.current
-    val qrScanner = rememberLauncherForActivityResult(
-        QRScanner(),
-    ) { result ->
-        if (result.contents == null) {
-            Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
-        } else {
-            if (isValidDeeplink(result.contents)) {
-                viewModel.insertAccount(result.contents, false)
-                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+    val qrScanner =
+        rememberLauncherForActivityResult(
+            QRScanner(),
+        ) { result ->
+            if (result.contents == null) {
+                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
+                if (isValidDeeplink(result.contents)) {
+                    viewModel.insertAccount(result.contents, false)
+                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -127,8 +128,7 @@ fun HomeScreen(
                         .hazeEffect(
                             state = hazeState,
                             style = HazeMaterials.ultraThin(),
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             ) {
                 TopAppBar(
                     colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
@@ -217,11 +217,10 @@ fun BottomContent(
                     RoundedCornerShape(
                         topStart = 12.dp,
                     ),
-                )
-                .hazeEffect(
-                    state = hazeState, style = HazeMaterials.thin(),
-                )
-                .fillMaxWidth(),
+                ).hazeEffect(
+                    state = hazeState,
+                    style = HazeMaterials.thin(),
+                ).fillMaxWidth(),
     ) {
         Column(
             modifier =
