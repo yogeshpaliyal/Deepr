@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,11 +54,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
+import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.hasShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
@@ -100,6 +102,22 @@ fun HomeScreen(
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val hazeState = rememberHazeState()
+    val context = LocalContext.current
+    val qrScanner =
+        rememberLauncherForActivityResult(
+            QRScanner(),
+        ) { result ->
+            if (result.contents == null) {
+                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
+            } else {
+                if (isValidDeeplink(result.contents)) {
+                    viewModel.insertAccount(result.contents, false)
+                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -130,10 +148,17 @@ fun HomeScreen(
                                 contentDescription = if (isSearchActive) "Close search" else "Search",
                             )
                         }
+                        IconButton(onClick = {
+                            qrScanner.launch(ScanOptions())
+                        }) {
+                            Icon(
+                                TablerIcons.Qrcode,
+                                contentDescription = "QR Scanner",
+                            )
+                        }
                         FilterMenu(onSortOrderChange = {
                             viewModel.setSortOrder(it)
                         })
-
                         IconButton(onClick = {
                             backStack.add(Settings)
                         }) {
@@ -174,6 +199,7 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun BottomContent(
     hazeState: HazeState,
@@ -191,8 +217,10 @@ fun BottomContent(
                     RoundedCornerShape(
                         topStart = 12.dp,
                     ),
-                ).hazeEffect(state = hazeState, style = HazeMaterials.thin())
-                .fillMaxWidth(),
+                ).hazeEffect(
+                    state = hazeState,
+                    style = HazeMaterials.thin(),
+                ).fillMaxWidth(),
     ) {
         Column(
             modifier =
@@ -229,8 +257,11 @@ fun BottomContent(
                     if (isValidDeeplink(inputText.value)) {
                         viewModel.insertAccount(inputText.value, false)
                         Toast
-                            .makeText(context, "Saved", Toast.LENGTH_SHORT)
-                            .show()
+                            .makeText(
+                                context,
+                                "Saved",
+                                Toast.LENGTH_SHORT,
+                            ).show()
                         inputText.value = ""
                     } else {
                         isError = true
@@ -524,9 +555,10 @@ fun DeeprItem(
             modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-                .combinedClickable(onClick = { onItemClick?.invoke(account) }, onLongClick = {
-                    onItemLongClick?.invoke(account)
-                }),
+                .combinedClickable(
+                    onClick = { onItemClick?.invoke(account) },
+                    onLongClick = { onItemLongClick?.invoke(account) },
+                ),
     ) {
         Row(
             modifier =
