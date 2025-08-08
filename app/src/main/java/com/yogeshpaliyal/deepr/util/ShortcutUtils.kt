@@ -6,16 +6,15 @@ import android.content.pm.ShortcutInfo
 import android.os.Build
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import com.yogeshpaliyal.deepr.Deepr
-import com.yogeshpaliyal.deepr.R
 
 fun createShortcut(
     context: Context,
     deepr: Deepr,
     shortcutName: String,
     alreadyExists: Boolean,
+    useLinkBasedIcon: Boolean,
 ) {
     if (isShortcutSupported(context)) {
         val shortcutInfo =
@@ -23,10 +22,9 @@ fun createShortcut(
                 .Builder(context, "deepr_${deepr.id}")
                 .setShortLabel(shortcutName)
                 .setLongLabel(shortcutName)
-                .setIcon(IconCompat.createWithResource(context, R.mipmap.ic_launcher))
+                .setIcon(getShortcutAppIcon(context, deepr.link, useLinkBasedIcon))
                 .setIntent(
-                    Intent(Intent.ACTION_VIEW, deepr.link.toUri()).apply {
-                    },
+                    Intent(Intent.ACTION_VIEW, deepr.link.toUri()),
                 ).build()
         if (alreadyExists) {
             // If the shortcut already exists, we update it

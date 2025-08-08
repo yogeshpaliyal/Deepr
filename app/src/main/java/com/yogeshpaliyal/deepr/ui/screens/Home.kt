@@ -332,9 +332,6 @@ fun Content(
             CreateShortcutDialog(
                 deepr = deepr,
                 onDismiss = { showShortcutDialog = null },
-                onCreate = { d, name ->
-                    showShortcutDialog = null
-                },
             )
         }
 
