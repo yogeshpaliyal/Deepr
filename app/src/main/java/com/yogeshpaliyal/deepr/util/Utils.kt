@@ -25,9 +25,9 @@ fun openDeeplink(
 fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
     return try {
-        link.toUri()
-        return true
-    } catch (e: Exception) {
+        val uri = link.toUri()
+        uri.scheme != null && uri.scheme!!.isNotBlank()
+    } catch (_: Exception) {
         false
     }
 }
