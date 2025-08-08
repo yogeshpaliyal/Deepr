@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Deepr 🔗 - Deeplink Management for Android</title>
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .bg-hero-pattern {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                filter: blur(0.5px);
+            }
+            .hero-content-hidden {
+                opacity: 0;
+                transform: translateY(40px) scale(0.98);
+                transition:
+                    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+                pointer-events: none;
+            }
+            .hero-content-visible {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                transition:
+                    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+                /* background: rgba(255, 255, 255, 0.85); */
+                padding: 2rem;
+            }
+            body {
+                font-family: "Inter", "Segoe UI", Arial, sans-serif;
+                margin: 0;
+                background: #f7f8fa;
+                color: #222;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-white font-sans antialiased">
+        <style>
+            @media (max-width: 768px) {
+                .hero-content-visible {
+                    padding: 1rem;
+                    font-size: 1rem;
+                }
+                h1 {
+                    font-size: 2.5rem !important;
+                }
+                h2 {
+                    font-size: 1.25rem !important;
+                }
+            }
+        </style>
+        <!-- Header Section -->
+        <header
+            class="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-80 backdrop-blur-md"
+        >
+            <nav
+                class="container mx-auto px-6 py-4 flex items-center justify-between"
+            >
+                <a
+                    href="#"
+                    class="text-3xl font-bold tracking-tight text-white transition duration-300 hover:text-indigo-400"
+                >
+                    Deepr 🔗
+                </a>
+                <a
+                    href="https://github.com/yogeshpaliyal/Deepr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="px-4 py-2 text-sm font-semibold bg-indigo-600 rounded-full hover:bg-indigo-700 transition-colors duration-300 shadow-lg"
+                >
+                    View on GitHub
+                </a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section
+            class="relative h-screen flex flex-col items-center justify-center text-center overflow-hidden"
+        >
+            <!-- Animated gradient background -->
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <div
+                    class="w-full h-full absolute bg-hero-pattern opacity-10"
+                ></div>
+                <div
+                    class="w-full h-full absolute bg-gradient-to-br from-indigo-900 via-indigo-700 to-purple-900 opacity-20"
+                ></div>
+                <div
+                    class="absolute inset-0 bg-gradient-radial from-indigo-900 via-transparent to-gray-900 opacity-30"
+                ></div>
+            </div>
+            <div
+                id="hero-content"
+                class="relative z-10 p-6 max-w-3xl hero-content-hidden flex flex-col items-center"
+            >
+                <img
+                    src="./fastlane/metadata/android/en-US/images/featureGraphic.png"
+                    alt="Deepr Android App Feature Graphic"
+                    class="mx-auto mb-8 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-800"
+                />
+                <h1
+                    class="text-6xl md:text-7xl font-extrabold tracking-tight mb-2 leading-tight text-white drop-shadow-lg"
+                >
+                    Deepr <span class="text-indigo-400">🔗</span>
+                </h1>
+                <h2
+                    class="text-2xl md:text-3xl font-semibold text-indigo-200 mb-4 tracking-wide"
+                >
+                    Native Deeplink Management for Android
+                </h2>
+                <p
+                    class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8 font-medium"
+                >
+                    The fastest way to store, organize, and launch your
+                    deeplinks.<br />
+                    Built for developers & testers who want to save time and
+                    boost productivity.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <a
+                        href="https://github.com/yogeshpaliyal/Deepr/releases/latest"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="transition-transform hover:scale-105"
+                    >
+                        <img
+                            src="https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge"
+                            alt="Github Releases"
+                        />
+                    </a>
+                    <a
+                        href="https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="transition-transform hover:scale-105"
+                    >
+                        <img
+                            src="https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge"
+                            alt="Latest Master"
+                        />
+                    </a>
+                    <a
+                        href="http://androidweekly.net/issues/issue-685"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="transition-transform hover:scale-105"
+                    >
+                        <img
+                            src="https://img.shields.io/badge/Android%20Weekly-%23685-2CA3E6.svg?style=for-the-badge"
+                            alt="Android Weekly"
+                        />
+                    </a>
+                    <a
+                        href="https://bsky.app/profile/yogeshpaliyal.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="transition-transform hover:scale-105"
+                    >
+                        <img
+                            src="https://img.shields.io/badge/Bluesky-Follow-blue?style=for-the-badge&logo=bluesky&logoColor=%23fff&color=%23333&labelColor=%230285FF"
+                            alt="Bluesky Follow"
+                        />
+                    </a>
+                    <a
+                        href="https://twitter.com/intent/follow?screen_name=yogeshpaliyal"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="transition-transform hover:scale-105"
+                    >
+                        <img
+                            src="https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social"
+                            alt="Twitter Follow"
+                        />
+                    </a>
+                    <img
+                        src="https://img.shields.io/github/followers/yogeshpaliyal"
+                        alt="GitHub followers"
+                        class="transition-transform hover:scale-105"
+                    />
+                </div>
+                <div
+                    class="flex flex-col md:flex-row justify-center items-center gap-4"
+                >
+                    <a
+                        href="https://github.com/yogeshpaliyal/Deepr/releases/latest"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="px-8 py-4 text-lg font-bold bg-indigo-600 text-white rounded-full transition-all duration-300 hover:bg-indigo-700 transform hover:scale-105 shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-400"
+                    >
+                        🚀 Download Latest Release
+                    </a>
+                    <a
+                        href="#features"
+                        class="px-8 py-4 text-lg font-bold bg-gray-700 text-gray-200 rounded-full transition-all duration-300 hover:bg-gray-600 transform hover:scale-105 shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-400"
+                    >
+                        📖 Learn More
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="container mx-auto px-6 py-20">
+            <h2
+                class="text-4xl font-extrabold text-center mb-16 text-indigo-400 drop-shadow-lg"
+            >
+                🚀 Features
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">📂</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Save & Organize Deeplinks
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Store, categorize, and manage your deeplinks for instant
+                        access.
+                    </p>
+                </div>
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">⚡</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Launch Deeplinks
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Test and launch deeplinks directly from the app to speed
+                        up your workflow.
+                    </p>
+                </div>
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">🔍</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Search & Sort
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Find the right deeplink instantly with powerful search
+                        and sorting.
+                    </p>
+                </div>
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">📊</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Open Counter
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Track usage frequency for each deeplink to gain testing
+                        insights.
+                    </p>
+                </div>
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">🏠</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Home Screen Shortcuts
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Add deeplinks to your Android home screen for one-tap
+                        access.
+                    </p>
+                </div>
+                <div
+                    class="p-8 bg-gray-800 rounded-3xl flex flex-col items-center transition-all duration-300 hover:bg-indigo-900 transform hover:-translate-y-2 shadow-2xl border border-indigo-700"
+                >
+                    <span class="text-4xl mb-4">🔒</span>
+                    <h3 class="text-xl font-bold mb-2 text-indigo-300">
+                        Privacy First
+                    </h3>
+                    <p class="text-gray-300 text-center">
+                        Your data stays on your device. No tracking, no ads,
+                        just productivity.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="container mx-auto px-6 py-16">
+            <h2
+                class="text-3xl font-extrabold text-center mb-8 text-indigo-400 drop-shadow-lg"
+            >
+                🏗️ Architecture
+            </h2>
+            <div class="max-w-4xl mx-auto">
+                <p class="text-gray-300 text-lg text-center mb-10">
+                    Deepr is built with modern Android technologies for
+                    performance, scalability, and developer happiness.
+                </p>
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center"
+                >
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">🎨</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >Jetpack Compose</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Declarative & reactive UI toolkit for beautiful
+                            interfaces.</span
+                        >
+                    </div>
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">🧭</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >Compose Navigation</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Type-safe navigation for seamless user flows.</span
+                        >
+                    </div>
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">🗂️</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >Android ViewModel</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Lifecycle-aware state management for robust
+                            apps.</span
+                        >
+                    </div>
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">🗄️</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >SQLDelight</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Type-safe, multiplatform SQL database for
+                            reliability.</span
+                        >
+                    </div>
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">🔗</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >Koin DI</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Simple dependency injection for modular code.</span
+                        >
+                    </div>
+                    <div
+                        class="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center border border-indigo-700"
+                    >
+                        <span class="text-4xl mb-3">⏱️</span>
+                        <span class="text-indigo-300 font-bold mb-1"
+                            >Kotlin Coroutines</span
+                        >
+                        <span class="text-gray-400 text-sm"
+                            >Efficient background operations for smooth
+                            performance.</span
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Author Section -->
+        <section id="author" class="container mx-auto px-6 py-16">
+            <h2 class="text-3xl font-extrabold text-center mb-8">✍️ Author</h2>
+            <div
+                class="max-w-xl mx-auto text-center text-gray-300 text-lg flex flex-col items-center"
+            >
+                <img
+                    src="https://github.com/yogeshpaliyal.png?s=400&v=4"
+                    alt="Yogesh Choudhary Paliyal"
+                    class="w-28 h-28 rounded-full mb-4 border-4 border-indigo-600 shadow-lg"
+                />
+                <p class="font-bold text-white text-xl mb-2">
+                    Yogesh Choudhary Paliyal
+                </p>
+                <p class="mb-4 text-gray-400">
+                    Android developer, open-source enthusiast, and creator of
+                    Deepr. Passionate about building tools that help developers
+                    work smarter.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mb-4">
+                    <a
+                        href="https://twitter.com/yogeshpaliyal"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M24 4.557a9.93 9.93 0 01-2.828.775 4.932 4.932 0 002.165-2.724c-.951.564-2.005.974-3.127 1.195a4.916 4.916 0 00-8.38 4.482C7.691 8.094 4.066 6.13 1.64 3.161c-.542.929-.855 2.006-.855 3.17 0 2.188 1.115 4.116 2.823 5.247a4.904 4.904 0 01-2.229-.616c-.054 2.281 1.581 4.415 3.949 4.89a4.936 4.936 0 01-2.224.084c.627 1.956 2.444 3.377 4.6 3.417A9.867 9.867 0 010 21.543a13.94 13.94 0 007.548 2.212c9.058 0 14.009-7.513 14.009-14.009 0-.213-.005-.425-.014-.636A10.025 10.025 0 0024 4.557z"
+                            />
+                        </svg>
+                        @yogeshpaliyal
+                    </a>
+                    <a
+                        href="https://bsky.app/profile/yogeshpaliyal.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bluesky"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M6.335 5.144c-1.654 -1.199 -4.335 -2.127 -4.335 .826c0 .59 .35 4.953 .556 5.661c.713 2.463 3.13 2.75 5.444 2.369c-4.045 .665 -4.889 3.208 -2.667 5.41c1.03 1.018 1.913 1.59 2.667 1.59c2 0 3.134 -2.769 3.5 -3.5c.333 -.667 .5 -1.167 .5 -1.5c0 .333 .167 .833 .5 1.5c.366 .731 1.5 3.5 3.5 3.5c.754 0 1.637 -.571 2.667 -1.59c2.222 -2.203 1.378 -4.746 -2.667 -5.41c2.314 .38 4.73 .094 5.444 -2.369c.206 -.708 .556 -5.072 .556 -5.661c0 -2.953 -2.68 -2.025 -4.335 -.826c-2.293 1.662 -4.76 5.048 -5.665 6.856c-.905 -1.808 -3.372 -5.194 -5.665 -6.856z"
+                            />
+                        </svg>
+                        @yogeshpaliyal.com
+                    </a>
+                    <a
+                        href="mailto:yogeshpaliyal.foss@gmail.com"
+                        class="text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2v.01L12 13 4 6.01V6h16zm-16 12V8.99l8 6.99 8-6.99V18H4z"
+                            />
+                        </svg>
+                        yogeshpaliyal.foss@gmail.com
+                    </a>
+                    <a
+                        href="https://github.com/yogeshpaliyal"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.757-1.333-1.757-1.089-.745.083-.729.083-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.834 2.809 1.304 3.495.997.108-.775.418-1.304.762-1.604-2.665-.305-5.466-1.332-5.466-5.93 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 013.003-.404c1.018.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.653.242 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.61-2.803 5.624-5.475 5.921.43.371.823 1.102.823 2.222v3.293c0 .322.218.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+                            />
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+                <p class="mt-2 text-gray-400">Feel free to ping me 😉</p>
+            </div>
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="bg-gray-900 py-12 text-center text-gray-400">
+            <p><span id="copyright-year"></span> Deepr. All rights reserved.</p>
+        </footer>
+
+        <!-- JavaScript for hero animation and footer year -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const heroContent = document.getElementById("hero-content");
+                setTimeout(() => {
+                    heroContent.classList.remove("hero-content-hidden");
+                    heroContent.classList.add("hero-content-visible");
+                }, 300);
+
+                const currentYear = new Date().getFullYear();
+                document.getElementById("copyright-year").textContent =
+                    `© ${currentYear}`;
+            });
+        </script>
+    </body>
+</html>
