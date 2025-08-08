@@ -1,6 +1,6 @@
 # Deepr 🔗
 
-![./assets/deepr-cover.png](./deepr-cover.png)
+![./fastlane/metadata/android/en-US/images/featureGraphic.png](./fastlane/metadata/android/en-US/images/featureGraphic.png)
 
 > Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
 
