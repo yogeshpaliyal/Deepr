@@ -103,7 +103,9 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     val hazeState = rememberHazeState()
     val context = LocalContext.current
-    val qrScanner = rememberLauncherForActivityResult(QRScanner()) { result ->
+    val qrScanner = rememberLauncherForActivityResult(
+        QRScanner()
+    ) { result ->
         if (result.contents == null) {
             Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
         } else {
@@ -125,8 +127,7 @@ fun HomeScreen(
                         .hazeEffect(
                             state = hazeState,
                             style = HazeMaterials.ultraThin(),
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             ) {
                 TopAppBar(
                     colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),

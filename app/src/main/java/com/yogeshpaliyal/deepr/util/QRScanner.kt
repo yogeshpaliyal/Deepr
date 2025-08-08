@@ -8,7 +8,6 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 
 class QRScanner : ActivityResultContract<ScanOptions, ScanIntentResult>() {
-
     override fun createIntent(context: Context, input: ScanOptions): Intent {
         return Intent(context, CaptureActivity::class.java)
     }
