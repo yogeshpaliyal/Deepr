@@ -127,7 +127,8 @@ fun HomeScreen(
                         .hazeEffect(
                             state = hazeState,
                             style = HazeMaterials.ultraThin(),
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             ) {
                 TopAppBar(
                     colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
@@ -218,8 +219,9 @@ fun BottomContent(
                     ),
                 )
                 .hazeEffect(
-                    state = hazeState, style = HazeMaterials.thin()
-                ).fillMaxWidth(),
+                    state = hazeState, style = HazeMaterials.thin(),
+                )
+                .fillMaxWidth(),
     ) {
         Column(
             modifier =
@@ -256,8 +258,11 @@ fun BottomContent(
                     if (isValidDeeplink(inputText.value)) {
                         viewModel.insertAccount(inputText.value, false)
                         Toast
-                            .makeText(context, "Saved", Toast.LENGTH_SHORT)
-                            .show()
+                            .makeText(
+                                context,
+                                "Saved",
+                                Toast.LENGTH_SHORT,
+                            ).show()
                         inputText.value = ""
                     } else {
                         isError = true
@@ -554,9 +559,10 @@ fun DeeprItem(
             modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-                .combinedClickable(onClick = { onItemClick?.invoke(account) }, onLongClick = {
-                    onItemLongClick?.invoke(account)
-                }),
+                .combinedClickable(
+                    onClick = { onItemClick?.invoke(account) },
+                    onLongClick = { onItemLongClick?.invoke(account) },
+                ),
     ) {
         Row(
             modifier =

@@ -10,11 +10,11 @@ import com.journeyapps.barcodescanner.ScanOptions
 class QRScanner : ActivityResultContract<ScanOptions, ScanIntentResult>() {
     override fun createIntent(
         context: Context,
-        input: ScanOptions
+        input: ScanOptions,
     ): Intent = Intent(context, CaptureActivity::class.java)
 
     override fun parseResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): ScanIntentResult = ScanIntentResult.parseActivityResult(resultCode, intent)
 }
