@@ -9,6 +9,13 @@
         </intent>
     </queries>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="*" />
+        </intent>
+    </queries>
+
     <application
         android:name=".DeeprApplication"
         android:allowBackup="true"
