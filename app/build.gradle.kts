@@ -102,7 +102,6 @@ dependencies {
     ktlint(libs.ktlint)
     implementation("dev.chrisbanes.haze:haze:1.6.9")
     implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
-
 }
 
 kotlinter {

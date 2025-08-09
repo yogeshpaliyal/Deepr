@@ -53,7 +53,7 @@ class AccountViewModel(
     val importResultFlow = importResultChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<Deepr>> =
+    val accounts: StateFlow<List<Deepr>?> =
         combine(searchQuery, sortOrder) { query, order ->
             Pair(query, order)
         }.flatMapLatest { (query, order) ->
@@ -72,7 +72,7 @@ class AccountViewModel(
                     SortOrder.OPENED_DESC -> deeprQueries.searchDeeprByOpenedCountDesc(query)
                 }.asFlow().mapToList(viewModelScope.coroutineContext)
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun search(query: String) {
         searchQuery.value = query
