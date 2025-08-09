@@ -15,8 +15,8 @@ android {
         applicationId = "com.yogeshpaliyal.deepr"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 5
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.accompanist)
     implementation(libs.opencsv)
     implementation(libs.koin.compose)
+    implementation(libs.zxing.scanner)
     ktlint(libs.ktlint)
     implementation("dev.chrisbanes.haze:haze:1.6.9")
     implementation("dev.chrisbanes.haze:haze-materials:1.6.9")

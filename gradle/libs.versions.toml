@@ -19,6 +19,7 @@ lifecycleViewmodelNav3 = "1.0.0-alpha04"
 dataStore = "1.1.7"
 accompanist = "0.37.3"
 opencsv = "5.12.0"
+zxing = "4.3.0"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -52,6 +53,7 @@ accompanist = { group = "com.google.accompanist", name = "accompanist-permission
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+zxing-scanner = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxing" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
