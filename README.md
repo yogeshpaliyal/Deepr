@@ -49,11 +49,13 @@ Contributions are what make the open-source community such an amazing place to l
 contributions you make are **greatly appreciated**.
 
 1. Open an issue first to discuss what you would like to change.
-1. Fork the Project
-1. Create your feature branch (`git checkout -b feature/amazing-feature`)
-1. Commit your changes (`git commit -m 'Add some amazing feature'`)
-1. Push to the branch (`git push origin feature/amazing-feature`)
-1. Open a pull request
+2. Fork the Project
+3. Create your feature branch (`git checkout -b feature/amazing-feature`)
+4. Check lint issues before commiting with command `./gradlew lintKotlin`.
+   - If there are using run to auto fix `./gradlew formatKotlin`. If the errors are still there resolve them manually. 
+6. Commit your changes (`git commit -m 'Add some amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a pull request
 
 Please make sure to update tests as appropriate.
 
