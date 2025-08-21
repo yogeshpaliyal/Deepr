@@ -35,7 +35,9 @@ The application is built using modern Android development practices and librarie
 - **Asynchronous Operations:** Kotlin Coroutines
 
 ## 📲 Download
-You can download from any of the sources mentioned below. If you've previously installed app from F-Droid then also you can update the app from Github Releases.  
+You can download from any of the sources mentioned below.  
+All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid then you can update the app from any of the sources.
+  
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - Play Store : In Internal testing
