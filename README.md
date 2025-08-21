@@ -34,6 +34,11 @@ The application is built using modern Android development practices and librarie
 - **Dependency Injection:** Koin
 - **Asynchronous Operations:** Kotlin Coroutines
 
+## 📲 Download
+- F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
+- Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+- Play Store : In Internal testing
+
 ## ✍️ Author
 
 👤 **Yogesh Choudhary Paliyal**
