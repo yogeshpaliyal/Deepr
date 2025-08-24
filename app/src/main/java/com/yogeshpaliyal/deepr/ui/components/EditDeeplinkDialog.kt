@@ -41,8 +41,9 @@ fun EditDeeplinkDialog(
                         link = it
                         isError = false
                     },
-                    label = { Text("Deeplink")
-                            },
+                    label = {
+                        Text("Deeplink")
+                    },
                     isError = isError,
                     supportingText = {
                         if (isError) {
