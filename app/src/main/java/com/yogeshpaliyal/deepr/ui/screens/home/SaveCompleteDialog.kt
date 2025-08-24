@@ -1,4 +1,4 @@
-package com.yogeshpaliyal.deepr.ui.screens
+package com.yogeshpaliyal.deepr.ui.screens.home
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

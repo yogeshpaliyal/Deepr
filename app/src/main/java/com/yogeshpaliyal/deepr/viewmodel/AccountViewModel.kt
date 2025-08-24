@@ -109,9 +109,10 @@ class AccountViewModel(
     fun updateDeeplink(
         id: Long,
         newLink: String,
+        newName: String,
     ) {
         viewModelScope.launch {
-            deeprQueries.updateDeeplink(newLink, id)
+            deeprQueries.updateDeeplink(newLink, newName, id)
         }
     }
 

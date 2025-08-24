@@ -1,4 +1,4 @@
-package com.yogeshpaliyal.deepr.ui.screens
+package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

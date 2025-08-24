@@ -1,4 +1,4 @@
-package com.yogeshpaliyal.deepr.ui.screens
+package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -6,12 +6,9 @@ import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,10 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.ContainedLoadingIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -43,35 +37,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
+import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.util.QRScanner
-import com.yogeshpaliyal.deepr.util.hasShortcut
-import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
-import com.yogeshpaliyal.deepr.viewmodel.SortOrder
 import compose.icons.TablerIcons
-import compose.icons.tablericons.Copy
-import compose.icons.tablericons.DotsVertical
-import compose.icons.tablericons.Edit
-import compose.icons.tablericons.Filter
 import compose.icons.tablericons.Link
-import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
-import compose.icons.tablericons.Trash
 import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -80,10 +64,6 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
 data object Home
 
@@ -196,52 +176,6 @@ fun HomeScreen(
     }
 }
 
-@Composable
-fun FilterMenu(
-    onSortOrderChange: (SortOrder) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    Box(modifier) {
-        IconButton(onClick = { expanded = true }) {
-            Icon(TablerIcons.Filter, contentDescription = "Filter")
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text("Sort by Date Ascending") },
-                onClick = {
-                    onSortOrderChange(SortOrder.ASC)
-                    expanded = false
-                },
-            )
-            DropdownMenuItem(
-                text = { Text("Sort by Date Descending") },
-                onClick = {
-                    onSortOrderChange(SortOrder.DESC)
-                    expanded = false
-                },
-            )
-            DropdownMenuItem(
-                text = { Text("Sort by Opened Ascending") },
-                onClick = {
-                    onSortOrderChange(SortOrder.OPENED_ASC)
-                    expanded = false
-                },
-            )
-            DropdownMenuItem(
-                text = { Text("Sort by Opened Descending") },
-                onClick = {
-                    onSortOrderChange(SortOrder.OPENED_DESC)
-                    expanded = false
-                },
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Content(
@@ -284,8 +218,8 @@ fun Content(
             EditDeeplinkDialog(
                 deepr = deepr,
                 onDismiss = { showEditDialog = null },
-                onSave = { newLink ->
-                    viewModel.updateDeeplink(deepr.id, newLink)
+                onSave = { newLink, newName ->
+                    viewModel.updateDeeplink(deepr.id, newLink, newName)
                     Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
                     showEditDialog = null
                 },
@@ -395,188 +329,3 @@ fun DeeprList(
         }
     }
 }
-
-@Composable
-fun ShowQRCodeMenuItem(
-    account: Deepr,
-    onQrCodeClick: (Deepr) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    DropdownMenuItem(
-        modifier = modifier,
-        text = { Text("Show QR Code") },
-        onClick = {
-            onQrCodeClick(account)
-        },
-        leadingIcon = {
-            Icon(
-                TablerIcons.Qrcode,
-                contentDescription = "Show QR Code",
-            )
-        },
-    )
-}
-
-@Composable
-fun ShortcutMenuItem(
-    account: Deepr,
-    onShortcutClick: (Deepr) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val shortcutExists = remember(account.id) { hasShortcut(context, account.id) }
-
-    if (isShortcutSupported(LocalContext.current)) {
-        DropdownMenuItem(
-            modifier = modifier,
-            text = { Text(if (shortcutExists) "Edit shortcut" else "Add shortcut") },
-            onClick = {
-                onShortcutClick(account)
-            },
-            leadingIcon = {
-                Icon(
-                    TablerIcons.Plus,
-                    contentDescription = if (shortcutExists) "Edit shortcut" else "Add shortcut",
-                )
-            },
-        )
-    }
-}
-
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-@Composable
-fun DeeprItem(
-    account: Deepr,
-    modifier: Modifier = Modifier,
-    onItemClick: ((Deepr) -> Unit)? = null,
-    onRemoveClick: ((Deepr) -> Unit)? = null,
-    onShortcutClick: ((Deepr) -> Unit)? = null,
-    onQrCodeClick: ((Deepr) -> Unit)? = null,
-    onEditClick: ((Deepr) -> Unit)? = null,
-    onItemLongClick: ((Deepr) -> Unit)? = null,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .combinedClickable(
-                    onClick = { onItemClick?.invoke(account) },
-                    onLongClick = { onItemLongClick?.invoke(account) },
-                ),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-            ) {
-                Text(
-                    text = account.link,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = formatDateTime(account.createdAt),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "Opened: ${account.openedCount}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            Box {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(TablerIcons.DotsVertical, contentDescription = "More options")
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Copy link") },
-                        onClick = {
-                            val clipboard =
-                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("Link copied", account.link)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                TablerIcons.Copy,
-                                contentDescription = "Copy link",
-                            )
-                        },
-                    )
-                    ShortcutMenuItem(account, {
-                        onShortcutClick?.invoke(it)
-                        expanded = false
-                    })
-                    ShowQRCodeMenuItem(account, {
-                        onQrCodeClick?.invoke(it)
-                        expanded = false
-                    })
-                    DropdownMenuItem(
-                        text = { Text("Edit") },
-                        onClick = {
-                            onEditClick?.invoke(account)
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                TablerIcons.Edit,
-                                contentDescription = "Edit",
-                            )
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Delete") },
-                        onClick = {
-                            onRemoveClick?.invoke(account)
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                TablerIcons.Trash,
-                                contentDescription = "Delete",
-                            )
-                        },
-                    )
-                }
-            }
-        }
-    }
-}
-
-private fun formatDateTime(dateTimeString: String): String =
-    try {
-        val dbFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        dbFormatter.timeZone = TimeZone.getTimeZone("UTC")
-        val date = dbFormatter.parse(dateTimeString)
-        val displayFormatter =
-            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault())
-        date?.let { displayFormatter.format(it) } ?: dateTimeString
-    } catch (_: Exception) {
-        dateTimeString // fallback to raw string
-    }
