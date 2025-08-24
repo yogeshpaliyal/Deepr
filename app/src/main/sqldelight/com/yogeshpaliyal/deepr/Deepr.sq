@@ -1,12 +1,13 @@
 CREATE TABLE Deepr (
 id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
+name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 openedCount INTEGER NOT NULL DEFAULT 0
 );
 
 insertDeepr:
-INSERT INTO Deepr (link, openedCount) VALUES (?, ?);
+INSERT INTO Deepr (link, name, openedCount) VALUES (?, ?, ?);
 
 listDeeprDesc:
 SELECT * FROM Deepr ORDER BY createdAt DESC;
@@ -39,7 +40,7 @@ incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
 
 updateDeeplink:
-UPDATE Deepr SET link = ? WHERE id = ?;
+UPDATE Deepr SET link = ? , name = ? WHERE id = ?;
 
 countDeepr:
 SELECT COUNT(*) FROM Deepr;

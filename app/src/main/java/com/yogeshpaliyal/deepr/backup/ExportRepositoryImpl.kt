@@ -83,10 +83,12 @@ class ExportRepositoryImpl(
     ) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
-            writer.write("${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT}\n")
+            writer.write(
+                "${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT},${Constants.Header.NAME}\n",
+            )
             // Write Data
             data.forEach { item ->
-                val row = "${item.link},${item.createdAt},${item.openedCount}\n"
+                val row = "${item.link},${item.createdAt},${item.openedCount},${item.name}\n"
                 writer.write(row)
             }
         }
