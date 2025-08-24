@@ -56,7 +56,7 @@ fun HomeBottomContent(
                 }
                 if (!isError) {
                     inputText.value = ""
-                    Toast.makeText(context, stringResource(R.string.saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
                     viewModel.insertAccount(result.link, result.name, result.executeAfterSave)
                 }
             }
