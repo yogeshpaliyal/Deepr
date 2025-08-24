@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+echo "
+===============
+|  Running detekt...
+===============
+"
+
+./gradlew --no-daemon --stacktrace :app:formatKotlin :app:lintKotlin
+
+lintStatus=$?
+
+# return 1 exit code if running checks fails
+[ $lintStatus -ne 0 ] && exit 1
+
+exit 0
