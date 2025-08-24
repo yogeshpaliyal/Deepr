@@ -7,6 +7,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
@@ -25,11 +26,11 @@ class ExportRepositoryImpl(
     override suspend fun exportToCsv(): RequestResult<String> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
-            return RequestResult.Error("No data found in the database to export.")
+            return RequestResult.Error(context.getString(R.string.no_data_to_export))
         }
         val dataToExportInCsvFormat = deeprQueries.listDeeprAsc().executeAsList()
         if (dataToExportInCsvFormat.isEmpty()) {
-            return RequestResult.Error("No data available to export after mapping.")
+            return RequestResult.Error(context.getString(R.string.no_data_available_export))
         }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -55,9 +56,9 @@ class ExportRepositoryImpl(
                     resolver.openOutputStream(uri)?.use { outputStream ->
                         writeCsvData(outputStream, dataToExportInCsvFormat)
                     }
-                    RequestResult.Success("Successfully exported to ${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName")
+                    RequestResult.Success(context.getString(R.string.export_success, "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"))
                 } else {
-                    RequestResult.Error("Failed to create CSV file.")
+                    RequestResult.Error(context.getString(R.string.export_failed))
                 }
             } else {
                 val downloadsDir =
@@ -72,7 +73,7 @@ class ExportRepositoryImpl(
                 FileOutputStream(file).use { outputStream ->
                     writeCsvData(outputStream, dataToExportInCsvFormat)
                 }
-                RequestResult.Success("Successfully exported to $downloadsDir/${file.absolutePath}")
+                RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
             }
         }
     }
