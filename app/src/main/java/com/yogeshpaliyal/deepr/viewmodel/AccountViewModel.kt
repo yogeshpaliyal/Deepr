@@ -86,10 +86,11 @@ class AccountViewModel(
 
     fun insertAccount(
         link: String,
+        name: String,
         executed: Boolean,
     ) {
         viewModelScope.launch {
-            deeprQueries.insertDeepr(link = link, if (executed) 1 else 0)
+            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0)
         }
     }
 
@@ -108,9 +109,10 @@ class AccountViewModel(
     fun updateDeeplink(
         id: Long,
         newLink: String,
+        newName: String,
     ) {
         viewModelScope.launch {
-            deeprQueries.updateDeeplink(newLink, id)
+            deeprQueries.updateDeeplink(newLink, newName, id)
         }
     }
 

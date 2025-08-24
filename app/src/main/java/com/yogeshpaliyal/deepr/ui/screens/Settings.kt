@@ -35,12 +35,14 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -100,7 +102,7 @@ fun SettingsScreen(
             Column {
                 TopAppBar(
                     title = {
-                        Text("Settings")
+                        Text(stringResource(R.string.settings))
                     },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -108,7 +110,7 @@ fun SettingsScreen(
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                             )
                         }
                     },
@@ -137,12 +139,12 @@ fun SettingsScreen(
                                 ),
                             )
                         },
-                    headlineContent = { Text("Import Deeplinks") },
-                    supportingContent = { Text("Import Deeplinks from CSV file") },
+                    headlineContent = { Text(stringResource(R.string.import_deeplinks)) },
+                    supportingContent = { Text(stringResource(R.string.import_deeplinks_description)) },
                     leadingContent = {
                         Icon(
                             TablerIcons.Download,
-                            contentDescription = "Import Deeplinks",
+                            contentDescription = stringResource(R.string.import_deeplinks),
                         )
                     },
                 )
@@ -159,12 +161,12 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                    headlineContent = { Text("Export Deeplinks") },
-                    supportingContent = { Text("Export Deeplinks to CSV file") },
+                    headlineContent = { Text(stringResource(R.string.export_deeplinks)) },
+                    supportingContent = { Text(stringResource(R.string.export_deeplinks_description)) },
                     leadingContent = {
                         Icon(
                             TablerIcons.Upload,
-                            contentDescription = "Export Deeplinks",
+                            contentDescription = stringResource(R.string.export_deeplinks),
                         )
                     },
                 )
@@ -178,14 +180,22 @@ fun SettingsScreen(
                             // Toggle the preference
                             viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
                         },
-                    headlineContent = { Text("Shortcut Icon") },
+                    headlineContent = { Text(stringResource(R.string.shortcut_icon)) },
                     supportingContent = {
-                        Text(if (useLinkBasedIcons) "Use link supporting app icon" else "Use Deepr app icon")
+                        Text(
+                            if (useLinkBasedIcons) {
+                                stringResource(
+                                    R.string.use_link_app_icon,
+                                )
+                            } else {
+                                stringResource(R.string.use_deepr_app_icon)
+                            },
+                        )
                     },
                     leadingContent = {
                         Icon(
                             TablerIcons.Settings,
-                            contentDescription = "Shortcut Icon Setting",
+                            contentDescription = stringResource(R.string.shortcut_icon_setting),
                         )
                     },
                     trailingContent = {
@@ -202,11 +212,11 @@ fun SettingsScreen(
                         Modifier.clickable(true) {
                             backStack.add(AboutUs)
                         },
-                    headlineContent = { Text("About Us") },
+                    headlineContent = { Text(stringResource(R.string.about_us)) },
                     leadingContent = {
                         Icon(
                             TablerIcons.InfoCircle,
-                            contentDescription = "About Us",
+                            contentDescription = stringResource(R.string.about_us),
                         )
                     },
                 )
@@ -218,14 +228,14 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    "App Version: ${BuildConfig.VERSION_NAME}",
+                    stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Made with ❤️ in India",
+                    stringResource(R.string.made_with_love),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
