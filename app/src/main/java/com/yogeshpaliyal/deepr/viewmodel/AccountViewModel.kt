@@ -86,10 +86,11 @@ class AccountViewModel(
 
     fun insertAccount(
         link: String,
+        name: String,
         executed: Boolean,
     ) {
         viewModelScope.launch {
-            deeprQueries.insertDeepr(link = link, if (executed) 1 else 0)
+            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0)
         }
     }
 

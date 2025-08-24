@@ -38,10 +38,12 @@ fun HomeBottomContent(
     hazeState: HazeState,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    saveDialogInfo: SaveDialogInfo? = null,
+    onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
 ) {
     val inputText = remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
-    var saveDialogInfo by remember { mutableStateOf<SaveDialogInfo?>(null) }
+
     val context = LocalContext.current
 
     saveDialogInfo?.let { localSaveDialogInfo ->
@@ -53,10 +55,10 @@ fun HomeBottomContent(
                 if (!isError) {
                     inputText.value = ""
                     Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
-                    viewModel.insertAccount(result.link, result.executeAfterSave)
+                    viewModel.insertAccount(result.link, result.name, result.executeAfterSave)
                 }
             }
-            saveDialogInfo = null
+            onSaveDialogInfoChange(null)
         }
     }
 
@@ -105,7 +107,7 @@ fun HomeBottomContent(
             ) {
                 OutlinedButton(onClick = {
                     if (isValidDeeplink(inputText.value)) {
-                        saveDialogInfo = SaveDialogInfo(inputText.value, false)
+                        onSaveDialogInfoChange(SaveDialogInfo(inputText.value, false))
                     } else {
                         isError = true
                     }
@@ -119,7 +121,7 @@ fun HomeBottomContent(
                 }
                 Button(onClick = {
                     if (isValidDeeplink(inputText.value)) {
-                        saveDialogInfo = SaveDialogInfo(inputText.value, true)
+                        onSaveDialogInfoChange(SaveDialogInfo(inputText.value, true))
                     } else {
                         isError = true
                     }

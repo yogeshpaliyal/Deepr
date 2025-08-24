@@ -96,6 +96,7 @@ fun HomeScreen(
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var saveDialogInfo by remember { mutableStateOf<SaveDialogInfo?>(null) }
     val hazeState = rememberHazeState()
     val context = LocalContext.current
     val qrScanner =
@@ -106,8 +107,7 @@ fun HomeScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 if (isValidDeeplink(result.contents)) {
-                    viewModel.insertAccount(result.contents, false)
-                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                    saveDialogInfo = SaveDialogInfo(result.contents, false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -181,7 +181,9 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            HomeBottomContent(hazeState)
+            HomeBottomContent(hazeState, saveDialogInfo = saveDialogInfo) {
+                saveDialogInfo = it
+            }
         },
     ) { contentPadding ->
         Column(
