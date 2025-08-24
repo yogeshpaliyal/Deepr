@@ -39,6 +39,7 @@ class ImportRepositoryImpl(
                         if (row.size >= 3) {
                             val link = row[0]
                             val openedCount = row[2].toLongOrNull() ?: 0L
+                            val name = row[3].toString()
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
@@ -46,6 +47,7 @@ class ImportRepositoryImpl(
                                     deeprQueries.insertDeepr(
                                         link = link,
                                         openedCount = openedCount,
+                                        name = name,
                                     )
                                 }
                             } else {

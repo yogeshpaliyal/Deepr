@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -25,9 +24,10 @@ import com.yogeshpaliyal.deepr.util.isValidDeeplink
 fun EditDeeplinkDialog(
     deepr: Deepr,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit,
+    onSave: (link: String, name: String) -> Unit,
 ) {
     var link by remember { mutableStateOf(deepr.link) }
+    var name by remember { mutableStateOf(deepr.name) }
     var isError by remember { mutableStateOf(false) }
 
     AlertDialog(
@@ -56,11 +56,13 @@ fun EditDeeplinkDialog(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Edit your deeplink URL",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 4.dp),
+                TextField(
+                    value = name,
+                    onValueChange = {
+                        name = it
+                    },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
@@ -68,7 +70,7 @@ fun EditDeeplinkDialog(
             Button(
                 onClick = {
                     if (isValidDeeplink(link)) {
-                        onSave(link)
+                        onSave(link, name)
                     } else {
                         isError = true
                     }

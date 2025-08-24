@@ -18,10 +18,10 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.yogeshpaliyal.deepr.ui.screens.AboutUs
 import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
-import com.yogeshpaliyal.deepr.ui.screens.Home
-import com.yogeshpaliyal.deepr.ui.screens.HomeScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
+import com.yogeshpaliyal.deepr.ui.screens.home.Home
+import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 
 class MainActivity : ComponentActivity() {
