@@ -19,6 +19,8 @@
 - Sort
 - Open Counter
 - Home Screen Shortcuts
+- Import/Export Deeplinks
+- QR Code support: Generate and scan
 
 ## 🏗️ Architecture
 
