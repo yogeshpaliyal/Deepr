@@ -182,7 +182,15 @@ fun SettingsScreen(
                         },
                     headlineContent = { Text(stringResource(R.string.shortcut_icon)) },
                     supportingContent = {
-                        Text(if (useLinkBasedIcons) stringResource(R.string.use_link_app_icon) else stringResource(R.string.use_deepr_app_icon))
+                        Text(
+                            if (useLinkBasedIcons) {
+                                stringResource(
+                                    R.string.use_link_app_icon,
+                                )
+                            } else {
+                                stringResource(R.string.use_deepr_app_icon)
+                            },
+                        )
                     },
                     leadingContent = {
                         Icon(
