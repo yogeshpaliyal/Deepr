@@ -22,7 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
@@ -54,7 +56,7 @@ fun HomeBottomContent(
                 }
                 if (!isError) {
                     inputText.value = ""
-                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, stringResource(R.string.saved), Toast.LENGTH_SHORT).show()
                     viewModel.insertAccount(result.link, result.name, result.executeAfterSave)
                 }
             }
@@ -91,11 +93,11 @@ fun HomeBottomContent(
                     Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                placeholder = { Text("Enter deeplink or command") },
+                placeholder = { Text(stringResource(R.string.enter_deeplink_command)) },
                 isError = isError,
                 supportingText = {
                     if (isError) {
-                        Text(text = "Invalid or empty deeplink.")
+                        Text(text = stringResource(R.string.invalid_empty_deeplink))
                     }
                 },
             )
@@ -112,12 +114,12 @@ fun HomeBottomContent(
                         isError = true
                     }
                 }) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
                 OutlinedButton(onClick = {
                     isError = !openDeeplink(context, inputText.value)
                 }) {
-                    Text("Execute")
+                    Text(stringResource(R.string.execute))
                 }
                 Button(onClick = {
                     if (isValidDeeplink(inputText.value)) {
@@ -126,7 +128,7 @@ fun HomeBottomContent(
                         isError = true
                     }
                 }) {
-                    Text("Save & Execute")
+                    Text(stringResource(R.string.save_and_execute))
                 }
             }
         }

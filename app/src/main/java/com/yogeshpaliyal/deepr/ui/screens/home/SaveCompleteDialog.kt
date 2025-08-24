@@ -13,7 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.R
 
 data class SaveDialogInfo(
     val link: String,
@@ -41,10 +43,10 @@ fun SaveCompleteDialog(
         },
         modifier = modifier,
         title = {
-            Text("Save Deeplink")
+            Text(stringResource(R.string.save_deeplink))
         },
         text = {
-            Text("Save the deeplink: ${localSaveDialogInfo.link} ?")
+            Text(stringResource(R.string.save_deeplink_message, localSaveDialogInfo.link))
             TextField(
                 value = linkName.value,
                 onValueChange = {
@@ -55,10 +57,10 @@ fun SaveCompleteDialog(
                     Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                placeholder = { Text("Please enter name for the link") },
+                placeholder = { Text(stringResource(R.string.enter_link_name)) },
                 supportingText = {
                     if (isError) {
-                        Text(text = "Please enter name for the link.")
+                        Text(text = stringResource(R.string.enter_link_name_error))
                     }
                 },
             )
@@ -71,14 +73,14 @@ fun SaveCompleteDialog(
                 }
                 onDismiss(SaveDialogSuccessInfo(localSaveDialogInfo.executeAfterSave, localSaveDialogInfo.link, linkName.value))
             }) {
-                Text(if (localSaveDialogInfo.executeAfterSave) "Save & Execute" else "Save")
+                Text(if (localSaveDialogInfo.executeAfterSave) stringResource(R.string.save_and_execute) else stringResource(R.string.save))
             }
         },
         dismissButton = {
             OutlinedButton(onClick = {
                 onDismiss(null)
             }) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
     )
