@@ -11,7 +11,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
-## Features
+## 🎩 🪄 Features
 
 - Save and Organize Deeplinks
 - Launch Deeplinks
@@ -20,7 +20,7 @@
 - Open Counter
 - Home Screen Shortcuts
 
-## Architecture
+## 🏗️ Architecture
 
 The application is built using modern Android development practices and libraries:
 
