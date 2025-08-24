@@ -16,15 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.DropdownMenu
@@ -34,11 +29,9 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -188,7 +181,7 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            BottomContent(hazeState)
+            HomeBottomContent(hazeState)
         },
     ) { contentPadding ->
         Column(
@@ -197,106 +190,6 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             Content(hazeState, contentPadding)
-        }
-    }
-}
-
-@OptIn(ExperimentalHazeMaterialsApi::class)
-@Composable
-fun BottomContent(
-    hazeState: HazeState,
-    modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = koinViewModel(),
-) {
-    val inputText = remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    Column(
-        modifier =
-            modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 12.dp,
-                    ),
-                ).hazeEffect(
-                    state = hazeState,
-                    style = HazeMaterials.thin(),
-                ).fillMaxWidth(),
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
-                    .imePadding()
-                    .padding(8.dp),
-        ) {
-            TextField(
-                value = inputText.value,
-                onValueChange = {
-                    inputText.value = it
-                    isError = false
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                placeholder = { Text("Enter deeplink or command") },
-                isError = isError,
-                supportingText = {
-                    if (isError) {
-                        Text(text = "Invalid or empty deeplink.")
-                    }
-                },
-            )
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-            ) {
-                OutlinedButton(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
-                        viewModel.insertAccount(inputText.value, false)
-                        Toast
-                            .makeText(
-                                context,
-                                "Saved",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        inputText.value = ""
-                    } else {
-                        isError = true
-                    }
-                }) {
-                    Text("Save")
-                }
-                OutlinedButton(onClick = {
-                    isError = !openDeeplink(context, inputText.value)
-                }) {
-                    Text("Execute")
-                }
-                Button(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
-                        val success = openDeeplink(context, inputText.value)
-                        if (success) {
-                            viewModel.insertAccount(inputText.value, true)
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Saved",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                            inputText.value = ""
-                        }
-                        isError = !success
-                    } else {
-                        isError = true
-                    }
-                }) {
-                    Text("Save & Execute")
-                }
-            }
         }
     }
 }
