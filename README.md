@@ -22,7 +22,7 @@
 - Import/Export Deeplinks
 - QR Code support: Generate and scan
 
-## 🏗️ Architecture
+## 🏗️ Tech Stack
 
 The application is built using modern Android development practices and libraries:
 
