@@ -11,10 +11,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
-## Download
-You can download the latest version of the application from the [releases page](https://github.com/yogeshpaliyal/Deepr/releases).
-
-## Features
+## 🎩 🪄 Features
 
 - Save and Organize Deeplinks
 - Launch Deeplinks
@@ -22,8 +19,10 @@ You can download the latest version of the application from the [releases page](
 - Sort
 - Open Counter
 - Home Screen Shortcuts
+- Import/Export Deeplinks
+- QR Code support: Generate and scan
 
-## Architecture
+## 🏗️ Tech Stack
 
 The application is built using modern Android development practices and libraries:
 
@@ -41,6 +40,10 @@ All these sources supports cross platform app updates. for eg: if you've install
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - Play Store : In Internal testing
+
+> [!IMPORTANT]
+> Need more testers on play store, to make app live on play store, if you're interestn to become a tester please drop a email to yogeshpaliyal.foss@gmail.com  
+> The process is simple send us the email, we will add you to the internal testers list, then you can download the app from this [playstore link](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 
 ## ✍️ Author
 

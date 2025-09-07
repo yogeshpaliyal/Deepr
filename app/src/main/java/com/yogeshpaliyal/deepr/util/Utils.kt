@@ -21,7 +21,7 @@ fun openDeeplink(
         true
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, "Invalid deeplink: $link", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.invalid_deeplink_toast, link), Toast.LENGTH_SHORT).show()
         // Optionally, show a toast or a dialog to the user that the link is invalid
         false
     }
