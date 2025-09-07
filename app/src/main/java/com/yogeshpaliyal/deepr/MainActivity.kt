@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,10 +30,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Check if this activity was started via a share intent
+        val sharedText = when {
+            intent?.action == Intent.ACTION_SEND -> {
+                if (intent.type == "text/plain") {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)
+                } else null
+            }
+            else -> null
+        }
+        
         setContent {
             DeeprTheme {
                 Surface {
-                    Dashboard()
+                    Dashboard(sharedText = sharedText)
                 }
             }
         }
@@ -40,7 +52,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Dashboard(modifier: Modifier = Modifier) {
+fun Dashboard(modifier: Modifier = Modifier, sharedText: String? = null) {
     val backStack = remember { mutableStateListOf<Any>(Home) }
 
     NavDisplay(
@@ -59,7 +71,7 @@ fun Dashboard(modifier: Modifier = Modifier) {
             when (key) {
                 is Home ->
                     NavEntry(key) {
-                        HomeScreen(backStack)
+                        HomeScreen(backStack, sharedText = sharedText)
                     }
 
                 is Settings ->

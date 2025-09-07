@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,7 @@ fun HomeScreen(
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    sharedText: String? = null,
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -93,6 +95,15 @@ fun HomeScreen(
                 }
             }
         }
+
+    // Handle shared text from other apps
+    LaunchedEffect(sharedText) {
+        if (!sharedText.isNullOrBlank() && isValidDeeplink(sharedText)) {
+            saveDialogInfo = SaveDialogInfo(sharedText, false)
+        } else if (!sharedText.isNullOrBlank()) {
+            Toast.makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
