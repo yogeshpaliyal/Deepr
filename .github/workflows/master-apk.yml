@@ -25,7 +25,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleFreeDebug
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -33,4 +33,4 @@ jobs:
           automatic_release_tag: "latest-master"
           prerelease: true
           title: "Latest Master Build"
-          files: app/build/outputs/apk/debug/*.apk
+          files: app/build/outputs/apk/free/debug/*.apk
