@@ -98,10 +98,12 @@ fun HomeScreen(
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
-        if (!sharedText.isNullOrBlank() && isValidDeeplink(sharedText)) {
-            saveDialogInfo = SaveDialogInfo(sharedText, false)
-        } else if (!sharedText.isNullOrBlank()) {
-            Toast.makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT).show()
+        if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
+            if (isValidDeeplink(sharedText)) {
+                saveDialogInfo = SaveDialogInfo(sharedText, false)
+            } else {
+                Toast.makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
