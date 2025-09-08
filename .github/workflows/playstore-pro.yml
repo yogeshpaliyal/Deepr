@@ -32,7 +32,7 @@ jobs:
         with:
           releaseDirectory: app/build/outputs/bundle/pro/release
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
-          alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS_PRO }}
+          alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
