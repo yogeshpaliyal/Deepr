@@ -52,7 +52,7 @@ jobs:
         id: signApk
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/apk/free/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -76,7 +76,7 @@ jobs:
 
       - name: Rename artifact names
         run: |
-          mv ${{steps.signApk.outputs.signedReleaseFile}} app/build/outputs/apk/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk
+          mv ${{steps.signApk.outputs.signedReleaseFile}} app/build/outputs/apk/free/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk
 
       - name: Create Release
         uses: ncipollo/release-action@v1.16.0
@@ -84,6 +84,6 @@ jobs:
           tag: "${{ steps.bump-app-version.outputs.newVersion }}"
           generateReleaseNotes: true
           commit: "master"
-          artifacts: "app/build/outputs/apk/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk"
+          artifacts: "app/build/outputs/apk/free/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk"
           discussionCategory: "Release feedbacks"
           makeLatest: true

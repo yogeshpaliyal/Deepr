@@ -21,8 +21,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    productFlavors {
+        create("free") {
+            isDefault = true
+        }
+        create("pro") {
+            applicationIdSuffix = ".pro"
+        }
+    }
 
+    buildTypes {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
@@ -47,6 +55,8 @@ android {
         compose = true
         buildConfig = true
     }
+
+    flavorDimensions("default")
 
     signingConfigs {
         getByName("debug") {
