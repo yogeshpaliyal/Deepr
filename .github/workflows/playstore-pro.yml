@@ -30,7 +30,7 @@ jobs:
         id: signAAB
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/bundle/pro/release
+          releaseDirectory: app/build/outputs/bundle/proRelease
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
           alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -45,8 +45,8 @@ jobs:
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJson: service_account.json
-          packageName: com.yogeshpaliyal.deepr
-          releaseFiles: app/build/outputs/bundle/pro/release/*.aab
+          packageName: com.yogeshpaliyal.deepr.pro
+          releaseFiles: app/build/outputs/bundle/proRelease/*.aab
           track: alpha
           whatsNewDirectory: whatsnew/
 
