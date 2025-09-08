@@ -30,7 +30,7 @@ jobs:
         id: signAAB
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/bundle/free/release
+          releaseDirectory: app/build/outputs/bundle/freeRelease
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
           alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -46,7 +46,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr
-          releaseFiles: app/build/outputs/bundle/free/release/*.aab
+          releaseFiles: app/build/outputs/bundle/freeRelease/*.aab
           track: alpha
           whatsNewDirectory: whatsnew/
 
