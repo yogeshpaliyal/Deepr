@@ -46,7 +46,7 @@ jobs:
         run: echo "${{ steps.bump-app-version.outputs.newVersion }}"
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleFreeRelease
 
       - name: Sign Release APK
         id: signApk
