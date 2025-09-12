@@ -75,6 +75,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     sharedText: String? = null,
+    resetSharedText: () -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -176,6 +177,9 @@ fun HomeScreen(
         bottomBar = {
             HomeBottomContent(hazeState, saveDialogInfo = saveDialogInfo) {
                 saveDialogInfo = it
+                if (it == null) {
+                    resetSharedText()
+                }
             }
         },
     ) { contentPadding ->

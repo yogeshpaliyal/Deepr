@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
@@ -29,7 +28,6 @@ import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
-
     val sharingLink = MutableStateFlow<String?>(null)
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -39,12 +37,13 @@ class MainActivity : ComponentActivity() {
 
         getLinkFromIntent(intent)
 
-        
         setContent {
             DeeprTheme {
                 Surface {
                     val sharedText = sharingLink.collectAsState().value
-                    Dashboard(sharedText = sharedText)
+                    Dashboard(sharedText = sharedText) {
+                        sharingLink.value = null
+                    }
                 }
             }
         }
@@ -52,27 +51,33 @@ class MainActivity : ComponentActivity() {
 
     fun getLinkFromIntent(intent: Intent) {
         // Check if this activity was started via a share intent
-        val sharedText = when {
-            intent?.action == Intent.ACTION_SEND -> {
-                if (intent.type == "text/plain") {
-                    intent.getStringExtra(Intent.EXTRA_TEXT)
-                } else null
+        val sharedText =
+            when {
+                intent?.action == Intent.ACTION_SEND -> {
+                    if (intent.type == "text/plain") {
+                        intent.getStringExtra(Intent.EXTRA_TEXT)
+                    } else {
+                        null
+                    }
+                }
+                else -> null
             }
-            else -> null
-        }
         sharingLink.value = sharedText
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         getLinkFromIntent(intent)
-
     }
 }
 
 @Composable
-fun Dashboard(modifier: Modifier = Modifier, sharedText: String? = null) {
-    val backStack = remember { mutableStateListOf<Any>(Home) }
+fun Dashboard(
+    modifier: Modifier = Modifier,
+    sharedText: String? = null,
+    resetSharedText: () -> Unit,
+) {
+    val backStack = remember(sharedText) { mutableStateListOf<Any>(Home) }
 
     NavDisplay(
         backStack = backStack,
@@ -90,7 +95,7 @@ fun Dashboard(modifier: Modifier = Modifier, sharedText: String? = null) {
             when (key) {
                 is Home ->
                     NavEntry(key) {
-                        HomeScreen(backStack, sharedText = sharedText)
+                        HomeScreen(backStack, sharedText = sharedText, resetSharedText = resetSharedText)
                     }
 
                 is Settings ->
