@@ -9,9 +9,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
@@ -24,13 +26,31 @@ import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
+
+    val sharingLink = MutableStateFlow<String?>(null)
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        getLinkFromIntent(intent)
+
         
+        setContent {
+            DeeprTheme {
+                Surface {
+                    val sharedText = sharingLink.collectAsState().value
+                    Dashboard(sharedText = sharedText)
+                }
+            }
+        }
+    }
+
+    fun getLinkFromIntent(intent: Intent) {
         // Check if this activity was started via a share intent
         val sharedText = when {
             intent?.action == Intent.ACTION_SEND -> {
@@ -40,14 +60,13 @@ class MainActivity : ComponentActivity() {
             }
             else -> null
         }
-        
-        setContent {
-            DeeprTheme {
-                Surface {
-                    Dashboard(sharedText = sharedText)
-                }
-            }
-        }
+        sharingLink.value = sharedText
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        getLinkFromIntent(intent)
+
     }
 }
 
