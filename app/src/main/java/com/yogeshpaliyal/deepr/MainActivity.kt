@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,25 +25,59 @@ import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
+    val sharingLink = MutableStateFlow<String?>(null)
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        getLinkFromIntent(intent)
+
         setContent {
             DeeprTheme {
                 Surface {
-                    Dashboard()
+                    val sharedText = sharingLink.collectAsState().value
+                    Dashboard(sharedText = sharedText) {
+                        sharingLink.value = null
+                    }
                 }
             }
         }
     }
+
+    fun getLinkFromIntent(intent: Intent) {
+        // Check if this activity was started via a share intent
+        val sharedText =
+            when {
+                intent?.action == Intent.ACTION_SEND -> {
+                    if (intent.type == "text/plain") {
+                        intent.getStringExtra(Intent.EXTRA_TEXT)
+                    } else {
+                        null
+                    }
+                }
+                else -> null
+            }
+        sharingLink.value = sharedText
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        getLinkFromIntent(intent)
+    }
 }
 
 @Composable
-fun Dashboard(modifier: Modifier = Modifier) {
-    val backStack = remember { mutableStateListOf<Any>(Home) }
+fun Dashboard(
+    modifier: Modifier = Modifier,
+    sharedText: String? = null,
+    resetSharedText: () -> Unit,
+) {
+    val backStack = remember(sharedText) { mutableStateListOf<Any>(Home) }
 
     NavDisplay(
         backStack = backStack,
@@ -59,7 +95,7 @@ fun Dashboard(modifier: Modifier = Modifier) {
             when (key) {
                 is Home ->
                     NavEntry(key) {
-                        HomeScreen(backStack)
+                        HomeScreen(backStack, sharedText = sharedText, resetSharedText = resetSharedText)
                     }
 
                 is Settings ->

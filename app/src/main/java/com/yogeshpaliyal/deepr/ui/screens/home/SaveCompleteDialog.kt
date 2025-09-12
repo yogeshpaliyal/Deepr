@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -46,24 +47,26 @@ fun SaveCompleteDialog(
             Text(stringResource(R.string.save_deeplink))
         },
         text = {
-            Text(stringResource(R.string.save_deeplink_message, localSaveDialogInfo.link))
-            TextField(
-                value = linkName.value,
-                onValueChange = {
-                    linkName.value = it
-                    isError = false
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                placeholder = { Text(stringResource(R.string.enter_link_name)) },
-                supportingText = {
-                    if (isError) {
-                        Text(text = stringResource(R.string.enter_link_name_error))
-                    }
-                },
-            )
+            Column {
+                Text(localSaveDialogInfo.link)
+                TextField(
+                    value = linkName.value,
+                    onValueChange = {
+                        linkName.value = it
+                        isError = false
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    placeholder = { Text(stringResource(R.string.enter_link_name)) },
+                    supportingText = {
+                        if (isError) {
+                            Text(text = stringResource(R.string.enter_link_name_error))
+                        }
+                    },
+                )
+            }
         },
         confirmButton = {
             Button(onClick = {
