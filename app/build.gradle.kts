@@ -15,14 +15,22 @@ android {
         applicationId = "com.yogeshpaliyal.deepr"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.0.6"
+        versionCode = 8
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    productFlavors {
+        create("free") {
+            isDefault = true
+        }
+        create("pro") {
+            applicationIdSuffix = ".pro"
+        }
+    }
 
+    buildTypes {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
@@ -47,6 +55,8 @@ android {
         compose = true
         buildConfig = true
     }
+
+    flavorDimensions("default")
 
     signingConfigs {
         getByName("debug") {
