@@ -52,7 +52,7 @@
     <string name="export_failed">Failed to create CSV file.</string>
     
     <!-- Sync Settings -->
-    <string name="sync_to_file">Sync to Local File</string>
+    <string name="sync_to_file">Sync to Local File (Beta)</string>
     <string name="sync_to_file_description">Automatically sync deeplinks to a markdown file</string>
     <string name="select_sync_file">Select Sync File</string>
     <string name="select_sync_file_description">Choose file location for markdown sync</string>
