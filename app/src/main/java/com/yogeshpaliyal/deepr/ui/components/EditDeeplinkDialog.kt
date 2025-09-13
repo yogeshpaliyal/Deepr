@@ -18,13 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 
 @Composable
 fun EditDeeplinkDialog(
     deepr: Deepr,
-    deeprQueries: DeeprQueries,
     onDismiss: () -> Unit,
     onSave: (link: String, name: String) -> Unit,
 ) {
@@ -72,7 +70,7 @@ fun EditDeeplinkDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (isValidDeeplink(link, deeprQueries)) {
+                    if (isValidDeeplink(link)) {
                         onSave(link, name)
                     } else {
                         isError = true
