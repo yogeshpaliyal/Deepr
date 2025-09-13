@@ -19,6 +19,8 @@ class AppPreferenceDataStore(
     companion object {
         private val SORTING_ORDER = stringPreferencesKey("sorting_order")
         private val USE_LINK_BASED_ICONS = booleanPreferencesKey("use_link_based_icons")
+        private val SYNC_ENABLED = booleanPreferencesKey("sync_enabled")
+        private val SYNC_FILE_PATH = stringPreferencesKey("sync_file_path")
     }
 
     val getSortingOrder: Flow<String> =
@@ -31,6 +33,16 @@ class AppPreferenceDataStore(
             preferences[USE_LINK_BASED_ICONS] ?: true // Default to link-based icons
         }
 
+    val getSyncEnabled: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SYNC_ENABLED] ?: false // Default to disabled
+        }
+
+    val getSyncFilePath: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SYNC_FILE_PATH] ?: "" // Default to empty path
+        }
+
     suspend fun setSortingOrder(order: String) {
         context.appDataStore.edit { prefs ->
             prefs[SORTING_ORDER] = order
@@ -40,6 +52,18 @@ class AppPreferenceDataStore(
     suspend fun setUseLinkBasedIcons(useLink: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[USE_LINK_BASED_ICONS] = useLink
+        }
+    }
+
+    suspend fun setSyncEnabled(enabled: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[SYNC_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setSyncFilePath(path: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[SYNC_FILE_PATH] = path
         }
     }
 }

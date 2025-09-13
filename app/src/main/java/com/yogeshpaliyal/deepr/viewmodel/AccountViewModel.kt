@@ -10,6 +10,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -37,6 +38,7 @@ class AccountViewModel(
     private val deeprQueries: DeeprQueries,
     private val exportRepository: ExportRepository,
     private val importRepository: ImportRepository,
+    private val syncRepository: SyncRepository,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
@@ -51,6 +53,12 @@ class AccountViewModel(
 
     private val importResultChannel = Channel<String>()
     val importResultFlow = importResultChannel.receiveAsFlow()
+
+    private val syncResultChannel = Channel<String>()
+    val syncResultFlow = syncResultChannel.receiveAsFlow()
+
+    private val syncValidationChannel = Channel<String>()
+    val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>?> =
@@ -158,6 +166,62 @@ class AccountViewModel(
     fun setUseLinkBasedIcons(useLink: Boolean) {
         viewModelScope.launch {
             preferenceDataStore.setUseLinkBasedIcons(useLink)
+        }
+    }
+
+    // Sync preference methods
+    val syncEnabled =
+        preferenceDataStore.getSyncEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val syncFilePath =
+        preferenceDataStore.getSyncFilePath
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    fun setSyncEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferenceDataStore.setSyncEnabled(enabled)
+        }
+    }
+
+    fun setSyncFilePath(path: String) {
+        viewModelScope.launch {
+            preferenceDataStore.setSyncFilePath(path)
+            // Validate the file after setting the path
+            validateSyncFile(path)
+        }
+    }
+
+    fun syncToMarkdown() {
+        viewModelScope.launch {
+            val result = syncRepository.syncToMarkdown()
+            when (result) {
+                is RequestResult.Success -> {
+                    syncResultChannel.send(result.data)
+                }
+                is RequestResult.Error -> {
+                    syncResultChannel.send(result.message)
+                }
+            }
+        }
+    }
+
+    fun validateSyncFile(filePath: String = "") {
+        viewModelScope.launch {
+            val pathToValidate = filePath.ifEmpty { syncFilePath.value }
+            val result = syncRepository.validateMarkdownFile(pathToValidate)
+            when (result) {
+                is RequestResult.Success -> {
+                    if (result.data) {
+                        syncValidationChannel.send("valid")
+                    } else {
+                        syncValidationChannel.send("invalid")
+                    }
+                }
+                is RequestResult.Error -> {
+                    syncValidationChannel.send("error: ${result.message}")
+                }
+            }
         }
     }
 }

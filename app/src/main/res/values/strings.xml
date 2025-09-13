@@ -50,4 +50,25 @@
     <string name="no_data_available_export">No data available to export after mapping.</string>
     <string name="export_success">Successfully exported to %s</string>
     <string name="export_failed">Failed to create CSV file.</string>
+    
+    <!-- Sync Settings -->
+    <string name="sync_to_file">Sync to Local File</string>
+    <string name="sync_to_file_description">Automatically sync deeplinks to a markdown file</string>
+    <string name="select_sync_file">Select Sync File</string>
+    <string name="select_sync_file_description">Choose file location for markdown sync</string>
+    <string name="sync_file_validation">File Format Validation</string>
+    <string name="sync_status_valid">✓ File format is valid</string>
+    <string name="sync_status_invalid">⚠ File format is invalid</string>
+    <string name="sync_status_no_file">No sync file selected</string>
+    <string name="sync_now">Sync Now</string>
+    <string name="sync_now_description">Manually sync deeplinks to selected file</string>
+    
+    <!-- Sync Messages -->
+    <string name="sync_disabled">Sync is disabled</string>
+    <string name="sync_file_not_selected">No sync file selected</string>
+    <string name="sync_success">Successfully synced to %s</string>
+    <string name="sync_failed">Sync failed: %s</string>
+    <string name="no_file_path_provided">No file path provided</string>
+    <string name="invalid_markdown_format">Invalid markdown table format</string>
+    <string name="file_validation_error">File validation error: %s</string>
 </resources>
