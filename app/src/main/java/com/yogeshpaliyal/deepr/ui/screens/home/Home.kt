@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +48,6 @@ import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
-import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.util.QRScanner
@@ -55,6 +56,7 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Link
+import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
@@ -93,7 +95,7 @@ fun HomeScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 if (isValidDeeplink(result.contents)) {
-                    saveDialogInfo = SaveDialogInfo(result.contents, false)
+                    saveDialogInfo = SaveDialogInfo(Deepr(0, result.contents, "", "", 0), false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -104,7 +106,7 @@ fun HomeScreen(
     LaunchedEffect(sharedText) {
         if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
             if (isValidDeeplink(sharedText)) {
-                saveDialogInfo = SaveDialogInfo(sharedText, false)
+                saveDialogInfo = SaveDialogInfo(Deepr(0, sharedText, "", "", 0), false)
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -142,25 +144,9 @@ fun HomeScreen(
                                 contentDescription = if (isSearchActive) "Close search" else "Search",
                             )
                         }
-                        IconButton(onClick = {
-                            qrScanner.launch(ScanOptions())
-                        }) {
-                            Icon(
-                                TablerIcons.Qrcode,
-                                contentDescription = "QR Scanner",
-                            )
-                        }
                         FilterMenu(onSortOrderChange = {
                             viewModel.setSortOrder(it)
                         })
-                        IconButton(onClick = {
-                            backStack.add(Settings)
-                        }) {
-                            Icon(
-                                TablerIcons.Settings,
-                                contentDescription = "Settings",
-                            )
-                        }
                     },
                 )
                 AnimatedVisibility(visible = isSearchActive) {
@@ -180,16 +166,43 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            HomeBottomContent(
-                hazeState = hazeState,
-                saveDialogInfo = saveDialogInfo,
-                deeprQueries = deeprQueries,
-            ) {
-                saveDialogInfo = it
-                if (it == null) {
-                    resetSharedText()
-                }
-            }
+            BottomAppBar(
+                modifier =
+                    Modifier.hazeEffect(
+                        state = hazeState,
+                        style = HazeMaterials.ultraThin(),
+                    ),
+                containerColor = Color.Transparent,
+                actions = {
+                    IconButton(onClick = {
+                        qrScanner.launch(ScanOptions())
+                    }) {
+                        Icon(
+                            TablerIcons.Qrcode,
+                            contentDescription = "QR Scanner",
+                        )
+                    }
+                    IconButton(onClick = {
+                        // Settings action
+                        backStack.add(Settings)
+                    }) {
+                        Icon(
+                            TablerIcons.Settings,
+                            contentDescription = "Settings",
+                        )
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(onClick = {
+                        saveDialogInfo = SaveDialogInfo(createDeeprObject(), true)
+                    }) {
+                        Icon(
+                            TablerIcons.Plus,
+                            contentDescription = "Add Link",
+                        )
+                    }
+                },
+            )
         },
     ) { contentPadding ->
         Column(
@@ -200,8 +213,33 @@ fun HomeScreen(
             Content(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
-                deeprQueries = deeprQueries,
+                editDeepr = {
+                    saveDialogInfo = SaveDialogInfo(it, false)
+                },
             )
+        }
+
+        saveDialogInfo?.let {
+            HomeBottomContent(
+                deeprQueries = deeprQueries,
+                saveDialogInfo = it,
+            ) { updatedValue ->
+                if (updatedValue != null) {
+                    if (updatedValue.deepr.id == 0L) {
+                        // New Account
+                        viewModel.insertAccount(updatedValue.deepr.link, updatedValue.deepr.name, updatedValue.executeAfterSave)
+                    } else {
+                        // Edit
+                        viewModel.updateDeeplink(updatedValue.deepr.id, updatedValue.deepr.link, updatedValue.deepr.name)
+                    }
+
+                    if (updatedValue.executeAfterSave) {
+                        openDeeplink(context, updatedValue.deepr.link)
+                    }
+                }
+                saveDialogInfo = null
+                resetSharedText()
+            }
         }
     }
 }
@@ -211,9 +249,9 @@ fun HomeScreen(
 fun Content(
     hazeState: HazeState,
     contentPaddingValues: PaddingValues,
-    deeprQueries: DeeprQueries,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    editDeepr: (Deepr) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
 
@@ -230,7 +268,6 @@ fun Content(
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
         var showQrCodeDialog by remember { mutableStateOf<Deepr?>(null) }
-        var showEditDialog by remember { mutableStateOf<Deepr?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -243,24 +280,6 @@ fun Content(
             QrCodeDialog(it) {
                 showQrCodeDialog = null
             }
-        }
-
-        showEditDialog?.let { deepr ->
-            EditDeeplinkDialog(
-                deepr = deepr,
-                onDismiss = { showEditDialog = null },
-                onSave = { newLink, newName ->
-                    if (deeprQueries.getDeeprByLink(newLink).executeAsOneOrNull() != null) {
-                        Toast
-                            .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
-                            .show()
-                    } else {
-                        viewModel.updateDeeplink(deepr.id, newLink, newName)
-                        Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
-                    }
-                    showEditDialog = null
-                },
-            )
         }
 
         DeeprList(
@@ -282,9 +301,7 @@ fun Content(
             onShortcutClick = {
                 showShortcutDialog = it
             },
-            onEditClick = {
-                showEditDialog = it
-            },
+            onEditClick = editDeepr,
             onItemLongClick = {
                 val clipboard =
                     context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
