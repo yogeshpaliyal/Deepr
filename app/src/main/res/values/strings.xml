@@ -42,7 +42,7 @@
     
     <!-- Home Screen -->
     <string name="enter_deeplink_command">Enter deeplink or command</string>
-    <string name="invalid_empty_deeplink">Invalid or empty deeplink.</string>
+    <string name="invalid_empty_duplicate_deeplink">Invalid, Duplicate or empty deeplink.</string>
     
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">Invalid deeplink: %s</string>

@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -38,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -74,7 +74,7 @@ fun SettingsScreen(
         }
 
     // Collect the shortcut icon preference state
-    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsState()
+    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
 
     LaunchedEffect(storagePermissionState.status) {
         if (storagePermissionState.status.isGranted) {

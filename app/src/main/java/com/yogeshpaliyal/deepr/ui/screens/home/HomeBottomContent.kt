@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -38,6 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeBottomContent(
     hazeState: HazeState,
+    deeprQueries: DeeprQueries,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     saveDialogInfo: SaveDialogInfo? = null,
@@ -52,7 +54,7 @@ fun HomeBottomContent(
         SaveCompleteDialog(localSaveDialogInfo) { result ->
             if (result != null) {
                 if (result.executeAfterSave) {
-                    openDeeplink(context, inputText.value)
+                    openDeeplink(context, inputText.value, deeprQueries)
                 }
                 if (!isError) {
                     inputText.value = ""
@@ -97,7 +99,7 @@ fun HomeBottomContent(
                 isError = isError,
                 supportingText = {
                     if (isError) {
-                        Text(text = stringResource(R.string.invalid_empty_deeplink))
+                        Text(text = stringResource(R.string.invalid_empty_duplicate_deeplink))
                     }
                 },
             )
@@ -108,7 +110,7 @@ fun HomeBottomContent(
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 OutlinedButton(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
+                    if (isValidDeeplink(inputText.value, deeprQueries)) {
                         onSaveDialogInfoChange(SaveDialogInfo(inputText.value, false))
                     } else {
                         isError = true
@@ -117,12 +119,12 @@ fun HomeBottomContent(
                     Text(stringResource(R.string.save))
                 }
                 OutlinedButton(onClick = {
-                    isError = !openDeeplink(context, inputText.value)
+                    isError = !openDeeplink(context, inputText.value, deeprQueries)
                 }) {
                     Text(stringResource(R.string.execute))
                 }
                 Button(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
+                    if (isValidDeeplink(inputText.value, deeprQueries)) {
                         onSaveDialogInfoChange(SaveDialogInfo(inputText.value, true))
                     } else {
                         isError = true

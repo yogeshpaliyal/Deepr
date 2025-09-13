@@ -9,10 +9,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DeeprTheme {
                 Surface {
-                    val sharedText = sharingLink.collectAsState().value
+                    val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {
                         sharingLink.value = null
                     }
@@ -53,13 +54,14 @@ class MainActivity : ComponentActivity() {
         // Check if this activity was started via a share intent
         val sharedText =
             when {
-                intent?.action == Intent.ACTION_SEND -> {
+                intent.action == Intent.ACTION_SEND -> {
                     if (intent.type == "text/plain") {
                         intent.getStringExtra(Intent.EXTRA_TEXT)
                     } else {
                         null
                     }
                 }
+
                 else -> null
             }
         sharingLink.value = sharedText
@@ -95,7 +97,11 @@ fun Dashboard(
             when (key) {
                 is Home ->
                     NavEntry(key) {
-                        HomeScreen(backStack, sharedText = sharedText, resetSharedText = resetSharedText)
+                        HomeScreen(
+                            backStack,
+                            sharedText = sharedText,
+                            resetSharedText = resetSharedText,
+                        )
                     }
 
                 is Settings ->
