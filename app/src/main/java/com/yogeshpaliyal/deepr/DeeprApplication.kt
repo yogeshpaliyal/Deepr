@@ -8,6 +8,8 @@ import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.sync.SyncRepository
+import com.yogeshpaliyal.deepr.sync.SyncRepositoryImpl
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -43,7 +45,9 @@ class DeeprApplication : Application() {
 
                 single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
 
-                viewModel { AccountViewModel(get(), get(), get()) }
+                single<SyncRepository> { SyncRepositoryImpl(androidContext(), get(), get()) }
+
+                viewModel { AccountViewModel(get(), get(), get(), get()) }
             }
 
         startKoin {

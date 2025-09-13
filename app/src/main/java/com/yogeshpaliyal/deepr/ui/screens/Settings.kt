@@ -47,7 +47,9 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
+import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
+import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
@@ -76,6 +78,20 @@ fun SettingsScreen(
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
 
+    // Collect sync preference states
+    val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
+    val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
+
+    // Launcher for picking sync file location
+    val syncFileLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("text/markdown"),
+        ) { uri ->
+            uri?.let {
+                viewModel.setSyncFilePath(it.toString())
+            }
+        }
+
     LaunchedEffect(storagePermissionState.status) {
         if (storagePermissionState.status.isGranted) {
             viewModel.exportCsvData()
@@ -93,6 +109,12 @@ fun SettingsScreen(
             if (message.isNotBlank()) {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.syncResultFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -170,6 +192,76 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                HorizontalDivider()
+
+                // Sync Settings Section
+                ListItem(
+                    modifier =
+                        Modifier.clickable {
+                            viewModel.setSyncEnabled(!syncEnabled)
+                        },
+                    headlineContent = { Text(stringResource(R.string.sync_to_file)) },
+                    supportingContent = { Text(stringResource(R.string.sync_to_file_description)) },
+                    leadingContent = {
+                        Icon(
+                            TablerIcons.Refresh,
+                            contentDescription = stringResource(R.string.sync_to_file),
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = syncEnabled,
+                            onCheckedChange = { viewModel.setSyncEnabled(it) },
+                        )
+                    },
+                )
+
+                if (syncEnabled) {
+                    ListItem(
+                        modifier =
+                            Modifier.clickable {
+                                syncFileLauncher.launch("deeplinks.md")
+                            },
+                        headlineContent = { Text(stringResource(R.string.select_sync_file)) },
+                        supportingContent = {
+                            Text(
+                                if (syncFilePath.isNotEmpty()) {
+                                    syncFilePath
+                                        .substringAfterLast("/")
+                                        .replace("%2F", "/")
+                                        .replace("%20", " ")
+                                        .replace("%3A", ":")
+                                } else {
+                                    stringResource(R.string.select_sync_file_description)
+                                },
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                TablerIcons.FileText,
+                                contentDescription = stringResource(R.string.select_sync_file),
+                            )
+                        },
+                    )
+
+                    if (syncFilePath.isNotEmpty()) {
+                        ListItem(
+                            modifier =
+                                Modifier.clickable {
+                                    viewModel.syncToMarkdown()
+                                },
+                            headlineContent = { Text(stringResource(R.string.sync_now)) },
+                            supportingContent = { Text(stringResource(R.string.sync_now_description)) },
+                            leadingContent = {
+                                Icon(
+                                    TablerIcons.Upload,
+                                    contentDescription = stringResource(R.string.sync_now),
+                                )
+                            },
+                        )
+                    }
+                }
 
                 HorizontalDivider()
 
