@@ -227,7 +227,11 @@ fun SettingsScreen(
                         supportingContent = {
                             Text(
                                 if (syncFilePath.isNotEmpty()) {
-                                    syncFilePath.substringAfterLast("/")
+                                    syncFilePath
+                                        .substringAfterLast("/")
+                                        .replace("%2F", "/")
+                                        .replace("%20", " ")
+                                        .replace("%3A", ":")
                                 } else {
                                     stringResource(R.string.select_sync_file_description)
                                 },

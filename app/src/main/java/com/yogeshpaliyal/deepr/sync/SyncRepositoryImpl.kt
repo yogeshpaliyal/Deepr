@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.sync
 
 import android.content.Context
+import androidx.core.net.toUri
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
@@ -10,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
+import java.io.OutputStream
 
 class SyncRepositoryImpl(
     private val context: Context,
@@ -30,24 +31,27 @@ class SyncRepositoryImpl(
                     return@withContext RequestResult.Error(context.getString(R.string.sync_file_not_selected))
                 }
 
-                val file = File(filePath)
-                if (!file.exists()) {
-                    file.parentFile?.mkdirs()
-                    file.createNewFile()
-                }
+                val res =
+                    context.contentResolver.openOutputStream(filePath.toUri())?.use {
+                        val count = deeprQueries.countDeepr().executeAsOne()
+                        if (count == 0L) {
+                            return@withContext RequestResult.Error(context.getString(R.string.no_data_to_export))
+                        }
 
-                val count = deeprQueries.countDeepr().executeAsOne()
-                if (count == 0L) {
-                    return@withContext RequestResult.Error(context.getString(R.string.no_data_to_export))
-                }
+                        val dataToSync = deeprQueries.listDeeprAsc().executeAsList()
+                        if (dataToSync.isEmpty()) {
+                            return@withContext RequestResult.Error(context.getString(R.string.no_data_available_export))
+                        }
 
-                val dataToSync = deeprQueries.listDeeprAsc().executeAsList()
-                if (dataToSync.isEmpty()) {
-                    return@withContext RequestResult.Error(context.getString(R.string.no_data_available_export))
-                }
-
-                writeMarkdownData(file, dataToSync)
-                RequestResult.Success(context.getString(R.string.sync_success, file.absolutePath))
+                        writeMarkdownData(it, dataToSync)
+                        RequestResult.Success(
+                            context.getString(
+                                R.string.sync_success,
+                                filePath,
+                            ),
+                        )
+                    }
+                res ?: RequestResult.Error(context.getString(R.string.sync_failed, ""))
             } catch (e: Exception) {
                 RequestResult.Error(context.getString(R.string.sync_failed, e.message))
             }
@@ -81,10 +85,10 @@ class SyncRepositoryImpl(
     }
 
     private fun writeMarkdownData(
-        file: File,
+        file: OutputStream,
         data: List<Deepr>,
     ) {
-        FileOutputStream(file).use { outputStream ->
+        file.use { outputStream ->
             outputStream.bufferedWriter().use { writer ->
                 // Write header comment
                 writer.write("<!-- Deepr Sync File - Do not modify the table structure -->\n")
