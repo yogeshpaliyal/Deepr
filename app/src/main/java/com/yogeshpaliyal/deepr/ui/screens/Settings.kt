@@ -49,8 +49,8 @@ import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
+import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Settings
-import compose.icons.tablericons.Sync
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
@@ -205,7 +205,7 @@ fun SettingsScreen(
                     supportingContent = { Text(stringResource(R.string.sync_to_file_description)) },
                     leadingContent = {
                         Icon(
-                            TablerIcons.Sync,
+                            TablerIcons.Refresh,
                             contentDescription = stringResource(R.string.sync_to_file),
                         )
                     },
