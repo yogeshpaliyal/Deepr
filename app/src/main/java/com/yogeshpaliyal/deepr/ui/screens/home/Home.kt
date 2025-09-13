@@ -92,7 +92,7 @@ fun HomeScreen(
             if (result.contents == null) {
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
-                if (isValidDeeplink(result.contents, deeprQueries)) {
+                if (isValidDeeplink(result.contents)) {
                     saveDialogInfo = SaveDialogInfo(result.contents, false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
@@ -103,7 +103,7 @@ fun HomeScreen(
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
         if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
-            if (isValidDeeplink(sharedText, deeprQueries)) {
+            if (isValidDeeplink(sharedText)) {
                 saveDialogInfo = SaveDialogInfo(sharedText, false)
             } else {
                 Toast
@@ -248,11 +248,16 @@ fun Content(
         showEditDialog?.let { deepr ->
             EditDeeplinkDialog(
                 deepr = deepr,
-                deeprQueries = deeprQueries,
                 onDismiss = { showEditDialog = null },
                 onSave = { newLink, newName ->
-                    viewModel.updateDeeplink(deepr.id, newLink, newName)
-                    Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
+                    if (deeprQueries.getDeeprByLink(newLink).executeAsOneOrNull() != null) {
+                        Toast
+                            .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        viewModel.updateDeeplink(deepr.id, newLink, newName)
+                        Toast.makeText(context, "Deeplink updated", Toast.LENGTH_SHORT).show()
+                    }
                     showEditDialog = null
                 },
             )

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Canvas
+import android.util.Log
 import android.widget.Toast
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
@@ -16,8 +17,10 @@ fun openDeeplink(
     link: String,
     deeprQueries: DeeprQueries,
 ): Boolean {
-    if (!isValidDeeplink(link, deeprQueries)) return false
+    Log.d("Anas", "open 1 ${isValidDeeplink(link)}")
+    if (!isValidDeeplink(link)) return false
     return try {
+        Log.d("Anas", "opened")
         val intent = Intent(Intent.ACTION_VIEW, link.toUri())
         context.startActivity(intent)
         true
@@ -62,12 +65,8 @@ fun getShortcutAppIcon(
     }
 }
 
-fun isValidDeeplink(
-    link: String,
-    deeprQueries: DeeprQueries,
-): Boolean {
+fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
-    if (deeprQueries.getDeeprByLink(link).executeAsOneOrNull() != null) return false
     return try {
         val uri = link.toUri()
         val hasValidScheme = uri.scheme != null && uri.scheme!!.isNotBlank()

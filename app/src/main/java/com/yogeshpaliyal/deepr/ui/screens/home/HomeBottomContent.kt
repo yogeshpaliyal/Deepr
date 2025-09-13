@@ -99,7 +99,7 @@ fun HomeBottomContent(
                 isError = isError,
                 supportingText = {
                     if (isError) {
-                        Text(text = stringResource(R.string.invalid_empty_duplicate_deeplink))
+                        Text(text = stringResource(R.string.invalid_empty_deeplink))
                     }
                 },
             )
@@ -110,8 +110,17 @@ fun HomeBottomContent(
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 OutlinedButton(onClick = {
-                    if (isValidDeeplink(inputText.value, deeprQueries)) {
-                        onSaveDialogInfoChange(SaveDialogInfo(inputText.value, false))
+                    if (isValidDeeplink(inputText.value)) {
+                        if (deeprQueries
+                                .getDeeprByLink(inputText.value)
+                                .executeAsOneOrNull() != null
+                        ) {
+                            Toast
+                                .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            onSaveDialogInfoChange(SaveDialogInfo(inputText.value, false))
+                        }
                     } else {
                         isError = true
                     }
@@ -124,8 +133,17 @@ fun HomeBottomContent(
                     Text(stringResource(R.string.execute))
                 }
                 Button(onClick = {
-                    if (isValidDeeplink(inputText.value, deeprQueries)) {
-                        onSaveDialogInfoChange(SaveDialogInfo(inputText.value, true))
+                    if (isValidDeeplink(inputText.value)) {
+                        if (deeprQueries
+                                .getDeeprByLink(inputText.value)
+                                .executeAsOneOrNull() != null
+                        ) {
+                            Toast
+                                .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            onSaveDialogInfoChange(SaveDialogInfo(inputText.value, true))
+                        }
                     } else {
                         isError = true
                     }
