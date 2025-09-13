@@ -54,7 +54,7 @@ fun HomeBottomContent(
         SaveCompleteDialog(localSaveDialogInfo) { result ->
             if (result != null) {
                 if (result.executeAfterSave) {
-                    openDeeplink(context, inputText.value, deeprQueries)
+                    openDeeplink(context, inputText.value)
                 }
                 if (!isError) {
                     inputText.value = ""
@@ -128,7 +128,7 @@ fun HomeBottomContent(
                     Text(stringResource(R.string.save))
                 }
                 OutlinedButton(onClick = {
-                    isError = !openDeeplink(context, inputText.value, deeprQueries)
+                    isError = !openDeeplink(context, inputText.value)
                 }) {
                     Text(stringResource(R.string.execute))
                 }

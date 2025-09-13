@@ -9,15 +9,12 @@ import android.widget.Toast
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
 
 fun openDeeplink(
     context: Context,
     link: String,
-    deeprQueries: DeeprQueries,
 ): Boolean {
-    Log.d("Anas", "open 1 ${isValidDeeplink(link)}")
     if (!isValidDeeplink(link)) return false
     return try {
         Log.d("Anas", "opened")

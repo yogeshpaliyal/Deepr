@@ -273,7 +273,7 @@ fun Content(
             accounts = accounts!!,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
-                openDeeplink(context, it.link, deeprQueries)
+                openDeeplink(context, it.link)
             },
             onRemoveClick = {
                 viewModel.deleteAccount(it.id)
