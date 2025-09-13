@@ -5,12 +5,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.getShortcut
@@ -27,7 +27,7 @@ fun CreateShortcutDialog(
     val context = LocalContext.current
     val existingShortcut = getShortcut(context, deepr.id)
     // Collect the shortcut icon preference state
-    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsState()
+    val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
 
     if (isShortcutSupported(context)) {
         var shortcutName by remember {
@@ -50,7 +50,13 @@ fun CreateShortcutDialog(
                 Button(
                     onClick = {
                         onDismiss()
-                        createShortcut(context, deepr, shortcutName, existingShortcut != null, useLinkBasedIcons)
+                        createShortcut(
+                            context,
+                            deepr,
+                            shortcutName,
+                            existingShortcut != null,
+                            useLinkBasedIcons,
+                        )
                     },
                     enabled = shortcutName.isNotBlank(),
                 ) {

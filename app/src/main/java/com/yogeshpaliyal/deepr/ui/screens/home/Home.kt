@@ -30,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +41,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.EditDeeplinkDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -65,6 +66,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 data object Home
 
@@ -74,6 +76,7 @@ fun HomeScreen(
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    deeprQueries: DeeprQueries = koinInject(),
     sharedText: String? = null,
     resetSharedText: () -> Unit,
 ) {
@@ -89,7 +92,7 @@ fun HomeScreen(
             if (result.contents == null) {
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
-                if (isValidDeeplink(result.contents)) {
+                if (isValidDeeplink(result.contents, deeprQueries)) {
                     saveDialogInfo = SaveDialogInfo(result.contents, false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
@@ -100,10 +103,12 @@ fun HomeScreen(
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
         if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
-            if (isValidDeeplink(sharedText)) {
+            if (isValidDeeplink(sharedText, deeprQueries)) {
                 saveDialogInfo = SaveDialogInfo(sharedText, false)
             } else {
-                Toast.makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -175,7 +180,11 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            HomeBottomContent(hazeState, saveDialogInfo = saveDialogInfo) {
+            HomeBottomContent(
+                hazeState = hazeState,
+                saveDialogInfo = saveDialogInfo,
+                deeprQueries = deeprQueries,
+            ) {
                 saveDialogInfo = it
                 if (it == null) {
                     resetSharedText()
@@ -188,7 +197,11 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize(),
         ) {
-            Content(hazeState, contentPadding)
+            Content(
+                hazeState = hazeState,
+                contentPaddingValues = contentPadding,
+                deeprQueries = deeprQueries,
+            )
         }
     }
 }
@@ -198,10 +211,11 @@ fun HomeScreen(
 fun Content(
     hazeState: HazeState,
     contentPaddingValues: PaddingValues,
+    deeprQueries: DeeprQueries,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
-    val accounts by viewModel.accounts.collectAsState()
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
 
     if (accounts == null) {
         Column(
@@ -234,6 +248,7 @@ fun Content(
         showEditDialog?.let { deepr ->
             EditDeeplinkDialog(
                 deepr = deepr,
+                deeprQueries = deeprQueries,
                 onDismiss = { showEditDialog = null },
                 onSave = { newLink, newName ->
                     viewModel.updateDeeplink(deepr.id, newLink, newName)
@@ -253,7 +268,7 @@ fun Content(
             accounts = accounts!!,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
-                openDeeplink(context, it.link)
+                openDeeplink(context, it.link, deeprQueries)
             },
             onRemoveClick = {
                 viewModel.deleteAccount(it.id)

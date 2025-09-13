@@ -8,20 +8,27 @@ import android.widget.Toast
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
 
 fun openDeeplink(
     context: Context,
     link: String,
+    deeprQueries: DeeprQueries,
 ): Boolean {
-    if (!isValidDeeplink(link)) return false
+    if (!isValidDeeplink(link, deeprQueries)) return false
     return try {
         val intent = Intent(Intent.ACTION_VIEW, link.toUri())
         context.startActivity(intent)
         true
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, context.getString(R.string.invalid_deeplink_toast, link), Toast.LENGTH_SHORT).show()
+        Toast
+            .makeText(
+                context,
+                context.getString(R.string.invalid_deeplink_toast, link),
+                Toast.LENGTH_SHORT,
+            ).show()
         // Optionally, show a toast or a dialog to the user that the link is invalid
         false
     }
@@ -55,11 +62,17 @@ fun getShortcutAppIcon(
     }
 }
 
-fun isValidDeeplink(link: String): Boolean {
+fun isValidDeeplink(
+    link: String,
+    deeprQueries: DeeprQueries,
+): Boolean {
     if (link.isBlank()) return false
+    if (deeprQueries.getDeeprByLink(link).executeAsOneOrNull() != null) return false
     return try {
         val uri = link.toUri()
-        uri.scheme != null && uri.scheme!!.isNotBlank()
+        val hasValidScheme = uri.scheme != null && uri.scheme!!.isNotBlank()
+        val hasValidAuthority = uri.authority != null && uri.authority!!.isNotBlank()
+        hasValidScheme && hasValidAuthority
     } catch (_: Exception) {
         false
     }
