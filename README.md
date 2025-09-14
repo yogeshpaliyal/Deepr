@@ -39,7 +39,7 @@ All these sources supports cross platform app updates. for eg: if you've install
   
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
-- Play Store : In Internal testing
+- Play Store : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 > [!IMPORTANT]
 > Need more testers on play store, to make app live on play store, if you're interestn to become a tester please drop a email to yogeshpaliyal.foss@gmail.com  
