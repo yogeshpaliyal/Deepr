@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.screens.Settings
@@ -60,6 +61,7 @@ import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
+import compose.icons.tablericons.Tag
 import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -83,8 +85,10 @@ fun HomeScreen(
     resetSharedText: () -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
+    var isTagsSelectionActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var saveDialogInfo by remember { mutableStateOf<SaveDialogInfo?>(null) }
+    val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
     val qrScanner =
@@ -183,6 +187,14 @@ fun HomeScreen(
                         )
                     }
                     IconButton(onClick = {
+                        isTagsSelectionActive = true
+                    }) {
+                        Icon(
+                            TablerIcons.Tag,
+                            contentDescription = "Tags",
+                        )
+                    }
+                    IconButton(onClick = {
                         // Settings action
                         backStack.add(Settings)
                     }) {
@@ -213,6 +225,7 @@ fun HomeScreen(
             Content(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
+                selectedTag = selectedTag.value,
                 editDeepr = {
                     saveDialogInfo = SaveDialogInfo(it, false)
                 },
@@ -233,6 +246,17 @@ fun HomeScreen(
                 resetSharedText()
             }
         }
+
+        if (isTagsSelectionActive) {
+            TagSelectionBottomSheet(
+                tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                selectedTag = selectedTag.value,
+                dismissBottomSheet = {
+                    isTagsSelectionActive = false
+                },
+                setTagFilter = { viewModel.setTagFilter(it) },
+            )
+        }
     }
 }
 
@@ -240,6 +264,7 @@ fun HomeScreen(
 @Composable
 fun Content(
     hazeState: HazeState,
+    selectedTag: Tags?,
     contentPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
@@ -282,6 +307,7 @@ fun Content(
                     .padding(8.dp),
             contentPaddingValues = contentPaddingValues,
             accounts = accounts!!,
+            selectedTag = selectedTag,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
                 openDeeplink(context, it.link)
@@ -304,6 +330,13 @@ fun Content(
             onQrCodeCLick = {
                 showQrCodeDialog = it
             },
+            onTagClick = {
+                if (viewModel.selectedTagFilter.value ?.name == it) {
+                    viewModel.setTagFilter(null)
+                } else {
+                    viewModel.setSelectedTagByName(it)
+                }
+            },
         )
     }
 }
@@ -311,6 +344,7 @@ fun Content(
 @Composable
 fun DeeprList(
     accounts: List<GetLinksAndTags>,
+    selectedTag: Tags?,
     contentPaddingValues: PaddingValues,
     onItemClick: (GetLinksAndTags) -> Unit,
     onRemoveClick: (GetLinksAndTags) -> Unit,
@@ -318,6 +352,7 @@ fun DeeprList(
     onEditClick: (GetLinksAndTags) -> Unit,
     onItemLongClick: (GetLinksAndTags) -> Unit,
     onQrCodeCLick: (GetLinksAndTags) -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (accounts.isEmpty()) {
@@ -364,12 +399,14 @@ fun DeeprList(
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
+                    selectedTag = selectedTag,
                     onItemClick = onItemClick,
                     onRemoveClick = onRemoveClick,
                     onShortcutClick = onShortcutClick,
                     onEditClick = onEditClick,
                     onItemLongClick = onItemLongClick,
                     onQrCodeClick = onQrCodeCLick,
+                    onTagClick = onTagClick,
                 )
             }
         }

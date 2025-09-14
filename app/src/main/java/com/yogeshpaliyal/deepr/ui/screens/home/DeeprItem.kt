@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
@@ -48,6 +49,7 @@ import java.util.TimeZone
 @Composable
 fun DeeprItem(
     account: GetLinksAndTags,
+    selectedTag: Tags?,
     modifier: Modifier = Modifier,
     onItemClick: ((GetLinksAndTags) -> Unit)? = null,
     onRemoveClick: ((GetLinksAndTags) -> Unit)? = null,
@@ -55,6 +57,7 @@ fun DeeprItem(
     onQrCodeClick: ((GetLinksAndTags) -> Unit)? = null,
     onEditClick: ((GetLinksAndTags) -> Unit)? = null,
     onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
+    onTagClick: ((String) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -186,9 +189,9 @@ fun DeeprItem(
                 ) {
                     selectedTags?.forEach { tag ->
                         InputChip(
-                            selected = false,
-                            onClick = { /* Do nothing on click */ },
-                            label = { Text(tag) },
+                            selected = selectedTag?.name == tag.trim(),
+                            onClick = { onTagClick?.invoke(tag.trim()) },
+                            label = { Text(tag.trim()) },
                         )
                     }
                 }
