@@ -7,6 +7,8 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
@@ -60,6 +62,10 @@ class AccountViewModel(
     private val syncValidationChannel = Channel<String>()
     val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
+    // State for tag filter
+    private val _selectedTagFilter = MutableStateFlow<Tags?>(null)
+    val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<Deepr>?> =
         combine(searchQuery, sortOrder) { query, order ->
@@ -80,6 +86,21 @@ class AccountViewModel(
                     SortOrder.OPENED_DESC -> deeprQueries.searchDeeprByOpenedCountDesc(query)
                 }.asFlow().mapToList(viewModelScope.coroutineContext)
             }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val accounts: StateFlow<List<GetLinksAndTags>?> =
+        combine(searchQuery, sortOrder, selectedTagFilter) { query, sorting, tag ->
+            Triple(query, sorting, tag)
+        }.flatMapLatest { combined ->
+            deeprQueries
+                .getLinksAndTags(
+                    combined.first,
+                    combined.first,
+                    combined.third?.id?.toString() ?: "",
+                    combined.third?.id,
+                ).asFlow()
+                .mapToList(viewModelScope.coroutineContext)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun search(query: String) {
