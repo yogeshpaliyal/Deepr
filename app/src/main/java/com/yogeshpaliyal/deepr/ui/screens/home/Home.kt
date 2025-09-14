@@ -223,7 +223,6 @@ fun HomeScreen(
             HomeBottomContent(
                 deeprQueries = deeprQueries,
                 saveDialogInfo = it,
-                viewModel = viewModel,
             ) { updatedValue ->
                 if (updatedValue != null) {
                     if (updatedValue.executeAfterSave) {

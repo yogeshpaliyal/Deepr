@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +49,7 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.X
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import org.koin.compose.koinInject
 import kotlin.collections.addAll
 import kotlin.collections.remove
 import kotlin.compareTo
@@ -59,7 +61,7 @@ fun HomeBottomContent(
     deeprQueries: DeeprQueries,
     saveDialogInfo: SaveDialogInfo,
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel,
+    viewModel: AccountViewModel = koinInject(),
     onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
 ) {
     var deeprInfo by remember(saveDialogInfo) {
@@ -130,8 +132,9 @@ fun HomeBottomContent(
     }
 
     val context = LocalContext.current
+    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    ModalBottomSheet(onDismissRequest = {
+    ModalBottomSheet(sheetState = modalBottomSheetState, onDismissRequest = {
         onSaveDialogInfoChange(null)
     }) {
         Column(
@@ -224,6 +227,8 @@ fun HomeBottomContent(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Display selected tags - only show the label if there are tags
                 if (selectedTags.isNotEmpty()) {
                     Text(
@@ -297,7 +302,8 @@ fun HomeBottomContent(
                 ) {
                     OutlinedButton(modifier = Modifier.then(if (isCreate) Modifier else Modifier.fillMaxWidth()), onClick = {
                         if (isValidDeeplink(deeprInfo.link)) {
-                            if (deeprQueries
+                            if (isCreate &&
+                                deeprQueries
                                     .getDeeprByLink(deeprInfo.link)
                                     .executeAsOneOrNull() != null
                             ) {
