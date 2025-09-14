@@ -223,16 +223,9 @@ fun HomeScreen(
             HomeBottomContent(
                 deeprQueries = deeprQueries,
                 saveDialogInfo = it,
+                viewModel = viewModel,
             ) { updatedValue ->
                 if (updatedValue != null) {
-                    if (updatedValue.deepr.id == 0L) {
-                        // New Account
-                        viewModel.insertAccount(updatedValue.deepr.link, updatedValue.deepr.name, updatedValue.executeAfterSave)
-                    } else {
-                        // Edit
-                        viewModel.updateDeeplink(updatedValue.deepr.id, updatedValue.deepr.link, updatedValue.deepr.name)
-                    }
-
                     if (updatedValue.executeAfterSave) {
                         openDeeplink(context, updatedValue.deepr.link)
                     }

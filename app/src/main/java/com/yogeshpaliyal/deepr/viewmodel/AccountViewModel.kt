@@ -67,6 +67,15 @@ class AccountViewModel(
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
 
+    // State for tags
+    val allTags: StateFlow<List<Tags>> =
+        deeprQueries
+            .getAllTags()
+            .asFlow()
+            .mapToList(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
 
@@ -85,6 +94,45 @@ class AccountViewModel(
     // State for tag filter
     private val _selectedTagFilter = MutableStateFlow<Tags?>(null)
     val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
+
+    // Remove tag from link
+    fun removeTagFromLink(
+        linkId: Long,
+        tagId: Long,
+    ) {
+        viewModelScope.launch {
+            deeprQueries.removeTagFromLink(linkId, tagId)
+        }
+    }
+
+    // Add tag to link
+    fun addTagToLink(
+        linkId: Long,
+        tagId: Long,
+    ) {
+        viewModelScope.launch {
+            deeprQueries.addTagToLink(linkId, tagId)
+        }
+    }
+
+    // Add tag by name (creates tag if it doesn't exist)
+    fun addTagToLinkByName(
+        linkId: Long,
+        tagName: String,
+    ) {
+        viewModelScope.launch {
+            // Create the tag if it doesn't exist
+            deeprQueries.insertTag(tagName)
+
+            // Get the tag ID
+            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+
+            if (tag != null) {
+                // Add the tag to the link
+                deeprQueries.addTagToLink(linkId, tag.id)
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<GetLinksAndTags>?> =
