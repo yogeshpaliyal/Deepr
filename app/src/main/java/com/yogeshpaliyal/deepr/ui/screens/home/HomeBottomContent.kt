@@ -305,7 +305,8 @@ fun HomeBottomContent(
                             if (isCreate &&
                                 deeprQueries
                                     .getDeeprByLink(deeprInfo.link)
-                                    .executeAsOneOrNull() != null
+                                    .executeAsList()
+                                    .isNotEmpty()
                             ) {
                                 Toast
                                     .makeText(
@@ -336,7 +337,8 @@ fun HomeBottomContent(
                             if (isValidDeeplink(deeprInfo.link)) {
                                 if (deeprQueries
                                         .getDeeprByLink(deeprInfo.link)
-                                        .executeAsOneOrNull() != null
+                                        .executeAsList()
+                                        .isNotEmpty()
                                 ) {
                                     Toast
                                         .makeText(
