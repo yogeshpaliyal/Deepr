@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
@@ -45,14 +45,14 @@ import java.util.TimeZone
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
-    account: Deepr,
+    account: GetLinksAndTags,
     modifier: Modifier = Modifier,
-    onItemClick: ((Deepr) -> Unit)? = null,
-    onRemoveClick: ((Deepr) -> Unit)? = null,
-    onShortcutClick: ((Deepr) -> Unit)? = null,
-    onQrCodeClick: ((Deepr) -> Unit)? = null,
-    onEditClick: ((Deepr) -> Unit)? = null,
-    onItemLongClick: ((Deepr) -> Unit)? = null,
+    onItemClick: ((GetLinksAndTags) -> Unit)? = null,
+    onRemoveClick: ((GetLinksAndTags) -> Unit)? = null,
+    onShortcutClick: ((GetLinksAndTags) -> Unit)? = null,
+    onQrCodeClick: ((GetLinksAndTags) -> Unit)? = null,
+    onEditClick: ((GetLinksAndTags) -> Unit)? = null,
+    onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current

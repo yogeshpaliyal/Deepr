@@ -6,7 +6,6 @@ createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 openedCount INTEGER NOT NULL DEFAULT 0
 );
 
-
 CREATE TABLE Tags (
 id INTEGER PRIMARY KEY NOT NULL,
 name TEXT NOT NULL UNIQUE
@@ -47,7 +46,25 @@ WHERE
 GROUP BY
   Deepr.id
 ORDER BY
-  Deepr.createdAt DESC;
+    CASE WHEN ? = 'ASC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END ASC,
+    CASE WHEN ? = 'DESC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END DESC;
+
 
 listDeeprDesc:
 SELECT * FROM Deepr ORDER BY createdAt DESC;

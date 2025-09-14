@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.dp
 import com.lightspark.composeqr.DotShape
 import com.lightspark.composeqr.QrCodeColors
 import com.lightspark.composeqr.QrCodeView
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 
 @Composable
 fun QrCodeDialog(
-    deepr: Deepr,
+    deepr: GetLinksAndTags,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(

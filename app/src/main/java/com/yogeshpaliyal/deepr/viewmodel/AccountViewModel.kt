@@ -1,11 +1,11 @@
 package com.yogeshpaliyal.deepr.viewmodel
 
 import android.net.Uri
+import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
@@ -22,18 +22,39 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
-enum class SortOrder {
-    ASC,
-    DESC,
-    OPENED_ASC,
-    OPENED_DESC,
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.TYPE,
+)
+@StringDef(
+    value = [
+        SortType.SORT_CREATED_BY_ASC,
+        SortType.SORT_CREATED_BY_DESC,
+        SortType.SORT_OPENED_ASC,
+        SortType.SORT_OPENED_DESC,
+        SortType.SORT_NAME_ASC,
+        SortType.SORT_NAME_DESC,
+        SortType.SORT_LINK_ASC,
+        SortType.SORT_LINK_DESC,
+    ],
+)
+annotation class SortType {
+    companion object {
+        const val SORT_CREATED_BY_ASC = "createdAt_ASC"
+        const val SORT_CREATED_BY_DESC = "createdAt_DESC"
+        const val SORT_OPENED_ASC = "openedCount_ASC"
+        const val SORT_OPENED_DESC = "openedCount_DESC"
+        const val SORT_NAME_ASC = "name_ASC"
+        const val SORT_NAME_DESC = "name_DESC"
+        const val SORT_LINK_ASC = "link_ASC"
+        const val SORT_LINK_DESC = "link_DESC"
+    }
 }
 
 class AccountViewModel(
@@ -45,10 +66,9 @@ class AccountViewModel(
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
-    private val sortOrder: Flow<SortOrder> =
-        preferenceDataStore.getSortingOrder.map { sortOrderName ->
-            SortOrder.valueOf(sortOrderName)
-        }
+
+    private val sortOrder: Flow<@SortType String> =
+        preferenceDataStore.getSortingOrder
 
     private val exportResultChannel = Channel<String>()
     val exportResultFlow = exportResultChannel.receiveAsFlow()
@@ -67,38 +87,23 @@ class AccountViewModel(
     val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<Deepr>?> =
-        combine(searchQuery, sortOrder) { query, order ->
-            Pair(query, order)
-        }.flatMapLatest { (query, order) ->
-            if (query.isBlank()) {
-                when (order) {
-                    SortOrder.ASC -> deeprQueries.listDeeprAsc()
-                    SortOrder.DESC -> deeprQueries.listDeeprDesc()
-                    SortOrder.OPENED_ASC -> deeprQueries.listDeeprByOpenedCountAsc()
-                    SortOrder.OPENED_DESC -> deeprQueries.listDeeprByOpenedCountDesc()
-                }.asFlow().mapToList(viewModelScope.coroutineContext)
-            } else {
-                when (order) {
-                    SortOrder.ASC -> deeprQueries.searchDeeprAsc(query)
-                    SortOrder.DESC -> deeprQueries.searchDeeprDesc(query)
-                    SortOrder.OPENED_ASC -> deeprQueries.searchDeeprByOpenedCountAsc(query)
-                    SortOrder.OPENED_DESC -> deeprQueries.searchDeeprByOpenedCountDesc(query)
-                }.asFlow().mapToList(viewModelScope.coroutineContext)
-            }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<GetLinksAndTags>?> =
         combine(searchQuery, sortOrder, selectedTagFilter) { query, sorting, tag ->
             Triple(query, sorting, tag)
         }.flatMapLatest { combined ->
+            val sorting = combined.second.split("_")
+            val sortField = sorting.getOrNull(0) ?: "createdAt"
+            val sortType = sorting.getOrNull(1) ?: "DESC"
             deeprQueries
                 .getLinksAndTags(
                     combined.first,
                     combined.first,
                     combined.third?.id?.toString() ?: "",
                     combined.third?.id,
+                    sortType,
+                    sortField,
+                    sortType,
+                    sortField,
                 ).asFlow()
                 .mapToList(viewModelScope.coroutineContext)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -107,9 +112,9 @@ class AccountViewModel(
         searchQuery.value = query
     }
 
-    fun setSortOrder(order: SortOrder) {
+    fun setSortOrder(type: @SortType String) {
         viewModelScope.launch {
-            preferenceDataStore.setSortingOrder(order.name)
+            preferenceDataStore.setSortingOrder(type)
         }
     }
 
@@ -220,6 +225,7 @@ class AccountViewModel(
                 is RequestResult.Success -> {
                     syncResultChannel.send(result.data)
                 }
+
                 is RequestResult.Error -> {
                     syncResultChannel.send(result.message)
                 }
@@ -239,6 +245,7 @@ class AccountViewModel(
                         syncValidationChannel.send("invalid")
                     }
                 }
+
                 is RequestResult.Error -> {
                     syncValidationChannel.send("error: ${result.message}")
                 }

@@ -45,8 +45,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.screens.Settings
@@ -95,7 +95,7 @@ fun HomeScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 if (isValidDeeplink(result.contents)) {
-                    saveDialogInfo = SaveDialogInfo(Deepr(0, result.contents, "", "", 0), false)
+                    saveDialogInfo = SaveDialogInfo(createDeeprObject(link = result.contents), false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -106,7 +106,7 @@ fun HomeScreen(
     LaunchedEffect(sharedText) {
         if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
             if (isValidDeeplink(sharedText)) {
-                saveDialogInfo = SaveDialogInfo(Deepr(0, sharedText, "", "", 0), false)
+                saveDialogInfo = SaveDialogInfo(createDeeprObject(link = sharedText), false)
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -251,7 +251,7 @@ fun Content(
     contentPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
-    editDeepr: (Deepr) -> Unit = {},
+    editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
 
@@ -266,8 +266,8 @@ fun Content(
 
     Column(modifier.fillMaxSize()) {
         val context = LocalContext.current
-        var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
-        var showQrCodeDialog by remember { mutableStateOf<Deepr?>(null) }
+        var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+        var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -318,14 +318,14 @@ fun Content(
 
 @Composable
 fun DeeprList(
-    accounts: List<Deepr>,
+    accounts: List<GetLinksAndTags>,
     contentPaddingValues: PaddingValues,
-    onItemClick: (Deepr) -> Unit,
-    onRemoveClick: (Deepr) -> Unit,
-    onShortcutClick: (Deepr) -> Unit,
-    onEditClick: (Deepr) -> Unit,
-    onItemLongClick: (Deepr) -> Unit,
-    onQrCodeCLick: (Deepr) -> Unit,
+    onItemClick: (GetLinksAndTags) -> Unit,
+    onRemoveClick: (GetLinksAndTags) -> Unit,
+    onShortcutClick: (GetLinksAndTags) -> Unit,
+    onEditClick: (GetLinksAndTags) -> Unit,
+    onItemLongClick: (GetLinksAndTags) -> Unit,
+    onQrCodeCLick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (accounts.isEmpty()) {

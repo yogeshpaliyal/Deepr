@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.getShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
@@ -20,7 +20,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateShortcutDialog(
-    deepr: Deepr,
+    deepr: GetLinksAndTags,
     onDismiss: () -> Unit,
     viewModel: AccountViewModel = koinViewModel(),
 ) {

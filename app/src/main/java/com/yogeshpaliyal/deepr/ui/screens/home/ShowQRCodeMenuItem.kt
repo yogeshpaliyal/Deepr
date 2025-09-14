@@ -5,14 +5,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 
 @Composable
 fun ShowQRCodeMenuItem(
-    account: Deepr,
-    onQrCodeClick: (Deepr) -> Unit,
+    account: GetLinksAndTags,
+    onQrCodeClick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenuItem(

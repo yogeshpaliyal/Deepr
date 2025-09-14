@@ -12,13 +12,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.yogeshpaliyal.deepr.viewmodel.SortOrder
+import com.yogeshpaliyal.deepr.viewmodel.SortType
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Filter
 
 @Composable
 fun FilterMenu(
-    onSortOrderChange: (SortOrder) -> Unit,
+    onSortOrderChange: (sortType: @SortType String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -33,28 +33,56 @@ fun FilterMenu(
             DropdownMenuItem(
                 text = { Text("Sort by Date Ascending") },
                 onClick = {
-                    onSortOrderChange(SortOrder.ASC)
+                    onSortOrderChange(SortType.SORT_CREATED_BY_ASC)
                     expanded = false
                 },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Date Descending") },
                 onClick = {
-                    onSortOrderChange(SortOrder.DESC)
+                    onSortOrderChange(SortType.SORT_CREATED_BY_DESC)
                     expanded = false
                 },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Opened Ascending") },
                 onClick = {
-                    onSortOrderChange(SortOrder.OPENED_ASC)
+                    onSortOrderChange(SortType.SORT_OPENED_ASC)
                     expanded = false
                 },
             )
             DropdownMenuItem(
                 text = { Text("Sort by Opened Descending") },
                 onClick = {
-                    onSortOrderChange(SortOrder.OPENED_DESC)
+                    onSortOrderChange(SortType.SORT_OPENED_DESC)
+                    expanded = false
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Name Ascending") },
+                onClick = {
+                    onSortOrderChange(SortType.SORT_NAME_ASC)
+                    expanded = false
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Name Descending") },
+                onClick = {
+                    onSortOrderChange(SortType.SORT_NAME_DESC)
+                    expanded = false
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Link Ascending") },
+                onClick = {
+                    onSortOrderChange(SortType.SORT_LINK_ASC)
+                    expanded = false
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Link Descending") },
+                onClick = {
+                    onSortOrderChange(SortType.SORT_LINK_DESC)
                     expanded = false
                 },
             )
