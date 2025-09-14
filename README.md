@@ -12,15 +12,15 @@
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
 ## 🎩 🪄 Features
-
-- Save and Organize Deeplinks
-- Launch Deeplinks
 - Search
 - Sort
 - Open Counter
 - Home Screen Shortcuts
 - Import/Export Deeplinks
 - QR Code support: Generate and scan
+- Organize links by tags
+- Save link by sharing from other app (eg: chrome, etc.)
+- Save links to markdown file in local storage. (can be used for obsidian)
 
 ## 🏗️ Tech Stack
 
