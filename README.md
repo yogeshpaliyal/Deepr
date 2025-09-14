@@ -2,7 +2,7 @@
 
 ![./fastlane/metadata/android/en-US/images/featureGraphic.png](./fastlane/metadata/android/en-US/images/featureGraphic.png)
 
-> Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
+> Deepr is a native Android application designed to streamline the management and testing of links. It provides a simple and efficient way to store, organize, and open links.
 
 [![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
@@ -16,7 +16,7 @@
 - Sort
 - Open Counter
 - Home Screen Shortcuts
-- Import/Export Deeplinks
+- Import/Export links
 - QR Code support: Generate and scan
 - Organize links by tags
 - Save link by sharing from other app (eg: chrome, etc.)
