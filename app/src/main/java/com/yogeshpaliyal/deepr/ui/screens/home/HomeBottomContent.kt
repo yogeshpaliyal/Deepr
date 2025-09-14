@@ -5,12 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,127 +27,150 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
-import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
-import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeBottomContent(
-    hazeState: HazeState,
     deeprQueries: DeeprQueries,
+    saveDialogInfo: SaveDialogInfo,
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = koinViewModel(),
-    saveDialogInfo: SaveDialogInfo? = null,
     onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
 ) {
-    val inputText = remember { mutableStateOf("") }
+    var deeprInfo by remember(saveDialogInfo) {
+        mutableStateOf(
+            saveDialogInfo.deepr,
+        )
+    }
     var isError by remember { mutableStateOf(false) }
+    var isNameError by remember { mutableStateOf(false) }
+    val isCreate = saveDialogInfo.deepr.id == 0L
 
     val context = LocalContext.current
 
-    saveDialogInfo?.let { localSaveDialogInfo ->
-        SaveCompleteDialog(localSaveDialogInfo) { result ->
-            if (result != null) {
-                if (result.executeAfterSave) {
-                    openDeeplink(context, inputText.value)
-                }
-                if (!isError) {
-                    inputText.value = ""
-                    Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
-                    viewModel.insertAccount(result.link, result.name, result.executeAfterSave)
-                }
-            }
-            onSaveDialogInfoChange(null)
-        }
-    }
-
-    Column(
-        modifier =
-            modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 12.dp,
-                    ),
-                ).hazeEffect(
-                    state = hazeState,
-                    style = HazeMaterials.thin(),
-                ).fillMaxWidth(),
-    ) {
+    ModalBottomSheet(onDismissRequest = {
+        onSaveDialogInfoChange(null)
+    }) {
         Column(
             modifier =
-                Modifier
-                    .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
-                    .imePadding()
-                    .padding(8.dp),
+                modifier
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 12.dp,
+                        ),
+                    ).fillMaxWidth(),
         ) {
-            TextField(
-                value = inputText.value,
-                onValueChange = {
-                    inputText.value = it
-                    isError = false
-                },
+            Column(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                placeholder = { Text(stringResource(R.string.enter_deeplink_command)) },
-                isError = isError,
-                supportingText = {
-                    if (isError) {
-                        Text(text = stringResource(R.string.invalid_empty_deeplink))
-                    }
-                },
-            )
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
+                        .padding(8.dp),
             ) {
-                OutlinedButton(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
-                        if (deeprQueries
-                                .getDeeprByLink(inputText.value)
-                                .executeAsOneOrNull() != null
-                        ) {
-                            Toast
-                                .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            onSaveDialogInfoChange(SaveDialogInfo(inputText.value, false))
+                TextField(
+                    value = deeprInfo.name,
+                    onValueChange = {
+                        deeprInfo = deeprInfo.copy(name = it)
+                        isNameError = false
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    label = { Text(stringResource(R.string.enter_link_name)) },
+                    supportingText = {
+                        if (isNameError) {
+                            Text(text = stringResource(R.string.enter_link_name_error))
                         }
-                    } else {
-                        isError = true
-                    }
-                }) {
-                    Text(stringResource(R.string.save))
-                }
-                OutlinedButton(onClick = {
-                    isError = !openDeeplink(context, inputText.value)
-                }) {
-                    Text(stringResource(R.string.execute))
-                }
-                Button(onClick = {
-                    if (isValidDeeplink(inputText.value)) {
-                        if (deeprQueries
-                                .getDeeprByLink(inputText.value)
-                                .executeAsOneOrNull() != null
-                        ) {
-                            Toast
-                                .makeText(context, "Deeplink already exists", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            onSaveDialogInfoChange(SaveDialogInfo(inputText.value, true))
+                    },
+                )
+
+                TextField(
+                    value = deeprInfo.link,
+                    onValueChange = {
+                        deeprInfo = deeprInfo.copy(link = it)
+                        isError = false
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    label = { Text(stringResource(R.string.enter_deeplink_command)) },
+                    isError = isError,
+                    supportingText = {
+                        if (isError) {
+                            Text(text = stringResource(R.string.invalid_empty_deeplink))
                         }
-                    } else {
-                        isError = true
+                    },
+                )
+
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                ) {
+                    OutlinedButton(modifier = Modifier.then(if (isCreate) Modifier else Modifier.fillMaxWidth()), onClick = {
+                        if (isValidDeeplink(deeprInfo.link)) {
+                            if (deeprQueries
+                                    .getDeeprByLink(deeprInfo.link)
+                                    .executeAsOneOrNull() != null
+                            ) {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Deeplink already exists",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            } else {
+                                onSaveDialogInfoChange(
+                                    SaveDialogInfo(
+                                        deeprInfo,
+                                        saveDialogInfo.executeAfterSave,
+                                    ),
+                                )
+                            }
+                        } else {
+                            isError = true
+                        }
+                    }) {
+                        Text(stringResource(R.string.save))
                     }
-                }) {
-                    Text(stringResource(R.string.save_and_execute))
+
+                    if (isCreate) {
+                        OutlinedButton(onClick = {
+                            isError = !openDeeplink(context, deeprInfo.link)
+                        }) {
+                            Text(stringResource(R.string.execute))
+                        }
+                    }
+
+                    if (isCreate) {
+                        Button(onClick = {
+                            if (isValidDeeplink(deeprInfo.link)) {
+                                if (deeprQueries
+                                        .getDeeprByLink(deeprInfo.link)
+                                        .executeAsOneOrNull() != null
+                                ) {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Deeplink already exists",
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                } else {
+                                    onSaveDialogInfoChange(
+                                        SaveDialogInfo(
+                                            deeprInfo,
+                                            saveDialogInfo.executeAfterSave,
+                                        ),
+                                    )
+                                }
+                            } else {
+                                isError = true
+                            }
+                        }) {
+                            Text(stringResource(R.string.save_and_execute))
+                        }
+                    }
                 }
             }
         }
