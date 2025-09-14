@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.util.hasShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import compose.icons.TablerIcons
@@ -15,8 +15,8 @@ import compose.icons.tablericons.Plus
 
 @Composable
 fun ShortcutMenuItem(
-    account: Deepr,
-    onShortcutClick: (Deepr) -> Unit,
+    account: GetLinksAndTags,
+    onShortcutClick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current

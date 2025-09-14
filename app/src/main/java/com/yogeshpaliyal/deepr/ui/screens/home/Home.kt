@@ -45,8 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.screens.Settings
@@ -60,6 +61,7 @@ import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
+import compose.icons.tablericons.Tag
 import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -83,8 +85,10 @@ fun HomeScreen(
     resetSharedText: () -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
+    var isTagsSelectionActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var saveDialogInfo by remember { mutableStateOf<SaveDialogInfo?>(null) }
+    val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
     val qrScanner =
@@ -95,7 +99,7 @@ fun HomeScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 if (isValidDeeplink(result.contents)) {
-                    saveDialogInfo = SaveDialogInfo(Deepr(0, result.contents, "", "", 0), false)
+                    saveDialogInfo = SaveDialogInfo(createDeeprObject(link = result.contents), false)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -106,7 +110,7 @@ fun HomeScreen(
     LaunchedEffect(sharedText) {
         if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
             if (isValidDeeplink(sharedText)) {
-                saveDialogInfo = SaveDialogInfo(Deepr(0, sharedText, "", "", 0), false)
+                saveDialogInfo = SaveDialogInfo(createDeeprObject(link = sharedText), false)
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -183,6 +187,14 @@ fun HomeScreen(
                         )
                     }
                     IconButton(onClick = {
+                        isTagsSelectionActive = true
+                    }) {
+                        Icon(
+                            TablerIcons.Tag,
+                            contentDescription = "Tags",
+                        )
+                    }
+                    IconButton(onClick = {
                         // Settings action
                         backStack.add(Settings)
                     }) {
@@ -213,6 +225,7 @@ fun HomeScreen(
             Content(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
+                selectedTag = selectedTag.value,
                 editDeepr = {
                     saveDialogInfo = SaveDialogInfo(it, false)
                 },
@@ -225,14 +238,6 @@ fun HomeScreen(
                 saveDialogInfo = it,
             ) { updatedValue ->
                 if (updatedValue != null) {
-                    if (updatedValue.deepr.id == 0L) {
-                        // New Account
-                        viewModel.insertAccount(updatedValue.deepr.link, updatedValue.deepr.name, updatedValue.executeAfterSave)
-                    } else {
-                        // Edit
-                        viewModel.updateDeeplink(updatedValue.deepr.id, updatedValue.deepr.link, updatedValue.deepr.name)
-                    }
-
                     if (updatedValue.executeAfterSave) {
                         openDeeplink(context, updatedValue.deepr.link)
                     }
@@ -241,6 +246,17 @@ fun HomeScreen(
                 resetSharedText()
             }
         }
+
+        if (isTagsSelectionActive) {
+            TagSelectionBottomSheet(
+                tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                selectedTag = selectedTag.value,
+                dismissBottomSheet = {
+                    isTagsSelectionActive = false
+                },
+                setTagFilter = { viewModel.setTagFilter(it) },
+            )
+        }
     }
 }
 
@@ -248,10 +264,11 @@ fun HomeScreen(
 @Composable
 fun Content(
     hazeState: HazeState,
+    selectedTag: Tags?,
     contentPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
-    editDeepr: (Deepr) -> Unit = {},
+    editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
 
@@ -266,8 +283,8 @@ fun Content(
 
     Column(modifier.fillMaxSize()) {
         val context = LocalContext.current
-        var showShortcutDialog by remember { mutableStateOf<Deepr?>(null) }
-        var showQrCodeDialog by remember { mutableStateOf<Deepr?>(null) }
+        var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+        var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -290,6 +307,7 @@ fun Content(
                     .padding(8.dp),
             contentPaddingValues = contentPaddingValues,
             accounts = accounts!!,
+            selectedTag = selectedTag,
             onItemClick = {
                 viewModel.incrementOpenedCount(it.id)
                 openDeeplink(context, it.link)
@@ -312,20 +330,29 @@ fun Content(
             onQrCodeCLick = {
                 showQrCodeDialog = it
             },
+            onTagClick = {
+                if (viewModel.selectedTagFilter.value ?.name == it) {
+                    viewModel.setTagFilter(null)
+                } else {
+                    viewModel.setSelectedTagByName(it)
+                }
+            },
         )
     }
 }
 
 @Composable
 fun DeeprList(
-    accounts: List<Deepr>,
+    accounts: List<GetLinksAndTags>,
+    selectedTag: Tags?,
     contentPaddingValues: PaddingValues,
-    onItemClick: (Deepr) -> Unit,
-    onRemoveClick: (Deepr) -> Unit,
-    onShortcutClick: (Deepr) -> Unit,
-    onEditClick: (Deepr) -> Unit,
-    onItemLongClick: (Deepr) -> Unit,
-    onQrCodeCLick: (Deepr) -> Unit,
+    onItemClick: (GetLinksAndTags) -> Unit,
+    onRemoveClick: (GetLinksAndTags) -> Unit,
+    onShortcutClick: (GetLinksAndTags) -> Unit,
+    onEditClick: (GetLinksAndTags) -> Unit,
+    onItemLongClick: (GetLinksAndTags) -> Unit,
+    onQrCodeCLick: (GetLinksAndTags) -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (accounts.isEmpty()) {
@@ -372,12 +399,14 @@ fun DeeprList(
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
+                    selectedTag = selectedTag,
                     onItemClick = onItemClick,
                     onRemoveClick = onRemoveClick,
                     onShortcutClick = onShortcutClick,
                     onEditClick = onEditClick,
                     onItemLongClick = onItemLongClick,
                     onQrCodeClick = onQrCodeCLick,
+                    onTagClick = onTagClick,
                 )
             }
         }

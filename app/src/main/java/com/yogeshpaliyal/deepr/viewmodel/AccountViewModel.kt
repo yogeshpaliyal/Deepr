@@ -1,17 +1,20 @@
 package com.yogeshpaliyal.deepr.viewmodel
 
 import android.net.Uri
+import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -20,18 +23,39 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
-enum class SortOrder {
-    ASC,
-    DESC,
-    OPENED_ASC,
-    OPENED_DESC,
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.TYPE,
+)
+@StringDef(
+    value = [
+        SortType.SORT_CREATED_BY_ASC,
+        SortType.SORT_CREATED_BY_DESC,
+        SortType.SORT_OPENED_ASC,
+        SortType.SORT_OPENED_DESC,
+        SortType.SORT_NAME_ASC,
+        SortType.SORT_NAME_DESC,
+        SortType.SORT_LINK_ASC,
+        SortType.SORT_LINK_DESC,
+    ],
+)
+annotation class SortType {
+    companion object {
+        const val SORT_CREATED_BY_ASC = "createdAt_ASC"
+        const val SORT_CREATED_BY_DESC = "createdAt_DESC"
+        const val SORT_OPENED_ASC = "openedCount_ASC"
+        const val SORT_OPENED_DESC = "openedCount_DESC"
+        const val SORT_NAME_ASC = "name_ASC"
+        const val SORT_NAME_DESC = "name_DESC"
+        const val SORT_LINK_ASC = "link_ASC"
+        const val SORT_LINK_DESC = "link_DESC"
+    }
 }
 
 class AccountViewModel(
@@ -43,10 +67,18 @@ class AccountViewModel(
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val searchQuery = MutableStateFlow("")
-    private val sortOrder: Flow<SortOrder> =
-        preferenceDataStore.getSortingOrder.map { sortOrderName ->
-            SortOrder.valueOf(sortOrderName)
-        }
+
+    // State for tags
+    val allTags: StateFlow<List<Tags>> =
+        deeprQueries
+            .getAllTags()
+            .asFlow()
+            .mapToList(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    private val sortOrder: Flow<@SortType String> =
+        preferenceDataStore.getSortingOrder
 
     private val exportResultChannel = Channel<String>()
     val exportResultFlow = exportResultChannel.receiveAsFlow()
@@ -60,35 +92,90 @@ class AccountViewModel(
     private val syncValidationChannel = Channel<String>()
     val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<Deepr>?> =
-        combine(searchQuery, sortOrder) { query, order ->
-            Pair(query, order)
-        }.flatMapLatest { (query, order) ->
-            if (query.isBlank()) {
-                when (order) {
-                    SortOrder.ASC -> deeprQueries.listDeeprAsc()
-                    SortOrder.DESC -> deeprQueries.listDeeprDesc()
-                    SortOrder.OPENED_ASC -> deeprQueries.listDeeprByOpenedCountAsc()
-                    SortOrder.OPENED_DESC -> deeprQueries.listDeeprByOpenedCountDesc()
-                }.asFlow().mapToList(viewModelScope.coroutineContext)
-            } else {
-                when (order) {
-                    SortOrder.ASC -> deeprQueries.searchDeeprAsc(query)
-                    SortOrder.DESC -> deeprQueries.searchDeeprDesc(query)
-                    SortOrder.OPENED_ASC -> deeprQueries.searchDeeprByOpenedCountAsc(query)
-                    SortOrder.OPENED_DESC -> deeprQueries.searchDeeprByOpenedCountDesc(query)
-                }.asFlow().mapToList(viewModelScope.coroutineContext)
+    // State for tag filter
+    private val _selectedTagFilter = MutableStateFlow<Tags?>(null)
+    val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
+
+    // Set tag filter
+    fun setTagFilter(tag: Tags?) {
+        _selectedTagFilter.value = tag
+    }
+
+    // Remove tag from link
+    fun removeTagFromLink(
+        linkId: Long,
+        tagId: Long,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.removeTagFromLink(linkId, tagId)
+        }
+    }
+
+    // Add tag to link
+    fun addTagToLink(
+        linkId: Long,
+        tagId: Long,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.addTagToLink(linkId, tagId)
+        }
+    }
+
+    // Add tag by name (creates tag if it doesn't exist)
+    fun addTagToLinkByName(
+        linkId: Long,
+        tagName: String,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Create the tag if it doesn't exist
+            deeprQueries.insertTag(tagName)
+
+            // Get the tag ID
+            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+
+            if (tag != null) {
+                // Add the tag to the link
+                deeprQueries.addTagToLink(linkId, tag.id)
             }
+        }
+    }
+
+    fun setSelectedTagByName(tagName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+            _selectedTagFilter.value = tag
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val accounts: StateFlow<List<GetLinksAndTags>?> =
+        combine(searchQuery, sortOrder, selectedTagFilter) { query, sorting, tag ->
+            Triple(query, sorting, tag)
+        }.flatMapLatest { combined ->
+            val sorting = combined.second.split("_")
+            val sortField = sorting.getOrNull(0) ?: "createdAt"
+            val sortType = sorting.getOrNull(1) ?: "DESC"
+            deeprQueries
+                .getLinksAndTags(
+                    combined.first,
+                    combined.first,
+                    combined.third?.id?.toString() ?: "",
+                    combined.third?.id,
+                    sortType,
+                    sortField,
+                    sortType,
+                    sortField,
+                ).asFlow()
+                .mapToList(viewModelScope.coroutineContext)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun search(query: String) {
         searchQuery.value = query
     }
 
-    fun setSortOrder(order: SortOrder) {
-        viewModelScope.launch {
-            preferenceDataStore.setSortingOrder(order.name)
+    fun setSortOrder(type: @SortType String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setSortingOrder(type)
         }
     }
 
@@ -97,19 +184,19 @@ class AccountViewModel(
         name: String,
         executed: Boolean,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0)
         }
     }
 
     fun deleteAccount(id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.deleteDeeprById(id)
         }
     }
 
     fun incrementOpenedCount(id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
         }
     }
@@ -119,13 +206,13 @@ class AccountViewModel(
         newLink: String,
         newName: String,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, id)
         }
     }
 
     fun exportCsvData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = exportRepository.exportToCsv()
             when (result) {
                 is RequestResult.Success -> {
@@ -140,7 +227,7 @@ class AccountViewModel(
     }
 
     fun importCsvData(uri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             importResultChannel.send("Importing, please wait...")
             val result = importRepository.importFromCsv(uri)
 
@@ -164,7 +251,7 @@ class AccountViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     fun setUseLinkBasedIcons(useLink: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setUseLinkBasedIcons(useLink)
         }
     }
@@ -179,13 +266,13 @@ class AccountViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     fun setSyncEnabled(enabled: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setSyncEnabled(enabled)
         }
     }
 
     fun setSyncFilePath(path: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setSyncFilePath(path)
             // Validate the file after setting the path
             validateSyncFile(path)
@@ -193,12 +280,13 @@ class AccountViewModel(
     }
 
     fun syncToMarkdown() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = syncRepository.syncToMarkdown()
             when (result) {
                 is RequestResult.Success -> {
                     syncResultChannel.send(result.data)
                 }
+
                 is RequestResult.Error -> {
                     syncResultChannel.send(result.message)
                 }
@@ -207,7 +295,7 @@ class AccountViewModel(
     }
 
     fun validateSyncFile(filePath: String = "") {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val pathToValidate = filePath.ifEmpty { syncFilePath.value }
             val result = syncRepository.validateMarkdownFile(pathToValidate)
             when (result) {
@@ -218,6 +306,7 @@ class AccountViewModel(
                         syncValidationChannel.send("invalid")
                     }
                 }
+
                 is RequestResult.Error -> {
                     syncValidationChannel.send("error: ${result.message}")
                 }

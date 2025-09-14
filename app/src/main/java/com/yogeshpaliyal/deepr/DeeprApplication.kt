@@ -1,8 +1,10 @@
 package com.yogeshpaliyal.deepr
 
 import android.app.Application
+import android.util.Log
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import app.cash.sqldelight.logs.LogSqliteDriver
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
@@ -24,7 +26,15 @@ class DeeprApplication : Application() {
             module {
                 // Provide the Android-specific SqlDriver
                 single<SqlDriver> {
-                    AndroidSqliteDriver(DeeprDB.Schema, this@DeeprApplication, "deepr.db")
+                    LogSqliteDriver(
+                        AndroidSqliteDriver(
+                            DeeprDB.Schema,
+                            this@DeeprApplication,
+                            "deepr.db",
+                        ),
+                    ) {
+                        Log.d("loggingDB", it)
+                    }
                 }
 
                 // Provide the Database instance

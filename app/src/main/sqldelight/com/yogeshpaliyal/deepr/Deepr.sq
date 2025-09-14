@@ -6,8 +6,65 @@ createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 openedCount INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE Tags (
+id INTEGER PRIMARY KEY NOT NULL,
+name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE LinkTags (
+linkId INTEGER NOT NULL,
+tagId INTEGER NOT NULL,
+PRIMARY KEY (linkId, tagId),
+FOREIGN KEY (linkId) REFERENCES Deepr(id) ON DELETE CASCADE,
+FOREIGN KEY (tagId) REFERENCES Tags(id) ON DELETE CASCADE
+);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
 insertDeepr:
 INSERT INTO Deepr (link, name, openedCount) VALUES (?, ?, ?);
+
+getLinksAndTags:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
+  GROUP_CONCAT(Tags.id, ', ') AS tagsIds
+FROM
+  Deepr
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
+  AND (
+    ? = '' OR Tags.id = ?
+  )
+GROUP BY
+  Deepr.id
+ORDER BY
+    CASE WHEN ? = 'ASC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END ASC,
+    CASE WHEN ? = 'DESC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END DESC;
+
 
 listDeeprDesc:
 SELECT * FROM Deepr ORDER BY createdAt DESC;
@@ -47,3 +104,24 @@ SELECT COUNT(*) FROM Deepr;
 
 getDeeprByLink:
 SELECT * FROM Deepr WHERE link = ?;
+
+
+-- Tag operations
+insertTag:
+INSERT OR IGNORE INTO Tags (name) VALUES (?);
+
+getTagByName:
+SELECT * FROM Tags WHERE name = ?;
+
+getAllTags:
+SELECT * FROM Tags ORDER BY name;
+
+
+-- Link-Tag relations
+addTagToLink:
+INSERT OR IGNORE INTO LinkTags (linkId, tagId) VALUES (?, ?);
+
+removeTagFromLink:
+DELETE FROM LinkTags WHERE linkId = ? AND tagId = ?;
+
+

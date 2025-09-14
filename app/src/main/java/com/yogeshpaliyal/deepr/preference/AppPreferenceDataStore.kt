@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.yogeshpaliyal.deepr.viewmodel.SortOrder
+import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -23,9 +23,9 @@ class AppPreferenceDataStore(
         private val SYNC_FILE_PATH = stringPreferencesKey("sync_file_path")
     }
 
-    val getSortingOrder: Flow<String> =
+    val getSortingOrder: Flow<@SortType String> =
         context.appDataStore.data.map { preferences ->
-            preferences[SORTING_ORDER] ?: SortOrder.DESC.name
+            preferences[SORTING_ORDER] ?: SortType.SORT_CREATED_BY_DESC
         }
 
     val getUseLinkBasedIcons: Flow<Boolean> =
@@ -43,7 +43,7 @@ class AppPreferenceDataStore(
             preferences[SYNC_FILE_PATH] ?: "" // Default to empty path
         }
 
-    suspend fun setSortingOrder(order: String) {
+    suspend fun setSortingOrder(order: @SortType String) {
         context.appDataStore.edit { prefs ->
             prefs[SORTING_ORDER] = order
         }

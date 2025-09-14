@@ -7,11 +7,11 @@ import android.os.Build
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
-import com.yogeshpaliyal.deepr.Deepr
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 
 fun createShortcut(
     context: Context,
-    deepr: Deepr,
+    deepr: GetLinksAndTags,
     shortcutName: String,
     alreadyExists: Boolean,
     useLinkBasedIcon: Boolean,
