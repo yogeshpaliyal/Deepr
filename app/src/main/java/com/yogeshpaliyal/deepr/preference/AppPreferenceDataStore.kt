@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.yogeshpaliyal.deepr.viewmodel.SortType
@@ -21,6 +22,7 @@ class AppPreferenceDataStore(
         private val USE_LINK_BASED_ICONS = booleanPreferencesKey("use_link_based_icons")
         private val SYNC_ENABLED = booleanPreferencesKey("sync_enabled")
         private val SYNC_FILE_PATH = stringPreferencesKey("sync_file_path")
+        private val LAST_SYNC_TIME = longPreferencesKey("last_sync_time")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -41,6 +43,11 @@ class AppPreferenceDataStore(
     val getSyncFilePath: Flow<String> =
         context.appDataStore.data.map { preferences ->
             preferences[SYNC_FILE_PATH] ?: "" // Default to empty path
+        }
+
+    val getLastSyncTime: Flow<Long> =
+        context.appDataStore.data.map { preferences ->
+            preferences[LAST_SYNC_TIME] ?: 0L // Default to 0 (never synced)
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -64,6 +71,12 @@ class AppPreferenceDataStore(
     suspend fun setSyncFilePath(path: String) {
         context.appDataStore.edit { prefs ->
             prefs[SYNC_FILE_PATH] = path
+        }
+    }
+
+    suspend fun setLastSyncTime(timestamp: Long) {
+        context.appDataStore.edit { prefs ->
+            prefs[LAST_SYNC_TIME] = timestamp
         }
     }
 }

@@ -62,6 +62,9 @@
     <string name="sync_status_no_file">No sync file selected</string>
     <string name="sync_now">Sync Now</string>
     <string name="sync_now_description">Manually sync deeplinks to selected file</string>
+    <string name="last_sync_time">Last Sync</string>
+    <string name="last_sync_time_never">Never synced</string>
+    <string name="last_sync_time_format">%s</string>
     
     <!-- Sync Messages -->
     <string name="sync_disabled">Sync is disabled</string>

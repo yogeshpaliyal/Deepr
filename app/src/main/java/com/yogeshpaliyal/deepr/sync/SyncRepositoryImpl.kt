@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SyncRepositoryImpl(
     private val context: Context,
@@ -44,6 +47,8 @@ class SyncRepositoryImpl(
                         }
 
                         writeMarkdownData(it, dataToSync)
+                        // Record sync time on successful completion
+                        recordSyncTime()
                         RequestResult.Success(
                             context.getString(
                                 R.string.sync_success,
@@ -84,15 +89,23 @@ class SyncRepositoryImpl(
         }
     }
 
+    override suspend fun recordSyncTime() {
+        val currentTime = System.currentTimeMillis()
+        preferenceDataStore.setLastSyncTime(currentTime)
+    }
+
     private fun writeMarkdownData(
         file: OutputStream,
         data: List<Deepr>,
     ) {
         file.use { outputStream ->
             outputStream.bufferedWriter().use { writer ->
-                // Write header comment
+                // Write header comment with sync time
+                val syncTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 writer.write("<!-- Deepr Sync File - Do not modify the table structure -->\n")
+                writer.write("<!-- Last Synced: $syncTime -->\n")
                 writer.write("# Deeplinks\n\n")
+                writer.write("**Last Sync:** $syncTime\n\n")
                 writer.write("**Warning:** Please maintain the markdown table format when editing this file.\n\n")
 
                 // Write markdown table header

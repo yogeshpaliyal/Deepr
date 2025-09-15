@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -54,6 +55,9 @@ import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data object Settings
 
@@ -81,6 +85,7 @@ fun SettingsScreen(
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
     val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
+    val lastSyncTime by viewModel.lastSyncTime.collectAsStateWithLifecycle()
 
     // Launcher for picking sync file location
     val syncFileLauncher =
@@ -88,6 +93,13 @@ fun SettingsScreen(
             contract = ActivityResultContracts.CreateDocument("text/markdown"),
         ) { uri ->
             uri?.let {
+                val contentResolver = context.contentResolver
+
+                val takeFlags: Int =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                // Check for the freshest data.
+                contentResolver.takePersistableUriPermission(uri, takeFlags)
                 viewModel.setSyncFilePath(it.toString())
             }
         }
@@ -241,6 +253,27 @@ fun SettingsScreen(
                             Icon(
                                 TablerIcons.FileText,
                                 contentDescription = stringResource(R.string.select_sync_file),
+                            )
+                        },
+                    )
+
+                    // Show last sync time if sync is enabled
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.last_sync_time)) },
+                        supportingContent = {
+                            Text(
+                                if (lastSyncTime > 0) {
+                                    val formatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
+                                    stringResource(R.string.last_sync_time_format, formatter.format(Date(lastSyncTime)))
+                                } else {
+                                    stringResource(R.string.last_sync_time_never)
+                                },
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                TablerIcons.InfoCircle,
+                                contentDescription = stringResource(R.string.last_sync_time),
                             )
                         },
                     )
