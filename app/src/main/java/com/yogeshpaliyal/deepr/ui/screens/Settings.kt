@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -92,6 +93,13 @@ fun SettingsScreen(
             contract = ActivityResultContracts.CreateDocument("text/markdown"),
         ) { uri ->
             uri?.let {
+                val contentResolver = context.contentResolver
+
+                val takeFlags: Int =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                // Check for the freshest data.
+                contentResolver.takePersistableUriPermission(uri, takeFlags)
                 viewModel.setSyncFilePath(it.toString())
             }
         }
@@ -259,7 +267,7 @@ fun SettingsScreen(
                                     stringResource(R.string.last_sync_time_format, formatter.format(Date(lastSyncTime)))
                                 } else {
                                     stringResource(R.string.last_sync_time_never)
-                                }
+                                },
                             )
                         },
                         leadingContent = {
