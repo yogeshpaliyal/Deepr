@@ -54,6 +54,9 @@ import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data object Settings
 
@@ -81,6 +84,7 @@ fun SettingsScreen(
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
     val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
+    val lastSyncTime by viewModel.lastSyncTime.collectAsStateWithLifecycle()
 
     // Launcher for picking sync file location
     val syncFileLauncher =
@@ -241,6 +245,27 @@ fun SettingsScreen(
                             Icon(
                                 TablerIcons.FileText,
                                 contentDescription = stringResource(R.string.select_sync_file),
+                            )
+                        },
+                    )
+
+                    // Show last sync time if sync is enabled
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.last_sync_time)) },
+                        supportingContent = {
+                            Text(
+                                if (lastSyncTime > 0) {
+                                    val formatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
+                                    stringResource(R.string.last_sync_time_format, formatter.format(Date(lastSyncTime)))
+                                } else {
+                                    stringResource(R.string.last_sync_time_never)
+                                }
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                TablerIcons.InfoCircle,
+                                contentDescription = stringResource(R.string.last_sync_time),
                             )
                         },
                     )

@@ -265,6 +265,10 @@ class AccountViewModel(
         preferenceDataStore.getSyncFilePath
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
+    val lastSyncTime =
+        preferenceDataStore.getLastSyncTime
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
     fun setSyncEnabled(enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setSyncEnabled(enabled)

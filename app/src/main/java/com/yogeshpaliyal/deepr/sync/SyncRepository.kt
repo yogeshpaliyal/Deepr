@@ -6,4 +6,6 @@ interface SyncRepository {
     suspend fun syncToMarkdown(): RequestResult<String>
 
     suspend fun validateMarkdownFile(filePath: String): RequestResult<Boolean>
+    
+    suspend fun recordSyncTime()
 }
