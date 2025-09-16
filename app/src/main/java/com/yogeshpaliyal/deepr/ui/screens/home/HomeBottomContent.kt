@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
@@ -59,14 +60,14 @@ import kotlin.text.clear
 @Composable
 fun HomeBottomContent(
     deeprQueries: DeeprQueries,
-    saveDialogInfo: SaveDialogInfo,
+    selectedLink: GetLinksAndTags,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinInject(),
     onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
 ) {
-    var deeprInfo by remember(saveDialogInfo) {
+    var deeprInfo by remember(selectedLink) {
         mutableStateOf(
-            saveDialogInfo.deepr,
+            selectedLink,
         )
     }
     var isError by remember { mutableStateOf(false) }
@@ -76,16 +77,16 @@ fun HomeBottomContent(
     val allTags by viewModel.allTags.collectAsState()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
-    val isCreate = saveDialogInfo.deepr.id == 0L
+    val isCreate = selectedLink.id == 0L
 
     // Initialize selected tags if in edit mode
     LaunchedEffect(isCreate) {
         if (isCreate.not()) {
             val existingTags =
-                saveDialogInfo.deepr.tagsIds?.split(",")?.mapIndexed { index, tagId ->
+                selectedLink.tagsIds?.split(",")?.mapIndexed { index, tagId ->
                     Tags(
                         tagId.trim().toLong(),
-                        saveDialogInfo.deepr.tagsNames
+                        selectedLink.tagsNames
                             ?.split(",")
                             ?.getOrNull(index)
                             ?.trim()
@@ -101,7 +102,7 @@ fun HomeBottomContent(
         }
     }
 
-    val save = {
+    val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
         val currentTagIds = selectedTags.map { it.id }.toSet()
@@ -123,12 +124,12 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(deeprInfo.link, deeprInfo.name, saveDialogInfo.executeAfterSave)
+            viewModel.insertAccount(deeprInfo.link, deeprInfo.name, executeAfterSave)
         } else {
             // Edit
             viewModel.updateDeeplink(deeprInfo.id, deeprInfo.link, deeprInfo.name)
         }
-        onSaveDialogInfoChange(SaveDialogInfo(deeprInfo, saveDialogInfo.executeAfterSave))
+        onSaveDialogInfoChange(SaveDialogInfo(deeprInfo, executeAfterSave))
     }
 
     val context = LocalContext.current
@@ -315,7 +316,7 @@ fun HomeBottomContent(
                                         Toast.LENGTH_SHORT,
                                     ).show()
                             } else {
-                                save()
+                                save(false)
                             }
                         } else {
                             isError = true
@@ -347,7 +348,7 @@ fun HomeBottomContent(
                                             Toast.LENGTH_SHORT,
                                         ).show()
                                 } else {
-                                    save()
+                                    save(true)
                                 }
                             } else {
                                 isError = true
