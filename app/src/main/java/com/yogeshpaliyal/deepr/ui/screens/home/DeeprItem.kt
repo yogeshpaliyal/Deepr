@@ -16,11 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,135 +66,135 @@ fun DeeprItem(
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
 
     Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            ),
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
                 .combinedClickable(
                     onClick = { onItemClick?.invoke(account) },
                     onLongClick = { onItemLongClick?.invoke(account) },
                 ),
     ) {
-        Row(
+        Column(
             modifier =
                 Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        if (account.name.isNotEmpty()) {
-                            Text(
-                                text = account.name,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
+                Column(modifier = Modifier.weight(1f)) {
+                    if (account.name.isNotEmpty()) {
                         Text(
-                            text = account.link,
+                            text = account.name,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelLarge,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = formatDateTime(account.createdAt),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "Opened: ${account.openedCount}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
                     }
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(TablerIcons.DotsVertical, contentDescription = "More options")
-                        }
-
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Copy link") },
-                                onClick = {
-                                    val clipboard =
-                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newPlainText("Link copied", account.link)
-                                    clipboard.setPrimaryClip(clip)
-                                    Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
-                                    expanded = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        TablerIcons.Copy,
-                                        contentDescription = "Copy link",
-                                    )
-                                },
-                            )
-                            ShortcutMenuItem(account, {
-                                onShortcutClick?.invoke(it)
-                                expanded = false
-                            })
-                            ShowQRCodeMenuItem(account, {
-                                onQrCodeClick?.invoke(it)
-                                expanded = false
-                            })
-                            DropdownMenuItem(
-                                text = { Text("Edit") },
-                                onClick = {
-                                    onEditClick?.invoke(account)
-                                    expanded = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        TablerIcons.Edit,
-                                        contentDescription = "Edit",
-                                    )
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Delete") },
-                                onClick = {
-                                    onRemoveClick?.invoke(account)
-                                    expanded = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        TablerIcons.Trash,
-                                        contentDescription = "Delete",
-                                    )
-                                },
-                            )
-                        }
+                    Text(
+                        text = account.link,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = formatDateTime(account.createdAt),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Opened: ${account.openedCount}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
+                Box {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(TablerIcons.DotsVertical, contentDescription = "More options")
+                    }
 
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    selectedTags?.forEach { tag ->
-                        InputChip(
-                            selected = selectedTag?.name == tag.trim(),
-                            onClick = { onTagClick?.invoke(tag.trim()) },
-                            label = { Text(tag.trim()) },
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Copy link") },
+                            onClick = {
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("Link copied", account.link)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Copy,
+                                    contentDescription = "Copy link",
+                                )
+                            },
+                        )
+                        ShortcutMenuItem(account, {
+                            onShortcutClick?.invoke(it)
+                            expanded = false
+                        })
+                        ShowQRCodeMenuItem(account, {
+                            onQrCodeClick?.invoke(it)
+                            expanded = false
+                        })
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                onEditClick?.invoke(account)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Edit,
+                                    contentDescription = "Edit",
+                                )
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                onRemoveClick?.invoke(account)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Trash,
+                                    contentDescription = "Delete",
+                                )
+                            },
                         )
                     }
+                }
+            }
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                selectedTags?.forEach { tag ->
+                    FilterChip(
+                        modifier = Modifier.padding(0.dp),
+                        elevation = null,
+                        selected = selectedTag?.name == tag.trim(),
+                        onClick = { onTagClick?.invoke(tag.trim()) },
+                        label = { Text(tag.trim()) },
+                    )
                 }
             }
         }
