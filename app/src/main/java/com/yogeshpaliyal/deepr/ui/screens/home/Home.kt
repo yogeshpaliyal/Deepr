@@ -87,7 +87,7 @@ fun HomeScreen(
     var isSearchActive by remember { mutableStateOf(false) }
     var isTagsSelectionActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
-    var saveDialogInfo by remember { mutableStateOf<SaveDialogInfo?>(null) }
+    var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
@@ -99,7 +99,7 @@ fun HomeScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 if (isValidDeeplink(result.contents)) {
-                    saveDialogInfo = SaveDialogInfo(createDeeprObject(link = result.contents), false)
+                    selectedLink = createDeeprObject(link = result.contents)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -108,9 +108,9 @@ fun HomeScreen(
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
-        if (!sharedText.isNullOrBlank() && saveDialogInfo == null) {
+        if (!sharedText.isNullOrBlank() && selectedLink == null) {
             if (isValidDeeplink(sharedText)) {
-                saveDialogInfo = SaveDialogInfo(createDeeprObject(link = sharedText), false)
+                selectedLink = createDeeprObject(link = sharedText)
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -206,7 +206,7 @@ fun HomeScreen(
                 },
                 floatingActionButton = {
                     FloatingActionButton(onClick = {
-                        saveDialogInfo = SaveDialogInfo(createDeeprObject(), true)
+                        selectedLink = createDeeprObject()
                     }) {
                         Icon(
                             TablerIcons.Plus,
@@ -227,22 +227,22 @@ fun HomeScreen(
                 contentPaddingValues = contentPadding,
                 selectedTag = selectedTag.value,
                 editDeepr = {
-                    saveDialogInfo = SaveDialogInfo(it, false)
+                    selectedLink = it
                 },
             )
         }
 
-        saveDialogInfo?.let {
+        selectedLink?.let {
             HomeBottomContent(
                 deeprQueries = deeprQueries,
-                saveDialogInfo = it,
+                selectedLink = it,
             ) { updatedValue ->
                 if (updatedValue != null) {
                     if (updatedValue.executeAfterSave) {
                         openDeeplink(context, updatedValue.deepr.link)
                     }
                 }
-                saveDialogInfo = null
+                selectedLink = null
                 resetSharedText()
             }
         }
