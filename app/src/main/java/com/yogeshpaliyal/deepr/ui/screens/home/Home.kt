@@ -5,36 +5,46 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberSearchBarState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -56,25 +66,30 @@ import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
+import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
-import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 data object Home
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalHazeMaterialsApi::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+)
 @Composable
 fun HomeScreen(
     backStack: SnapshotStateList<Any>,
@@ -84,13 +99,16 @@ fun HomeScreen(
     sharedText: String? = null,
     resetSharedText: () -> Unit,
 ) {
-    var isSearchActive by remember { mutableStateOf(false) }
     var isTagsSelectionActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
+    val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
+    val searchBarState = rememberSearchBarState()
+    val textFieldState = rememberTextFieldState()
+    val scope = rememberCoroutineScope()
+
     val qrScanner =
         rememberLauncherForActivityResult(
             QRScanner(),
@@ -119,6 +137,68 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(textFieldState.text) {
+        viewModel.search(textFieldState.text.toString())
+    }
+
+    val inputField =
+        @Composable {
+            SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth(),
+                searchBarState = searchBarState,
+                textFieldState = textFieldState,
+                onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
+                placeholder = {
+                    if (searchBarState.currentValue == SearchBarValue.Collapsed) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Search",
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                },
+                leadingIcon = {
+                    if (searchBarState.currentValue == SearchBarValue.Expanded) {
+                        TooltipBox(
+                            positionProvider =
+                                TooltipDefaults.rememberTooltipPositionProvider(
+                                    TooltipAnchorPosition.Above,
+                                ),
+                            tooltip = { PlainTooltip { Text("Back") } },
+                            state = rememberTooltipState(),
+                        ) {
+                            IconButton(
+                                onClick = { scope.launch { searchBarState.animateToCollapsed() } },
+                            ) {
+                                Icon(
+                                    TablerIcons.ArrowLeft,
+                                    contentDescription = "Back",
+                                )
+                            }
+                        }
+                    } else {
+                        Icon(TablerIcons.Search, contentDescription = null)
+                    }
+                },
+                trailingIcon = {
+                    if (searchBarState.currentValue == SearchBarValue.Collapsed) {
+                        TooltipBox(
+                            positionProvider =
+                                TooltipDefaults.rememberTooltipPositionProvider(
+                                    TooltipAnchorPosition.Below,
+                                ),
+                            tooltip = { PlainTooltip { Text("Sorting") } },
+                            state = rememberTooltipState(),
+                        ) {
+                            FilterMenu(onSortOrderChange = {
+                                viewModel.setSortOrder(it)
+                            })
+                        }
+                    }
+                },
+            )
+        }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -130,94 +210,71 @@ fun HomeScreen(
                             style = HazeMaterials.ultraThin(),
                         ).fillMaxWidth(),
             ) {
-                TopAppBar(
-                    colors = TopAppBarDefaults.largeTopAppBarColors(Color.Transparent),
-                    title = {
-                        Text("Deepr")
-                    },
-                    actions = {
-                        IconButton(onClick = {
-                            isSearchActive = !isSearchActive
-                            if (!isSearchActive) {
-                                searchQuery = ""
-                                viewModel.search("")
-                            }
-                        }) {
-                            Icon(
-                                if (isSearchActive) TablerIcons.X else TablerIcons.Search,
-                                contentDescription = if (isSearchActive) "Close search" else "Search",
-                            )
-                        }
-                        FilterMenu(onSortOrderChange = {
-                            viewModel.setSortOrder(it)
-                        })
-                    },
+                AppBarWithSearch(
+                    scrollBehavior = scrollBehavior,
+                    state = searchBarState,
+                    inputField = inputField,
+                    colors =
+                        SearchBarDefaults.appBarWithSearchColors(
+                            appBarContainerColor = Color.Transparent,
+                        ),
                 )
-                AnimatedVisibility(visible = isSearchActive) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = {
-                            searchQuery = it
-                            viewModel.search(it)
-                        },
-                        placeholder = { Text("Search...") },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    )
-                }
             }
         },
         bottomBar = {
-            BottomAppBar(
+            Box(
                 modifier =
-                    Modifier.hazeEffect(
-                        state = hazeState,
-                        style = HazeMaterials.ultraThin(),
-                    ),
-                containerColor = Color.Transparent,
-                actions = {
-                    IconButton(onClick = {
-                        qrScanner.launch(ScanOptions())
-                    }) {
-                        Icon(
-                            TablerIcons.Qrcode,
-                            contentDescription = "QR Scanner",
-                        )
-                    }
-                    IconButton(onClick = {
-                        isTagsSelectionActive = true
-                    }) {
-                        Icon(
-                            TablerIcons.Tag,
-                            contentDescription = "Tags",
-                        )
-                    }
-                    IconButton(onClick = {
-                        // Settings action
-                        backStack.add(Settings)
-                    }) {
-                        Icon(
-                            TablerIcons.Settings,
-                            contentDescription = "Settings",
-                        )
-                    }
-                },
-                floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        selectedLink = createDeeprObject()
-                    }) {
-                        Icon(
-                            TablerIcons.Plus,
-                            contentDescription = "Add Link",
-                        )
-                    }
-                },
-            )
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
+                contentAlignment = Alignment.Center,
+            ) {
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = FloatingToolbarExitDirection.Bottom),
+                    colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
+                    content = {
+                        IconButton(onClick = {
+                            qrScanner.launch(ScanOptions())
+                        }) {
+                            Icon(
+                                TablerIcons.Qrcode,
+                                contentDescription = "QR Scanner",
+                            )
+                        }
+                        IconButton(onClick = {
+                            isTagsSelectionActive = true
+                        }) {
+                            Icon(
+                                TablerIcons.Tag,
+                                contentDescription = "Tags",
+                            )
+                        }
+                        IconButton(onClick = {
+                            // Settings action
+                            backStack.add(Settings)
+                        }) {
+                            Icon(
+                                TablerIcons.Settings,
+                                contentDescription = "Settings",
+                            )
+                        }
+                    },
+                    floatingActionButton = {
+                        FloatingToolbarDefaults.VibrantFloatingActionButton(onClick = {
+                            selectedLink = createDeeprObject()
+                        }) {
+                            Icon(
+                                TablerIcons.Plus,
+                                contentDescription = "Add Link",
+                            )
+                        }
+                    },
+                )
+            }
         },
     ) { contentPadding ->
-        Column(
+        Box(
             modifier =
                 Modifier
                     .fillMaxSize(),
@@ -331,7 +388,7 @@ fun Content(
                 showQrCodeDialog = it
             },
             onTagClick = {
-                if (viewModel.selectedTagFilter.value ?.name == it) {
+                if (viewModel.selectedTagFilter.value?.name == it) {
                     viewModel.setTagFilter(null)
                 } else {
                     viewModel.setSelectedTagByName(it)
@@ -378,13 +435,13 @@ fun DeeprList(
                     tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "No deeplinks saved yet",
+                    text = "No links saved yet",
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Save your frequently used deeplinks below to quickly access them later.",
+                    text = "Save your link below to quickly access them later.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -395,7 +452,11 @@ fun DeeprList(
             Spacer(modifier = Modifier.weight(1f)) // Push content up
         }
     } else {
-        LazyColumn(modifier = modifier, contentPadding = contentPaddingValues) {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = contentPaddingValues,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             items(accounts) { account ->
                 DeeprItem(
                     account = account,
