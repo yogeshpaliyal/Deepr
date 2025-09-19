@@ -21,6 +21,9 @@ accompanist = "0.37.3"
 opencsv = "5.12.0"
 zxing = "4.3.0"
 material3 = "1.5.0-alpha04"
+ktorClient = "3.2.3"
+jsoup = "1.21.1"
+coilCompose = "3.3.0"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -55,6 +58,13 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 zxing-scanner = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxing" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
