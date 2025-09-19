@@ -9,10 +9,14 @@ import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
+import com.yogeshpaliyal.deepr.data.HtmlParser
+import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.sync.SyncRepositoryImpl
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModel
@@ -57,7 +61,19 @@ class DeeprApplication : Application() {
 
                 single<SyncRepository> { SyncRepositoryImpl(androidContext(), get(), get()) }
 
-                viewModel { AccountViewModel(get(), get(), get(), get()) }
+                single {
+                    HttpClient(CIO)
+                }
+
+                viewModel { AccountViewModel(get(), get(), get(), get(), get()) }
+
+                single {
+                    HtmlParser()
+                }
+
+                single {
+                    NetworkRepository(get(), get())
+                }
             }
 
         startKoin {

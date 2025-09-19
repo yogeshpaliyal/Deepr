@@ -112,6 +112,12 @@ dependencies {
     ktlint(libs.ktlint)
     implementation("dev.chrisbanes.haze:haze:1.6.9")
     implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
+    implementation(libs.jsoup)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.ktor3)
+    implementation(libs.ktor.client.android)
 }
 
 kotlinter {

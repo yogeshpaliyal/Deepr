@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.widget.Toast
@@ -11,9 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
@@ -51,10 +56,6 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.X
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import org.koin.compose.koinInject
-import kotlin.collections.addAll
-import kotlin.collections.remove
-import kotlin.compareTo
-import kotlin.text.clear
 
 @OptIn(ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -102,6 +103,17 @@ fun HomeBottomContent(
         }
     }
 
+    LaunchedEffect(Unit) {
+        deeprInfo.link?.let {
+            viewModel.fetchMetaData(it) {
+                if (it != null) {
+                    deeprInfo = deeprInfo.copy(name = it.title ?: "")
+                    isNameError = false
+                }
+            }
+        }
+    }
+
     val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
@@ -141,17 +153,65 @@ fun HomeBottomContent(
         Column(
             modifier =
                 modifier
+                    .verticalScroll(rememberScrollState())
                     .clip(
                         RoundedCornerShape(
                             topStart = 12.dp,
                         ),
                     ).fillMaxWidth(),
         ) {
+            Text(
+                text = if (isCreate) "Create" else "Edit",
+                modifier = Modifier.padding(8.dp),
+                style = MaterialTheme.typography.headlineMedium,
+            )
             Column(
                 modifier =
                     Modifier
                         .padding(8.dp),
             ) {
+                TextField(
+                    value = deeprInfo.link,
+                    onValueChange = {
+                        deeprInfo = deeprInfo.copy(link = it)
+                        isError = false
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(),
+                    label = { Text(stringResource(R.string.enter_deeplink_command)) },
+                    isError = isError,
+                    supportingText = {
+                        if (isError) {
+                            Text(text = stringResource(R.string.invalid_empty_deeplink))
+                        }
+                    },
+                )
+
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = deeprInfo.link.isNotBlank(),
+                    onClick = {
+                        viewModel.fetchMetaData(deeprInfo.link) {
+                            if (it != null) {
+                                deeprInfo = deeprInfo.copy(name = it.title ?: "")
+                                isNameError = false
+                            } else {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Failed to fetch metadata",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        }
+                    },
+                ) {
+                    Text("Fetch name from link")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 TextField(
                     value = deeprInfo.name,
                     onValueChange = {
@@ -166,25 +226,6 @@ fun HomeBottomContent(
                     supportingText = {
                         if (isNameError) {
                             Text(text = stringResource(R.string.enter_link_name_error))
-                        }
-                    },
-                )
-
-                TextField(
-                    value = deeprInfo.link,
-                    onValueChange = {
-                        deeprInfo = deeprInfo.copy(link = it)
-                        isError = false
-                    },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                    label = { Text(stringResource(R.string.enter_deeplink_command)) },
-                    isError = isError,
-                    supportingText = {
-                        if (isError) {
-                            Text(text = stringResource(R.string.invalid_empty_deeplink))
                         }
                     },
                 )
@@ -294,35 +335,51 @@ fun HomeBottomContent(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier =
                         Modifier
                             .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    OutlinedButton(modifier = Modifier.then(if (isCreate) Modifier else Modifier.fillMaxWidth()), onClick = {
-                        if (isValidDeeplink(deeprInfo.link)) {
-                            if (isCreate &&
-                                deeprQueries
-                                    .getDeeprByLink(deeprInfo.link)
-                                    .executeAsList()
-                                    .isNotEmpty()
-                            ) {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Deeplink already exists",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                            } else {
-                                save(false)
-                            }
-                        } else {
-                            isError = true
+                    if (!isCreate) {
+                        Button(
+                            onClick = {
+                                if (isValidDeeplink(deeprInfo.link)) {
+                                    save(false)
+                                } else {
+                                    isError = true
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(R.string.save))
                         }
-                    }) {
-                        Text(stringResource(R.string.save))
+                    } else {
+                        OutlinedButton(
+                            modifier = Modifier,
+                            onClick = {
+                                if (isValidDeeplink(deeprInfo.link)) {
+                                    if (deeprQueries
+                                            .getDeeprByLink(deeprInfo.link)
+                                            .executeAsList()
+                                            .isNotEmpty()
+                                    ) {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Deeplink already exists",
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    } else {
+                                        save(false)
+                                    }
+                                } else {
+                                    isError = true
+                                }
+                            },
+                        ) {
+                            Text(stringResource(R.string.save))
+                        }
                     }
 
                     if (isCreate) {
