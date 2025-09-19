@@ -11,6 +11,8 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.data.LinkInfo
+import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
@@ -63,6 +66,7 @@ class AccountViewModel(
     private val exportRepository: ExportRepository,
     private val importRepository: ImportRepository,
     private val syncRepository: SyncRepository,
+    private val networkRepository: NetworkRepository,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
@@ -144,6 +148,19 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
             _selectedTagFilter.value = tag
+        }
+    }
+
+    fun fetchMetaData(
+        link: String,
+        onLinkMetaDataFound: (LinkInfo?) -> Unit,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.getLinkInfo(link).getOrNull().let {
+                withContext(Dispatchers.Main) {
+                    onLinkMetaDataFound(it)
+                }
+            }
         }
     }
 
