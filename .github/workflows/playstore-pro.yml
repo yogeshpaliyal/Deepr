@@ -47,6 +47,8 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr.pro
           releaseFiles: app/build/outputs/bundle/proRelease/*.aab
-          track: alpha
+          track: production
+          userFraction: 0.01
+          status: inProgress
           whatsNewDirectory: whatsnew/
 
