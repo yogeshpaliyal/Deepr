@@ -28,8 +28,13 @@ import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
+data class SharedLink(
+    val url: String,
+    val title: String?,
+)
+
 class MainActivity : ComponentActivity() {
-    val sharingLink = MutableStateFlow<String?>(null)
+    val sharingLink = MutableStateFlow<SharedLink?>(null)
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +61,13 @@ class MainActivity : ComponentActivity() {
             when {
                 intent.action == Intent.ACTION_SEND -> {
                     if (intent.type == "text/plain") {
-                        intent.getStringExtra(Intent.EXTRA_TEXT)
+                        val link = intent.getStringExtra(Intent.EXTRA_TEXT)
+                        val title = intent.getStringExtra(Intent.EXTRA_TITLE)
+                        if (link != null) {
+                            SharedLink(link, title)
+                        } else {
+                            null
+                        }
                     } else {
                         null
                     }
@@ -76,7 +87,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Dashboard(
     modifier: Modifier = Modifier,
-    sharedText: String? = null,
+    sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
     val backStack = remember(sharedText) { mutableStateListOf<Any>(Home) }

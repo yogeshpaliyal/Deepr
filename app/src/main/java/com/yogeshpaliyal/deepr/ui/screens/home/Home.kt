@@ -57,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -96,7 +97,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
-    sharedText: String? = null,
+    sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
     var isTagsSelectionActive by remember { mutableStateOf(false) }
@@ -126,9 +127,9 @@ fun HomeScreen(
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
-        if (!sharedText.isNullOrBlank() && selectedLink == null) {
-            if (isValidDeeplink(sharedText)) {
-                selectedLink = createDeeprObject(link = sharedText)
+        if (!sharedText?.url.isNullOrBlank() && selectedLink == null) {
+            if (isValidDeeplink(sharedText.url)) {
+                selectedLink = createDeeprObject(link = sharedText.url, name = sharedText.title ?: "")
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)

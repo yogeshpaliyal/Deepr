@@ -103,17 +103,6 @@ fun HomeBottomContent(
         }
     }
 
-    LaunchedEffect(Unit) {
-        deeprInfo.link?.let {
-            viewModel.fetchMetaData(it) {
-                if (it != null) {
-                    deeprInfo = deeprInfo.copy(name = it.title ?: "")
-                    isNameError = false
-                }
-            }
-        }
-    }
-
     val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
