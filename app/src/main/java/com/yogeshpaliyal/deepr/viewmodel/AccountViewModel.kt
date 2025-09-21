@@ -231,6 +231,20 @@ class AccountViewModel(
     fun deleteAccount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.deleteDeeprById(id)
+            deeprQueries.deleteLinkRelations(id)
+        }
+    }
+
+    fun deleteTag(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.deleteTag(id)
+            deeprQueries.deleteTagRelations(id)
+        }
+    }
+
+    suspend fun updateTag(tag: Tags) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.updateTag(tag.name, tag.id)
         }
     }
 
