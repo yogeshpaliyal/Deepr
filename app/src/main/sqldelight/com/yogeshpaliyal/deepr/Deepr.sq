@@ -66,32 +66,11 @@ ORDER BY
     END DESC;
 
 
-listDeeprDesc:
-SELECT * FROM Deepr ORDER BY createdAt DESC;
-
 listDeeprAsc:
 SELECT * FROM Deepr ORDER BY createdAt ASC;
 
 deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
-
-searchDeeprDesc:
-SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt DESC;
-
-searchDeeprAsc:
-SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY createdAt ASC;
-
-listDeeprByOpenedCountDesc:
-SELECT * FROM Deepr ORDER BY openedCount DESC;
-
-listDeeprByOpenedCountAsc:
-SELECT * FROM Deepr ORDER BY openedCount ASC;
-
-searchDeeprByOpenedCountDesc:
-SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY openedCount DESC;
-
-searchDeeprByOpenedCountAsc:
-SELECT * FROM Deepr WHERE link LIKE '%' || ? || '%' ORDER BY openedCount ASC;
 
 incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
@@ -123,5 +102,18 @@ INSERT OR IGNORE INTO LinkTags (linkId, tagId) VALUES (?, ?);
 
 removeTagFromLink:
 DELETE FROM LinkTags WHERE linkId = ? AND tagId = ?;
+
+deleteLinkRelations:
+DELETE FROM LinkTags WHERE linkId = ?;
+
+
+deleteTag:
+DELETE FROM Tags WHERE id = ?;
+
+deleteTagRelations:
+DELETE FROM LinkTags WHERE tagId = ?;
+
+updateTag:
+UPDATE Tags SET name = ? WHERE id = ?;
 
 
