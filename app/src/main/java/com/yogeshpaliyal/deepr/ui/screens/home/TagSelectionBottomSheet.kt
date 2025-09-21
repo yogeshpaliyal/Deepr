@@ -14,6 +14,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +33,7 @@ fun TagSelectionBottomSheet(
         Column(modifier) {
             TopAppBar(
                 title = {
-                    Text("Tags")
+                    Text(stringResource(R.string.tags))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
@@ -42,7 +44,7 @@ fun TagSelectionBottomSheet(
                         setTagFilter(null)
                         dismissBottomSheet()
                     },
-                headlineContent = { Text("All") },
+                headlineContent = { Text(stringResource(R.string.all)) },
                 colors =
                     if (selectedTag == null) {
                         ListItemDefaults.colors(

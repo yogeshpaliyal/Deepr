@@ -5,7 +5,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.R
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 
@@ -17,14 +19,14 @@ fun ShowQRCodeMenuItem(
 ) {
     DropdownMenuItem(
         modifier = modifier,
-        text = { Text("Show QR Code") },
+        text = { Text(stringResource(R.string.show_qr_code)) },
         onClick = {
             onQrCodeClick(account)
         },
         leadingIcon = {
             Icon(
                 TablerIcons.Qrcode,
-                contentDescription = "Show QR Code",
+                contentDescription = stringResource(R.string.show_qr_code),
             )
         },
     )

@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +20,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.ui.screens.AboutUs
 import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
@@ -26,7 +28,12 @@ import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import com.yogeshpaliyal.deepr.util.LanguageUtil
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 data class SharedLink(
     val url: String,
@@ -35,6 +42,28 @@ data class SharedLink(
 
 class MainActivity : ComponentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
+    private val accountViewModel: AccountViewModel by viewModel()
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(
+            newBase?.let { context ->
+                try {
+                    val preferenceDataStore = AppPreferenceDataStore(context)
+                    val languageCode =
+                        runBlocking {
+                            preferenceDataStore.getLanguageCode.first()
+                        }
+                    if (languageCode.isNotEmpty()) {
+                        LanguageUtil.updateLocale(context, languageCode)
+                    } else {
+                        context
+                    }
+                } catch (e: Exception) {
+                    context
+                }
+            },
+        )
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {

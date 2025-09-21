@@ -23,6 +23,7 @@ class AppPreferenceDataStore(
         private val SYNC_ENABLED = booleanPreferencesKey("sync_enabled")
         private val SYNC_FILE_PATH = stringPreferencesKey("sync_file_path")
         private val LAST_SYNC_TIME = longPreferencesKey("last_sync_time")
+        private val LANGUAGE_CODE = stringPreferencesKey("language_code")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -48,6 +49,11 @@ class AppPreferenceDataStore(
     val getLastSyncTime: Flow<Long> =
         context.appDataStore.data.map { preferences ->
             preferences[LAST_SYNC_TIME] ?: 0L // Default to 0 (never synced)
+        }
+
+    val getLanguageCode: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[LANGUAGE_CODE] ?: "" // Default to system language
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -77,6 +83,12 @@ class AppPreferenceDataStore(
     suspend fun setLastSyncTime(timestamp: Long) {
         context.appDataStore.edit { prefs ->
             prefs[LAST_SYNC_TIME] = timestamp
+        }
+    }
+
+    suspend fun setLanguageCode(code: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[LANGUAGE_CODE] = code
         }
     }
 }

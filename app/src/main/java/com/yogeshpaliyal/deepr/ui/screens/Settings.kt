@@ -31,25 +31,35 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
+import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
+import compose.icons.tablericons.Language
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
@@ -81,6 +91,10 @@ fun SettingsScreen(
 
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
+
+    // Collect language preference state
+    val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
+    var showLanguageDialog by remember { mutableStateOf(false) }
 
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
@@ -139,12 +153,20 @@ fun SettingsScreen(
                         Text(stringResource(R.string.settings))
                     },
                     navigationIcon = {
+                        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
                         IconButton(onClick = {
                             backStack.removeLastOrNull()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
                                 contentDescription = stringResource(R.string.back),
+                                modifier =
+                                    if (isRtl) {
+                                        Modifier.graphicsLayer(scaleX = -1f)
+                                    } else {
+                                        Modifier
+                                    },
                             )
                         }
                     },
@@ -332,6 +354,27 @@ fun SettingsScreen(
                 )
                 HorizontalDivider()
 
+                // Language Selection Setting
+                ListItem(
+                    modifier =
+                        Modifier.clickable {
+                            showLanguageDialog = true
+                        },
+                    headlineContent = { Text(stringResource(R.string.language)) },
+                    supportingContent = {
+                        Text(
+                            LanguageUtil.getLanguageNativeName(languageCode),
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            TablerIcons.Language,
+                            contentDescription = stringResource(R.string.language),
+                        )
+                    },
+                )
+                HorizontalDivider()
+
                 ListItem(
                     modifier =
                         Modifier.clickable(true) {
@@ -367,6 +410,22 @@ fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+
+        // Language Selection Dialog
+        if (showLanguageDialog) {
+            LanguageSelectionDialog(
+                currentLanguageCode = languageCode,
+                onLanguageSelect = { selectedLanguageCode ->
+                    viewModel.setLanguageCode(selectedLanguageCode)
+                    showLanguageDialog = false
+                    // Recreate activity to apply language change
+                    (context as? MainActivity)?.let { activity ->
+                        activity.recreate()
+                    }
+                },
+                onDismiss = { showLanguageDialog = false },
+            )
         }
     }
 }

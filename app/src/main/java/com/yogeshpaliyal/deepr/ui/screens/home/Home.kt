@@ -50,13 +50,18 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
@@ -153,19 +158,21 @@ fun HomeScreen(
                     if (searchBarState.currentValue == SearchBarValue.Collapsed) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Search",
+                            text = stringResource(R.string.search),
                             textAlign = TextAlign.Center,
                         )
                     }
                 },
                 leadingIcon = {
                     if (searchBarState.currentValue == SearchBarValue.Expanded) {
+                        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
                         TooltipBox(
                             positionProvider =
                                 TooltipDefaults.rememberTooltipPositionProvider(
                                     TooltipAnchorPosition.Above,
                                 ),
-                            tooltip = { PlainTooltip { Text("Back") } },
+                            tooltip = { PlainTooltip { Text(stringResource(R.string.back)) } },
                             state = rememberTooltipState(),
                         ) {
                             IconButton(
@@ -173,7 +180,13 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     TablerIcons.ArrowLeft,
-                                    contentDescription = "Back",
+                                    contentDescription = stringResource(R.string.back),
+                                    modifier =
+                                        if (isRtl) {
+                                            Modifier.graphicsLayer(scaleX = -1f)
+                                        } else {
+                                            Modifier
+                                        },
                                 )
                             }
                         }
@@ -188,7 +201,7 @@ fun HomeScreen(
                                 TooltipDefaults.rememberTooltipPositionProvider(
                                     TooltipAnchorPosition.Below,
                                 ),
-                            tooltip = { PlainTooltip { Text("Sorting") } },
+                            tooltip = { PlainTooltip { Text(stringResource(R.string.sorting)) } },
                             state = rememberTooltipState(),
                         ) {
                             FilterMenu(onSortOrderChange = {
@@ -240,7 +253,7 @@ fun HomeScreen(
                         }) {
                             Icon(
                                 TablerIcons.Qrcode,
-                                contentDescription = "QR Scanner",
+                                contentDescription = stringResource(R.string.qr_scanner),
                             )
                         }
                         IconButton(onClick = {
@@ -248,7 +261,7 @@ fun HomeScreen(
                         }) {
                             Icon(
                                 TablerIcons.Tag,
-                                contentDescription = "Tags",
+                                contentDescription = stringResource(R.string.tags),
                             )
                         }
                         IconButton(onClick = {
@@ -257,7 +270,7 @@ fun HomeScreen(
                         }) {
                             Icon(
                                 TablerIcons.Settings,
-                                contentDescription = "Settings",
+                                contentDescription = stringResource(R.string.settings),
                             )
                         }
                     },
@@ -267,7 +280,7 @@ fun HomeScreen(
                         }) {
                             Icon(
                                 TablerIcons.Plus,
-                                contentDescription = "Add Link",
+                                contentDescription = stringResource(R.string.add_link),
                             )
                         }
                     },
@@ -436,13 +449,13 @@ fun DeeprList(
                     tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "No links saved yet",
+                    text = stringResource(R.string.no_links_saved_yet),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Save your link below to quickly access them later.",
+                    text = stringResource(R.string.save_your_link_below),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
