@@ -42,8 +42,8 @@ All these sources supports cross platform app updates. for eg: if you've install
 - Play Store : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 > [!IMPORTANT]
-> Need more testers on play store, to make app live on play store, if you're interestn to become a tester please drop a email to yogeshpaliyal.foss@gmail.com  
-> The process is simple send us the email, we will add you to the internal testers list, then you can download the app from this [playstore link](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
+> Need more testers on play store, to make app live on play store, if you're interested to become a tester please join [Google Group for Deepr Internal Testers](https://groups.google.com/u/0/g/deepr-internal-testers)
+> The process is simple Join the group, you will be add you to the internal testers list automatically, then you can download the app from this [playstore link](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 
 ## ✍️ Author
 

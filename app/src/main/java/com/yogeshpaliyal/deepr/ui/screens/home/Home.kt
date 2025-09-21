@@ -86,6 +86,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -106,10 +107,12 @@ fun HomeScreen(
     resetSharedText: () -> Unit,
 ) {
     var isTagsSelectionActive by remember { mutableStateOf(false) }
+
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
+    val contextCoroutine = rememberCoroutineScope()
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
@@ -326,6 +329,20 @@ fun HomeScreen(
                     isTagsSelectionActive = false
                 },
                 setTagFilter = { viewModel.setTagFilter(it) },
+                editTag = { tag ->
+                    runBlocking {
+                        try {
+                            viewModel.updateTag(tag)
+                            Result.success(true)
+                        } catch (e: Exception) {
+                            return@runBlocking Result.failure(e)
+                        }
+                    }
+                },
+                deleteTag = {
+                    viewModel.deleteTag(it.id)
+                    Result.success(true)
+                },
             )
         }
     }
