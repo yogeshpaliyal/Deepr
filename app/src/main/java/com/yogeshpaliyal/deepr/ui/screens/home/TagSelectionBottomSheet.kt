@@ -130,22 +130,27 @@ fun TagSelectionBottomSheet(
                 Button(onClick = {
                     val result = deleteTag(tag)
                     if (result.isFailure) {
-                        Toast.makeText(context, "Failed to delete tag ${result.exceptionOrNull()}", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(R.string.failed_to_delete_tag, result.exceptionOrNull()),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     } else {
                         isTagDeleteEnable = null
                         Toast
-                            .makeText(context, "Tag deleted successfully", Toast.LENGTH_SHORT)
+                            .makeText(context, context.getString(R.string.tag_deleted_successfully), Toast.LENGTH_SHORT)
                             .show()
                     }
                 }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 Button(onClick = {
                     isTagDeleteEnable = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -194,7 +199,7 @@ fun TagSelectionBottomSheet(
                                 }) {
                                     Icon(
                                         imageVector = TablerIcons.Edit,
-                                        contentDescription = "Edit Tag",
+                                        contentDescription = stringResource(R.string.edit_tag_description),
                                     )
                                 }
 
@@ -203,7 +208,7 @@ fun TagSelectionBottomSheet(
                                 }) {
                                     Icon(
                                         imageVector = TablerIcons.Trash,
-                                        contentDescription = "Clear Tag",
+                                        contentDescription = stringResource(R.string.delete_tag_description),
                                     )
                                 }
                             }

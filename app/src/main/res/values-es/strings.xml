@@ -48,6 +48,18 @@
     <string name="sort_by_name_descending">Ordenar por Nombre Descendente</string>
     <string name="sort_by_link_ascending">Ordenar por Enlace Ascendente</string>
     <string name="sort_by_link_descending">Ordenar por Enlace Descendente</string>
+    
+    <!-- Tag Management -->
+    <string name="edit_tag">Editar Etiqueta</string>
+    <string name="delete_tag">Eliminar Etiqueta</string>
+    <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
+    <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
+    <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
+    <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
+    <string name="failed_to_delete_tag">Error al eliminar la etiqueta: %s</string>
+    <string name="tag_deleted_successfully">Etiqueta eliminada exitosamente</string>
+    <string name="edit_tag_description">Editar Etiqueta</string>
+    <string name="delete_tag_description">Eliminar Etiqueta</string>
 
     <!-- Settings Screen -->
     <string name="import_deeplinks">Importar Deeplinks</string>

@@ -48,8 +48,19 @@
     <string name="sort_by_name_descending">نام کے حساب سے نازل ترتیب</string>
     <string name="sort_by_link_ascending">لنک کے حساب سے صاعد ترتیب</string>
     <string name="sort_by_link_descending">لنک کے حساب سے نازل ترتیب</string>
-
-    <!-- Settings Screen -->
+    
+    <!-- Tag Management -->
+    <!-- Tag Management -->
+    <string name="edit_tag">ٹیگ ایڈٹ کریں</string>
+    <string name="delete_tag">ٹیگ حذف کریں</string>
+    <string name="delete_tag_confirmation">کیا آپ واقعی اس ٹیگ کو حذف کرنا چاہتے ہیں؟</string>
+    <string name="tag_name_exists">اس نام کے ساتھ ایک ٹیگ پہلے سے موجود ہے</string>
+    <string name="failed_to_edit_tag">ٹیگ ایڈٹ کرنے میں ناکام</string>
+    <string name="tag_edited_successfully">ٹیگ کامیابی سے ایڈٹ ہوگیا</string>
+    <string name="failed_to_delete_tag">ٹیگ حذف کرنے میں ناکام: %s</string>
+    <string name="tag_deleted_successfully">ٹیگ کامیابی سے حذف ہوگیا</string>
+    <string name="edit_tag_description">ٹیگ ایڈٹ کریں</string>
+    <string name="delete_tag_description">ٹیگ حذف کریں</string>    <!-- Settings Screen -->
     <string name="import_deeplinks">Deeplinks درآمد کریں</string>
     <string name="import_deeplinks_description">CSV فائل سے Deeplinks درآمد کریں</string>
     <string name="export_deeplinks">Deeplinks برآمد کریں</string>

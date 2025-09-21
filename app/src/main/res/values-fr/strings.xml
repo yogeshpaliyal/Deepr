@@ -48,6 +48,18 @@
     <string name="sort_by_name_descending">Trier par Nom Décroissant</string>
     <string name="sort_by_link_ascending">Trier par Lien Croissant</string>
     <string name="sort_by_link_descending">Trier par Lien Décroissant</string>
+    
+    <!-- Tag Management -->
+    <string name="edit_tag">Modifier le Tag</string>
+    <string name="delete_tag">Supprimer le Tag</string>
+    <string name="delete_tag_confirmation">Êtes-vous sûr de vouloir supprimer ce tag ?</string>
+    <string name="tag_name_exists">Un tag avec ce nom existe déjà</string>
+    <string name="failed_to_edit_tag">Échec de la modification du tag</string>
+    <string name="tag_edited_successfully">Tag modifié avec succès</string>
+    <string name="failed_to_delete_tag">Échec de la suppression du tag: %s</string>
+    <string name="tag_deleted_successfully">Tag supprimé avec succès</string>
+    <string name="edit_tag_description">Modifier le Tag</string>
+    <string name="delete_tag_description">Supprimer le Tag</string>
 
     <!-- Settings Screen -->
     <string name="import_deeplinks">Importer des Deeplinks</string>
