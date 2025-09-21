@@ -116,21 +116,21 @@ class AccountViewModel(
     }
 
     // Add tag to link
-    fun addTagToLink(
+    private suspend fun addTagToLink(
         linkId: Long,
         tagId: Long,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             deeprQueries.addTagToLink(linkId, tagId)
         }
     }
 
     // Add tag by name (creates tag if it doesn't exist)
-    fun addTagToLinkByName(
+    private suspend fun addTagToLinkByName(
         linkId: Long,
         tagName: String,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             // Create the tag if it doesn't exist
             deeprQueries.insertTag(tagName)
 
@@ -200,9 +200,31 @@ class AccountViewModel(
         link: String,
         name: String,
         executed: Boolean,
+        tagsList: List<Tags>,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0)
+            deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
+                modifyTagsForLink(it, tagsList)
+            }
+        }
+    }
+
+    suspend fun modifyTagsForLink(
+        linkId: Long,
+        tagsList: List<Tags>,
+    ) {
+        withContext(Dispatchers.IO) {
+            // Then add selected tags
+            tagsList.forEach { tag ->
+                if (tag.id > 0) {
+                    // Existing tag
+                    addTagToLink(linkId, tag.id)
+                } else {
+                    // New tag
+                    addTagToLinkByName(linkId, tag.name)
+                }
+            }
         }
     }
 
@@ -222,9 +244,11 @@ class AccountViewModel(
         id: Long,
         newLink: String,
         newName: String,
+        tagsList: List<Tags>,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, id)
+            modifyTagsForLink(id, tagsList)
         }
     }
 

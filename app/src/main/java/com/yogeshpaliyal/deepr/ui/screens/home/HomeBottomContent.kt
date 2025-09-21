@@ -112,23 +112,12 @@ fun HomeBottomContent(
             viewModel.removeTagFromLink(deeprInfo.id, tagId)
         }
 
-        // Then add selected tags
-        selectedTags.forEach { tag ->
-            if (tag.id > 0) {
-                // Existing tag
-                viewModel.addTagToLink(deeprInfo.id, tag.id)
-            } else {
-                // New tag
-                viewModel.addTagToLinkByName(deeprInfo.id, tag.name)
-            }
-        }
-
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(deeprInfo.link, deeprInfo.name, executeAfterSave)
+            viewModel.insertAccount(deeprInfo.link, deeprInfo.name, executeAfterSave, selectedTags)
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, deeprInfo.link, deeprInfo.name)
+            viewModel.updateDeeplink(deeprInfo.id, deeprInfo.link, deeprInfo.name, selectedTags)
         }
         onSaveDialogInfoChange(SaveDialogInfo(deeprInfo, executeAfterSave))
     }
