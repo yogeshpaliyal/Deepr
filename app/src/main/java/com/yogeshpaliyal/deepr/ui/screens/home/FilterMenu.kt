@@ -21,7 +21,6 @@ import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.Eye
 import compose.icons.tablericons.EyeOff
 import compose.icons.tablericons.Filter
-import compose.icons.tablericons.Link
 import compose.icons.tablericons.SortAscending
 import compose.icons.tablericons.SortDescending
 
@@ -125,7 +124,7 @@ fun FilterMenu(
                 },
                 leadingIcon = {
                     Icon(
-                        TablerIcons.Link,
+                        TablerIcons.SortAscending,
                         contentDescription = null,
                     )
                 },
@@ -138,7 +137,7 @@ fun FilterMenu(
                 },
                 leadingIcon = {
                     Icon(
-                        TablerIcons.Link,
+                        TablerIcons.SortDescending,
                         contentDescription = null,
                     )
                 },
