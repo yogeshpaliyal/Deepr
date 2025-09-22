@@ -30,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
@@ -59,7 +61,7 @@ fun TagSelectionBottomSheet(
                 tagEditError = null
             },
             title = {
-                Text(text = "Edit Tag")
+                Text(text = stringResource(R.string.edit_tag))
             },
             text = {
                 Column {
@@ -84,22 +86,22 @@ fun TagSelectionBottomSheet(
                         val exception = result.exceptionOrNull()
                         when (exception) {
                             is SQLiteConstraintException -> {
-                                tagEditError = "Tag with this name already exists"
+                                tagEditError = context.getString(R.string.tag_name_exists)
                             }
 
                             else -> {
-                                tagEditError = "Failed to edit tag"
+                                tagEditError = context.getString(R.string.failed_to_edit_tag)
                             }
                         }
                     } else {
                         isTagEditEnable = null
                         tagEditError = null
                         Toast
-                            .makeText(context, "Tag edited successfully", Toast.LENGTH_SHORT)
+                            .makeText(context, context.getString(R.string.tag_edited_successfully), Toast.LENGTH_SHORT)
                             .show()
                     }
                 }) {
-                    Text("Edit")
+                    Text(stringResource(R.string.edit))
                 }
             },
             dismissButton = {
@@ -107,7 +109,7 @@ fun TagSelectionBottomSheet(
                     isTagEditEnable = null
                     tagEditError = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -119,31 +121,36 @@ fun TagSelectionBottomSheet(
                 isTagDeleteEnable = null
             },
             title = {
-                Text(text = "Delete Tag")
+                Text(text = stringResource(R.string.delete_tag))
             },
             text = {
-                Text(text = "Are you sure you want to delete this tag?")
+                Text(text = stringResource(R.string.delete_tag_confirmation))
             },
             confirmButton = {
                 Button(onClick = {
                     val result = deleteTag(tag)
                     if (result.isFailure) {
-                        Toast.makeText(context, "Failed to delete tag ${result.exceptionOrNull()}", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(R.string.failed_to_delete_tag, result.exceptionOrNull()),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     } else {
                         isTagDeleteEnable = null
                         Toast
-                            .makeText(context, "Tag deleted successfully", Toast.LENGTH_SHORT)
+                            .makeText(context, context.getString(R.string.tag_deleted_successfully), Toast.LENGTH_SHORT)
                             .show()
                     }
                 }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 Button(onClick = {
                     isTagDeleteEnable = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -153,7 +160,7 @@ fun TagSelectionBottomSheet(
         Column(modifier) {
             TopAppBar(
                 title = {
-                    Text("Tags")
+                    Text(stringResource(R.string.tags))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
@@ -166,7 +173,7 @@ fun TagSelectionBottomSheet(
                                 setTagFilter(null)
                                 dismissBottomSheet()
                             },
-                        headlineContent = { Text("All") },
+                        headlineContent = { Text(stringResource(R.string.all)) },
                         colors =
                             if (selectedTag == null) {
                                 ListItemDefaults.colors(
@@ -192,7 +199,7 @@ fun TagSelectionBottomSheet(
                                 }) {
                                     Icon(
                                         imageVector = TablerIcons.Edit,
-                                        contentDescription = "Edit Tag",
+                                        contentDescription = stringResource(R.string.edit_tag_description),
                                     )
                                 }
 
@@ -201,7 +208,7 @@ fun TagSelectionBottomSheet(
                                 }) {
                                     Icon(
                                         imageVector = TablerIcons.Trash,
-                                        contentDescription = "Clear Tag",
+                                        contentDescription = stringResource(R.string.delete_tag_description),
                                     )
                                 }
                             }

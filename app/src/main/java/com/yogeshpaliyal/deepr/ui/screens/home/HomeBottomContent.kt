@@ -66,6 +66,10 @@ fun HomeBottomContent(
     viewModel: AccountViewModel = koinInject(),
     onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
 ) {
+    val context = LocalContext.current
+    val fetchMetadataErrorText = stringResource(R.string.failed_to_fetch_metadata)
+    val removeTagText = stringResource(R.string.remove_tag)
+    val deeplinkExistsText = stringResource(R.string.deeplink_already_exists)
     var deeprInfo by remember(selectedLink) {
         mutableStateOf(
             selectedLink,
@@ -122,7 +126,6 @@ fun HomeBottomContent(
         onSaveDialogInfoChange(SaveDialogInfo(deeprInfo, executeAfterSave))
     }
 
-    val context = LocalContext.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(sheetState = modalBottomSheetState, onDismissRequest = {
@@ -139,7 +142,7 @@ fun HomeBottomContent(
                     ).fillMaxWidth(),
         ) {
             Text(
-                text = if (isCreate) "Create" else "Edit",
+                text = if (isCreate) stringResource(R.string.create) else stringResource(R.string.edit),
                 modifier = Modifier.padding(8.dp),
                 style = MaterialTheme.typography.headlineMedium,
             )
@@ -178,14 +181,14 @@ fun HomeBottomContent(
                                 Toast
                                     .makeText(
                                         context,
-                                        "Failed to fetch metadata",
+                                        fetchMetadataErrorText,
                                         Toast.LENGTH_SHORT,
                                     ).show()
                             }
                         }
                     },
                 ) {
-                    Text("Fetch name from link")
+                    Text(stringResource(R.string.fetch_name_from_link))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -215,7 +218,7 @@ fun HomeBottomContent(
                     OutlinedTextField(
                         value = newTagName,
                         onValueChange = { newTagName = it },
-                        label = { Text("New tag") },
+                        label = { Text(stringResource(R.string.new_tag)) },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                     )
@@ -243,7 +246,7 @@ fun HomeBottomContent(
                         },
                         enabled = newTagName.isNotBlank(),
                     ) {
-                        Text("Add Tag")
+                        Text(stringResource(R.string.add_tag))
                     }
                 }
 
@@ -252,7 +255,7 @@ fun HomeBottomContent(
                 // Display selected tags - only show the label if there are tags
                 if (selectedTags.isNotEmpty()) {
                     Text(
-                        "Tags:",
+                        stringResource(R.string.tags_label),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -276,7 +279,7 @@ fun HomeBottomContent(
                                     ) {
                                         Icon(
                                             imageVector = TablerIcons.X,
-                                            contentDescription = "Remove tag",
+                                            contentDescription = removeTagText,
                                         )
                                     }
                                 },
@@ -291,7 +294,7 @@ fun HomeBottomContent(
                 val availableSuggestions = allTags.filter { tag -> !selectedTags.contains(tag) }
                 if (availableSuggestions.isNotEmpty()) {
                     Text(
-                        "Suggestions:",
+                        stringResource(R.string.suggestions_label),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -345,7 +348,7 @@ fun HomeBottomContent(
                                         Toast
                                             .makeText(
                                                 context,
-                                                "Deeplink already exists",
+                                                deeplinkExistsText,
                                                 Toast.LENGTH_SHORT,
                                             ).show()
                                     } else {
@@ -379,7 +382,7 @@ fun HomeBottomContent(
                                     Toast
                                         .makeText(
                                             context,
-                                            "Deeplink already exists",
+                                            deeplinkExistsText,
                                             Toast.LENGTH_SHORT,
                                         ).show()
                                 } else {

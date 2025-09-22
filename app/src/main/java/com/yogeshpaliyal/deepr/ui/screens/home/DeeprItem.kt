@@ -32,9 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
@@ -64,6 +66,10 @@ fun DeeprItem(
     val context = LocalContext.current
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
+
+    // Extract string resources at Composable level
+    val copyLinkText = stringResource(R.string.copy_link)
+    val linkCopiedText = stringResource(R.string.link_copied)
 
     Card(
         colors =
@@ -113,7 +119,7 @@ fun DeeprItem(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "Opened: ${account.openedCount}",
+                            text = stringResource(R.string.opened_count, account.openedCount),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -121,7 +127,7 @@ fun DeeprItem(
                 }
                 Box {
                     IconButton(onClick = { expanded = true }) {
-                        Icon(TablerIcons.DotsVertical, contentDescription = "More options")
+                        Icon(TablerIcons.DotsVertical, contentDescription = stringResource(R.string.more_options))
                     }
 
                     DropdownMenu(
@@ -129,19 +135,19 @@ fun DeeprItem(
                         onDismissRequest = { expanded = false },
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Copy link") },
+                            text = { Text(copyLinkText) },
                             onClick = {
                                 val clipboard =
                                     context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText("Link copied", account.link)
+                                val clip = ClipData.newPlainText(linkCopiedText, account.link)
                                 clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
                                 expanded = false
                             },
                             leadingIcon = {
                                 Icon(
                                     TablerIcons.Copy,
-                                    contentDescription = "Copy link",
+                                    contentDescription = copyLinkText,
                                 )
                             },
                         )
@@ -154,7 +160,7 @@ fun DeeprItem(
                             expanded = false
                         })
                         DropdownMenuItem(
-                            text = { Text("Edit") },
+                            text = { Text(stringResource(R.string.edit)) },
                             onClick = {
                                 onEditClick?.invoke(account)
                                 expanded = false
@@ -162,12 +168,12 @@ fun DeeprItem(
                             leadingIcon = {
                                 Icon(
                                     TablerIcons.Edit,
-                                    contentDescription = "Edit",
+                                    contentDescription = stringResource(R.string.edit),
                                 )
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete") },
+                            text = { Text(stringResource(R.string.delete)) },
                             onClick = {
                                 onRemoveClick?.invoke(account)
                                 expanded = false
@@ -175,7 +181,7 @@ fun DeeprItem(
                             leadingIcon = {
                                 Icon(
                                     TablerIcons.Trash,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(R.string.delete),
                                 )
                             },
                         )

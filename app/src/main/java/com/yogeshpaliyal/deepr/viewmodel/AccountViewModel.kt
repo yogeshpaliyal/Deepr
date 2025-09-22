@@ -311,6 +311,17 @@ class AccountViewModel(
         }
     }
 
+    // Language preference methods
+    val languageCode =
+        preferenceDataStore.getLanguageCode
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    fun setLanguageCode(code: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setLanguageCode(code)
+        }
+    }
+
     // Sync preference methods
     val syncEnabled =
         preferenceDataStore.getSyncEnabled

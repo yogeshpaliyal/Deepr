@@ -1,0 +1,140 @@
+<resources>
+    <string name="app_name">Deepr</string>
+
+    <!-- Navigation and UI Labels -->
+    <string name="settings">سیٹنگز</string>
+    <string name="about_us">ہمارے بارے میں</string>
+    <string name="back">واپس</string>
+    <string name="save">محفوظ کریں</string>
+    <string name="saved">محفوظ ہو گیا</string>
+    <string name="execute">چلائیں</string>
+    <string name="cancel">منسوخ کریں</string>
+    <string name="search">تلاش کریں</string>
+    <string name="create">بنائیں</string>
+    <string name="edit">ترمیم کریں</string>
+    <string name="sorting">ترتیب</string>
+    <string name="qr_scanner">QR اسکینر</string>
+    <string name="tags">ٹیگز</string>
+    <string name="all">تمام</string>
+    <string name="add_link">لنک شامل کریں</string>
+    <string name="fetch_name_from_link">لنک سے نام حاصل کریں</string>
+    <string name="add_tag">ٹیگ شامل کریں</string>
+    <string name="new_tag">نیا ٹیگ</string>
+    <string name="no_links_saved_yet">ابھی تک کوئی لنک محفوظ نہیں</string>
+    <string name="save_your_link_below">بعد میں تیزی سے رسائی کے لیے اپنا لنک نیچے محفوظ کریں۔</string>
+    
+    <!-- Menu and Dialog Items -->
+    <string name="more_options">مزید اختیارات</string>
+    <string name="copy_link">لنک کاپی کریں</string>
+    <string name="link_copied">لنک کاپی ہو گیا</string>
+    <string name="delete">حذف کریں</string>
+    <string name="remove_tag">ٹیگ ہٹائیں</string>
+    <string name="failed_to_fetch_metadata">میٹاڈیٹا لانے میں ناکام</string>
+    <string name="opened_count">کھولا گیا: %d</string>
+    <string name="tags_label">ٹیگز:</string>
+    <string name="suggestions_label">تجاویز:</string>
+    <string name="filter">فلٹر</string>
+    <string name="add_shortcut">شارٹ کٹ شامل کریں</string>
+    <string name="edit_shortcut">شارٹ کٹ میں تبدیلی</string>
+    <string name="show_qr_code">QR کوڈ دکھائیں</string>
+    <string name="deeplink_already_exists">ڈیپ لنک پہلے سے موجود ہے</string>
+    
+    <!-- Sort Menu Items -->
+    <string name="sort_by_date_ascending">تاریخ کے حساب سے صاعد ترتیب</string>
+    <string name="sort_by_date_descending">تاریخ کے حساب سے نازل ترتیب</string>
+    <string name="sort_by_opened_ascending">کھولے گئے کے حساب سے صاعد ترتیب</string>
+    <string name="sort_by_opened_descending">کھولے گئے کے حساب سے نازل ترتیب</string>
+    <string name="sort_by_name_ascending">نام کے حساب سے صاعد ترتیب</string>
+    <string name="sort_by_name_descending">نام کے حساب سے نازل ترتیب</string>
+    <string name="sort_by_link_ascending">لنک کے حساب سے صاعد ترتیب</string>
+    <string name="sort_by_link_descending">لنک کے حساب سے نازل ترتیب</string>
+    
+    <!-- Tag Management -->
+    <string name="edit_tag">ٹیگ ایڈٹ کریں</string>
+    <string name="delete_tag">ٹیگ حذف کریں</string>
+    <string name="delete_tag_confirmation">کیا آپ واقعی اس ٹیگ کو حذف کرنا چاہتے ہیں؟</string>
+    <string name="tag_name_exists">اس نام کے ساتھ ایک ٹیگ پہلے سے موجود ہے</string>
+    <string name="failed_to_edit_tag">ٹیگ ایڈٹ کرنے میں ناکام</string>
+    <string name="tag_edited_successfully">ٹیگ کامیابی سے ایڈٹ ہوگیا</string>
+    <string name="failed_to_delete_tag">ٹیگ حذف کرنے میں ناکام: %s</string>
+    <string name="tag_deleted_successfully">ٹیگ کامیابی سے حذف ہوگیا</string>
+    <string name="edit_tag_description">ٹیگ ایڈٹ کریں</string>
+    <string name="delete_tag_description">ٹیگ حذف کریں</string>
+    
+    <!-- Settings Screen -->
+    <string name="import_deeplinks">Deeplinks درآمد کریں</string>
+    <string name="import_deeplinks_description">CSV فائل سے Deeplinks درآمد کریں</string>
+    <string name="export_deeplinks">Deeplinks برآمد کریں</string>
+    <string name="export_deeplinks_description">Deeplinks کو CSV فائل میں برآمد کریں</string>
+    <string name="shortcut_icon">شارٹ کٹ آئیکن</string>
+    <string name="use_link_app_icon">لنک سپورٹ کرنے والے ایپ کا آئیکن استعمال کریں</string>
+    <string name="use_deepr_app_icon">Deepr ایپ آئیکن استعمال کریں</string>
+    <string name="shortcut_icon_setting">شارٹ کٹ آئیکن سیٹنگ</string>
+    <string name="language">زبان</string>
+    <string name="language_description">ایپ کی زبان تبدیل کریں</string>
+    <string name="language_dialog_title">زبان منتخب کریں</string>
+    <string name="system_default">سسٹم ڈیفالٹ</string>
+    <string name="english">English</string>
+    <string name="hindi">हिंदी</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="urdu">اردو</string>
+    <string name="app_version">ایپ ورژن: %s</string>
+    <string name="made_with_love">ہندوستان میں ❤️ کے ساتھ بنایا گیا</string>
+
+    <!-- About Us Screen -->
+    <string name="app_logo">ایپ لوگو</string>
+    <string name="version_format">ورژن %s</string>
+    <string name="app_description">ڈیپ لنکس کو محفوظ کرنے، منظم کرنے اور لانچ کرنے کے لیے ایک آسان ایپ۔</string>
+    <string name="author">مصنف</string>
+    <string name="author_name">یوگیش چوہدری</string>
+    <string name="twitter">ٹویٹر</string>
+    <string name="github">گٹ ہب</string>
+    <string name="linkedin">لنکڈ ان</string>
+    <string name="view_on_github">گٹ ہب پر دیکھیں</string>
+
+    <!-- Save Dialog -->
+    <string name="save_deeplink">ڈیپ لنک محفوظ کریں</string>
+    <string name="save_deeplink_message">ڈیپ لنک محفوظ کریں: %s؟</string>
+    <string name="enter_link_name">براہ کرم لنک کا نام داخل کریں</string>
+    <string name="enter_link_name_error">براہ کرم لنک کا نام داخل کریں۔</string>
+    <string name="save_and_execute">محفوظ کریں اور چلائیں</string>
+
+    <!-- Home Screen -->
+    <string name="enter_deeplink_command">ڈیپ لنک یا کمانڈ داخل کریں</string>
+    <string name="invalid_empty_deeplink">غلط یا خالی ڈیپ لنک۔</string>
+
+    <!-- Error Messages -->
+    <string name="invalid_deeplink_toast">غلط ڈیپ لنک: %s</string>
+    <string name="no_data_to_export">ایکسپورٹ کرنے کے لیے ڈیٹابیس میں کوئی ڈیٹا نہیں ملا۔</string>
+    <string name="no_data_available_export">میپنگ کے بعد ایکسپورٹ کرنے کے لیے کوئی ڈیٹا دستیاب نہیں۔</string>
+    <string name="export_success">کامیابی سے %s میں ایکسپورٹ کیا گیا</string>
+    <string name="export_failed">CSV فائل بنانے میں ناکام۔</string>
+
+    <!-- Sync Settings -->
+    <string name="select_sync_file">ہم آہنگی فائل منتخب کریں</string>
+    <string name="sync_now">ابھی ہم آہنگ کریں</string>
+    <string name="last_sync_time">آخری ہم آہنگی:</string>
+    <string name="last_sync_time_never">کبھی ہم آہنگ نہیں ہوا</string>
+    <string name="last_sync_time_format">%s</string>
+    
+    <!-- Sync Messages -->
+    <string name="sync_disabled">ہم آہنگی غیر فعال ہے</string>
+    <string name="sync_file_not_selected">کوئی ہم آہنگی فائل منتخب نہیں</string>
+    <string name="sync_success">%s کے ساتھ کامیابی سے ہم آہنگ</string>
+    <string name="sync_failed">ہم آہنگی ناکام: %s</string>
+    <string name="no_file_path_provided">کوئی فائل کا راستہ فراہم نہیں کیا گیا</string>
+    <string name="invalid_markdown_format">غلط مارک ڈاؤن ٹیبل فارمیٹ</string>
+    <string name="file_validation_error">فائل توثیق کی خرابی: %s</string>
+    
+    <!-- Additional Sync Settings -->
+    <string name="sync_to_file">مقامی فائل سے ہم آہنگ کریں (بیٹا)</string>
+    <string name="sync_to_file_description">ڈیپ لنکس کو مارک ڈاؤن فائل میں خودکار طور پر ہم آہنگ کریں</string>
+    <string name="select_sync_file_description">مارک ڈاؤن ہم آہنگی کے لیے فائل کا مقام منتخب کریں</string>
+    <string name="sync_file_validation">فائل فارمیٹ کی توثیق</string>
+    <string name="sync_status_valid">✓ فائل فارمیٹ درست ہے</string>
+    <string name="sync_status_invalid">⚠ فائل فارمیٹ غلط ہے</string>
+    <string name="sync_status_no_file">کوئی ہم آہنگی فائل منتخب نہیں</string>
+    <string name="sync_now_description">منتخب کردہ فائل میں ڈیپ لنکس کو دستی طور پر ہم آہنگ کریں</string>
+</resources>
