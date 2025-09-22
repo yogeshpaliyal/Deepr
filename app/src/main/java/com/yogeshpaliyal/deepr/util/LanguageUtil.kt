@@ -24,7 +24,7 @@ object LanguageUtil {
 
     val availableLanguages =
         listOf(
-            Language(SYSTEM_DEFAULT, "System Default", "System Default"),
+            Language(SYSTEM_DEFAULT, "", ""), // Will be replaced in UI with localized strings
             Language(ENGLISH, "English", "English"),
             Language(HINDI, "Hindi", "हिंदी"),
             Language(SPANISH, "Spanish", "Español"),
@@ -70,11 +70,10 @@ object LanguageUtil {
     /**
      * Gets the display name for a language code
      */
-    fun getLanguageDisplayName(languageCode: String): String = availableLanguages.find { it.code == languageCode }?.name ?: "System Default"
+    fun getLanguageDisplayName(languageCode: String): String = availableLanguages.find { it.code == languageCode }?.name ?: ""
 
     /**
      * Gets the native name for a language code
      */
-    fun getLanguageNativeName(languageCode: String): String =
-        availableLanguages.find { it.code == languageCode }?.nativeName ?: "System Default"
+    fun getLanguageNativeName(languageCode: String): String = availableLanguages.find { it.code == languageCode }?.nativeName ?: ""
 }

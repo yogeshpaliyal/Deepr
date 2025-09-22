@@ -40,6 +40,22 @@ fun LanguageSelectionDialog(
         text = {
             Column {
                 LanguageUtil.availableLanguages.forEach { language ->
+                    val displayName =
+                        if (language.code == LanguageUtil.SYSTEM_DEFAULT) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            language.nativeName
+                        }
+
+                    val supportingText =
+                        if (language.code == LanguageUtil.SYSTEM_DEFAULT) {
+                            null // No supporting text for system default
+                        } else if (language.name != language.nativeName) {
+                            language.name
+                        } else {
+                            null
+                        }
+
                     ListItem(
                         modifier =
                             Modifier
@@ -51,21 +67,19 @@ fun LanguageSelectionDialog(
                                 }.padding(vertical = 4.dp),
                         headlineContent = {
                             Text(
-                                text = language.nativeName,
+                                text = displayName,
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         },
                         supportingContent =
-                            if (language.name != language.nativeName) {
+                            supportingText?.let { text ->
                                 {
                                     Text(
-                                        text = language.name,
+                                        text = text,
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
-                            } else {
-                                null
                             },
                         trailingContent = {
                             RadioButton(

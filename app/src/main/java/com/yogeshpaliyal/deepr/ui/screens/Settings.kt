@@ -363,7 +363,13 @@ fun SettingsScreen(
                     headlineContent = { Text(stringResource(R.string.language)) },
                     supportingContent = {
                         Text(
-                            LanguageUtil.getLanguageNativeName(languageCode),
+                            if (languageCode.isEmpty()) {
+                                stringResource(R.string.system_default)
+                            } else {
+                                LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
+                                    stringResource(R.string.system_default)
+                                }
+                            },
                         )
                     },
                     leadingContent = {
