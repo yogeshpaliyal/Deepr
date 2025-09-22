@@ -11,7 +11,7 @@
     <string name="failed_to_delete_tag">Fehler beim Löschen des Tags: %s</string>
     <string name="tag_deleted_successfully">Tag erfolgreich gelöscht</string>
     <string name="edit_tag_description">Tag Bearbeiten</string>
-    <string name="delete_tag_description">Tag Löschen</string>ing>
+    <string name="delete_tag_description">Tag Löschen</string>
 
     <!-- Navigation and UI Labels -->
     <string name="settings">Einstellungen</string>

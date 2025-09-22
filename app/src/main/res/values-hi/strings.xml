@@ -11,7 +11,9 @@
     <string name="failed_to_delete_tag">टैग हटाने में विफल: %s</string>
     <string name="tag_deleted_successfully">टैग सफलतापूर्वक हटाया गया</string>
     <string name="edit_tag_description">टैग संपादित करें</string>
-    <string name="delete_tag_description">टैग हटाएं</string> Navigation and UI Labels -->
+    <string name="delete_tag_description">टैग हटाएं</string>
+    
+    <!-- Navigation and UI Labels -->
     <string name="settings">सेटिंग्स</string>
     <string name="about_us">हमारे बारे में</string>
     <string name="back">वापस</string>

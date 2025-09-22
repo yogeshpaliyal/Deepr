@@ -60,7 +60,9 @@
     <string name="failed_to_delete_tag">ٹیگ حذف کرنے میں ناکام: %s</string>
     <string name="tag_deleted_successfully">ٹیگ کامیابی سے حذف ہوگیا</string>
     <string name="edit_tag_description">ٹیگ ایڈٹ کریں</string>
-    <string name="delete_tag_description">ٹیگ حذف کریں</string>    <!-- Settings Screen -->
+    <string name="delete_tag_description">ٹیگ حذف کریں</string>
+    
+    <!-- Settings Screen -->
     <string name="import_deeplinks">Deeplinks درآمد کریں</string>
     <string name="import_deeplinks_description">CSV فائل سے Deeplinks درآمد کریں</string>
     <string name="export_deeplinks">Deeplinks برآمد کریں</string>

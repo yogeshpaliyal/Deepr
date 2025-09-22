@@ -120,7 +120,7 @@
     <string name="last_sync_time_format">%s</string>
     
     <!-- Sync Messages -->
-        <string name="sync_disabled">Sincronización deshabilitada</string>
+    <string name="sync_disabled">Sincronización deshabilitada</string>
     <string name="sync_file_not_selected">No se seleccionó archivo de sincronización</string>
     <string name="sync_success">Sincronizado exitosamente con %s</string>
     <string name="sync_failed">Error de sincronización: %s</string>
