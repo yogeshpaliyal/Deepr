@@ -50,7 +50,6 @@
     <string name="sort_by_link_descending">لنک کے حساب سے نازل ترتیب</string>
     
     <!-- Tag Management -->
-    <!-- Tag Management -->
     <string name="edit_tag">ٹیگ ایڈٹ کریں</string>
     <string name="delete_tag">ٹیگ حذف کریں</string>
     <string name="delete_tag_confirmation">کیا آپ واقعی اس ٹیگ کو حذف کرنا چاہتے ہیں؟</string>
