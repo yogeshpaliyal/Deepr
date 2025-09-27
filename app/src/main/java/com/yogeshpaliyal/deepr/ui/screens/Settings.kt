@@ -7,8 +7,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -174,14 +172,19 @@ fun SettingsScreen(
             }
         },
     ) { innerPadding ->
-        Box(
+        Column(
             modifier =
                 Modifier
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f, fill = true)
+                        .verticalScroll(rememberScrollState()),
+            ) {
                 HorizontalDivider()
 
                 ListItem(
@@ -397,9 +400,11 @@ fun SettingsScreen(
             }
 
             Column(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp),
             ) {
                 Text(
                     stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
@@ -414,7 +419,6 @@ fun SettingsScreen(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
