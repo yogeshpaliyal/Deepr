@@ -240,6 +240,7 @@ class AccountViewModel(
             }
 
             deeprQueries.deleteDeeprById(id)
+            deeprQueries.deleteLinkRelations(id)
             tagsToDelete.forEach { tagId ->
                 deeprQueries.deleteTag(tagId)
             }
