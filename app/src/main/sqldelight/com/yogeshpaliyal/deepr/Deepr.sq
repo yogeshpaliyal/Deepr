@@ -116,4 +116,8 @@ DELETE FROM LinkTags WHERE tagId = ?;
 updateTag:
 UPDATE Tags SET name = ? WHERE id = ?;
 
+getTagsForLink:
+SELECT Tags.id,Tags.name FROM Tags INNER JOIN LinkTags ON Tags.id = LinkTags.tagId WHERE LinkTags.linkId = ? ORDER BY Tags.name;
 
+hasTagLinks:
+SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;

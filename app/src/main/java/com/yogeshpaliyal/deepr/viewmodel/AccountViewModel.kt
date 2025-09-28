@@ -230,8 +230,19 @@ class AccountViewModel(
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
+            val tagsToDelete = mutableListOf<Long>()
+
+            deeprQueries.getTagsForLink(id).executeAsList().forEach { tag ->
+                val linkCount = deeprQueries.hasTagLinks(tag.id).executeAsOne()
+                if (linkCount == 1L) {
+                    tagsToDelete.add(tag.id)
+                }
+            }
+
             deeprQueries.deleteDeeprById(id)
-            deeprQueries.deleteLinkRelations(id)
+            tagsToDelete.forEach { tagId ->
+                deeprQueries.deleteTag(tagId)
+            }
         }
     }
 
