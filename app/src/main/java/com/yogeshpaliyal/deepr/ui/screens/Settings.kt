@@ -6,21 +6,28 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -39,6 +46,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -54,6 +62,7 @@ import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
@@ -175,78 +184,55 @@ fun SettingsScreen(
         Column(
             modifier =
                 Modifier
+                    .fillMaxSize()
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f, fill = true)
-                        .verticalScroll(rememberScrollState()),
-            ) {
-                HorizontalDivider()
-
-                ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            launcherActivityPickResult.launch(
-                                arrayOf(
-                                    "text/csv",
-                                    "text/comma-separated-values",
-                                    "application/csv",
-                                ),
-                            )
-                        },
-                    headlineContent = { Text(stringResource(R.string.import_deeplinks)) },
-                    supportingContent = { Text(stringResource(R.string.import_deeplinks_description)) },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.Download,
-                            contentDescription = stringResource(R.string.import_deeplinks),
+            SettingsSection("CSV Management") {
+                SettingsItem(
+                    TablerIcons.Download,
+                    title = stringResource(R.string.import_deeplinks),
+                    description = stringResource(R.string.import_deeplinks_description),
+                    onClick = {
+                        launcherActivityPickResult.launch(
+                            arrayOf(
+                                "text/csv",
+                                "text/comma-separated-values",
+                                "application/csv",
+                            ),
                         )
                     },
                 )
-                ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                SettingsItem(
+                    TablerIcons.Upload,
+                    title = stringResource(R.string.export_deeplinks),
+                    description = stringResource(R.string.export_deeplinks_description),
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            viewModel.exportCsvData()
+                        } else {
+                            if (storagePermissionState.status.isGranted) {
                                 viewModel.exportCsvData()
                             } else {
-                                if (storagePermissionState.status.isGranted) {
-                                    viewModel.exportCsvData()
-                                } else {
-                                    storagePermissionState.launchPermissionRequest()
-                                }
+                                storagePermissionState.launchPermissionRequest()
                             }
-                        },
-                    headlineContent = { Text(stringResource(R.string.export_deeplinks)) },
-                    supportingContent = { Text(stringResource(R.string.export_deeplinks_description)) },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.Upload,
-                            contentDescription = stringResource(R.string.export_deeplinks),
-                        )
+                        }
                     },
                 )
+            }
 
-                HorizontalDivider()
-
-                // Sync Settings Section
-                ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            viewModel.setSyncEnabled(!syncEnabled)
-                        },
-                    headlineContent = { Text(stringResource(R.string.sync_to_file)) },
-                    supportingContent = { Text(stringResource(R.string.sync_to_file_description)) },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.Refresh,
-                            contentDescription = stringResource(R.string.sync_to_file),
-                        )
+            SettingsSection("Local File Sync") {
+                SettingsItem(
+                    TablerIcons.Refresh,
+                    title = stringResource(R.string.sync_to_file),
+                    description = stringResource(R.string.sync_to_file_description),
+                    onClick = {
+                        viewModel.setSyncEnabled(!syncEnabled)
                     },
-                    trailingContent = {
+                    trailing = {
                         Switch(
                             checked = syncEnabled,
                             onCheckedChange = { viewModel.setSyncEnabled(it) },
@@ -254,15 +240,12 @@ fun SettingsScreen(
                     },
                 )
 
-                if (syncEnabled) {
-                    ListItem(
-                        modifier =
-                            Modifier.clickable {
-                                syncFileLauncher.launch("deeplinks.md")
-                            },
-                        headlineContent = { Text(stringResource(R.string.select_sync_file)) },
-                        supportingContent = {
-                            Text(
+                AnimatedVisibility(syncEnabled) {
+                    Column {
+                        SettingsItem(
+                            TablerIcons.FileText,
+                            title = stringResource(R.string.select_sync_file),
+                            description =
                                 if (syncFilePath.isNotEmpty()) {
                                     syncFilePath
                                         .substringAfterLast("/")
@@ -272,129 +255,88 @@ fun SettingsScreen(
                                 } else {
                                     stringResource(R.string.select_sync_file_description)
                                 },
-                            )
-                        },
-                        leadingContent = {
-                            Icon(
-                                TablerIcons.FileText,
-                                contentDescription = stringResource(R.string.select_sync_file),
-                            )
-                        },
-                    )
+                            onClick = {
+                                syncFileLauncher.launch("deeplinks.md")
+                            },
+                        )
 
-                    // Show last sync time if sync is enabled
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.last_sync_time)) },
-                        supportingContent = {
-                            Text(
+                        SettingsItem(
+                            TablerIcons.InfoCircle,
+                            title = stringResource(R.string.last_sync_time),
+                            description =
                                 if (lastSyncTime > 0) {
-                                    val formatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
-                                    stringResource(R.string.last_sync_time_format, formatter.format(Date(lastSyncTime)))
+                                    val formatter =
+                                        SimpleDateFormat(
+                                            "MMM dd, yyyy 'at' HH:mm",
+                                            Locale.getDefault(),
+                                        )
+                                    stringResource(
+                                        R.string.last_sync_time_format,
+                                        formatter.format(Date(lastSyncTime)),
+                                    )
                                 } else {
                                     stringResource(R.string.last_sync_time_never)
                                 },
-                            )
-                        },
-                        leadingContent = {
-                            Icon(
-                                TablerIcons.InfoCircle,
-                                contentDescription = stringResource(R.string.last_sync_time),
-                            )
-                        },
-                    )
+                        )
 
-                    if (syncFilePath.isNotEmpty()) {
-                        ListItem(
-                            modifier =
-                                Modifier.clickable {
+                        AnimatedVisibility(syncFilePath.isNotEmpty()) {
+                            SettingsItem(
+                                TablerIcons.Upload,
+                                title = stringResource(R.string.sync_now),
+                                description = stringResource(R.string.sync_now_description),
+                                onClick = {
                                     viewModel.syncToMarkdown()
                                 },
-                            headlineContent = { Text(stringResource(R.string.sync_now)) },
-                            supportingContent = { Text(stringResource(R.string.sync_now_description)) },
-                            leadingContent = {
-                                Icon(
-                                    TablerIcons.Upload,
-                                    contentDescription = stringResource(R.string.sync_now),
-                                )
-                            },
-                        )
+                            )
+                        }
                     }
                 }
+            }
 
-                HorizontalDivider()
-
-                // Add Shortcut Icon Setting
-                ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            // Toggle the preference
-                            viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
+            SettingsSection("Others") {
+                SettingsItem(
+                    TablerIcons.Settings,
+                    title = stringResource(R.string.shortcut_icon),
+                    description =
+                        if (useLinkBasedIcons) {
+                            stringResource(
+                                R.string.use_link_app_icon,
+                            )
+                        } else {
+                            stringResource(R.string.use_deepr_app_icon)
                         },
-                    headlineContent = { Text(stringResource(R.string.shortcut_icon)) },
-                    supportingContent = {
-                        Text(
-                            if (useLinkBasedIcons) {
-                                stringResource(
-                                    R.string.use_link_app_icon,
-                                )
-                            } else {
-                                stringResource(R.string.use_deepr_app_icon)
-                            },
-                        )
+                    onClick = {
+                        viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
                     },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.Settings,
-                            contentDescription = stringResource(R.string.shortcut_icon_setting),
-                        )
-                    },
-                    trailingContent = {
+                    trailing = {
                         Switch(
                             checked = useLinkBasedIcons,
                             onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
                         )
                     },
                 )
-                HorizontalDivider()
 
-                // Language Selection Setting
-                ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            showLanguageDialog = true
-                        },
-                    headlineContent = { Text(stringResource(R.string.language)) },
-                    supportingContent = {
-                        Text(
-                            if (languageCode.isEmpty()) {
+                SettingsItem(
+                    TablerIcons.Language,
+                    title = stringResource(R.string.language),
+                    description =
+                        if (languageCode.isEmpty()) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
                                 stringResource(R.string.system_default)
-                            } else {
-                                LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
-                                    stringResource(R.string.system_default)
-                                }
-                            },
-                        )
-                    },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.Language,
-                            contentDescription = stringResource(R.string.language),
-                        )
+                            }
+                        },
+                    onClick = {
+                        showLanguageDialog = true
                     },
                 )
-                HorizontalDivider()
 
-                ListItem(
-                    modifier =
-                        Modifier.clickable(true) {
-                            backStack.add(AboutUs)
-                        },
-                    headlineContent = { Text(stringResource(R.string.about_us)) },
-                    leadingContent = {
-                        Icon(
-                            TablerIcons.InfoCircle,
-                            contentDescription = stringResource(R.string.about_us),
-                        )
+                SettingsItem(
+                    TablerIcons.InfoCircle,
+                    title = stringResource(R.string.about_us),
+                    onClick = {
+                        backStack.add(AboutUs)
                     },
                 )
             }
@@ -436,6 +378,114 @@ fun SettingsScreen(
                 },
                 onDismiss = { showLanguageDialog = false },
             )
+        }
+    }
+}
+
+@Composable
+private fun SettingsSection(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
+        Card(
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+        ) {
+            content()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SettingsItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    description: String? = null,
+    trailing: @Composable (() -> Unit)? = null,
+    onClick: ((onComplete: (() -> Unit)?) -> Unit)? = null,
+    isDestructive: Boolean = false,
+    shouldShowLoading: Boolean = false,
+) {
+    var isLoading by remember { mutableStateOf(false) }
+
+    val contentColor =
+        if (isDestructive) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable(true, onClick = {
+                            if (shouldShowLoading) {
+                                isLoading = true
+                            }
+                            onClick({
+                                isLoading = false
+                            })
+                        })
+                    } else {
+                        Modifier
+                    },
+                ).padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = contentColor,
+            modifier = Modifier.size(24.dp),
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = contentColor,
+            )
+            if (description != null) {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color =
+                        if (isDestructive) {
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                )
+            }
+        }
+
+        trailing?.invoke()
+
+        if (onClick != null && trailing == null && !isLoading) {
+            Icon(imageVector = TablerIcons.ChevronRight, contentDescription = "Go")
+        }
+
+        if (isLoading) {
+            ContainedLoadingIndicator(modifier = Modifier.size(32.dp))
         }
     }
 }
