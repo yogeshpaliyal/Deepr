@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -77,6 +78,7 @@ fun HomeBottomContent(
     }
     var isError by remember { mutableStateOf(false) }
     var isNameError by remember { mutableStateOf(false) }
+    var isFetchingMetadata by remember { mutableStateOf(false) }
     // Tags
     var newTagName by remember { mutableStateOf("") }
     val allTags by viewModel.allTags.collectAsState()
@@ -171,9 +173,11 @@ fun HomeBottomContent(
 
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = deeprInfo.link.isNotBlank(),
+                    enabled = deeprInfo.link.isNotBlank() && !isFetchingMetadata,
                     onClick = {
+                        isFetchingMetadata = true
                         viewModel.fetchMetaData(deeprInfo.link) {
+                            isFetchingMetadata = false
                             if (it != null) {
                                 deeprInfo = deeprInfo.copy(name = it.title ?: "")
                                 isNameError = false
@@ -188,6 +192,13 @@ fun HomeBottomContent(
                         }
                     },
                 ) {
+                    if (isFetchingMetadata) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                     Text(stringResource(R.string.fetch_name_from_link))
                 }
 
