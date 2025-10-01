@@ -23,6 +23,8 @@ import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.ui.screens.AboutUs
 import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
+import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
+import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServerScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
@@ -152,6 +154,11 @@ fun Dashboard(
                 is AboutUs ->
                     NavEntry(key) {
                         AboutUsScreen(backStack)
+                    }
+
+                is LocalNetworkServer ->
+                    NavEntry(key) {
+                        LocalNetworkServerScreen(backStack)
                     }
 
                 else -> NavEntry(Unit) { Text("Unknown route") }

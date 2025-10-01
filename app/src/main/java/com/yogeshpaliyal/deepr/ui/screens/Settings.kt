@@ -68,6 +68,7 @@ import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Refresh
+import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
@@ -294,6 +295,14 @@ fun SettingsScreen(
             }
 
             SettingsSection("Others") {
+                SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.local_network_server),
+                    onClick = {
+                        backStack.add(LocalNetworkServer)
+                    },
+                )
+
                 SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
