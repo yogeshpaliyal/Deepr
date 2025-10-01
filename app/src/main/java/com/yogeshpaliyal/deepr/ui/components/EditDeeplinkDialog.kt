@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
+import com.yogeshpaliyal.deepr.util.normalizeLink
 
 @Composable
 fun EditDeeplinkDialog(
@@ -70,8 +71,9 @@ fun EditDeeplinkDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (isValidDeeplink(link)) {
-                        onSave(link, name)
+                    val normalizedLink = normalizeLink(link)
+                    if (isValidDeeplink(normalizedLink)) {
+                        onSave(normalizedLink, name)
                     } else {
                         isError = true
                     }

@@ -16,9 +16,10 @@ fun openDeeplink(
     link: String,
 ): Boolean {
     if (!isValidDeeplink(link)) return false
+    val normalizedLink = normalizeLink(link)
     return try {
         Log.d("Anas", "opened")
-        val intent = Intent(Intent.ACTION_VIEW, link.toUri())
+        val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
         context.startActivity(intent)
         true
     } catch (e: Exception) {
@@ -26,7 +27,7 @@ fun openDeeplink(
         Toast
             .makeText(
                 context,
-                context.getString(R.string.invalid_deeplink_toast, link),
+                context.getString(R.string.invalid_deeplink_toast, normalizedLink),
                 Toast.LENGTH_SHORT,
             ).show()
         // Optionally, show a toast or a dialog to the user that the link is invalid
@@ -44,7 +45,8 @@ fun getShortcutAppIcon(
         return IconCompat.createWithResource(context, R.mipmap.ic_launcher)
     }
     try {
-        val intent = Intent(Intent.ACTION_VIEW, link.toUri())
+        val normalizedLink = normalizeLink(link)
+        val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
         val appIconDrawable = context.packageManager.getActivityIcon(intent)
 
         // Convert the Drawable to a Bitmap
@@ -62,10 +64,31 @@ fun getShortcutAppIcon(
     }
 }
 
+fun normalizeLink(link: String): String {
+    if (link.isBlank()) return link
+    
+    val trimmedLink = link.trim()
+    
+    // Check if the link already has a scheme
+    if (trimmedLink.contains("://")) {
+        return trimmedLink
+    }
+    
+    // If it looks like a URL (contains a dot and doesn't start with a scheme),
+    // prepend https://
+    if (trimmedLink.contains(".")) {
+        return "https://$trimmedLink"
+    }
+    
+    // Return as-is for other cases (like custom schemes without ://)
+    return trimmedLink
+}
+
 fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
     return try {
-        val uri = link.toUri()
+        val normalizedLink = normalizeLink(link)
+        val uri = normalizedLink.toUri()
         val hasValidScheme = uri.scheme != null && uri.scheme!!.isNotBlank()
         val hasValidAuthority = uri.authority != null && uri.authority!!.isNotBlank()
         hasValidScheme && hasValidAuthority
