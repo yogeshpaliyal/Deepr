@@ -51,6 +51,7 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
+import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
@@ -110,6 +111,9 @@ fun HomeBottomContent(
     }
 
     val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
+        // Normalize the link before saving
+        val normalizedLink = normalizeLink(deeprInfo.link)
+
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
         val currentTagIds = selectedTags.map { it.id }.toSet()
@@ -120,12 +124,12 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(deeprInfo.link, deeprInfo.name, executeAfterSave, selectedTags)
+            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags)
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, deeprInfo.link, deeprInfo.name, selectedTags)
+            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags)
         }
-        onSaveDialogInfoChange(SaveDialogInfo(deeprInfo, executeAfterSave))
+        onSaveDialogInfoChange(SaveDialogInfo(deeprInfo.copy(link = normalizedLink), executeAfterSave))
     }
 
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)

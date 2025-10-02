@@ -71,6 +71,7 @@ import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
+import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
@@ -127,8 +128,9 @@ fun HomeScreen(
             if (result.contents == null) {
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
-                if (isValidDeeplink(result.contents)) {
-                    selectedLink = createDeeprObject(link = result.contents)
+                val normalizedLink = normalizeLink(result.contents)
+                if (isValidDeeplink(normalizedLink)) {
+                    selectedLink = createDeeprObject(link = normalizedLink)
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -138,8 +140,9 @@ fun HomeScreen(
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
         if (!sharedText?.url.isNullOrBlank() && selectedLink == null) {
-            if (isValidDeeplink(sharedText.url)) {
-                selectedLink = createDeeprObject(link = sharedText.url, name = sharedText.title ?: "")
+            val normalizedLink = normalizeLink(sharedText.url)
+            if (isValidDeeplink(normalizedLink)) {
+                selectedLink = createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
