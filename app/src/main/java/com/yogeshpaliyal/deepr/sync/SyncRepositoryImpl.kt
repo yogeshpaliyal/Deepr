@@ -35,7 +35,7 @@ class SyncRepositoryImpl(
                 }
 
                 val res =
-                    context.contentResolver.openOutputStream(filePath.toUri())?.use {
+                    context.contentResolver.openOutputStream(filePath.toUri(), "wt")?.use {
                         val count = deeprQueries.countDeepr().executeAsOne()
                         if (count == 0L) {
                             return@withContext RequestResult.Error(context.getString(R.string.no_data_to_export))
