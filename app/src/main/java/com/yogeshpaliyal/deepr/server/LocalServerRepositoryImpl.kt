@@ -5,6 +5,7 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.data.NetworkRepository
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -32,6 +33,7 @@ import java.util.Locale
 class LocalServerRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
+    private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
@@ -128,11 +130,37 @@ class LocalServerRepositoryImpl(
                         post("/api/links") {
                             try {
                                 val request = call.receive<AddLinkRequest>()
-                                deeprQueries.insertDeepr(request.link, request.name, 0)
+                                // Insert the link without tags first
+                                accountViewModel.insertAccount(request.link, request.name, false, request.tags.map { it.toDbTag() })
                                 call.respond(HttpStatusCode.Created, SuccessResponse("Link added successfully"))
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error adding link", e)
                                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error adding link: ${e.message}"))
+                            }
+                        }
+
+                        get("/api/tags") {
+                            try {
+                                // Get all tags from the database with their IDs
+                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val response =
+                                    allTags.map { tag ->
+                                        // Count how many links use this tag
+                                        val linkCount =
+                                            deeprQueries
+                                                .getLinksAndTags("", "", "", tag.id, "DESC", "createdAt", "DESC", "createdAt")
+                                                .executeAsList()
+                                                .size
+                                        TagResponse(
+                                            id = tag.id,
+                                            name = tag.name,
+                                            count = linkCount,
+                                        )
+                                    }
+                                call.respond(HttpStatusCode.OK, response)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error getting tags", e)
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting tags: ${e.message}"))
                             }
                         }
 
@@ -238,9 +266,18 @@ data class LinkResponse(
 )
 
 @Serializable
+data class TagData(
+    val id: Long,
+    val name: String,
+) {
+    fun toDbTag() = com.yogeshpaliyal.deepr.Tags(id, name)
+}
+
+@Serializable
 data class AddLinkRequest(
     val link: String,
     val name: String,
+    val tags: List<TagData> = emptyList(),
 )
 
 @Serializable
@@ -257,4 +294,11 @@ data class SuccessResponse(
 @Serializable
 data class ErrorResponse(
     val error: String,
+)
+
+@Serializable
+data class TagResponse(
+    val id: Long,
+    val name: String,
+    val count: Int,
 )

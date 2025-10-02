@@ -79,7 +79,7 @@ class DeeprApplication : Application() {
                 }
 
                 single<LocalServerRepository> {
-                    LocalServerRepositoryImpl(androidContext(), get(), get())
+                    LocalServerRepositoryImpl(androidContext(), get(), get(), get())
                 }
 
                 viewModel {

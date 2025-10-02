@@ -109,6 +109,22 @@
                         >
                     </div>
 
+                    <div class="flex-1">
+                        <label for="linkTags" class="block text-sm font-medium text-gray-700 mb-2">
+                            Tags (Optional)
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="linkTags"
+                                placeholder="Type to add tags..."
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                            >
+                            <div id="tagSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-40 overflow-y-auto"></div>
+                        </div>
+                        <div id="selectedTags" class="flex flex-wrap gap-2 mt-2"></div>
+                    </div>
+
                     <button
                         type="submit"
                         id="addBtn"
@@ -123,12 +139,13 @@
         <!-- Links Section -->
         <section class="glass-effect rounded-2xl shadow-xl animate-slide-up" style="animation-delay: 0.4s">
             <div class="p-6 sm:p-8">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
                         <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                         </svg>
                         Your Links
+                        <span id="linkCount" class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm font-normal"></span>
                     </h2>
 
                     <button
@@ -140,6 +157,77 @@
                         </svg>
                         Refresh
                     </button>
+                </div>
+
+                <!-- Search and Filter Section -->
+                <div class="mb-6 space-y-4">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search links by name or URL..."
+                            class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                        >
+                        <button
+                            id="clearSearch"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center opacity-0 transition-opacity duration-200"
+                        >
+                            <svg class="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                        <!-- Tag Filter -->
+                        <div class="flex-1 w-full sm:w-auto">
+                            <select
+                                id="tagFilter"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
+                            >
+                                <option value="">All Tags</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort Controls -->
+                        <div class="flex gap-2">
+                            <select
+                                id="sortBy"
+                                class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
+                            >
+                                <option value="createdAt">Date Added</option>
+                                <option value="name">Name</option>
+                                <option value="openedCount">Opens</option>
+                            </select>
+                            <button
+                                id="sortOrder"
+                                class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 flex items-center gap-2"
+                                data-order="desc"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Clear Filters -->
+                        <button
+                            id="clearFilters"
+                            class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 flex items-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
                 </div>
 
                 <div id="linksContainer">
@@ -166,6 +254,11 @@
     </div>
 
     <script>
+        // Global variables to store all links and available tags
+        let allLinks = [];
+        let availableTags = []; // Now contains {id, name, count} objects
+        let selectedTags = []; // Now contains {id, name} objects
+
         // Toast notification system
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -190,82 +283,321 @@
             }, 3000);
         }
 
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Load available tags from API
+        async function loadAvailableTags() {
+            try {
+                const response = await fetch('/api/tags');
+                const tags = await response.json();
+                availableTags = tags; // tags now have {id, name, count} format
+            } catch (error) {
+                console.error('Error loading tags:', error);
+                availableTags = [];
+            }
+        }
+
+        // Tag management functions
+        function addSelectedTag(tagName) {
+            // Check if tag is already selected
+            if (selectedTags.some(tag => tag.name === tagName)) {
+                return;
+            }
+
+            // Find existing tag by name or create new one
+            const existingTag = availableTags.find(tag => tag.name === tagName);
+            const newTag = {
+                id: existingTag ? existingTag.id : 0, // 0 for new tags
+                name: tagName
+            };
+
+            selectedTags.push(newTag);
+            updateSelectedTagsDisplay();
+            document.getElementById('linkTags').value = '';
+            hideSuggestions();
+        }
+
+        function removeSelectedTag(tagName) {
+            selectedTags = selectedTags.filter(tag => tag.name !== tagName);
+            updateSelectedTagsDisplay();
+        }
+
+        function updateSelectedTagsDisplay() {
+            const container = document.getElementById('selectedTags');
+            container.innerHTML = selectedTags.map(tag => `
+                <span class="inline-flex items-center gap-1 bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ${escapeHtml(tag.name)}
+                    <button
+                        type="button"
+                        onclick="removeSelectedTag('${escapeHtml(tag.name)}')"
+                        class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                    >
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        function showSuggestions(input) {
+            const suggestions = document.getElementById('tagSuggestions');
+            const inputValue = input.value.toLowerCase().trim();
+
+            if (!inputValue) {
+                hideSuggestions();
+                return;
+            }
+
+            // Filter available tags based on input and exclude already selected tags
+            const filteredTags = availableTags
+                .filter(tagObj =>
+                    tagObj.name.toLowerCase().includes(inputValue) &&
+                    !selectedTags.some(selected => selected.name === tagObj.name)
+                )
+                .slice(0, 5); // Limit to 5 suggestions
+
+            if (filteredTags.length === 0) {
+                // Show option to create new tag
+                suggestions.innerHTML = `
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                        <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                    </div>
+                `;
+            } else {
+                suggestions.innerHTML = filteredTags.map(tagObj => `
+                    <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addSelectedTag('${escapeHtml(tagObj.name)}')">
+                        <span>${escapeHtml(tagObj.name)}</span>
+                        <span class="text-xs text-gray-500">${tagObj.count} links</span>
+                    </div>
+                `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                        <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                    </div>
+                ` : '');
+            }
+
+            suggestions.classList.remove('hidden');
+        }
+
+        function hideSuggestions() {
+            document.getElementById('tagSuggestions').classList.add('hidden');
+        }
+
+        // Filter and display links
+        function filterAndDisplayLinks() {
+            const searchInput = document.getElementById('searchInput');
+            const tagFilter = document.getElementById('tagFilter');
+            const sortBy = document.getElementById('sortBy');
+            const sortOrder = document.getElementById('sortOrder');
+            const container = document.getElementById('linksContainer');
+            const linkCount = document.getElementById('linkCount');
+
+            // Apply filters
+            const filteredLinks = allLinks.filter(link => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const matchesSearch = link.name.toLowerCase().includes(searchTerm) ||
+                                    link.link.toLowerCase().includes(searchTerm);
+                const matchesTag = tagFilter.value === '' || link.tags.includes(tagFilter.value);
+                return matchesSearch && matchesTag;
+            });
+
+            // Apply sorting
+            const sortedLinks = filteredLinks.sort((a, b) => {
+                const order = sortOrder.dataset.order === 'desc' ? -1 : 1;
+                if (sortBy.value === 'name') {
+                    return order * a.name.localeCompare(b.name);
+                } else if (sortBy.value === 'openedCount') {
+                    return order * (a.openedCount - b.openedCount);
+                } else { // createdAt
+                    return order * (new Date(a.createdAt) - new Date(b.createdAt));
+                }
+            });
+
+            // Update link count
+            linkCount.textContent = `${sortedLinks.length} of ${allLinks.length} ${sortedLinks.length === 1 ? 'link' : 'links'}`;
+
+            // Display results
+            if (sortedLinks.length === 0) {
+                const isEmpty = allLinks.length === 0;
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">
+                            ${isEmpty ? 'No links yet!' : 'No matching links found!'}
+                        </h3>
+                        <p class="text-gray-500 text-center">
+                            ${isEmpty ? 'Add your first link using the form above to get started.' : 'Try adjusting your search terms or filters.'}
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    ${sortedLinks.map((link, index) => `
+                        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-gray-800 line-clamp-2 flex-1">
+                                        ${escapeHtml(link.name)}
+                                    </h3>
+                                    <div class="ml-2 bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        ${link.openedCount} opens
+                                    </div>
+                                </div>
+
+                                <a href="${escapeHtml(link.link)}"
+                                   target="_blank"
+                                   class="text-primary-600 hover:text-primary-800 text-sm mb-4 block break-all transition-colors duration-200 line-clamp-2">
+                                    ${escapeHtml(link.link)}
+                                </a>
+
+                                <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        ${new Date(link.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+
+                                ${link.tags.length > 0 ? `
+                                    <div class="flex flex-wrap gap-1 mb-4">
+                                        ${link.tags.map(tag => `
+                                            <button
+                                                class="bg-gray-100 hover:bg-primary-100 hover:text-primary-700 text-gray-700 px-2 py-1 rounded-full text-xs font-medium transition-colors duration-200 cursor-pointer"
+                                                onclick="filterByTag('${escapeHtml(tag)}')"
+                                            >
+                                                ${escapeHtml(tag)}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+
+                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                    <a href="${escapeHtml(link.link)}"
+                                       target="_blank"
+                                       class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        Open Link
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Populate tag filter dropdown
+        function populateTagFilter() {
+            const tagFilter = document.getElementById('tagFilter');
+            const allTags = [...new Set(allLinks.flatMap(link => link.tags))].sort();
+
+            tagFilter.innerHTML = `
+                <option value="">All Tags (${allTags.length})</option>
+                ${allTags.map(tag => {
+                    const count = allLinks.filter(link => link.tags.includes(tag)).length;
+                    return `<option value="${escapeHtml(tag)}">${escapeHtml(tag)} (${count})</option>`;
+                }).join('')}
+            `;
+        }
+
+        // Filter by specific tag (called when tag is clicked)
+        function filterByTag(tag) {
+            const tagFilter = document.getElementById('tagFilter');
+            tagFilter.value = tag;
+            filterAndDisplayLinks();
+            showToast(`Filtered by tag: ${tag}`, 'info');
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('tagFilter').value = '';
+            document.getElementById('sortBy').value = 'createdAt';
+            document.getElementById('sortOrder').dataset.order = 'desc';
+            updateSortOrderIcon();
+            updateClearSearchButton();
+            filterAndDisplayLinks();
+            showToast('Filters cleared', 'info');
+        }
+
+        // Toggle sort order
+        function toggleSortOrder() {
+            const sortOrder = document.getElementById('sortOrder');
+            sortOrder.dataset.order = sortOrder.dataset.order === 'desc' ? 'asc' : 'desc';
+            updateSortOrderIcon();
+            filterAndDisplayLinks();
+        }
+
+        // Update sort order icon
+        function updateSortOrderIcon() {
+            const sortOrder = document.getElementById('sortOrder');
+            const isDesc = sortOrder.dataset.order === 'desc';
+            sortOrder.innerHTML = `
+                <svg class="w-4 h-4 transition-transform duration-200 ${isDesc ? '' : 'rotate-180'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            `;
+            sortOrder.title = `Sort ${isDesc ? 'Descending' : 'Ascending'}`;
+        }
+
+        // Update clear search button visibility
+        function updateClearSearchButton() {
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+
+            if (searchInput.value.trim()) {
+                clearSearch.classList.remove('opacity-0');
+                clearSearch.classList.add('opacity-100');
+            } else {
+                clearSearch.classList.remove('opacity-100');
+                clearSearch.classList.add('opacity-0');
+            }
+        }
+
+        // Clear search input
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            updateClearSearchButton();
+            filterAndDisplayLinks();
+        }
+
         async function loadLinks() {
             try {
                 const response = await fetch('/api/links');
                 const links = await response.json();
 
-                const container = document.getElementById('linksContainer');
+                allLinks = links;
+                populateTagFilter();
+                filterAndDisplayLinks();
 
-                if (links.length === 0) {
-                    container.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-16">
-                            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">No links yet!</h3>
-                            <p class="text-gray-500 text-center">Add your first link using the form above to get started.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        ${links.map((link, index) => `
-                            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 animate-fade-in" style="animation-delay: ${index * 0.1}s">
-                                <div class="p-6">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h3 class="text-lg font-semibold text-gray-800 line-clamp-2 flex-1">
-                                            ${escapeHtml(link.name)}
-                                        </h3>
-                                        <div class="ml-2 bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
-                                            ${link.openedCount} opens
-                                        </div>
-                                    </div>
-
-                                    <a href="${escapeHtml(link.link)}"
-                                       target="_blank"
-                                       class="text-primary-600 hover:text-primary-800 text-sm mb-4 block break-all transition-colors duration-200 line-clamp-2">
-                                        ${escapeHtml(link.link)}
-                                    </a>
-
-                                    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                            ${new Date(link.createdAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-
-                                    ${link.tags.length > 0 ? `
-                                        <div class="flex flex-wrap gap-1">
-                                            ${link.tags.map(tag => `
-                                                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
-                                                    ${escapeHtml(tag)}
-                                                </span>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-
-                                    <div class="mt-4 pt-4 border-t border-gray-100">
-                                        <a href="${escapeHtml(link.link)}"
-                                           target="_blank"
-                                           class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                            </svg>
-                                            Open Link
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
             } catch (error) {
                 console.error('Error loading links:', error);
                 document.getElementById('linksContainer').innerHTML = `
@@ -288,6 +620,7 @@
 
             const urlInput = document.getElementById('linkUrl');
             const nameInput = document.getElementById('linkName');
+            const tagsInput = document.getElementById('linkTags');
             const button = document.getElementById('addBtn');
 
             const originalText = button.textContent;
@@ -308,14 +641,19 @@
                     },
                     body: JSON.stringify({
                         link: urlInput.value,
-                        name: nameInput.value
+                        name: nameInput.value,
+                        tags: selectedTags // Send tags in {id, name} format
                     })
                 });
 
                 if (response.ok) {
                     urlInput.value = '';
                     nameInput.value = '';
+                    tagsInput.value = '';
+                    selectedTags = [];
+                    updateSelectedTagsDisplay();
                     loadLinks();
+                    loadAvailableTags();
 
                     button.innerHTML = `
                         <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
@@ -357,12 +695,58 @@
             return div.innerHTML;
         }
 
-        // Event listeners
-        document.getElementById('addLinkForm').addEventListener('submit', addLink);
-        document.getElementById('refreshBtn').addEventListener('click', loadLinks);
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search input with debounce
+            const searchInput = document.getElementById('searchInput');
+            const debouncedFilter = debounce(filterAndDisplayLinks, 300);
+            searchInput.addEventListener('input', function() {
+                updateClearSearchButton();
+                debouncedFilter();
+            });
 
-        // Load links when page loads
-        window.addEventListener('load', loadLinks);
+            // Clear search button
+            document.getElementById('clearSearch').addEventListener('click', clearSearch);
+
+            // Filter controls
+            document.getElementById('tagFilter').addEventListener('change', filterAndDisplayLinks);
+            document.getElementById('sortBy').addEventListener('change', filterAndDisplayLinks);
+            document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
+            document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+
+            // Tag input functionality
+            const tagInput = document.getElementById('linkTags');
+            const debouncedShowSuggestions = debounce((input) => showSuggestions(input), 200);
+
+            tagInput.addEventListener('input', function() {
+                debouncedShowSuggestions(this);
+            });
+
+            tagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    e.preventDefault();
+                    addSelectedTag(this.value.trim());
+                } else if (e.key === 'Escape') {
+                    hideSuggestions();
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!tagInput.contains(e.target) && !document.getElementById('tagSuggestions').contains(e.target)) {
+                    hideSuggestions();
+                }
+            });
+
+            // Form and refresh
+            document.getElementById('addLinkForm').addEventListener('submit', addLink);
+            document.getElementById('refreshBtn').addEventListener('click', loadLinks);
+
+            // Initialize
+            updateSortOrderIcon();
+            loadLinks();
+            loadAvailableTags();
+        });
     </script>
 </body>
 </html>
