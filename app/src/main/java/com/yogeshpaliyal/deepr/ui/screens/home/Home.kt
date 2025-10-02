@@ -66,6 +66,8 @@ import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
+import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
+import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
@@ -235,6 +237,14 @@ fun HomeScreen(
                         SearchBarDefaults.appBarWithSearchColors(
                             appBarContainerColor = Color.Transparent,
                         ),
+                )
+                ServerStatusBar(
+                    onServerStatusClick = {
+                        // Navigate to LocalNetworkServer screen when status bar is clicked
+                        if (backStack.lastOrNull() !is LocalNetworkServer) {
+                            backStack.add(LocalNetworkServer)
+                        }
+                    },
                 )
             }
         },

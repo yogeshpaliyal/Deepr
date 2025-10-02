@@ -140,6 +140,7 @@
     <string name="local_network_server">Local Network Server</string>
     <string name="server_status">Server Status</string>
     <string name="server_running">Server is running and accessible on your local network</string>
+    <string name="server_running_tap_to_configure">Server Running - Tap to configure</string>
     <string name="server_stopped">Server is not running</string>
     <string name="server_url">Server URL</string>
     <string name="copy">Copy</string>

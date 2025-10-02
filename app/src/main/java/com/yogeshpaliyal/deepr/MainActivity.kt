@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,11 +32,9 @@ import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
-import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 data class SharedLink(
     val url: String,
@@ -44,7 +43,6 @@ data class SharedLink(
 
 class MainActivity : ComponentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
-    private val accountViewModel: AccountViewModel by viewModel()
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(
@@ -60,7 +58,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         context
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     context
                 }
             },
@@ -123,46 +121,47 @@ fun Dashboard(
 ) {
     val backStack = remember(sharedText) { mutableStateListOf<Any>(Home) }
 
-    NavDisplay(
-        backStack = backStack,
-        modifier = modifier,
-        entryDecorators =
-            listOf(
-                // Add the default decorators for managing scenes and saving state
-                rememberSceneSetupNavEntryDecorator(),
-                rememberSavedStateNavEntryDecorator(),
-                // Then add the view model store decorator
-                rememberViewModelStoreNavEntryDecorator(),
-            ),
-        onBack = { backStack.removeLastOrNull() },
-        entryProvider = { key ->
-            when (key) {
-                is Home ->
-                    NavEntry(key) {
-                        HomeScreen(
-                            backStack,
-                            sharedText = sharedText,
-                            resetSharedText = resetSharedText,
-                        )
-                    }
+    Column(modifier = modifier) {
+        NavDisplay(
+            backStack = backStack,
+            entryDecorators =
+                listOf(
+                    // Add the default decorators for managing scenes and saving state
+                    rememberSceneSetupNavEntryDecorator(),
+                    rememberSavedStateNavEntryDecorator(),
+                    // Then add the view model store decorator
+                    rememberViewModelStoreNavEntryDecorator(),
+                ),
+            onBack = { backStack.removeLastOrNull() },
+            entryProvider = { key ->
+                when (key) {
+                    is Home ->
+                        NavEntry(key) {
+                            HomeScreen(
+                                backStack,
+                                sharedText = sharedText,
+                                resetSharedText = resetSharedText,
+                            )
+                        }
 
-                is Settings ->
-                    NavEntry(key) {
-                        SettingsScreen(backStack)
-                    }
+                    is Settings ->
+                        NavEntry(key) {
+                            SettingsScreen(backStack)
+                        }
 
-                is AboutUs ->
-                    NavEntry(key) {
-                        AboutUsScreen(backStack)
-                    }
+                    is AboutUs ->
+                        NavEntry(key) {
+                            AboutUsScreen(backStack)
+                        }
 
-                is LocalNetworkServer ->
-                    NavEntry(key) {
-                        LocalNetworkServerScreen(backStack)
-                    }
+                    is LocalNetworkServer ->
+                        NavEntry(key) {
+                            LocalNetworkServerScreen(backStack)
+                        }
 
-                else -> NavEntry(Unit) { Text("Unknown route") }
-            }
-        },
-    )
+                    else -> NavEntry(Unit) { Text("Unknown route") }
+                }
+            },
+        )
+    }
 }
