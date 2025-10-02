@@ -113,7 +113,7 @@ fun HomeBottomContent(
     val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
         // Normalize the link before saving
         val normalizedLink = normalizeLink(deeprInfo.link)
-        
+
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
         val currentTagIds = selectedTags.map { it.id }.toSet()

@@ -55,11 +55,11 @@ class UtilsTest {
     fun normalizeLink_handlesComplexUrls() {
         assertEquals(
             "https://www.example.com/path?query=value",
-            normalizeLink("www.example.com/path?query=value")
+            normalizeLink("www.example.com/path?query=value"),
         )
         assertEquals(
             "https://example.com:8080/path",
-            normalizeLink("example.com:8080/path")
+            normalizeLink("example.com:8080/path"),
         )
     }
 }
