@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepr - Link Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f4ff',
+                            100: '#e0e7ff',
+                            500: '#667eea',
+                            600: '#5a67d8',
+                            700: '#4c51bf',
+                        },
+                        secondary: {
+                            500: '#764ba2',
+                            600: '#6b46c1',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-gentle': 'bounceGentle 0.6s ease-in-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg p-4 sm:p-6 lg:p-8">
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="glass-effect rounded-2xl shadow-2xl mb-8 animate-fade-in">
+            <div class="p-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-3xl shadow-lg">
+                        🔗
+                    </div>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
+                    Deepr
+                </h1>
+                <p class="text-gray-600 text-lg">Your Personal Link Manager</p>
+            </div>
+        </header>
+
+        <!-- Add Link Section -->
+        <section class="glass-effect rounded-2xl shadow-xl mb-8 animate-slide-up" style="animation-delay: 0.2s">
+            <div class="p-6 sm:p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New Link
+                </h2>
+
+                <form id="addLinkForm" class="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:items-end">
+                    <div class="flex-1">
+                        <label for="linkUrl" class="block text-sm font-medium text-gray-700 mb-2">
+                            Link URL
+                        </label>
+                        <input
+                            type="url"
+                            id="linkUrl"
+                            placeholder="https://example.com"
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                        >
+                    </div>
+
+                    <div class="flex-1">
+                        <label for="linkName" class="block text-sm font-medium text-gray-700 mb-2">
+                            Link Name
+                        </label>
+                        <input
+                            type="text"
+                            id="linkName"
+                            placeholder="My Awesome Link"
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="addBtn"
+                        class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-300"
+                    >
+                        Add Link
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Links Section -->
+        <section class="glass-effect rounded-2xl shadow-xl animate-slide-up" style="animation-delay: 0.4s">
+            <div class="p-6 sm:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        Your Links
+                    </h2>
+
+                    <button
+                        id="refreshBtn"
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-2"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+
+                <div id="linksContainer">
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Loading links...</h3>
+                        <p class="text-gray-500">Please wait while we fetch your saved links.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300">
+        <div class="bg-white rounded-lg shadow-lg border-l-4 p-4 max-w-sm">
+            <div class="flex items-center">
+                <div id="toastIcon" class="flex-shrink-0 w-6 h-6 mr-3"></div>
+                <div>
+                    <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            const icons = {
+                success: `<svg class="text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`,
+                error: `<svg class="text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>`,
+                info: `<svg class="text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>`
+            };
+
+            toastMessage.textContent = message;
+            toastIcon.innerHTML = icons[type] || icons.info;
+
+            // Show toast
+            toast.classList.remove('translate-x-full');
+
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        async function loadLinks() {
+            try {
+                const response = await fetch('/api/links');
+                const links = await response.json();
+
+                const container = document.getElementById('linksContainer');
+
+                if (links.length === 0) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-16">
+                            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">No links yet!</h3>
+                            <p class="text-gray-500 text-center">Add your first link using the form above to get started.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        ${links.map((link, index) => `
+                            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                                <div class="p-6">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <h3 class="text-lg font-semibold text-gray-800 line-clamp-2 flex-1">
+                                            ${escapeHtml(link.name)}
+                                        </h3>
+                                        <div class="ml-2 bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
+                                            ${link.openedCount} opens
+                                        </div>
+                                    </div>
+
+                                    <a href="${escapeHtml(link.link)}"
+                                       target="_blank"
+                                       class="text-primary-600 hover:text-primary-800 text-sm mb-4 block break-all transition-colors duration-200 line-clamp-2">
+                                        ${escapeHtml(link.link)}
+                                    </a>
+
+                                    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            ${new Date(link.createdAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+
+                                    ${link.tags.length > 0 ? `
+                                        <div class="flex flex-wrap gap-1">
+                                            ${link.tags.map(tag => `
+                                                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
+                                                    ${escapeHtml(tag)}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="mt-4 pt-4 border-t border-gray-100">
+                                        <a href="${escapeHtml(link.link)}"
+                                           target="_blank"
+                                           class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                            Open Link
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading links:', error);
+                document.getElementById('linksContainer').innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.635 0L4.179 16.5c-.77.833.192 2.5 1.731 2.5z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Error loading links</h3>
+                        <p class="text-gray-500 text-center">Please try refreshing the page.</p>
+                    </div>
+                `;
+                showToast('Failed to load links. Please try again.', 'error');
+            }
+        }
+
+        async function addLink(event) {
+            event.preventDefault();
+
+            const urlInput = document.getElementById('linkUrl');
+            const nameInput = document.getElementById('linkName');
+            const button = document.getElementById('addBtn');
+
+            const originalText = button.textContent;
+            button.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Adding...
+            `;
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/api/links', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        link: urlInput.value,
+                        name: nameInput.value
+                    })
+                });
+
+                if (response.ok) {
+                    urlInput.value = '';
+                    nameInput.value = '';
+                    loadLinks();
+
+                    button.innerHTML = `
+                        <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Added!
+                    `;
+
+                    showToast('Link added successfully!', 'success');
+
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to add link');
+                }
+            } catch (error) {
+                console.error('Error adding link:', error);
+                button.innerHTML = `
+                    <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                    Error
+                `;
+
+                showToast('Failed to add link. Please try again.', 'error');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        document.getElementById('addLinkForm').addEventListener('submit', addLink);
+        document.getElementById('refreshBtn').addEventListener('click', loadLinks);
+
+        // Load links when page loads
+        window.addEventListener('load', loadLinks);
+    </script>
+</body>
+</html>

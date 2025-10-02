@@ -11,7 +11,8 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
-import io.ktor.server.engine.ApplicationEngine
+import io.ktor.server.cio.CIOApplicationEngine
+import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
@@ -26,13 +27,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
+import java.util.Locale
 
 class LocalServerRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
     private val networkRepository: NetworkRepository,
 ) : LocalServerRepository {
-    private var server: ApplicationEngine? = null
+    private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
     private val _isRunning = MutableStateFlow(false)
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
 
@@ -55,7 +57,7 @@ class LocalServerRepositoryImpl(
             }
 
             server =
-                embeddedServer(CIO, port = port, host = "0.0.0.0") {
+                embeddedServer(CIO, host = "0.0.0.0", port = port) {
                     install(ContentNegotiation) {
                         json(
                             Json {
@@ -68,29 +70,43 @@ class LocalServerRepositoryImpl(
 
                     routing {
                         get("/") {
-                            call.respondText(
-                                """
-                                <html>
-                                <head><title>Deepr Server</title></head>
-                                <body>
-                                    <h1>Deepr Local Network Server</h1>
-                                    <p>Server is running!</p>
-                                    <h2>Available endpoints:</h2>
-                                    <ul>
-                                        <li>GET /api/links - Get all links</li>
-                                        <li>POST /api/links - Add a new link (JSON body: {"link": "url", "name": "name"})</li>
-                                        <li>GET /api/link-info?url=<url> - Get link metadata</li>
-                                    </ul>
-                                </body>
-                                </html>
-                                """.trimIndent(),
-                                ContentType.Text.Html,
-                            )
+                            try {
+                                val htmlContent =
+                                    context.assets
+                                        .open("index.html")
+                                        .bufferedReader()
+                                        .use { it.readText() }
+                                call.respondText(htmlContent, ContentType.Text.Html)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error reading HTML asset", e)
+                                call.respondText(
+                                    """
+                                    <html>
+                                    <body>
+                                        <h1>Deepr Server</h1>
+                                        <p>Error loading interface. Please check server logs.</p>
+                                    </body>
+                                    </html>
+                                    """.trimIndent(),
+                                    ContentType.Text.Html,
+                                )
+                            }
                         }
 
                         get("/api/links") {
                             try {
-                                val links = deeprQueries.getLinksAndTags("", "", "", null, "DESC", "createdAt", "DESC", "createdAt").executeAsList()
+                                val links =
+                                    deeprQueries
+                                        .getLinksAndTags(
+                                            "",
+                                            "",
+                                            "",
+                                            null,
+                                            "DESC",
+                                            "createdAt",
+                                            "DESC",
+                                            "createdAt",
+                                        ).executeAsList()
                                 val response =
                                     links.map { link ->
                                         LinkResponse(
@@ -135,11 +151,14 @@ class LocalServerRepositoryImpl(
                                         HttpStatusCode.OK,
                                         LinkInfoResponse(
                                             title = linkInfo?.title,
-                                            imageUrl = linkInfo?.imageUrl,
+                                            imageUrl = linkInfo?.image,
                                         ),
                                     )
                                 } else {
-                                    call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error fetching link info: ${result.exceptionOrNull()?.message}"))
+                                    call.respond(
+                                        HttpStatusCode.InternalServerError,
+                                        ErrorResponse("Error fetching link info: ${result.exceptionOrNull()?.message}"),
+                                    )
                                 }
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting link info", e)
@@ -179,6 +198,7 @@ class LocalServerRepositoryImpl(
             wifiManager?.connectionInfo?.ipAddress?.let { ipInt ->
                 if (ipInt != 0) {
                     return String.format(
+                        Locale.US,
                         "%d.%d.%d.%d",
                         ipInt and 0xff,
                         ipInt shr 8 and 0xff,

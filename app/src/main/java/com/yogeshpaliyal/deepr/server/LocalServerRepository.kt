@@ -7,5 +7,6 @@ interface LocalServerRepository {
     val serverUrl: StateFlow<String?>
 
     suspend fun startServer()
+
     suspend fun stopServer()
 }
