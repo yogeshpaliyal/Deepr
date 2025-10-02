@@ -135,4 +135,22 @@
     <string name="no_file_path_provided">No file path provided</string>
     <string name="invalid_markdown_format">Invalid markdown table format</string>
     <string name="file_validation_error">File validation error: %s</string>
+    
+    <!-- Local Network Server -->
+    <string name="local_network_server">Local Network Server</string>
+    <string name="server_status">Server Status</string>
+    <string name="server_running">Server is running and accessible on your local network</string>
+    <string name="server_running_tap_to_configure">Server Running - Tap to configure</string>
+    <string name="server_stopped">Server is not running</string>
+    <string name="server_url">Server URL</string>
+    <string name="copy">Copy</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="scan_qr_code_description">Scan this QR code from another device to access the server</string>
+    <string name="how_to_use">How to Use</string>
+    <string name="local_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Use the URL or scan the QR code from another device\n4. Access the web interface or use the API endpoints to manage your links</string>
+    <string name="api_endpoints">API Endpoints</string>
+    <string name="api_get_links">Get all saved links</string>
+    <string name="api_add_link">Add a new link (JSON: {"link": "url", "name": "name"})</string>
+    <string name="api_get_link_info">Get metadata for a URL</string>
 </resources>

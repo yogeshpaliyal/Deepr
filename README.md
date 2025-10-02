@@ -21,6 +21,28 @@
 - Organize links by tags
 - Save link by sharing from other app (eg: chrome, etc.)
 - Save links to markdown file in local storage. (can be used for obsidian)
+- **Local network server:** Access and manage links from other devices on the same network
+
+### 🌐 Local Network Server
+
+The local network server feature allows you to access and manage your links from other devices on the same network. This is useful for:
+- Adding links from your desktop browser to your mobile device
+- Viewing your saved links on a bigger screen
+- Integrating with automation tools and scripts
+
+**Usage:**
+1. Open the app and go to Settings
+2. Tap on "Local Network Server"
+3. Toggle the server switch to start it
+4. Use the displayed URL or scan the QR code from another device
+5. Access the web interface or use the REST API
+
+**API Endpoints:**
+- `GET /api/links` - Get all saved links
+- `POST /api/links` - Add a new link (JSON body: `{"link": "url", "name": "name"}`)
+- `GET /api/link-info?url=<url>` - Get metadata for a URL
+
+**Note:** Both devices must be on the same Wi-Fi network.
 
 ## 🏗️ Tech Stack
 
@@ -32,6 +54,7 @@ The application is built using modern Android development practices and librarie
 - **Database:** SQLDelight
 - **Dependency Injection:** Koin
 - **Asynchronous Operations:** Kotlin Coroutines
+- **HTTP Client & Server:** Ktor
 
 ## 📲 Download
 You can download from any of the sources mentioned below.  

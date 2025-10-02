@@ -58,6 +58,7 @@ import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
+import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
@@ -68,6 +69,7 @@ import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Refresh
+import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
@@ -175,6 +177,14 @@ fun SettingsScreen(
                                         Modifier
                                     },
                             )
+                        }
+                    },
+                )
+                ServerStatusBar(
+                    onServerStatusClick = {
+                        // Navigate to LocalNetworkServer screen when status bar is clicked
+                        if (backStack.lastOrNull() !is LocalNetworkServer) {
+                            backStack.add(LocalNetworkServer)
                         }
                     },
                 )
@@ -294,6 +304,14 @@ fun SettingsScreen(
             }
 
             SettingsSection("Others") {
+                SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.local_network_server),
+                    onClick = {
+                        backStack.add(LocalNetworkServer)
+                    },
+                )
+
                 SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
