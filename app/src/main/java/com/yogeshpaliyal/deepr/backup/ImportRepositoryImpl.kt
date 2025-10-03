@@ -27,19 +27,21 @@ class ImportRepositoryImpl(
                     // verify header first
                     val header = csvReader.readNext()
                     if (header == null ||
-                        header.size < 3 ||
+                        header.size < 4 ||
                         header[0] != Constants.Header.LINK ||
                         header[1] != Constants.Header.CREATED_AT ||
-                        header[2] != Constants.Header.OPENED_COUNT
+                        header[2] != Constants.Header.OPENED_COUNT ||
+                        header[3] != Constants.Header.NAME
                     ) {
                         return RequestResult.Error("Invalid CSV header")
                     }
 
                     csvReader.forEach { row ->
-                        if (row.size >= 3) {
+                        if (row.size >= 4) {
                             val link = row[0]
                             val openedCount = row[2].toLongOrNull() ?: 0L
-                            val name = row[3].toString()
+                            // Name is everything from index 3 onwards, joined if split across columns
+                            val name = row.drop(3).joinToString(",")
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
