@@ -102,7 +102,7 @@
     <string name="save_and_execute">सहेजें और निष्पादित करें</string>
 
     <!-- Home Screen -->
-    <string name="enter_deeplink_command">डीपलिंक या कमांड दर्ज करें</string>
+    <string name="enter_deeplink_command">लिंक दर्ज करें</string>
     <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक।</string>
 
     <!-- Error Messages -->

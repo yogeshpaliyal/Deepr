@@ -37,7 +37,7 @@
     <string name="add_shortcut">Add shortcut</string>
     <string name="edit_shortcut">Edit shortcut</string>
     <string name="show_qr_code">Show QR Code</string>
-    <string name="deeplink_already_exists">Deeplink already exists</string>
+    <string name="deeplink_already_exists">Link already exists</string>
     
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">Sort by Date Ascending</string>
@@ -62,10 +62,10 @@
     <string name="delete_tag_description">Delete Tag</string>
 
     <!-- Settings Screen -->
-    <string name="import_deeplinks">Import Deeplinks</string>
-    <string name="import_deeplinks_description">Import Deeplinks from CSV file</string>
-    <string name="export_deeplinks">Export Deeplinks</string>
-    <string name="export_deeplinks_description">Export Deeplinks to CSV file</string>
+    <string name="import_deeplinks">Import links</string>
+    <string name="import_deeplinks_description">Import links from CSV file</string>
+    <string name="export_deeplinks">Export links</string>
+    <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
     <string name="use_link_app_icon">Use link supporting app icon</string>
     <string name="use_deepr_app_icon">Use Deepr app icon</string>
@@ -86,7 +86,7 @@
     <!-- About Us Screen -->
     <string name="app_logo">App Logo</string>
     <string name="version_format">Version %s</string>
-    <string name="app_description">A simple app to save, organize, and launch deeplinks.</string>
+    <string name="app_description">A simple app to save, organize, and launch links.</string>
     <string name="author">Author</string>
     <string name="author_name">Yogesh Choudhary</string>
     <string name="twitter">Twitter</string>
@@ -95,18 +95,18 @@
     <string name="view_on_github">View on GitHub</string>
 
     <!-- Save Dialog -->
-    <string name="save_deeplink">Save Deeplink</string>
-    <string name="save_deeplink_message">Save the deeplink: %s ?</string>
+    <string name="save_deeplink">Save Link</string>
+    <string name="save_deeplink_message">Save the link: %s ?</string>
     <string name="enter_link_name">Please enter name for the link</string>
     <string name="enter_link_name_error">Please enter name for the link.</string>
     <string name="save_and_execute">Save &amp; Execute</string>
 
     <!-- Home Screen -->
-    <string name="enter_deeplink_command">Enter deeplink or command</string>
-    <string name="invalid_empty_deeplink">Invalid or Empty deeplink.</string>
+    <string name="enter_deeplink_command">Enter link</string>
+    <string name="invalid_empty_deeplink">Invalid or Empty link.</string>
 
     <!-- Error Messages -->
-    <string name="invalid_deeplink_toast">Invalid deeplink: %s</string>
+    <string name="invalid_deeplink_toast">Invalid link: %s</string>
     <string name="no_data_to_export">No data found in the database to export.</string>
     <string name="no_data_available_export">No data available to export after mapping.</string>
     <string name="export_success">Successfully exported to %s</string>
@@ -114,7 +114,7 @@
     
     <!-- Sync Settings -->
     <string name="sync_to_file">Sync to Local File (Beta)</string>
-    <string name="sync_to_file_description">Automatically sync deeplinks to a markdown file</string>
+    <string name="sync_to_file_description">Automatically sync links to a markdown file</string>
     <string name="select_sync_file">Select Sync File</string>
     <string name="select_sync_file_description">Choose file location for markdown sync</string>
     <string name="sync_file_validation">File Format Validation</string>
@@ -122,7 +122,7 @@
     <string name="sync_status_invalid">⚠ File format is invalid</string>
     <string name="sync_status_no_file">No sync file selected</string>
     <string name="sync_now">Sync Now</string>
-    <string name="sync_now_description">Manually sync deeplinks to selected file</string>
+    <string name="sync_now_description">Manually sync links to selected file</string>
     <string name="last_sync_time">Last Sync</string>
     <string name="last_sync_time_never">Never synced</string>
     <string name="last_sync_time_format">%s</string>
