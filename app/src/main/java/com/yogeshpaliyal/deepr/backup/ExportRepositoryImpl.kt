@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import com.opencsv.CSVWriter
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
@@ -83,14 +84,27 @@ class ExportRepositoryImpl(
         data: List<Deepr>,
     ) {
         outputStream.bufferedWriter().use { writer ->
-            // Write Header
-            writer.write(
-                "${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT},${Constants.Header.NAME}\n",
-            )
-            // Write Data
-            data.forEach { item ->
-                val row = "${item.link},${item.createdAt},${item.openedCount},${item.name}\n"
-                writer.write(row)
+            CSVWriter(writer).use { csvWriter ->
+                // Write Header
+                csvWriter.writeNext(
+                    arrayOf(
+                        Constants.Header.LINK,
+                        Constants.Header.CREATED_AT,
+                        Constants.Header.OPENED_COUNT,
+                        Constants.Header.NAME,
+                    ),
+                )
+                // Write Data
+                data.forEach { item ->
+                    csvWriter.writeNext(
+                        arrayOf(
+                            item.link,
+                            item.createdAt.toString(),
+                            item.openedCount.toString(),
+                            item.name,
+                        ),
+                    )
+                }
             }
         }
     }
