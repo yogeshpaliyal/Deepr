@@ -72,12 +72,23 @@ fun LocalNetworkServerScreen(
     val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    
+    // Track if user wants to start the server (used for permission flow)
+    val pendingStart = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     // Request notification permission for Android 13+
     val notificationPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else {
         null
+    }
+
+    // Start server after permission is granted
+    androidx.compose.runtime.LaunchedEffect(notificationPermissionState?.status?.isGranted) {
+        if (notificationPermissionState?.status?.isGranted == true && pendingStart.value) {
+            pendingStart.value = false
+            LocalServerService.startService(context)
+        }
     }
 
     Scaffold(
@@ -155,6 +166,7 @@ fun LocalNetworkServerScreen(
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                                         notificationPermissionState?.status?.isGranted == false
                                     ) {
+                                        pendingStart.value = true
                                         notificationPermissionState.launchPermissionRequest()
                                     } else {
                                         LocalServerService.startService(context)
