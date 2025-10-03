@@ -153,4 +153,9 @@
     <string name="api_get_links">Get all saved links</string>
     <string name="api_add_link">Add a new link (JSON: {"link": "url", "name": "name"})</string>
     <string name="api_get_link_info">Get metadata for a URL</string>
+    <string name="local_server_notification_channel_name">Local Server</string>
+    <string name="local_server_notification_channel_description">Notifications for local server status</string>
+    <string name="local_server_notification_text">Server URL: %s</string>
+    <string name="local_server_starting">Starting server…</string>
+    <string name="stop">Stop</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -44,8 +46,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -55,7 +61,7 @@ import org.koin.androidx.compose.koinViewModel
 
 data object LocalNetworkServer
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LocalNetworkServerScreen(
     backStack: SnapshotStateList<Any>,
@@ -66,6 +72,13 @@ fun LocalNetworkServerScreen(
     val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    // Request notification permission for Android 13+
+    val notificationPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        null
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -138,9 +151,16 @@ fun LocalNetworkServerScreen(
                             checked = isRunning,
                             onCheckedChange = {
                                 if (it) {
-                                    viewModel.startServer()
+                                    // Check if notification permission is required and granted
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                        notificationPermissionState?.status?.isGranted == false
+                                    ) {
+                                        notificationPermissionState.launchPermissionRequest()
+                                    } else {
+                                        LocalServerService.startService(context)
+                                    }
                                 } else {
-                                    viewModel.stopServer()
+                                    LocalServerService.stopService(context)
                                 }
                             },
                         )
