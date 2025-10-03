@@ -23,7 +23,7 @@ import org.koin.android.ext.android.inject
 class LocalServerService : Service() {
     private val localServerRepository: LocalServerRepository by inject()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -72,7 +72,7 @@ class LocalServerService : Service() {
                 description = getString(R.string.local_server_notification_channel_description)
                 setShowBadge(false)
             }
-            
+
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
