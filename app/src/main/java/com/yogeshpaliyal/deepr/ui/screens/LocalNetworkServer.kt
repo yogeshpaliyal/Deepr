@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -190,7 +191,7 @@ fun LocalNetworkServerScreen(
             }
 
             // Server URL Card
-            if (isRunning && serverUrl != null) {
+            AnimatedVisibility(isRunning && serverUrl != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
