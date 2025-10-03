@@ -32,6 +32,8 @@ class LocalServerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
+                // Start foreground immediately to avoid ANR
+                startForeground(NOTIFICATION_ID, createNotification(null))
                 serviceScope.launch {
                     localServerRepository.startServer()
                     observeServerState()
@@ -53,7 +55,8 @@ class LocalServerService : Service() {
             localServerRepository.isRunning.collect { isRunning ->
                 if (isRunning) {
                     val serverUrl = localServerRepository.serverUrl.first()
-                    startForeground(NOTIFICATION_ID, createNotification(serverUrl))
+                    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.notify(NOTIFICATION_ID, createNotification(serverUrl))
                 }
             }
         }
