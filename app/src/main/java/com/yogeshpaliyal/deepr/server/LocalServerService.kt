@@ -29,7 +29,11 @@ class LocalServerService : Service() {
         createNotificationChannel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         when (intent?.action) {
             ACTION_START -> {
                 // Start foreground immediately to avoid ANR
@@ -64,14 +68,15 @@ class LocalServerService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.local_server_notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = getString(R.string.local_server_notification_channel_description)
-                setShowBadge(false)
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.local_server_notification_channel_name),
+                    NotificationManager.IMPORTANCE_LOW,
+                ).apply {
+                    description = getString(R.string.local_server_notification_channel_description)
+                    setShowBadge(false)
+                }
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -80,40 +85,42 @@ class LocalServerService : Service() {
 
     private fun createNotification(serverUrl: String?): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val stopIntent = Intent(this, LocalServerService::class.java).apply {
-            action = ACTION_STOP
-        }
-        val stopPendingIntent = PendingIntent.getService(
-            this,
-            1,
-            stopIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val stopIntent =
+            Intent(this, LocalServerService::class.java).apply {
+                action = ACTION_STOP
+            }
+        val stopPendingIntent =
+            PendingIntent.getService(
+                this,
+                1,
+                stopIntent,
+                PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.local_server_running))
             .setContentText(
                 if (serverUrl != null) {
                     getString(R.string.local_server_notification_text, serverUrl)
                 } else {
                     getString(R.string.local_server_starting)
-                }
-            )
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                },
+            ).setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .addAction(
                 0,
                 getString(R.string.stop),
-                stopPendingIntent
-            )
-            .setOngoing(true)
+                stopPendingIntent,
+            ).setOngoing(true)
             .build()
     }
 
@@ -131,9 +138,10 @@ class LocalServerService : Service() {
         const val ACTION_STOP = "com.yogeshpaliyal.deepr.ACTION_STOP_SERVER"
 
         fun startService(context: Context) {
-            val intent = Intent(context, LocalServerService::class.java).apply {
-                action = ACTION_START
-            }
+            val intent =
+                Intent(context, LocalServerService::class.java).apply {
+                    action = ACTION_START
+                }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
@@ -142,9 +150,10 @@ class LocalServerService : Service() {
         }
 
         fun stopService(context: Context) {
-            val intent = Intent(context, LocalServerService::class.java).apply {
-                action = ACTION_STOP
-            }
+            val intent =
+                Intent(context, LocalServerService::class.java).apply {
+                    action = ACTION_STOP
+                }
             context.startService(intent)
         }
     }

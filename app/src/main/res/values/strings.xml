@@ -138,6 +138,7 @@
     
     <!-- Local Network Server -->
     <string name="local_network_server">Local Network Server</string>
+    <string name="local_server_running">Local Server Running</string>
     <string name="server_status">Server Status</string>
     <string name="server_running">Server is running and accessible on your local network</string>
     <string name="server_running_tap_to_configure">Server Running - Tap to configure</string>
