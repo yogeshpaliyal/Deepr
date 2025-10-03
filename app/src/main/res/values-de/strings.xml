@@ -102,7 +102,7 @@
     <string name="save_and_execute">Speichern und ausführen</string>
 
     <!-- Home Screen -->
-    <string name="enter_deeplink_command">Deeplink oder Befehl eingeben</string>
+    <string name="enter_deeplink_command">Link eingeben</string>
     <string name="invalid_empty_deeplink">Ungültiger oder leerer Deeplink.</string>
 
     <!-- Error Messages -->

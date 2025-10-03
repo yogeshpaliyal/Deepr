@@ -102,7 +102,7 @@
     <string name="save_and_execute">محفوظ کریں اور چلائیں</string>
 
     <!-- Home Screen -->
-    <string name="enter_deeplink_command">ڈیپ لنک یا کمانڈ داخل کریں</string>
+    <string name="enter_deeplink_command">لنک داخل کریں۔</string>
     <string name="invalid_empty_deeplink">غلط یا خالی ڈیپ لنک۔</string>
 
     <!-- Error Messages -->

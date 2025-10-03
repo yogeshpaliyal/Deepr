@@ -102,7 +102,7 @@
     <string name="save_and_execute">Sauvegarder et exécuter</string>
 
     <!-- Home Screen -->
-    <string name="enter_deeplink_command">Saisir un lien profond ou une commande</string>
+    <string name="enter_deeplink_command">Entrez un lien</string>
     <string name="invalid_empty_deeplink">Lien profond invalide ou vide.</string>
 
     <!-- Error Messages -->
