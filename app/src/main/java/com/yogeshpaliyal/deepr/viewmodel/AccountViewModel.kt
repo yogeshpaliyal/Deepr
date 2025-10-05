@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -207,6 +208,7 @@ class AccountViewModel(
             deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
                 modifyTagsForLink(it, tagsList)
             }
+            syncToMarkdown()
         }
     }
 
@@ -275,6 +277,7 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, id)
             modifyTagsForLink(id, tagsList)
+            syncToMarkdown()
         }
     }
 
@@ -363,6 +366,10 @@ class AccountViewModel(
 
     fun syncToMarkdown() {
         viewModelScope.launch(Dispatchers.IO) {
+            val isEnabled = preferenceDataStore.getSyncEnabled.first()
+            if (!isEnabled) {
+                return@launch
+            }
             val result = syncRepository.syncToMarkdown()
             when (result) {
                 is RequestResult.Success -> {

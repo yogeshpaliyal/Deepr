@@ -69,6 +69,23 @@ ORDER BY
 listDeeprAsc:
 SELECT * FROM Deepr ORDER BY createdAt ASC;
 
+listDeeprWithTagsAsc:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames
+FROM
+  Deepr
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+GROUP BY
+  Deepr.id
+ORDER BY
+  Deepr.createdAt ASC;
+
 deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
