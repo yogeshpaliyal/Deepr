@@ -112,6 +112,9 @@ SELECT * FROM Tags WHERE name = ?;
 getAllTags:
 SELECT * FROM Tags ORDER BY name;
 
+countOfLinks:
+SELECT count(*) FROM Deepr;
+
 
 -- Link-Tag relations
 addTagToLink:
