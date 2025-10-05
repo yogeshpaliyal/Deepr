@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
@@ -81,6 +82,14 @@ class AccountViewModel(
             .mapToList(
                 viewModelScope.coroutineContext,
             ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    val countOfLinks: StateFlow<Long?> =
+        deeprQueries
+            .countOfLinks()
+            .asFlow()
+            .mapToOneOrNull(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder

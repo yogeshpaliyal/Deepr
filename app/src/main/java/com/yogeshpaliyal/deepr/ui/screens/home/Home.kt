@@ -5,6 +5,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,11 +120,11 @@ fun HomeScreen(
     val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
-    val contextCoroutine = rememberCoroutineScope()
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
+    val totalLinks = viewModel.countOfLinks.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -166,7 +171,7 @@ fun HomeScreen(
                     if (searchBarState.currentValue == SearchBarValue.Collapsed) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.search),
+                            text = stringResource(R.string.search) + " (" + totalLinks.value + ")",
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -456,7 +461,11 @@ fun DeeprList(
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (accounts.isEmpty()) {
+    AnimatedVisibility(
+        accounts.isEmpty(),
+        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
+    ) {
         // When empty, use a Column with weights to ensure vertical centering
         Column(
             modifier = modifier.fillMaxSize(),
@@ -495,7 +504,12 @@ fun DeeprList(
 
             Spacer(modifier = Modifier.weight(1f)) // Push content up
         }
-    } else {
+    }
+    AnimatedVisibility(
+        accounts.isNotEmpty(),
+        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
+    ) {
         LazyColumn(
             modifier = modifier,
             contentPadding = contentPaddingValues,
@@ -503,6 +517,7 @@ fun DeeprList(
         ) {
             items(accounts) { account ->
                 DeeprItem(
+                    modifier = Modifier.animateItem(),
                     account = account,
                     selectedTag = selectedTag,
                     onItemClick = onItemClick,
