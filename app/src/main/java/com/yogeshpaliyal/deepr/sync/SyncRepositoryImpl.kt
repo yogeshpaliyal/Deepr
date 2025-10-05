@@ -2,8 +2,8 @@ package com.yogeshpaliyal.deepr.sync
 
 import android.content.Context
 import androidx.core.net.toUri
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.ListDeeprWithTagsAsc
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
@@ -41,7 +41,7 @@ class SyncRepositoryImpl(
                             return@withContext RequestResult.Error(context.getString(R.string.no_data_to_export))
                         }
 
-                        val dataToSync = deeprQueries.listDeeprAsc().executeAsList()
+                        val dataToSync = deeprQueries.listDeeprWithTagsAsc().executeAsList()
                         if (dataToSync.isEmpty()) {
                             return@withContext RequestResult.Error(context.getString(R.string.no_data_available_export))
                         }
@@ -96,7 +96,7 @@ class SyncRepositoryImpl(
 
     private fun writeMarkdownData(
         file: OutputStream,
-        data: List<Deepr>,
+        data: List<ListDeeprWithTagsAsc>,
     ) {
         file.use { outputStream ->
             outputStream.bufferedWriter().use { writer ->
@@ -109,14 +109,26 @@ class SyncRepositoryImpl(
                 writer.write("**Warning:** Please maintain the markdown table format when editing this file.\n\n")
 
                 // Write markdown table header
-                writer.write("| Name | Link | Created At | Opened Count |\n")
-                writer.write("|------|------|------------|--------------|\n")
+                writer.write("| Name | Link | Created At | Opened Count | Tags |\n")
+                writer.write("|------|------|------------|--------------|------|\n")
 
                 // Write data rows
                 data.forEach { item ->
                     val escapedName = item.name.replace("|", "\\|").replace("\n", " ")
                     val escapedLink = item.link.replace("|", "\\|").replace("\n", " ")
-                    val row = "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} |\n"
+
+                    // Format tags as hashtags
+                    val tags =
+                        if (item.tagsNames.isNullOrEmpty()) {
+                            ""
+                        } else {
+                            item.tagsNames
+                                .split(", ")
+                                .filter { it.isNotEmpty() }
+                                .joinToString(" ") { "#${it.replace(" ", "").replace("|", "")}" }
+                        }
+
+                    val row = "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} | $tags |\n"
                     writer.write(row)
                 }
 
@@ -134,9 +146,9 @@ class SyncRepositoryImpl(
 
         for (line in lines) {
             val trimmedLine = line.trim()
-            if (trimmedLine.startsWith("| Name | Link | Created At | Opened Count |")) {
+            if (trimmedLine.startsWith("| Name | Link | Created At | Opened Count | Tags |")) {
                 foundHeader = true
-            } else if (foundHeader && trimmedLine.startsWith("|------|------|------------|--------------|")) {
+            } else if (foundHeader && trimmedLine.startsWith("|------|------|------------|--------------|------|")) {
                 foundSeparator = true
                 break
             }
