@@ -198,8 +198,9 @@ fun TagSelectionBottomSheet(
 
                         FilledIconButton(
                             onClick = {
-                                if (newTagName.isNotBlank()) {
-                                    val existingTag = tags.find { it.name.equals(newTagName, ignoreCase = true) }
+                                val trimmedTagName = newTagName.trim()
+                                if (trimmedTagName.isNotBlank()) {
+                                    val existingTag = tags.find { it.name.equals(trimmedTagName, ignoreCase = true) }
 
                                     if (existingTag != null) {
                                         Toast
@@ -209,7 +210,7 @@ fun TagSelectionBottomSheet(
                                                 Toast.LENGTH_SHORT,
                                             ).show()
                                     } else {
-                                        deeprQueries.insertTag(newTagName)
+                                        deeprQueries.insertTag(trimmedTagName)
                                         newTagName = ""
                                     }
                                 }
