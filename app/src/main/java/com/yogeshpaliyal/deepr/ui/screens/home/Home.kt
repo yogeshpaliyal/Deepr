@@ -342,7 +342,7 @@ fun HomeScreen(
 
         if (isTagsSelectionActive) {
             TagSelectionBottomSheet(
-                tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                tagsWithCount = viewModel.allTagsWithCount.collectAsStateWithLifecycle().value,
                 selectedTag = selectedTag.value,
                 dismissBottomSheet = {
                     isTagsSelectionActive = false
