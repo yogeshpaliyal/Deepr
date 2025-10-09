@@ -8,6 +8,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.ExportRepository
@@ -78,6 +79,14 @@ class AccountViewModel(
     val allTags: StateFlow<List<Tags>> =
         deeprQueries
             .getAllTags()
+            .asFlow()
+            .mapToList(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
+        deeprQueries
+            .getAllTagsWithCount()
             .asFlow()
             .mapToList(
                 viewModelScope.coroutineContext,
@@ -274,6 +283,12 @@ class AccountViewModel(
     fun incrementOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
+        }
+    }
+
+    fun resetOpenedCount(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.resetOpenedCount(id)
         }
     }
 
