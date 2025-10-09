@@ -160,7 +160,7 @@ fun TagSelectionBottomSheet(
         Column(modifier) {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.tags))
+                    Text(stringResource(R.string.tags) + " (" + tags.size + ")")
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
