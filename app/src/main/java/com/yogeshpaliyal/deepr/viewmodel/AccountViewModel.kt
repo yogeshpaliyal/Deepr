@@ -277,6 +277,12 @@ class AccountViewModel(
         }
     }
 
+    fun resetOpenedCount(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.resetOpenedCount(id)
+        }
+    }
+
     fun updateDeeplink(
         id: Long,
         newLink: String,
