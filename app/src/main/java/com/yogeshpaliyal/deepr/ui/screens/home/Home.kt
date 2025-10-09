@@ -362,6 +362,7 @@ fun HomeScreen(
                     viewModel.deleteTag(it.id)
                     Result.success(true)
                 },
+                deeprQueries = deeprQueries,
             )
         }
     }
