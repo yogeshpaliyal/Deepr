@@ -92,6 +92,9 @@ DELETE FROM Deepr WHERE id = ?;
 incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
 
+resetOpenedCount:
+UPDATE Deepr SET openedCount = 0 WHERE id = ?;
+
 updateDeeplink:
 UPDATE Deepr SET link = ? , name = ? WHERE id = ?;
 
