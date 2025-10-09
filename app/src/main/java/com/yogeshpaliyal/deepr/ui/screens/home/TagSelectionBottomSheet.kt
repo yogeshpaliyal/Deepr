@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Plus
@@ -90,6 +91,18 @@ fun TagSelectionBottomSheet(
                                 Text(text = it)
                             }
                         },
+                        suffix =
+                            if (isTagEditEnable?.name.isNullOrEmpty()) {
+                                null
+                            } else {
+                                {
+                                    ClearInputIconButton(
+                                        onClick = {
+                                            isTagEditEnable = tag.copy(name = "")
+                                        },
+                                    )
+                                }
+                            },
                     )
                 }
             },
