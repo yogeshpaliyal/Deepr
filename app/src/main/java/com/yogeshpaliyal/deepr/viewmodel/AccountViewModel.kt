@@ -97,6 +97,14 @@ class AccountViewModel(
     private val exportResultChannel = Channel<String>()
     val exportResultFlow = exportResultChannel.receiveAsFlow()
 
+    data class ExportDialogState(
+        val message: String,
+        val uri: Uri?
+    )
+
+    private val exportDialogStateChannel = Channel<ExportDialogState?>()
+    val exportDialogStateFlow = exportDialogStateChannel.receiveAsFlow()
+
     private val importResultChannel = Channel<String>()
     val importResultFlow = importResultChannel.receiveAsFlow()
 
@@ -295,7 +303,13 @@ class AccountViewModel(
             val result = exportRepository.exportToCsv()
             when (result) {
                 is RequestResult.Success -> {
-                    exportResultChannel.send("Export completed: ${result.data}")
+                    exportResultChannel.send("Export completed: ${result.data.message}")
+                    exportDialogStateChannel.send(
+                        ExportDialogState(
+                            message = result.data.message,
+                            uri = result.data.uri
+                        )
+                    )
                 }
 
                 is RequestResult.Error -> {

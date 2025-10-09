@@ -111,6 +111,9 @@
     <string name="no_data_available_export">No data available to export after mapping.</string>
     <string name="export_success">Successfully exported to %s</string>
     <string name="export_failed">Failed to create CSV file.</string>
+    <string name="export_complete">Export Complete</string>
+    <string name="open_file_location">Open File Location</string>
+    <string name="close">Close</string>
     
     <!-- Sync Settings -->
     <string name="sync_to_file">Sync to Local File (Beta)</string>

@@ -2,9 +2,11 @@ package com.yogeshpaliyal.deepr.backup
 
 import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
@@ -23,7 +25,7 @@ class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : ExportRepository {
-    override suspend fun exportToCsv(): RequestResult<String> {
+    override suspend fun exportToCsv(): RequestResult<ExportResult> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
             return RequestResult.Error(context.getString(R.string.no_data_to_export))
@@ -56,7 +58,12 @@ class ExportRepositoryImpl(
                     resolver.openOutputStream(uri)?.use { outputStream ->
                         writeCsvData(outputStream, dataToExportInCsvFormat)
                     }
-                    RequestResult.Success(context.getString(R.string.export_success, "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"))
+                    RequestResult.Success(
+                        ExportResult(
+                            message = context.getString(R.string.export_success, "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"),
+                            uri = uri
+                        )
+                    )
                 } else {
                     RequestResult.Error(context.getString(R.string.export_failed))
                 }
@@ -73,7 +80,24 @@ class ExportRepositoryImpl(
                 FileOutputStream(file).use { outputStream ->
                     writeCsvData(outputStream, dataToExportInCsvFormat)
                 }
-                RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
+                
+                // Get URI for the file
+                val uri = try {
+                    FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        file
+                    )
+                } catch (e: Exception) {
+                    Uri.fromFile(file)
+                }
+                
+                RequestResult.Success(
+                    ExportResult(
+                        message = context.getString(R.string.export_success, file.absolutePath),
+                        uri = uri
+                    )
+                )
             }
         }
     }

@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.components.ExportSuccessDialog
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.util.LanguageUtil
@@ -110,6 +111,9 @@ fun SettingsScreen(
     val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
     val lastSyncTime by viewModel.lastSyncTime.collectAsStateWithLifecycle()
 
+    // State for export dialog
+    var exportDialogState by remember { mutableStateOf<AccountViewModel.ExportDialogState?>(null) }
+
     // Launcher for picking sync file location
     val syncFileLauncher =
         rememberLauncherForActivityResult(
@@ -134,8 +138,15 @@ fun SettingsScreen(
     }
 
     LaunchedEffect(true) {
+        viewModel.exportDialogStateFlow.collectLatest { state ->
+            exportDialogState = state
+        }
+    }
+
+    LaunchedEffect(true) {
         viewModel.exportResultFlow.collectLatest { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            // Removed toast since we're showing a dialog now
+            // Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -395,6 +406,15 @@ fun SettingsScreen(
                     }
                 },
                 onDismiss = { showLanguageDialog = false },
+            )
+        }
+
+        // Export Success Dialog
+        exportDialogState?.let { state ->
+            ExportSuccessDialog(
+                message = state.message,
+                uri = state.uri,
+                onDismiss = { exportDialogState = null },
             )
         }
     }
