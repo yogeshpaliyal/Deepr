@@ -54,6 +54,7 @@ import compose.icons.tablericons.Trash
 @Composable
 fun TagSelectionBottomSheet(
     tags: List<Tags>,
+    tagsWithCount: List<com.yogeshpaliyal.deepr.GetAllTagsWithCount>,
     selectedTag: Tags?,
     dismissBottomSheet: () -> Unit,
     setTagFilter: (Tags?) -> Unit,
@@ -264,13 +265,14 @@ fun TagSelectionBottomSheet(
                     )
                 }
                 items(tags) { tag ->
+                    val tagCount = tagsWithCount.find { it.id == tag.id }?.linkCount ?: 0
                     ListItem(
                         modifier =
                             Modifier.clickable {
                                 setTagFilter(tag)
                                 dismissBottomSheet()
                             },
-                        headlineContent = { Text(tag.name) },
+                        headlineContent = { Text("${tag.name} ($tagCount)") },
                         trailingContent = {
                             Row {
                                 IconButton(onClick = {

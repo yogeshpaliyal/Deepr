@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
@@ -343,6 +344,7 @@ fun HomeScreen(
         if (isTagsSelectionActive) {
             TagSelectionBottomSheet(
                 tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                tagsWithCount = viewModel.allTagsWithCount.collectAsStateWithLifecycle().value,
                 selectedTag = selectedTag.value,
                 dismissBottomSheet = {
                     isTagsSelectionActive = false

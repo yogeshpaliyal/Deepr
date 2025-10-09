@@ -112,6 +112,16 @@ SELECT * FROM Tags WHERE name = ?;
 getAllTags:
 SELECT * FROM Tags ORDER BY name;
 
+getAllTagsWithCount:
+SELECT 
+  Tags.id,
+  Tags.name,
+  COUNT(LinkTags.linkId) AS linkCount
+FROM Tags
+LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
+GROUP BY Tags.id, Tags.name
+ORDER BY Tags.name;
+
 countOfLinks:
 SELECT count(*) FROM Deepr;
 
