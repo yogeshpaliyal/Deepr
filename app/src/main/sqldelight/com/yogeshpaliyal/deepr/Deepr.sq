@@ -3,8 +3,7 @@ id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
 name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-openedCount INTEGER NOT NULL DEFAULT 0,
-lastOpenedAt TEXT
+openedCount INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Tags (
@@ -20,6 +19,13 @@ FOREIGN KEY (linkId) REFERENCES Deepr(id) ON DELETE CASCADE,
 FOREIGN KEY (tagId) REFERENCES Tags(id) ON DELETE CASCADE
 );
 
+CREATE TABLE DeeprOpenLog (
+id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+deeplinkId INTEGER NOT NULL,
+openedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (deeplinkId) REFERENCES Deepr(id) ON DELETE CASCADE
+);
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 
@@ -33,7 +39,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
-  Deepr.lastOpenedAt,
+  (SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = Deepr.id ORDER BY openedAt DESC LIMIT 1) AS lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
 FROM
@@ -78,7 +84,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
-  Deepr.lastOpenedAt,
+  (SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = Deepr.id ORDER BY openedAt DESC LIMIT 1) AS lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
@@ -93,7 +99,7 @@ deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
 incrementOpenedCount:
-UPDATE Deepr SET openedCount = openedCount + 1, lastOpenedAt = CURRENT_TIMESTAMP WHERE id = ?;
+UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
 
 updateDeeplink:
 UPDATE Deepr SET link = ? , name = ? WHERE id = ?;
@@ -144,3 +150,11 @@ SELECT Tags.id,Tags.name FROM Tags INNER JOIN LinkTags ON Tags.id = LinkTags.tag
 
 hasTagLinks:
 SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;
+
+-- Deeplink Open Log operations
+insertDeeprOpenLog:
+INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
+
+getLastOpenedTime:
+SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
+
