@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -53,8 +54,7 @@ import compose.icons.tablericons.Trash
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagSelectionBottomSheet(
-    tags: List<Tags>,
-    tagsWithCount: List<com.yogeshpaliyal.deepr.GetAllTagsWithCount>,
+    tagsWithCount: List<GetAllTagsWithCount>,
     selectedTag: Tags?,
     dismissBottomSheet: () -> Unit,
     setTagFilter: (Tags?) -> Unit,
@@ -64,8 +64,8 @@ fun TagSelectionBottomSheet(
     modifier: Modifier = Modifier,
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var isTagEditEnable by remember { mutableStateOf<Tags?>(null) }
-    var isTagDeleteEnable by remember { mutableStateOf<Tags?>(null) }
+    var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
+    var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
     var tagEditError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     var newTagName by remember { mutableStateOf("") }
@@ -109,7 +109,7 @@ fun TagSelectionBottomSheet(
             },
             confirmButton = {
                 Button(onClick = {
-                    val result = editTag(tag)
+                    val result = editTag(Tags(tag.id, tag.name))
                     if (result.isFailure) {
                         val exception = result.exceptionOrNull()
                         when (exception) {
@@ -156,7 +156,7 @@ fun TagSelectionBottomSheet(
             },
             confirmButton = {
                 Button(onClick = {
-                    val result = deleteTag(tag)
+                    val result = deleteTag(Tags(tag.id, tag.name))
                     if (result.isFailure) {
                         Toast
                             .makeText(
@@ -214,7 +214,7 @@ fun TagSelectionBottomSheet(
                             onClick = {
                                 val trimmedTagName = newTagName.trim()
                                 if (trimmedTagName.isNotBlank()) {
-                                    val existingTag = tags.find { it.name.equals(trimmedTagName, ignoreCase = true) }
+                                    val existingTag = tagsWithCount.find { it.name.equals(trimmedTagName, ignoreCase = true) }
 
                                     if (existingTag != null) {
                                         Toast
@@ -264,15 +264,14 @@ fun TagSelectionBottomSheet(
                             },
                     )
                 }
-                items(tags) { tag ->
-                    val tagCount = tagsWithCount.find { it.id == tag.id }?.linkCount ?: 0
+                items(tagsWithCount) { tag ->
                     ListItem(
                         modifier =
                             Modifier.clickable {
-                                setTagFilter(tag)
+                                setTagFilter(Tags(tag.id, tag.name))
                                 dismissBottomSheet()
                             },
-                        headlineContent = { Text("${tag.name} ($tagCount)") },
+                        headlineContent = { Text("${tag.name} (${tag.linkCount})") },
                         trailingContent = {
                             Row {
                                 IconButton(onClick = {
