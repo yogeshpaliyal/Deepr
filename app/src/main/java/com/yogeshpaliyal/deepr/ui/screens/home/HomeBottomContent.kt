@@ -50,6 +50,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -173,6 +174,19 @@ fun HomeBottomContent(
                             Text(text = stringResource(R.string.invalid_empty_deeplink))
                         }
                     },
+                    suffix =
+                        if (deeprInfo.link.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = {
+                                        deeprInfo = deeprInfo.copy(link = "")
+                                        isError = false
+                                    },
+                                )
+                            }
+                        },
                 )
 
                 OutlinedButton(
@@ -224,6 +238,19 @@ fun HomeBottomContent(
                             Text(text = stringResource(R.string.enter_link_name_error))
                         }
                     },
+                    suffix =
+                        if (deeprInfo.name.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = {
+                                        deeprInfo = deeprInfo.copy(name = "")
+                                        isNameError = false
+                                    },
+                                )
+                            }
+                        },
                 )
 
                 Row(
@@ -236,6 +263,16 @@ fun HomeBottomContent(
                         label = { Text(stringResource(R.string.new_tag)) },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
+                        suffix =
+                            if (newTagName.isEmpty()) {
+                                null
+                            } else {
+                                {
+                                    ClearInputIconButton(
+                                        onClick = { newTagName = "" },
+                                    )
+                                }
+                            },
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))

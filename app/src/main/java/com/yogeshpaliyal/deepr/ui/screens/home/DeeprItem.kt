@@ -63,6 +63,7 @@ fun DeeprItem(
     onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
     onTagClick: ((String) -> Unit)? = null,
     onResetOpenedCountClick: ((GetLinksAndTags) -> Unit)? = null,
+    onDeleteClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -190,7 +191,7 @@ fun DeeprItem(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete)) },
                             onClick = {
-                                onRemoveClick?.invoke(account)
+                                onDeleteClick?.invoke(account)
                                 expanded = false
                             },
                             leadingIcon = {
