@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
     id("org.jmailen.kotlinter")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -26,10 +28,31 @@ android {
         create("free") {
             isDefault = true
         }
+        create("freePlaystore") {
+
+        }
         create("pro") {
             applicationIdSuffix = ".pro"
+
         }
     }
+
+    sourceSets {
+        // Configure the pro flavor to use the shared source set
+        named("pro") {
+            java.srcDirs("src/proFreePlaystore/java")
+            kotlin.srcDirs("src/proFreePlaystore/kotlin")
+            res.srcDirs("src/proFreePlaystore/res")
+        }
+
+        // Configure the freePlayStore flavor to use the shared source set
+        named("freePlaystore") {
+            java.srcDirs("src/proFreePlaystore/java")
+            kotlin.srcDirs("src/proFreePlaystore/kotlin")
+            res.srcDirs("src/proFreePlaystore/res")
+        }
+    }
+
 
     buildTypes {
         debug {
@@ -125,6 +148,20 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
+
+    // Firebase dependencies - use platform BOM and then add implementations
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics.ndk)
+
+    // Add Firebase dependencies to pro and freePlaystore flavors specifically
+    "proImplementation"(platform(libs.firebase.bom))
+    "proImplementation"(libs.firebase.analytics)
+    "proImplementation"(libs.firebase.crashlytics.ndk)
+
+    "freePlaystoreImplementation"(platform(libs.firebase.bom))
+    "freePlaystoreImplementation"(libs.firebase.analytics)
+    "freePlaystoreImplementation"(libs.firebase.crashlytics.ndk)
 }
 
 kotlinter {

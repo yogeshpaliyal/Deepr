@@ -24,13 +24,13 @@ jobs:
           echo "${{ github.ref_name || github.event.inputs.version }}"
 
       - name: Build Release AAB
-        run: ./gradlew bundleFreeRelease
+        run: ./gradlew bundleFreePlaystoreRelease
 
       - name: Sign Release AAB
         id: signAAB
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/bundle/freeRelease
+          releaseDirectory: app/build/outputs/bundle/freePlaystoreRelease
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
           alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -46,7 +46,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr
-          releaseFiles: app/build/outputs/bundle/freeRelease/*.aab
+          releaseFiles: app/build/outputs/bundle/freePlaystoreRelease/*.aab
           track: alpha
           whatsNewDirectory: whatsnew/
 
