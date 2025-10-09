@@ -64,9 +64,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1051853339817:android:6f723d90c92f69f63ffdb8",
+        "mobilesdk_app_id": "1:1051853339817:android:fc34994d707caa8c3ffdb8",
         "android_client_info": {
-          "package_name": "com.yogeshpaliyal.pro.debug"
+          "package_name": "com.yogeshpaliyal.deepr.pro.debug"
         }
       },
       "oauth_client": [],
