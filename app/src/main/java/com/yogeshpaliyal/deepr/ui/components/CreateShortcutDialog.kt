@@ -44,6 +44,18 @@ fun CreateShortcutDialog(
                     onValueChange = { shortcutName = it },
                     label = { Text("Shortcut Name") },
                     placeholder = { Text(text = deepr.link) },
+                    suffix =
+                        if (shortcutName.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = {
+                                        shortcutName = ""
+                                    },
+                                )
+                            }
+                        },
                 )
             },
             confirmButton = {
