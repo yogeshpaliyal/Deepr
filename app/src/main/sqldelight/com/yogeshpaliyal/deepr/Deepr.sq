@@ -3,7 +3,8 @@ id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
 name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-openedCount INTEGER NOT NULL DEFAULT 0
+openedCount INTEGER NOT NULL DEFAULT 0,
+lastOpenedAt TEXT
 );
 
 CREATE TABLE Tags (
@@ -32,6 +33,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  Deepr.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
 FROM
@@ -76,6 +78,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  Deepr.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
@@ -90,7 +93,7 @@ deleteDeeprById:
 DELETE FROM Deepr WHERE id = ?;
 
 incrementOpenedCount:
-UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
+UPDATE Deepr SET openedCount = openedCount + 1, lastOpenedAt = CURRENT_TIMESTAMP WHERE id = ?;
 
 updateDeeplink:
 UPDATE Deepr SET link = ? , name = ? WHERE id = ?;

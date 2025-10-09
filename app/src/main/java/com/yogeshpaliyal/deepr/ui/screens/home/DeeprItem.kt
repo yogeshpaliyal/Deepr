@@ -151,6 +151,34 @@ fun DeeprItem(
                                 )
                             },
                         )
+                        // Display last opened time
+                        account.lastOpenedAt?.let { lastOpened ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(R.string.last_opened, formatDateTime(lastOpened)),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                },
+                                onClick = { },
+                                enabled = false,
+                            )
+                        } ?: run {
+                            if (account.openedCount > 0) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(R.string.never_opened),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    },
+                                    onClick = { },
+                                    enabled = false,
+                                )
+                            }
+                        }
                         ShortcutMenuItem(account, {
                             onShortcutClick?.invoke(it)
                             expanded = false
