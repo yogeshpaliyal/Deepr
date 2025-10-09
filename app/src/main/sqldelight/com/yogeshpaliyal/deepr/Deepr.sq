@@ -39,11 +39,21 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
-  (SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = Deepr.id ORDER BY openedAt DESC LIMIT 1) AS lastOpenedAt,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
 FROM
   Deepr
+  LEFT JOIN (
+        -- Subquery to find the single latest log entry per deeplink
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
@@ -84,10 +94,20 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
-  (SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = Deepr.id ORDER BY openedAt DESC LIMIT 1) AS lastOpenedAt,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
+  LEFT JOIN (
+      -- Subquery to find the single latest log entry per deeplink
+      SELECT
+        deeplinkId,
+        MAX(openedAt) AS lastOpenedAt
+      FROM
+        DeeprOpenLog
+      GROUP BY
+        deeplinkId
+    ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 GROUP BY
