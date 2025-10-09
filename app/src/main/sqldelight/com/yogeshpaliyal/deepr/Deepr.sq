@@ -65,6 +65,60 @@ ORDER BY
         END
     END DESC;
 
+getLinksAndTagsWithPagination:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
+  GROUP_CONCAT(Tags.id, ', ') AS tagsIds
+FROM
+  Deepr
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
+  AND (
+    ? = '' OR Tags.id = ?
+  )
+GROUP BY
+  Deepr.id
+ORDER BY
+    CASE WHEN ? = 'ASC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END ASC,
+    CASE WHEN ? = 'DESC' THEN
+        CASE ?
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END DESC
+LIMIT ? OFFSET ?;
+
+countLinksAndTags:
+SELECT
+  COUNT(DISTINCT Deepr.id) AS total
+FROM
+  Deepr
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
+  AND (
+    ? = '' OR Tags.id = ?
+  );
+
 
 listDeeprAsc:
 SELECT * FROM Deepr ORDER BY createdAt ASC;

@@ -237,6 +237,35 @@
                         <p class="text-gray-500">Please wait while we fetch your saved links.</p>
                     </div>
                 </div>
+
+                <!-- Pagination Controls -->
+                <div id="paginationContainer" class="mt-6 hidden">
+                    <div class="flex justify-center items-center gap-2">
+                        <button
+                            id="prevPage"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed rounded-lg transition-all duration-200"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div id="pageNumbers" class="flex gap-1"></div>
+                        
+                        <button
+                            id="nextPage"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed rounded-lg transition-all duration-200"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mt-4 text-sm text-gray-600">
+                        <span id="paginationInfo"></span>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -258,6 +287,10 @@
         let allLinks = [];
         let availableTags = []; // Now contains {id, name, count} objects
         let selectedTags = []; // Now contains {id, name} objects
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let totalPages = 1;
+        let totalItems = 0;
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -302,6 +335,7 @@
                 const response = await fetch('/api/tags');
                 const tags = await response.json();
                 availableTags = tags; // tags now have {id, name, count} format
+                populateTagFilter();
             } catch (error) {
                 console.error('Error loading tags:', error);
                 availableTags = [];
@@ -403,40 +437,21 @@
 
         // Filter and display links
         function filterAndDisplayLinks() {
-            const searchInput = document.getElementById('searchInput');
-            const tagFilter = document.getElementById('tagFilter');
-            const sortBy = document.getElementById('sortBy');
-            const sortOrder = document.getElementById('sortOrder');
+            currentPage = 1; // Reset to first page when filtering
+            loadLinks();
+        }
+
+        // Display links (without filtering, since that's done server-side now)
+        function displayLinks() {
             const container = document.getElementById('linksContainer');
             const linkCount = document.getElementById('linkCount');
 
-            // Apply filters
-            const filteredLinks = allLinks.filter(link => {
-                const searchTerm = searchInput.value.toLowerCase();
-                const matchesSearch = link.name.toLowerCase().includes(searchTerm) ||
-                                    link.link.toLowerCase().includes(searchTerm);
-                const matchesTag = tagFilter.value === '' || link.tags.includes(tagFilter.value);
-                return matchesSearch && matchesTag;
-            });
-
-            // Apply sorting
-            const sortedLinks = filteredLinks.sort((a, b) => {
-                const order = sortOrder.dataset.order === 'desc' ? -1 : 1;
-                if (sortBy.value === 'name') {
-                    return order * a.name.localeCompare(b.name);
-                } else if (sortBy.value === 'openedCount') {
-                    return order * (a.openedCount - b.openedCount);
-                } else { // createdAt
-                    return order * (new Date(a.createdAt) - new Date(b.createdAt));
-                }
-            });
-
             // Update link count
-            linkCount.textContent = `${sortedLinks.length} of ${allLinks.length} ${sortedLinks.length === 1 ? 'link' : 'links'}`;
+            linkCount.textContent = `${totalItems} ${totalItems === 1 ? 'link' : 'links'}`;
 
             // Display results
-            if (sortedLinks.length === 0) {
-                const isEmpty = allLinks.length === 0;
+            if (allLinks.length === 0) {
+                const isEmpty = totalItems === 0;
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -457,7 +472,7 @@
 
             container.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    ${sortedLinks.map((link, index) => `
+                    ${allLinks.map((link, index) => `
                         <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 animate-fade-in" style="animation-delay: ${index * 0.1}s">
                             <div class="p-6">
                                 <div class="flex items-start justify-between mb-3">
@@ -517,23 +532,121 @@
         // Populate tag filter dropdown
         function populateTagFilter() {
             const tagFilter = document.getElementById('tagFilter');
-            const allTags = [...new Set(allLinks.flatMap(link => link.tags))].sort();
-
+            
             tagFilter.innerHTML = `
-                <option value="">All Tags (${allTags.length})</option>
-                ${allTags.map(tag => {
-                    const count = allLinks.filter(link => link.tags.includes(tag)).length;
-                    return `<option value="${escapeHtml(tag)}">${escapeHtml(tag)} (${count})</option>`;
+                <option value="">All Tags</option>
+                ${availableTags.map(tag => {
+                    return `<option value="${tag.id}">${escapeHtml(tag.name)} (${tag.count})</option>`;
                 }).join('')}
             `;
         }
 
         // Filter by specific tag (called when tag is clicked)
-        function filterByTag(tag) {
-            const tagFilter = document.getElementById('tagFilter');
-            tagFilter.value = tag;
-            filterAndDisplayLinks();
-            showToast(`Filtered by tag: ${tag}`, 'info');
+        function filterByTag(tagName) {
+            const tag = availableTags.find(t => t.name === tagName);
+            if (tag) {
+                const tagFilter = document.getElementById('tagFilter');
+                tagFilter.value = tag.id;
+                filterAndDisplayLinks();
+                showToast(`Filtered by tag: ${tagName}`, 'info');
+            }
+        }
+
+        // Pagination functions
+        function updatePaginationControls() {
+            const paginationContainer = document.getElementById('paginationContainer');
+            const prevButton = document.getElementById('prevPage');
+            const nextButton = document.getElementById('nextPage');
+            const pageNumbers = document.getElementById('pageNumbers');
+            const paginationInfo = document.getElementById('paginationInfo');
+
+            // Show/hide pagination based on whether there are multiple pages
+            if (totalPages > 1) {
+                paginationContainer.classList.remove('hidden');
+            } else {
+                paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            // Update prev/next buttons
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+
+            // Generate page numbers
+            const pages = [];
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust start if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Add first page if not visible
+            if (startPage > 1) {
+                pages.push(1);
+                if (startPage > 2) {
+                    pages.push('...');
+                }
+            }
+
+            // Add visible pages
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+
+            // Add last page if not visible
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pages.push('...');
+                }
+                pages.push(totalPages);
+            }
+
+            pageNumbers.innerHTML = pages.map(page => {
+                if (page === '...') {
+                    return `<span class="px-3 py-2">...</span>`;
+                }
+                const isActive = page === currentPage;
+                return `
+                    <button
+                        onclick="goToPage(${page})"
+                        class="px-4 py-2 rounded-lg transition-all duration-200 ${
+                            isActive
+                                ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-semibold'
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }"
+                    >
+                        ${page}
+                    </button>
+                `;
+            }).join('');
+
+            // Update pagination info
+            const startItem = (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+            paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${totalItems}`;
+        }
+
+        function goToPage(page) {
+            if (page >= 1 && page <= totalPages && page !== currentPage) {
+                currentPage = page;
+                loadLinks();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                goToPage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
         }
 
         // Clear all filters
@@ -591,12 +704,38 @@
 
         async function loadLinks() {
             try {
-                const response = await fetch('/api/links');
-                const links = await response.json();
+                const searchInput = document.getElementById('searchInput');
+                const tagFilter = document.getElementById('tagFilter');
+                const sortBy = document.getElementById('sortBy');
+                const sortOrder = document.getElementById('sortOrder');
+                
+                const searchQuery = searchInput.value || '';
+                const tagId = tagFilter.value || '';
+                const sortField = sortBy.value || 'createdAt';
+                const sortOrderValue = sortOrder.dataset.order === 'desc' ? 'DESC' : 'ASC';
+                
+                const params = new URLSearchParams({
+                    page: currentPage.toString(),
+                    limit: itemsPerPage.toString(),
+                    search: searchQuery,
+                    sortField: sortField,
+                    sortOrder: sortOrderValue
+                });
+                
+                if (tagId) {
+                    params.append('tagId', tagId);
+                }
+                
+                const response = await fetch(`/api/links?${params.toString()}`);
+                const data = await response.json();
 
-                allLinks = links;
-                populateTagFilter();
-                filterAndDisplayLinks();
+                allLinks = data.links;
+                totalPages = data.totalPages;
+                totalItems = data.total;
+                currentPage = data.page;
+
+                displayLinks();
+                updatePaginationControls();
 
             } catch (error) {
                 console.error('Error loading links:', error);
@@ -714,6 +853,10 @@
             document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
             document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
 
+            // Pagination controls
+            document.getElementById('prevPage').addEventListener('click', prevPage);
+            document.getElementById('nextPage').addEventListener('click', nextPage);
+
             // Tag input functionality
             const tagInput = document.getElementById('linkTags');
             const debouncedShowSuggestions = debounce((input) => showSuggestions(input), 200);
@@ -740,7 +883,10 @@
 
             // Form and refresh
             document.getElementById('addLinkForm').addEventListener('submit', addLink);
-            document.getElementById('refreshBtn').addEventListener('click', loadLinks);
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                currentPage = 1;
+                loadLinks();
+            });
 
             // Initialize
             updateSortOrderIcon();

@@ -97,18 +97,38 @@ class LocalServerRepositoryImpl(
 
                         get("/api/links") {
                             try {
+                                val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+                                val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
+                                val searchQuery = call.request.queryParameters["search"] ?: ""
+                                val tagId = call.request.queryParameters["tagId"]?.toLongOrNull()
+                                val sortOrder = call.request.queryParameters["sortOrder"] ?: "DESC"
+                                val sortField = call.request.queryParameters["sortField"] ?: "createdAt"
+                                
+                                val offset = (page - 1) * limit
+                                
                                 val links =
                                     deeprQueries
-                                        .getLinksAndTags(
-                                            "",
-                                            "",
-                                            "",
-                                            null,
-                                            "DESC",
-                                            "createdAt",
-                                            "DESC",
-                                            "createdAt",
+                                        .getLinksAndTagsWithPagination(
+                                            searchQuery,
+                                            searchQuery,
+                                            tagId?.toString() ?: "",
+                                            tagId,
+                                            sortOrder,
+                                            sortField,
+                                            sortOrder,
+                                            sortField,
+                                            limit.toLong(),
+                                            offset.toLong(),
                                         ).executeAsList()
+                                
+                                val total = deeprQueries
+                                    .countLinksAndTags(
+                                        searchQuery,
+                                        searchQuery,
+                                        tagId?.toString() ?: "",
+                                        tagId,
+                                    ).executeAsOne().toInt()
+                                
                                 val response =
                                     links.map { link ->
                                         LinkResponse(
@@ -120,7 +140,17 @@ class LocalServerRepositoryImpl(
                                             tags = link.tagsNames?.split(", ")?.filter { it.isNotEmpty() } ?: emptyList(),
                                         )
                                     }
-                                call.respond(HttpStatusCode.OK, response)
+                                
+                                val totalPages = (total + limit - 1) / limit
+                                val paginatedResponse = PaginatedLinksResponse(
+                                    links = response,
+                                    page = page,
+                                    limit = limit,
+                                    total = total,
+                                    totalPages = totalPages
+                                )
+                                
+                                call.respond(HttpStatusCode.OK, paginatedResponse)
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting links", e)
                                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting links: ${e.message}"))
@@ -263,6 +293,15 @@ data class LinkResponse(
     val createdAt: String,
     val openedCount: Long,
     val tags: List<String>,
+)
+
+@Serializable
+data class PaginatedLinksResponse(
+    val links: List<LinkResponse>,
+    val page: Int,
+    val limit: Int,
+    val total: Int,
+    val totalPages: Int,
 )
 
 @Serializable
