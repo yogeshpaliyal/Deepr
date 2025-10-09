@@ -10,8 +10,8 @@ class NetworkRepository(
     val httpParser: HtmlParser,
 ) {
     suspend fun getLinkInfo(url: String): Result<LinkInfo> {
+        val normalizedUrl = normalizeLink(url)
         try {
-            val normalizedUrl = normalizeLink(url)
             val response = httpClient.get(normalizedUrl)
             if (response.status.value != 200) {
                 return Result.failure(Exception("Failed to fetch data from $normalizedUrl, status code: ${response.status.value}"))
