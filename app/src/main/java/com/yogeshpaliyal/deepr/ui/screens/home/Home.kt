@@ -443,6 +443,10 @@ fun Content(
                     viewModel.setSelectedTagByName(it)
                 }
             },
+            onResetOpenedCountClick = {
+                viewModel.resetOpenedCount(it.id)
+                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+            },
         )
     }
 }
@@ -459,6 +463,7 @@ fun DeeprList(
     onItemLongClick: (GetLinksAndTags) -> Unit,
     onQrCodeCLick: (GetLinksAndTags) -> Unit,
     onTagClick: (String) -> Unit,
+    onResetOpenedCountClick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
@@ -527,6 +532,7 @@ fun DeeprList(
                     onItemLongClick = onItemLongClick,
                     onQrCodeClick = onQrCodeCLick,
                     onTagClick = onTagClick,
+                    onResetOpenedCountClick = onResetOpenedCountClick,
                 )
             }
         }

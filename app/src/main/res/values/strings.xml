@@ -29,6 +29,7 @@
     <string name="link_copied">Link copied</string>
     <string name="delete">Delete</string>
     <string name="remove_tag">Remove tag</string>
+    <string name="reset_opened_count">Reset opened count</string>
     <string name="failed_to_fetch_metadata">Failed to fetch metadata</string>
     <string name="opened_count">Opened: %d</string>
     <string name="tags_label">Tags:</string>
