@@ -42,6 +42,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
+import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -61,6 +62,8 @@ fun DeeprItem(
     onEditClick: ((GetLinksAndTags) -> Unit)? = null,
     onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
     onTagClick: ((String) -> Unit)? = null,
+    onResetOpenedCountClick: ((GetLinksAndTags) -> Unit)? = null,
+    onDeleteClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -187,9 +190,22 @@ fun DeeprItem(
                             },
                         )
                         DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reset_opened_count)) },
+                            onClick = {
+                                onResetOpenedCountClick?.invoke(account)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Refresh,
+                                    contentDescription = stringResource(R.string.reset_opened_count),
+                                )
+                            },
+                        )
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete)) },
                             onClick = {
-                                onRemoveClick?.invoke(account)
+                                onDeleteClick?.invoke(account)
                                 expanded = false
                             },
                             leadingIcon = {

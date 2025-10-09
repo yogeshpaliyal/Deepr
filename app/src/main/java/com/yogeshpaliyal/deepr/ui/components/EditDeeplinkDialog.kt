@@ -54,6 +54,19 @@ fun EditDeeplinkDialog(
                             )
                         }
                     },
+                    suffix =
+                        if (link.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = {
+                                        link = ""
+                                        isError = false
+                                    },
+                                )
+                            }
+                        },
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -64,6 +77,16 @@ fun EditDeeplinkDialog(
                         name = it
                     },
                     label = { Text("Name") },
+                    suffix =
+                        if (name.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = { name = "" },
+                                )
+                            }
+                        },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

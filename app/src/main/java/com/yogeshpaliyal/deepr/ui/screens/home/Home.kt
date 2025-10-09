@@ -70,6 +70,7 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
+import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
@@ -341,7 +342,7 @@ fun HomeScreen(
 
         if (isTagsSelectionActive) {
             TagSelectionBottomSheet(
-                tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                tagsWithCount = viewModel.allTagsWithCount.collectAsStateWithLifecycle().value,
                 selectedTag = selectedTag.value,
                 dismissBottomSheet = {
                     isTagsSelectionActive = false
@@ -361,6 +362,7 @@ fun HomeScreen(
                     viewModel.deleteTag(it.id)
                     Result.success(true)
                 },
+                deeprQueries = deeprQueries,
             )
         }
     }
@@ -391,6 +393,7 @@ fun Content(
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
         var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+        var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -403,6 +406,17 @@ fun Content(
             QrCodeDialog(it) {
                 showQrCodeDialog = null
             }
+        }
+
+        showDeleteConfirmDialog?.let { deepr ->
+            DeleteConfirmationDialog(
+                deepr = deepr,
+                onDismiss = { showDeleteConfirmDialog = null },
+                onConfirm = {
+                    viewModel.deleteAccount(it.id)
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                },
+            )
         }
 
         DeeprList(
@@ -443,6 +457,13 @@ fun Content(
                     viewModel.setSelectedTagByName(it)
                 }
             },
+            onResetOpenedCountClick = {
+                viewModel.resetOpenedCount(it.id)
+                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+            },
+            onDeleteClick = {
+                showDeleteConfirmDialog = it
+            },
         )
     }
 }
@@ -459,6 +480,8 @@ fun DeeprList(
     onItemLongClick: (GetLinksAndTags) -> Unit,
     onQrCodeCLick: (GetLinksAndTags) -> Unit,
     onTagClick: (String) -> Unit,
+    onResetOpenedCountClick: (GetLinksAndTags) -> Unit,
+    onDeleteClick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
@@ -527,6 +550,8 @@ fun DeeprList(
                     onItemLongClick = onItemLongClick,
                     onQrCodeClick = onQrCodeCLick,
                     onTagClick = onTagClick,
+                    onResetOpenedCountClick = onResetOpenedCountClick,
+                    onDeleteClick = onDeleteClick,
                 )
             }
         }
