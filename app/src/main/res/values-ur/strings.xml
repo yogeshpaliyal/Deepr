@@ -31,6 +31,7 @@
     <string name="remove_tag">ٹیگ ہٹائیں</string>
     <string name="failed_to_fetch_metadata">میٹاڈیٹا لانے میں ناکام</string>
     <string name="opened_count">کھولا گیا: %d</string>
+    <string name="last_opened">آخری بار کھولا گیا: %s</string>
     <string name="tags_label">ٹیگز:</string>
     <string name="suggestions_label">تجاویز:</string>
     <string name="filter">فلٹر</string>

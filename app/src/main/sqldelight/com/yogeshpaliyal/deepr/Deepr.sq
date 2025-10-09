@@ -19,6 +19,13 @@ FOREIGN KEY (linkId) REFERENCES Deepr(id) ON DELETE CASCADE,
 FOREIGN KEY (tagId) REFERENCES Tags(id) ON DELETE CASCADE
 );
 
+CREATE TABLE DeeprOpenLog (
+id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+deeplinkId INTEGER NOT NULL,
+openedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (deeplinkId) REFERENCES Deepr(id) ON DELETE CASCADE
+);
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 
@@ -32,10 +39,21 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
 FROM
   Deepr
+  LEFT JOIN (
+        -- Subquery to find the single latest log entry per deeplink
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
@@ -76,9 +94,20 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
+  LEFT JOIN (
+      -- Subquery to find the single latest log entry per deeplink
+      SELECT
+        deeplinkId,
+        MAX(openedAt) AS lastOpenedAt
+      FROM
+        DeeprOpenLog
+      GROUP BY
+        deeplinkId
+    ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 GROUP BY
@@ -154,3 +183,11 @@ SELECT Tags.id,Tags.name FROM Tags INNER JOIN LinkTags ON Tags.id = LinkTags.tag
 
 hasTagLinks:
 SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;
+
+-- Deeplink Open Log operations
+insertDeeprOpenLog:
+INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
+
+getLastOpenedTime:
+SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
+

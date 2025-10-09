@@ -34,6 +34,7 @@
     <string name="reset_opened_count">Reset opened count</string>
     <string name="failed_to_fetch_metadata">Failed to fetch metadata</string>
     <string name="opened_count">Opened: %d</string>
+    <string name="last_opened">Last Opened: %s</string>
     <string name="tags_label">Tags:</string>
     <string name="suggestions_label">Suggestions:</string>
     <string name="filter">Filter</string>

@@ -31,6 +31,7 @@
     <string name="remove_tag">Tag entfernen</string>
     <string name="failed_to_fetch_metadata">Fehler beim Abrufen der Metadaten</string>
     <string name="opened_count">Geöffnet: %d</string>
+    <string name="last_opened">Zuletzt geöffnet: %s</string>
     <string name="tags_label">Tags:</string>
     <string name="suggestions_label">Vorschläge:</string>
     <string name="filter">Filter</string>

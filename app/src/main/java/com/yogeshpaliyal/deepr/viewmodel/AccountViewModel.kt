@@ -283,6 +283,7 @@ class AccountViewModel(
     fun incrementOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
+            deeprQueries.insertDeeprOpenLog(id)
         }
     }
 
