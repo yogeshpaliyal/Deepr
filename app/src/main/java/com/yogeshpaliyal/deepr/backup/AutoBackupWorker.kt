@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.yogeshpaliyal.deepr.DeeprQueries
@@ -58,9 +59,14 @@ class AutoBackupWorker(
                 val fileName = "deepr_backup_$timeStamp.csv"
 
                 val success =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    if (location.startsWith("content://")) {
+                        // User selected location via document picker
+                        saveToSelectedLocation(location, fileName, dataToExport)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        // Use MediaStore for Android Q+
                         saveToMediaStore(fileName, dataToExport)
                     } else {
+                        // Use file path for older Android versions
                         saveToExternalStorage(location, fileName, dataToExport)
                     }
 
@@ -108,32 +114,51 @@ class AutoBackupWorker(
         }
     }
 
+    private fun saveToSelectedLocation(
+        location: String,
+        fileName: String,
+        data: List<com.yogeshpaliyal.deepr.Deepr>,
+    ): Boolean {
+        return try {
+            // For content:// URIs from document picker, create a new document in that folder
+            val locationUri = location.toUri()
+            val documentFile = androidx.documentfile.provider.DocumentFile.fromTreeUri(
+                applicationContext,
+                locationUri,
+            )
+            
+            val newFile = documentFile?.createFile("text/csv", fileName)
+            
+            if (newFile != null) {
+                applicationContext.contentResolver.openOutputStream(newFile.uri)
+                    ?.use { outputStream ->
+                        writeCsvData(outputStream, data)
+                    }
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     private fun saveToExternalStorage(
         location: String,
         fileName: String,
         data: List<com.yogeshpaliyal.deepr.Deepr>,
     ): Boolean {
         return try {
-            // If location is a URI, use ContentResolver
-            if (location.startsWith("content://")) {
-                applicationContext.contentResolver.openOutputStream(location.toUri(), "wt")
-                    ?.use { outputStream ->
-                        writeCsvData(outputStream, data)
-                    }
-                true
-            } else {
-                // Fallback to file path
-                val downloadsDir = File(location)
-                if (!downloadsDir.exists()) {
-                    downloadsDir.mkdirs()
-                }
-
-                val file = File(downloadsDir, fileName)
-                FileOutputStream(file).use { outputStream ->
-                    writeCsvData(outputStream, data)
-                }
-                true
+            val downloadsDir = File(location)
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdirs()
             }
+
+            val file = File(downloadsDir, fileName)
+            FileOutputStream(file).use { outputStream ->
+                writeCsvData(outputStream, data)
+            }
+            true
         } catch (e: Exception) {
             false
         }
