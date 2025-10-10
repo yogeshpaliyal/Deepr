@@ -172,6 +172,12 @@ fun DeeprItem(
                                     } else {
                                         stringResource(R.string.add_to_favourites)
                                     },
+                                tint =
+                                    if (account.isFavourite == 1L) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
                             )
                         }
 

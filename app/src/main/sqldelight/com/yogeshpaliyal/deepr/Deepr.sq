@@ -162,6 +162,9 @@ ORDER BY Tags.name;
 countOfLinks:
 SELECT count(*) FROM Deepr;
 
+countOfFavouriteLinks:
+SELECT count(*) FROM Deepr WHERE isFavourite = 1;
+
 
 -- Link-Tag relations
 addTagToLink:

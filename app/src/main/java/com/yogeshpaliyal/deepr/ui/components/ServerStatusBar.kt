@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,8 +39,8 @@ fun ServerStatusBar(
     if (isRunning) {
         OutlinedCard(
             modifier = modifier.padding(8.dp),
-            colors = CardDefaults.outlinedCardColors(containerColor = Color(0xFF4CAF50)),
-            border = BorderStroke(1.dp, Color(0xFF3C8D3E)),
+            colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primary),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         ) {
             Row(
                 modifier =
@@ -54,12 +54,12 @@ fun ServerStatusBar(
                 Icon(
                     TablerIcons.Server,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(16.dp),
                 )
                 Text(
                     text = stringResource(R.string.server_running_tap_to_configure),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.weight(1f),
@@ -67,7 +67,7 @@ fun ServerStatusBar(
                 if (serverUrl != null) {
                     Text(
                         text = serverUrl!!.substringAfter("://"),
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         fontSize = 12.sp,
                     )
                 }

@@ -100,6 +100,14 @@ class AccountViewModel(
                 viewModelScope.coroutineContext,
             ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
+    val countOfFavouriteLinks: StateFlow<Long?> =
+        deeprQueries
+            .countOfFavouriteLinks()
+            .asFlow()
+            .mapToOneOrNull(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
 
