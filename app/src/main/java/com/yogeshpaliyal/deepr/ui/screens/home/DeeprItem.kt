@@ -44,29 +44,53 @@ import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Star
-import compose.icons.tablericons.StarFilled
+import compose.icons.tablericons.StarOff
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
+sealed class MenuItem(
+    val item: GetLinksAndTags,
+) {
+    class Click(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Shortcut(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class ShowQrCode(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class FavouriteClick(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Edit(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class ResetCounter(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Delete(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
     account: GetLinksAndTags,
+    onItemClick: (MenuItem) -> Unit,
+    onTagClick: (tag: String) -> Unit,
     selectedTag: Tags?,
     modifier: Modifier = Modifier,
-    onItemClick: ((GetLinksAndTags) -> Unit)? = null,
-    onRemoveClick: ((GetLinksAndTags) -> Unit)? = null,
-    onShortcutClick: ((GetLinksAndTags) -> Unit)? = null,
-    onQrCodeClick: ((GetLinksAndTags) -> Unit)? = null,
-    onEditClick: ((GetLinksAndTags) -> Unit)? = null,
-    onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
-    onTagClick: ((String) -> Unit)? = null,
-    onResetOpenedCountClick: ((GetLinksAndTags) -> Unit)? = null,
-    onDeleteClick: ((GetLinksAndTags) -> Unit)? = null,
-    onToggleFavouriteClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -86,8 +110,14 @@ fun DeeprItem(
             modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onClick = { onItemClick?.invoke(account) },
-                    onLongClick = { onItemLongClick?.invoke(account) },
+                    onClick = { onItemClick(MenuItem.Click(account)) },
+                    onLongClick = {
+                        val clipboard =
+                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
+                    },
                 ),
     ) {
         Column(
@@ -172,11 +202,11 @@ fun DeeprItem(
                             )
                         }
                         ShortcutMenuItem(account, {
-                            onShortcutClick?.invoke(it)
+                            onItemClick(MenuItem.Shortcut(it))
                             expanded = false
                         })
                         ShowQRCodeMenuItem(account, {
-                            onQrCodeClick?.invoke(it)
+                            onItemClick(MenuItem.ShowQrCode(it))
                             expanded = false
                         })
                         DropdownMenuItem(
@@ -190,13 +220,13 @@ fun DeeprItem(
                                 )
                             },
                             onClick = {
-                                onToggleFavouriteClick?.invoke(account)
+                                onItemClick(MenuItem.FavouriteClick(account))
                                 expanded = false
                             },
                             leadingIcon = {
                                 Icon(
                                     if (account.isFavourite == 1L) {
-                                        TablerIcons.StarFilled
+                                        TablerIcons.StarOff
                                     } else {
                                         TablerIcons.Star
                                     },
@@ -212,7 +242,7 @@ fun DeeprItem(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit)) },
                             onClick = {
-                                onEditClick?.invoke(account)
+                                onItemClick(MenuItem.Edit(account))
                                 expanded = false
                             },
                             leadingIcon = {
@@ -225,7 +255,7 @@ fun DeeprItem(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.reset_opened_count)) },
                             onClick = {
-                                onResetOpenedCountClick?.invoke(account)
+                                onItemClick(MenuItem.ResetCounter(account))
                                 expanded = false
                             },
                             leadingIcon = {
@@ -238,7 +268,7 @@ fun DeeprItem(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete)) },
                             onClick = {
-                                onDeleteClick?.invoke(account)
+                                onItemClick(MenuItem.Delete(account))
                                 expanded = false
                             },
                             leadingIcon = {
@@ -261,7 +291,7 @@ fun DeeprItem(
                         modifier = Modifier.padding(0.dp),
                         elevation = null,
                         selected = selectedTag?.name == tag.trim(),
-                        onClick = { onTagClick?.invoke(tag.trim()) },
+                        onClick = { onTagClick(tag.trim()) },
                         label = { Text(tag.trim()) },
                     )
                 }

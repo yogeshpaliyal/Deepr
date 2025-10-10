@@ -21,4 +21,5 @@ fun createDeeprObject(
         tagsNames = "",
         tagsIds = "",
         lastOpenedAt = "",
+        isFavourite = 0,
     )
