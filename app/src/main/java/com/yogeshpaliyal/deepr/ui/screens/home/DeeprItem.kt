@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,27 +43,54 @@ import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Refresh
+import compose.icons.tablericons.Star
+import compose.icons.tablericons.StarOff
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
+sealed class MenuItem(
+    val item: GetLinksAndTags,
+) {
+    class Click(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Shortcut(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class ShowQrCode(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class FavouriteClick(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Edit(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class ResetCounter(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class Delete(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
     account: GetLinksAndTags,
+    onItemClick: (MenuItem) -> Unit,
+    onTagClick: (tag: String) -> Unit,
     selectedTag: Tags?,
     modifier: Modifier = Modifier,
-    onItemClick: ((GetLinksAndTags) -> Unit)? = null,
-    onRemoveClick: ((GetLinksAndTags) -> Unit)? = null,
-    onShortcutClick: ((GetLinksAndTags) -> Unit)? = null,
-    onQrCodeClick: ((GetLinksAndTags) -> Unit)? = null,
-    onEditClick: ((GetLinksAndTags) -> Unit)? = null,
-    onItemLongClick: ((GetLinksAndTags) -> Unit)? = null,
-    onTagClick: ((String) -> Unit)? = null,
-    onResetOpenedCountClick: ((GetLinksAndTags) -> Unit)? = null,
-    onDeleteClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -83,8 +110,14 @@ fun DeeprItem(
             modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onClick = { onItemClick?.invoke(account) },
-                    onLongClick = { onItemLongClick?.invoke(account) },
+                    onClick = { onItemClick(MenuItem.Click(account)) },
+                    onLongClick = {
+                        val clipboard =
+                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
+                    },
                 ),
     ) {
         Column(
@@ -120,102 +153,168 @@ fun DeeprItem(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = stringResource(R.string.opened_count, account.openedCount),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
                     }
                 }
-                Box {
-                    IconButton(onClick = { expanded = true }) {
-                        Icon(TablerIcons.DotsVertical, contentDescription = stringResource(R.string.more_options))
-                    }
+                Column(horizontalAlignment = Alignment.End) {
+                    Row {
+                        IconButton(onClick = {
+                            onItemClick(MenuItem.FavouriteClick(account))
+                        }) {
+                            Icon(
+                                if (account.isFavourite == 1L) {
+                                    TablerIcons.StarOff
+                                } else {
+                                    TablerIcons.Star
+                                },
+                                contentDescription =
+                                    if (account.isFavourite == 1L) {
+                                        stringResource(R.string.remove_from_favourites)
+                                    } else {
+                                        stringResource(R.string.add_to_favourites)
+                                    },
+                            )
+                        }
 
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(copyLinkText) },
-                            onClick = {
-                                val clipboard =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText(linkCopiedText, account.link)
-                                clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Copy,
-                                    contentDescription = copyLinkText,
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                TablerIcons.DotsVertical,
+                                contentDescription = stringResource(R.string.more_options),
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(copyLinkText) },
+                                onClick = {
+                                    val clipboard =
+                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast
+                                        .makeText(context, linkCopiedText, Toast.LENGTH_SHORT)
+                                        .show()
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Copy,
+                                        contentDescription = copyLinkText,
+                                    )
+                                },
+                            )
+                            // Display last opened time
+                            if (account.lastOpenedAt != null) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(
+                                                R.string.last_opened,
+                                                formatDateTime(account.lastOpenedAt),
+                                            ),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    },
+                                    onClick = { },
+                                    enabled = false,
                                 )
-                            },
-                        )
-                        // Display last opened time
-                        if (account.lastOpenedAt != null) {
+                            }
+                            ShortcutMenuItem(account, {
+                                onItemClick(MenuItem.Shortcut(it))
+                                expanded = false
+                            })
+                            ShowQRCodeMenuItem(account, {
+                                onItemClick(MenuItem.ShowQrCode(it))
+                                expanded = false
+                            })
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        stringResource(R.string.last_opened, formatDateTime(account.lastOpenedAt!!)),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        if (account.isFavourite == 1L) {
+                                            stringResource(R.string.remove_from_favourites)
+                                        } else {
+                                            stringResource(R.string.add_to_favourites)
+                                        },
                                     )
                                 },
-                                onClick = { },
-                                enabled = false,
+                                onClick = {
+                                    onItemClick(MenuItem.FavouriteClick(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        if (account.isFavourite == 1L) {
+                                            TablerIcons.StarOff
+                                        } else {
+                                            TablerIcons.Star
+                                        },
+                                        contentDescription =
+                                            if (account.isFavourite == 1L) {
+                                                stringResource(R.string.remove_from_favourites)
+                                            } else {
+                                                stringResource(R.string.add_to_favourites)
+                                            },
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                onClick = {
+                                    onItemClick(MenuItem.Edit(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.reset_opened_count)) },
+                                onClick = {
+                                    onItemClick(MenuItem.ResetCounter(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Refresh,
+                                        contentDescription = stringResource(R.string.reset_opened_count),
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                colors =
+                                    MenuDefaults.itemColors(
+                                        MaterialTheme.colorScheme.error,
+                                        MaterialTheme.colorScheme.error,
+                                    ),
+                                text = {
+                                    Text(
+                                        stringResource(R.string.delete),
+                                    )
+                                },
+                                onClick = {
+                                    onItemClick(MenuItem.Delete(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Trash,
+                                        contentDescription = stringResource(R.string.delete),
+                                    )
+                                },
                             )
                         }
-                        ShortcutMenuItem(account, {
-                            onShortcutClick?.invoke(it)
-                            expanded = false
-                        })
-                        ShowQRCodeMenuItem(account, {
-                            onQrCodeClick?.invoke(it)
-                            expanded = false
-                        })
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.edit)) },
-                            onClick = {
-                                onEditClick?.invoke(account)
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Edit,
-                                    contentDescription = stringResource(R.string.edit),
-                                )
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.reset_opened_count)) },
-                            onClick = {
-                                onResetOpenedCountClick?.invoke(account)
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Refresh,
-                                    contentDescription = stringResource(R.string.reset_opened_count),
-                                )
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.delete)) },
-                            onClick = {
-                                onDeleteClick?.invoke(account)
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Trash,
-                                    contentDescription = stringResource(R.string.delete),
-                                )
-                            },
-                        )
                     }
+                    Text(
+                        text = stringResource(R.string.opened_count, account.openedCount),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
 
@@ -228,7 +327,7 @@ fun DeeprItem(
                         modifier = Modifier.padding(0.dp),
                         elevation = null,
                         selected = selectedTag?.name == tag.trim(),
-                        onClick = { onTagClick?.invoke(tag.trim()) },
+                        onClick = { onTagClick(tag.trim()) },
                         label = { Text(tag.trim()) },
                     )
                 }
