@@ -1,7 +1,8 @@
 package com.yogeshpaliyal.deepr.backup
 
+import android.net.Uri
 import com.yogeshpaliyal.deepr.util.RequestResult
 
 interface ExportRepository {
-    suspend fun exportToCsv(): RequestResult<String>
+    suspend fun exportToCsv(uri: Uri? = null): RequestResult<String>
 }

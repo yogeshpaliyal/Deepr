@@ -98,6 +98,16 @@ fun SettingsScreen(
             }
         }
 
+    // Launcher for picking CSV export location
+    val csvExportLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("text/csv"),
+        ) { uri ->
+            uri?.let {
+                viewModel.exportCsvData(it)
+            }
+        }
+
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
 
@@ -230,6 +240,15 @@ fun SettingsScreen(
                                 storagePermissionState.launchPermissionRequest()
                             }
                         }
+                    },
+                )
+                SettingsItem(
+                    TablerIcons.FileText,
+                    title = stringResource(R.string.export_to_custom_location),
+                    description = stringResource(R.string.export_to_custom_location_description),
+                    onClick = {
+                        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
+                        csvExportLauncher.launch("deepr_export_$timeStamp.csv")
                     },
                 )
             }

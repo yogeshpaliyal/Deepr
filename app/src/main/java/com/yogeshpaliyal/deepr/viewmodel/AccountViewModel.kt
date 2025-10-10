@@ -306,9 +306,9 @@ class AccountViewModel(
         }
     }
 
-    fun exportCsvData() {
+    fun exportCsvData(uri: Uri? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = exportRepository.exportToCsv()
+            val result = exportRepository.exportToCsv(uri)
             when (result) {
                 is RequestResult.Success -> {
                     exportResultChannel.send("Export completed: ${result.data}")
