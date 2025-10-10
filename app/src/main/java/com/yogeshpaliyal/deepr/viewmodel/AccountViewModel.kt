@@ -362,6 +362,41 @@ class AccountViewModel(
         }
     }
 
+    // Auto backup preference methods
+    val autoBackupEnabled =
+        preferenceDataStore.getAutoBackupEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val autoBackupLocation =
+        preferenceDataStore.getAutoBackupLocation
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val autoBackupInterval =
+        preferenceDataStore.getAutoBackupInterval
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 86400000L) // 24 hours
+
+    val lastBackupTime =
+        preferenceDataStore.getLastBackupTime
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
+    fun setAutoBackupEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupEnabled(enabled)
+        }
+    }
+
+    fun setAutoBackupLocation(location: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupLocation(location)
+        }
+    }
+
+    fun setAutoBackupInterval(interval: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupInterval(interval)
+        }
+    }
+
     // Sync preference methods
     val syncEnabled =
         preferenceDataStore.getSyncEnabled

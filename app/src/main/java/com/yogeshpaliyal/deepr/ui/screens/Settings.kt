@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.components.BackupIntervalDialog
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.util.LanguageUtil
@@ -110,6 +111,13 @@ fun SettingsScreen(
     val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
     val lastSyncTime by viewModel.lastSyncTime.collectAsStateWithLifecycle()
 
+    // Collect auto backup preference states
+    val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
+    val autoBackupLocation by viewModel.autoBackupLocation.collectAsStateWithLifecycle()
+    val autoBackupInterval by viewModel.autoBackupInterval.collectAsStateWithLifecycle()
+    val lastBackupTime by viewModel.lastBackupTime.collectAsStateWithLifecycle()
+    var showIntervalDialog by remember { mutableStateOf(false) }
+
     // Launcher for picking sync file location
     val syncFileLauncher =
         rememberLauncherForActivityResult(
@@ -124,6 +132,23 @@ fun SettingsScreen(
                 // Check for the freshest data.
                 contentResolver.takePersistableUriPermission(uri, takeFlags)
                 viewModel.setSyncFilePath(it.toString())
+            }
+        }
+
+    // Launcher for picking auto backup location
+    val backupLocationLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocumentTree(),
+        ) { uri ->
+            uri?.let {
+                val contentResolver = context.contentResolver
+
+                val takeFlags: Int =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                // Check for the freshest data.
+                contentResolver.takePersistableUriPermission(uri, takeFlags)
+                viewModel.setAutoBackupLocation(it.toString())
             }
         }
 
@@ -150,6 +175,15 @@ fun SettingsScreen(
     LaunchedEffect(true) {
         viewModel.syncResultFlow.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Handle auto backup scheduling
+    LaunchedEffect(autoBackupEnabled, autoBackupInterval) {
+        if (autoBackupEnabled && autoBackupLocation.isNotEmpty()) {
+            com.yogeshpaliyal.deepr.backup.AutoBackupScheduler.scheduleBackup(context, autoBackupInterval)
+        } else {
+            com.yogeshpaliyal.deepr.backup.AutoBackupScheduler.cancelBackup(context)
         }
     }
 
@@ -303,6 +337,73 @@ fun SettingsScreen(
                 }
             }
 
+            SettingsSection("Auto Backup") {
+                SettingsItem(
+                    TablerIcons.Upload,
+                    title = stringResource(R.string.auto_backup),
+                    description = stringResource(R.string.auto_backup_description),
+                    onClick = {
+                        viewModel.setAutoBackupEnabled(!autoBackupEnabled)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = autoBackupEnabled,
+                            onCheckedChange = { viewModel.setAutoBackupEnabled(it) },
+                        )
+                    },
+                )
+
+                AnimatedVisibility(autoBackupEnabled) {
+                    Column {
+                        SettingsItem(
+                            TablerIcons.FileText,
+                            title = stringResource(R.string.select_backup_location),
+                            description =
+                                if (autoBackupLocation.isNotEmpty()) {
+                                    autoBackupLocation
+                                        .substringAfterLast("/")
+                                        .replace("%2F", "/")
+                                        .replace("%20", " ")
+                                        .replace("%3A", ":")
+                                } else {
+                                    stringResource(R.string.select_backup_location_description)
+                                },
+                            onClick = {
+                                backupLocationLauncher.launch(null)
+                            },
+                        )
+
+                        SettingsItem(
+                            TablerIcons.InfoCircle,
+                            title = stringResource(R.string.backup_interval),
+                            description = getIntervalText(autoBackupInterval),
+                            onClick = {
+                                showIntervalDialog = true
+                            },
+                        )
+
+                        SettingsItem(
+                            TablerIcons.InfoCircle,
+                            title = stringResource(R.string.last_backup_time),
+                            description =
+                                if (lastBackupTime > 0) {
+                                    val formatter =
+                                        SimpleDateFormat(
+                                            "MMM dd, yyyy 'at' HH:mm",
+                                            Locale.getDefault(),
+                                        )
+                                    stringResource(
+                                        R.string.last_backup_time_format,
+                                        formatter.format(Date(lastBackupTime)),
+                                    )
+                                } else {
+                                    stringResource(R.string.last_backup_time_never)
+                                },
+                        )
+                    }
+                }
+            }
+
             SettingsSection("Others") {
                 SettingsItem(
                     TablerIcons.Server,
@@ -397,6 +498,30 @@ fun SettingsScreen(
                 onDismiss = { showLanguageDialog = false },
             )
         }
+
+        // Backup Interval Selection Dialog
+        if (showIntervalDialog) {
+            BackupIntervalDialog(
+                currentInterval = autoBackupInterval,
+                onIntervalSelect = { selectedInterval ->
+                    viewModel.setAutoBackupInterval(selectedInterval)
+                    showIntervalDialog = false
+                },
+                onDismiss = { showIntervalDialog = false },
+            )
+        }
+    }
+}
+
+@Composable
+fun getIntervalText(intervalMillis: Long): String {
+    return when (intervalMillis) {
+        3600000L -> stringResource(R.string.interval_1_hour)
+        21600000L -> stringResource(R.string.interval_6_hours)
+        43200000L -> stringResource(R.string.interval_12_hours)
+        86400000L -> stringResource(R.string.interval_24_hours)
+        604800000L -> stringResource(R.string.interval_7_days)
+        else -> stringResource(R.string.interval_24_hours)
     }
 }
 

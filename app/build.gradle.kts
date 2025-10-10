@@ -148,6 +148,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Firebase dependencies - use platform BOM and then add implementations
     implementation(platform(libs.firebase.bom))

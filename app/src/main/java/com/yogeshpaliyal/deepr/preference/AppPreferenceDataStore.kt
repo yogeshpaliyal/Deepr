@@ -24,6 +24,10 @@ class AppPreferenceDataStore(
         private val SYNC_FILE_PATH = stringPreferencesKey("sync_file_path")
         private val LAST_SYNC_TIME = longPreferencesKey("last_sync_time")
         private val LANGUAGE_CODE = stringPreferencesKey("language_code")
+        private val AUTO_BACKUP_ENABLED = booleanPreferencesKey("auto_backup_enabled")
+        private val AUTO_BACKUP_LOCATION = stringPreferencesKey("auto_backup_location")
+        private val AUTO_BACKUP_INTERVAL = longPreferencesKey("auto_backup_interval")
+        private val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -54,6 +58,26 @@ class AppPreferenceDataStore(
     val getLanguageCode: Flow<String> =
         context.appDataStore.data.map { preferences ->
             preferences[LANGUAGE_CODE] ?: "" // Default to system language
+        }
+
+    val getAutoBackupEnabled: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[AUTO_BACKUP_ENABLED] ?: false // Default to disabled
+        }
+
+    val getAutoBackupLocation: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[AUTO_BACKUP_LOCATION] ?: "" // Default to empty path
+        }
+
+    val getAutoBackupInterval: Flow<Long> =
+        context.appDataStore.data.map { preferences ->
+            preferences[AUTO_BACKUP_INTERVAL] ?: 86400000L // Default to 24 hours in milliseconds
+        }
+
+    val getLastBackupTime: Flow<Long> =
+        context.appDataStore.data.map { preferences ->
+            preferences[LAST_BACKUP_TIME] ?: 0L // Default to 0 (never backed up)
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -89,6 +113,30 @@ class AppPreferenceDataStore(
     suspend fun setLanguageCode(code: String) {
         context.appDataStore.edit { prefs ->
             prefs[LANGUAGE_CODE] = code
+        }
+    }
+
+    suspend fun setAutoBackupEnabled(enabled: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[AUTO_BACKUP_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setAutoBackupLocation(location: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[AUTO_BACKUP_LOCATION] = location
+        }
+    }
+
+    suspend fun setAutoBackupInterval(interval: Long) {
+        context.appDataStore.edit { prefs ->
+            prefs[AUTO_BACKUP_INTERVAL] = interval
+        }
+    }
+
+    suspend fun setLastBackupTime(timestamp: Long) {
+        context.appDataStore.edit { prefs ->
+            prefs[LAST_BACKUP_TIME] = timestamp
         }
     }
 }
