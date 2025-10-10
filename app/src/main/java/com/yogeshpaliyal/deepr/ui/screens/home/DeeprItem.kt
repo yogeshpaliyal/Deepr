@@ -43,6 +43,8 @@ import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Refresh
+import compose.icons.tablericons.Star
+import compose.icons.tablericons.StarFilled
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -64,6 +66,7 @@ fun DeeprItem(
     onTagClick: ((String) -> Unit)? = null,
     onResetOpenedCountClick: ((GetLinksAndTags) -> Unit)? = null,
     onDeleteClick: ((GetLinksAndTags) -> Unit)? = null,
+    onToggleFavouriteClick: ((GetLinksAndTags) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -176,6 +179,36 @@ fun DeeprItem(
                             onQrCodeClick?.invoke(it)
                             expanded = false
                         })
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    if (account.isFavourite == 1L) {
+                                        stringResource(R.string.remove_from_favourites)
+                                    } else {
+                                        stringResource(R.string.add_to_favourites)
+                                    },
+                                )
+                            },
+                            onClick = {
+                                onToggleFavouriteClick?.invoke(account)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    if (account.isFavourite == 1L) {
+                                        TablerIcons.StarFilled
+                                    } else {
+                                        TablerIcons.Star
+                                    },
+                                    contentDescription =
+                                        if (account.isFavourite == 1L) {
+                                            stringResource(R.string.remove_from_favourites)
+                                        } else {
+                                            stringResource(R.string.add_to_favourites)
+                                        },
+                                )
+                            },
+                        )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit)) },
                             onClick = {
