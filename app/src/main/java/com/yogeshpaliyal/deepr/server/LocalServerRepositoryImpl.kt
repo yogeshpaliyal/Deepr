@@ -104,6 +104,8 @@ class LocalServerRepositoryImpl(
                                             "",
                                             "",
                                             null,
+                                            -1L,
+                                            -1L,
                                             "DESC",
                                             "createdAt",
                                             "DESC",
@@ -148,7 +150,7 @@ class LocalServerRepositoryImpl(
                                         // Count how many links use this tag
                                         val linkCount =
                                             deeprQueries
-                                                .getLinksAndTags("", "", "", tag.id, "DESC", "createdAt", "DESC", "createdAt")
+                                                .getLinksAndTags("", "", "", tag.id, -1L, -1L, "DESC", "createdAt", "DESC", "createdAt")
                                                 .executeAsList()
                                                 .size
                                         TagResponse(
