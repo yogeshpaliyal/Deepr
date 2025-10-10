@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -153,132 +152,164 @@ fun DeeprItem(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = stringResource(R.string.opened_count, account.openedCount),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
                     }
                 }
-                Box {
-                    IconButton(onClick = { expanded = true }) {
-                        Icon(TablerIcons.DotsVertical, contentDescription = stringResource(R.string.more_options))
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(copyLinkText) },
-                            onClick = {
-                                val clipboard =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText(linkCopiedText, account.link)
-                                clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Copy,
-                                    contentDescription = copyLinkText,
-                                )
-                            },
-                        )
-                        // Display last opened time
-                        if (account.lastOpenedAt != null) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        stringResource(R.string.last_opened, formatDateTime(account.lastOpenedAt!!)),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                Column(horizontalAlignment = Alignment.End) {
+                    Row {
+                        IconButton(onClick = {
+                            onItemClick(MenuItem.FavouriteClick(account))
+                        }) {
+                            Icon(
+                                if (account.isFavourite == 1L) {
+                                    TablerIcons.StarOff
+                                } else {
+                                    TablerIcons.Star
                                 },
-                                onClick = { },
-                                enabled = false,
-                            )
-                        }
-                        ShortcutMenuItem(account, {
-                            onItemClick(MenuItem.Shortcut(it))
-                            expanded = false
-                        })
-                        ShowQRCodeMenuItem(account, {
-                            onItemClick(MenuItem.ShowQrCode(it))
-                            expanded = false
-                        })
-                        DropdownMenuItem(
-                            text = {
-                                Text(
+                                contentDescription =
                                     if (account.isFavourite == 1L) {
                                         stringResource(R.string.remove_from_favourites)
                                     } else {
                                         stringResource(R.string.add_to_favourites)
                                     },
-                                )
-                            },
-                            onClick = {
-                                onItemClick(MenuItem.FavouriteClick(account))
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    if (account.isFavourite == 1L) {
-                                        TablerIcons.StarOff
-                                    } else {
-                                        TablerIcons.Star
+                            )
+                        }
+
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                TablerIcons.DotsVertical,
+                                contentDescription = stringResource(R.string.more_options),
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(copyLinkText) },
+                                onClick = {
+                                    val clipboard =
+                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast
+                                        .makeText(context, linkCopiedText, Toast.LENGTH_SHORT)
+                                        .show()
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Copy,
+                                        contentDescription = copyLinkText,
+                                    )
+                                },
+                            )
+                            // Display last opened time
+                            if (account.lastOpenedAt != null) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(
+                                                R.string.last_opened,
+                                                formatDateTime(account.lastOpenedAt),
+                                            ),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
                                     },
-                                    contentDescription =
+                                    onClick = { },
+                                    enabled = false,
+                                )
+                            }
+                            ShortcutMenuItem(account, {
+                                onItemClick(MenuItem.Shortcut(it))
+                                expanded = false
+                            })
+                            ShowQRCodeMenuItem(account, {
+                                onItemClick(MenuItem.ShowQrCode(it))
+                                expanded = false
+                            })
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
                                         if (account.isFavourite == 1L) {
                                             stringResource(R.string.remove_from_favourites)
                                         } else {
                                             stringResource(R.string.add_to_favourites)
                                         },
-                                )
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.edit)) },
-                            onClick = {
-                                onItemClick(MenuItem.Edit(account))
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Edit,
-                                    contentDescription = stringResource(R.string.edit),
-                                )
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.reset_opened_count)) },
-                            onClick = {
-                                onItemClick(MenuItem.ResetCounter(account))
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Refresh,
-                                    contentDescription = stringResource(R.string.reset_opened_count),
-                                )
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.delete)) },
-                            onClick = {
-                                onItemClick(MenuItem.Delete(account))
-                                expanded = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    TablerIcons.Trash,
-                                    contentDescription = stringResource(R.string.delete),
-                                )
-                            },
-                        )
+                                    )
+                                },
+                                onClick = {
+                                    onItemClick(MenuItem.FavouriteClick(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        if (account.isFavourite == 1L) {
+                                            TablerIcons.StarOff
+                                        } else {
+                                            TablerIcons.Star
+                                        },
+                                        contentDescription =
+                                            if (account.isFavourite == 1L) {
+                                                stringResource(R.string.remove_from_favourites)
+                                            } else {
+                                                stringResource(R.string.add_to_favourites)
+                                            },
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                onClick = {
+                                    onItemClick(MenuItem.Edit(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.reset_opened_count)) },
+                                onClick = {
+                                    onItemClick(MenuItem.ResetCounter(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Refresh,
+                                        contentDescription = stringResource(R.string.reset_opened_count),
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(R.string.delete),
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
+                                    )
+                                },
+                                onClick = {
+                                    onItemClick(MenuItem.Delete(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Trash,
+                                        contentDescription = stringResource(R.string.delete),
+                                    )
+                                },
+                            )
+                        }
                     }
+                    Text(
+                        text = stringResource(R.string.opened_count, account.openedCount),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
 

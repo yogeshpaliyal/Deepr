@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
+import android.R.attr.label
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +26,6 @@ import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -37,6 +36,9 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -255,23 +257,28 @@ fun HomeScreen(
                         }
                     },
                 )
+
+                val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
                 // Favourite filter tabs
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
-                    FilterChip(
-                        selected = favouriteFilter == -1,
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    SegmentedButton(
+                        shape =
+                            SegmentedButtonDefaults.itemShape(
+                                index = 0,
+                                count = 2,
+                            ),
                         onClick = { viewModel.setFavouriteFilter(-1) },
+                        selected = favouriteFilter == -1,
                         label = { Text(stringResource(R.string.all)) },
                     )
-                    FilterChip(
-                        selected = favouriteFilter == 1,
+                    SegmentedButton(
+                        shape =
+                            SegmentedButtonDefaults.itemShape(
+                                index = 1,
+                                count = 2,
+                            ),
                         onClick = { viewModel.setFavouriteFilter(1) },
+                        selected = favouriteFilter == 1,
                         label = { Text(stringResource(R.string.favourites)) },
                     )
                 }
