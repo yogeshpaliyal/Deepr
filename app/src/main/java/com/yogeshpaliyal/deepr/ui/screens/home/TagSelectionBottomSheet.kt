@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +24,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -170,12 +170,12 @@ fun TagSelectionBottomSheet(
                             .makeText(context, context.getString(R.string.tag_deleted_successfully), Toast.LENGTH_SHORT)
                             .show()
                     }
-                }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+                }) {
                     Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
-                Button(onClick = {
+                OutlinedButton(onClick = {
                     isTagDeleteEnable = null
                 }) {
                     Text(stringResource(R.string.cancel))
