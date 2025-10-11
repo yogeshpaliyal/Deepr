@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Canvas
-import android.util.Log
 import android.widget.Toast
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
@@ -18,7 +17,6 @@ fun openDeeplink(
     if (!isValidDeeplink(link)) return false
     val normalizedLink = normalizeLink(link)
     return try {
-        Log.d("Anas", "opened")
         val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
         context.startActivity(intent)
         true

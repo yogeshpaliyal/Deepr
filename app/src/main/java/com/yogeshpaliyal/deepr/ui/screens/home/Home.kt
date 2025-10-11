@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import android.R.attr.label
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -261,7 +260,12 @@ fun HomeScreen(
 
                 val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
                 // Favourite filter tabs
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                SingleChoiceSegmentedButtonRow(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                ) {
                     SegmentedButton(
                         shape =
                             SegmentedButtonDefaults.itemShape(
@@ -462,6 +466,7 @@ fun Content(
                         viewModel.incrementOpenedCount(it.item.id)
                         openDeeplink(context, it.item.link)
                     }
+
                     is MenuItem.Delete -> showDeleteConfirmDialog = it.item
                     is MenuItem.Edit -> editDeepr(it.item)
                     is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
@@ -469,9 +474,11 @@ fun Content(
                         viewModel.resetOpenedCount(it.item.id)
                         Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
                     }
+
                     is MenuItem.Shortcut -> {
                         showShortcutDialog = it.item
                     }
+
                     is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
                 }
             },

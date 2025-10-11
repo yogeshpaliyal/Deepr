@@ -112,21 +112,25 @@ fun TagSelectionBottomSheet(
                     val result = editTag(Tags(tag.id, tag.name))
                     if (result.isFailure) {
                         val exception = result.exceptionOrNull()
-                        when (exception) {
-                            is SQLiteConstraintException -> {
-                                tagEditError = context.getString(R.string.tag_name_exists)
-                            }
+                        tagEditError =
+                            when (exception) {
+                                is SQLiteConstraintException -> {
+                                    context.getString(R.string.tag_name_exists)
+                                }
 
-                            else -> {
-                                tagEditError = context.getString(R.string.failed_to_edit_tag)
+                                else -> {
+                                    context.getString(R.string.failed_to_edit_tag)
+                                }
                             }
-                        }
                     } else {
                         isTagEditEnable = null
                         tagEditError = null
                         Toast
-                            .makeText(context, context.getString(R.string.tag_edited_successfully), Toast.LENGTH_SHORT)
-                            .show()
+                            .makeText(
+                                context,
+                                context.getString(R.string.tag_edited_successfully),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }) {
                     Text(stringResource(R.string.edit))
@@ -161,14 +165,20 @@ fun TagSelectionBottomSheet(
                         Toast
                             .makeText(
                                 context,
-                                context.getString(R.string.failed_to_delete_tag, result.exceptionOrNull()),
+                                context.getString(
+                                    R.string.failed_to_delete_tag,
+                                    result.exceptionOrNull(),
+                                ),
                                 Toast.LENGTH_SHORT,
                             ).show()
                     } else {
                         isTagDeleteEnable = null
                         Toast
-                            .makeText(context, context.getString(R.string.tag_deleted_successfully), Toast.LENGTH_SHORT)
-                            .show()
+                            .makeText(
+                                context,
+                                context.getString(R.string.tag_deleted_successfully),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }) {
                     Text(stringResource(R.string.delete))
@@ -214,7 +224,13 @@ fun TagSelectionBottomSheet(
                             onClick = {
                                 val trimmedTagName = newTagName.trim()
                                 if (trimmedTagName.isNotBlank()) {
-                                    val existingTag = tagsWithCount.find { it.name.equals(trimmedTagName, ignoreCase = true) }
+                                    val existingTag =
+                                        tagsWithCount.find {
+                                            it.name.equals(
+                                                trimmedTagName,
+                                                ignoreCase = true,
+                                            )
+                                        }
 
                                     if (existingTag != null) {
                                         Toast
@@ -257,7 +273,7 @@ fun TagSelectionBottomSheet(
                         colors =
                             if (selectedTag == null) {
                                 ListItemDefaults.colors(
-                                    headlineColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                    headlineColor = MaterialTheme.colorScheme.primary,
                                 )
                             } else {
                                 ListItemDefaults.colors(containerColor = Color.Transparent)
@@ -296,7 +312,7 @@ fun TagSelectionBottomSheet(
                         colors =
                             if (selectedTag?.id == tag.id) {
                                 ListItemDefaults.colors(
-                                    headlineColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                    headlineColor = MaterialTheme.colorScheme.primary,
                                 )
                             } else {
                                 ListItemDefaults.colors(containerColor = Color.Transparent)

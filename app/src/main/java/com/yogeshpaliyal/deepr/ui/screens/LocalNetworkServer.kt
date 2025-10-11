@@ -32,6 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,14 +77,14 @@ fun LocalNetworkServerScreen(
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     // Track if user wants to start the server (used for permission flow)
-    val pendingStart = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var pendingStart by remember { mutableStateOf(false) }
 
     // Request notification permission for Android 13+
     val notificationPermissionState =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
-                if (pendingStart.value) {
-                    pendingStart.value = false
+                if (pendingStart) {
+                    pendingStart = false
                     LocalServerService.startService(context)
                 }
             }
@@ -164,7 +167,7 @@ fun LocalNetworkServerScreen(
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                                         notificationPermissionState?.status?.isGranted == false
                                     ) {
-                                        pendingStart.value = true
+                                        pendingStart = true
                                         notificationPermissionState.launchPermissionRequest()
                                     } else {
                                         LocalServerService.startService(context)
