@@ -23,6 +23,12 @@
 - Save links to markdown file in local storage. (can be used for obsidian)
 - **Local network server:** Access and manage links from other devices on the same network
 
+### Build Variant specific features
+| Feature | Github Release | Play Store | F-droid |
+|---------|----------------|------------|---------|
+|Firebase Analytics | ❌ | ✅ | ❌ |
+|Google Drive Backup (Coming Soon) | ❌ | ✅ | ❌ |
+
 ### 🌐 Local Network Server
 
 The local network server feature allows you to access and manage your links from other devices on the same network. This is useful for:
