@@ -37,8 +37,14 @@ jobs:
       - name: Lint Check
         run: bash ./gradlew lintKotlin
 
-      - name: 🏗 Build APK
+      - name: 🏗 Build Free APK
         run: bash ./gradlew assembleFreeDebug
+
+      - name: 🏗 Build Free Play store APK
+        run: bash ./gradlew assembleFreePlaystoreDebug
+
+      - name: 🏗 Build Pro APK
+        run: bash ./gradlew assembleProDebug
 
       - name: 🚀 Upload APK to Artifacts 📱
         uses: actions/upload-artifact@v4

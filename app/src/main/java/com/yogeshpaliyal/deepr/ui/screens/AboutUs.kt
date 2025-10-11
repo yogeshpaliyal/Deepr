@@ -27,10 +27,13 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.R
@@ -48,6 +51,8 @@ fun AboutUsScreen(
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
 ) {
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Column {
             TopAppBar(
@@ -61,6 +66,7 @@ fun AboutUsScreen(
                         Icon(
                             TablerIcons.ArrowLeft,
                             contentDescription = stringResource(R.string.back),
+                            modifier = if (isRtl) Modifier.scale(-1f, 1f) else Modifier,
                         )
                     }
                 },
@@ -103,7 +109,7 @@ fun AboutUsScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.author),
                         style = MaterialTheme.typography.titleLarge,

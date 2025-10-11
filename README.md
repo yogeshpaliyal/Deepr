@@ -2,7 +2,7 @@
 
 ![./fastlane/metadata/android/en-US/images/featureGraphic.png](./fastlane/metadata/android/en-US/images/featureGraphic.png)
 
-> Deepr is a native Android application designed to streamline the management and testing of deeplinks. It provides a simple and efficient way to store, organize, and launch deeplinks, making it an essential tool for developers and testers.
+> Deepr is a native Android application designed to streamline the management and testing of links. It provides a simple and efficient way to store, organize, and open links.
 
 [![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
@@ -12,15 +12,43 @@
 ![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
 ## 🎩 🪄 Features
-
-- Save and Organize Deeplinks
-- Launch Deeplinks
 - Search
 - Sort
 - Open Counter
 - Home Screen Shortcuts
-- Import/Export Deeplinks
+- Import/Export links
 - QR Code support: Generate and scan
+- Organize links by tags
+- Save link by sharing from other app (eg: chrome, etc.)
+- Save links to markdown file in local storage. (can be used for obsidian)
+- **Local network server:** Access and manage links from other devices on the same network
+
+### Build Variant specific features
+| Feature | Github Release | Play Store | F-droid |
+|---------|----------------|------------|---------|
+|Firebase Analytics | ❌ | ✅ | ❌ |
+|Google Drive Backup (Coming Soon) | ❌ | ✅ | ❌ |
+
+### 🌐 Local Network Server
+
+The local network server feature allows you to access and manage your links from other devices on the same network. This is useful for:
+- Adding links from your desktop browser to your mobile device
+- Viewing your saved links on a bigger screen
+- Integrating with automation tools and scripts
+
+**Usage:**
+1. Open the app and go to Settings
+2. Tap on "Local Network Server"
+3. Toggle the server switch to start it
+4. Use the displayed URL or scan the QR code from another device
+5. Access the web interface or use the REST API
+
+**API Endpoints:**
+- `GET /api/links` - Get all saved links
+- `POST /api/links` - Add a new link (JSON body: `{"link": "url", "name": "name"}`)
+- `GET /api/link-info?url=<url>` - Get metadata for a URL
+
+**Note:** Both devices must be on the same Wi-Fi network.
 
 ## 🏗️ Tech Stack
 
@@ -32,6 +60,7 @@ The application is built using modern Android development practices and librarie
 - **Database:** SQLDelight
 - **Dependency Injection:** Koin
 - **Asynchronous Operations:** Kotlin Coroutines
+- **HTTP Client & Server:** Ktor
 
 ## 📲 Download
 You can download from any of the sources mentioned below.  
@@ -39,11 +68,11 @@ All these sources supports cross platform app updates. for eg: if you've install
   
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
-- Play Store : In Internal testing
+- Play Store : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 > [!IMPORTANT]
-> Need more testers on play store, to make app live on play store, if you're interestn to become a tester please drop a email to yogeshpaliyal.foss@gmail.com  
-> The process is simple send us the email, we will add you to the internal testers list, then you can download the app from this [playstore link](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
+> Need more testers on play store, to make app live on play store, if you're interested to become a tester please join [Google Group for Deepr Internal Testers](https://groups.google.com/u/0/g/deepr-internal-testers)
+> The process is simple Join the group, you will be add you to the internal testers list automatically, then you can download the app from this [playstore link](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 
 ## ✍️ Author
 
@@ -69,29 +98,3 @@ contributions you make are **greatly appreciated**.
 8. Open a pull request
 
 Please make sure to update tests as appropriate.
-
-## 📝 License
-
-```
-MIT License
-
-Copyright (c) 2021 Yogesh Choudhary Paliyal
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
