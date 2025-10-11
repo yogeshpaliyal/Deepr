@@ -6,16 +6,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,6 +21,10 @@ class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : ExportRepository {
+    private val csvWriter by lazy {
+        CsvWriter()
+    }
+
     override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
@@ -42,7 +43,7 @@ class ExportRepositoryImpl(
             if (uri != null) {
                 return@withContext try {
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
-                        writeCsvData(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(context.getString(R.string.export_success, uri.toString()))
                 } catch (e: Exception) {
@@ -68,7 +69,7 @@ class ExportRepositoryImpl(
 
                 if (defaultUri != null) {
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
-                        writeCsvData(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(context.getString(R.string.export_success, "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"))
                 } else {
@@ -85,26 +86,9 @@ class ExportRepositoryImpl(
                 val file = File(downloadsDir, fileName)
 
                 FileOutputStream(file).use { outputStream ->
-                    writeCsvData(outputStream, dataToExportInCsvFormat)
+                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                 }
                 RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
-            }
-        }
-    }
-
-    private fun writeCsvData(
-        outputStream: OutputStream,
-        data: List<Deepr>,
-    ) {
-        outputStream.bufferedWriter().use { writer ->
-            // Write Header
-            writer.write(
-                "${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT},${Constants.Header.NAME}\n",
-            )
-            // Write Data
-            data.forEach { item ->
-                val row = "${item.link},${item.createdAt},${item.openedCount},${item.name}\n"
-                writer.write(row)
             }
         }
     }

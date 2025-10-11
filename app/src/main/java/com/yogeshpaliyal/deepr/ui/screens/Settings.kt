@@ -53,7 +53,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.ui.components.BackupIntervalDialog
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.util.LanguageUtil
@@ -119,9 +118,7 @@ fun SettingsScreen(
     // Collect auto backup preference states
     val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
     val autoBackupLocation by viewModel.autoBackupLocation.collectAsStateWithLifecycle()
-    val autoBackupInterval by viewModel.autoBackupInterval.collectAsStateWithLifecycle()
     val lastBackupTime by viewModel.lastBackupTime.collectAsStateWithLifecycle()
-    var showIntervalDialog by remember { mutableStateOf(false) }
 
     // Launcher for picking sync file location
     val syncFileLauncher =
@@ -157,12 +154,6 @@ fun SettingsScreen(
             }
         }
 
-    LaunchedEffect(storagePermissionState.status) {
-        if (storagePermissionState.status.isGranted) {
-            viewModel.exportCsvData()
-        }
-    }
-
     LaunchedEffect(true) {
         viewModel.exportResultFlow.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -180,15 +171,6 @@ fun SettingsScreen(
     LaunchedEffect(true) {
         viewModel.syncResultFlow.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Handle auto backup scheduling
-    LaunchedEffect(autoBackupEnabled, autoBackupInterval) {
-        if (autoBackupEnabled && autoBackupLocation.isNotEmpty()) {
-            com.yogeshpaliyal.deepr.backup.AutoBackupScheduler.scheduleBackup(context, autoBackupInterval)
-        } else {
-            com.yogeshpaliyal.deepr.backup.AutoBackupScheduler.cancelBackup(context)
         }
     }
 
@@ -260,7 +242,11 @@ fun SettingsScreen(
                     title = stringResource(R.string.export_deeplinks),
                     description = stringResource(R.string.export_deeplinks_description),
                     onClick = {
-                        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
+                        val timeStamp =
+                            SimpleDateFormat(
+                                "yyyyMMdd_HHmmss",
+                                Locale.US,
+                            ).format(Date())
                         csvExportLauncher.launch("deepr_export_$timeStamp.csv")
                     },
                 )
@@ -368,15 +354,6 @@ fun SettingsScreen(
                                 },
                             onClick = {
                                 backupLocationLauncher.launch(null)
-                            },
-                        )
-
-                        SettingsItem(
-                            TablerIcons.InfoCircle,
-                            title = stringResource(R.string.backup_interval),
-                            description = getIntervalText(autoBackupInterval),
-                            onClick = {
-                                showIntervalDialog = true
                             },
                         )
 
@@ -496,30 +473,6 @@ fun SettingsScreen(
                 onDismiss = { showLanguageDialog = false },
             )
         }
-
-        // Backup Interval Selection Dialog
-        if (showIntervalDialog) {
-            BackupIntervalDialog(
-                currentInterval = autoBackupInterval,
-                onIntervalSelect = { selectedInterval ->
-                    viewModel.setAutoBackupInterval(selectedInterval)
-                    showIntervalDialog = false
-                },
-                onDismiss = { showIntervalDialog = false },
-            )
-        }
-    }
-}
-
-@Composable
-fun getIntervalText(intervalMillis: Long): String {
-    return when (intervalMillis) {
-        3600000L -> stringResource(R.string.interval_1_hour)
-        21600000L -> stringResource(R.string.interval_6_hours)
-        43200000L -> stringResource(R.string.interval_12_hours)
-        86400000L -> stringResource(R.string.interval_24_hours)
-        604800000L -> stringResource(R.string.interval_7_days)
-        else -> stringResource(R.string.interval_24_hours)
     }
 }
 

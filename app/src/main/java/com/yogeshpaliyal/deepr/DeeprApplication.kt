@@ -5,6 +5,7 @@ import android.util.Log
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import app.cash.sqldelight.logs.LogSqliteDriver
+import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
@@ -64,11 +65,13 @@ class DeeprApplication : Application() {
 
                 single<SyncRepository> { SyncRepositoryImpl(androidContext(), get(), get()) }
 
+                single<AutoBackupWorker> { AutoBackupWorker(androidContext(), get(), get()) }
+
                 single {
                     HttpClient(CIO)
                 }
 
-                viewModel { AccountViewModel(get(), get(), get(), get(), get()) }
+                viewModel { AccountViewModel(get(), get(), get(), get(), get(), get()) }
 
                 single {
                     HtmlParser()

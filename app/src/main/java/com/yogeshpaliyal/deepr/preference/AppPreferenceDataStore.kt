@@ -70,11 +70,6 @@ class AppPreferenceDataStore(
             preferences[AUTO_BACKUP_LOCATION] ?: "" // Default to empty path
         }
 
-    val getAutoBackupInterval: Flow<Long> =
-        context.appDataStore.data.map { preferences ->
-            preferences[AUTO_BACKUP_INTERVAL] ?: 86400000L // Default to 24 hours in milliseconds
-        }
-
     val getLastBackupTime: Flow<Long> =
         context.appDataStore.data.map { preferences ->
             preferences[LAST_BACKUP_TIME] ?: 0L // Default to 0 (never backed up)

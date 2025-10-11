@@ -1,116 +1,60 @@
 package com.yogeshpaliyal.deepr.backup
 
-import android.content.ContentValues
 import android.content.Context
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import com.yogeshpaliyal.deepr.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class AutoBackupWorker(
-    context: Context,
-    params: WorkerParameters,
-) : CoroutineWorker(context, params),
-    KoinComponent {
-    private val deeprQueries: DeeprQueries by inject()
-    private val preferenceDataStore: AppPreferenceDataStore by inject()
+    val context: Context,
+    val deeprQueries: DeeprQueries,
+    val preferenceDataStore: AppPreferenceDataStore,
+) {
+    private val csvWriter by lazy {
+        CsvWriter()
+    }
 
-    override suspend fun doWork(): Result {
+    suspend fun doWork() {
         return withContext(Dispatchers.IO) {
             try {
                 val enabled = preferenceDataStore.getAutoBackupEnabled.first()
                 if (!enabled) {
-                    return@withContext Result.success()
+                    return@withContext
                 }
 
                 val location = preferenceDataStore.getAutoBackupLocation.first()
                 if (location.isEmpty()) {
-                    return@withContext Result.failure()
+                    return@withContext
                 }
 
                 val count = deeprQueries.countDeepr().executeAsOne()
                 if (count == 0L) {
-                    return@withContext Result.success()
+                    return@withContext
                 }
 
                 val dataToExport = deeprQueries.listDeeprAsc().executeAsList()
                 if (dataToExport.isEmpty()) {
-                    return@withContext Result.success()
+                    return@withContext
                 }
 
-                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                val fileName = "deepr_backup_$timeStamp.csv"
+                if (!location.startsWith("content://")) {
+                    return@withContext
+                }
 
-                val success =
-                    if (location.startsWith("content://")) {
-                        // User selected location via document picker
-                        saveToSelectedLocation(location, fileName, dataToExport)
-                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        // Use MediaStore for Android Q+
-                        saveToMediaStore(fileName, dataToExport)
-                    } else {
-                        // Use file path for older Android versions
-                        saveToExternalStorage(location, fileName, dataToExport)
-                    }
+                val fileName = "deepr_backup.csv"
+
+                val success = saveToSelectedLocation(location, fileName, dataToExport)
 
                 if (success) {
                     // Record backup time on successful completion
                     preferenceDataStore.setLastBackupTime(System.currentTimeMillis())
-                    Result.success()
-                } else {
-                    Result.failure()
                 }
             } catch (e: Exception) {
-                Result.failure()
             }
-        }
-    }
-
-    private fun saveToMediaStore(
-        fileName: String,
-        data: List<com.yogeshpaliyal.deepr.Deepr>,
-    ): Boolean {
-        return try {
-            val contentValues =
-                ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
-                    put(
-                        MediaStore.MediaColumns.RELATIVE_PATH,
-                        "${Environment.DIRECTORY_DOWNLOADS}/Deepr/AutoBackup",
-                    )
-                }
-
-            val resolver = applicationContext.contentResolver
-            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
-            if (uri != null) {
-                resolver.openOutputStream(uri)?.use { outputStream ->
-                    writeCsvData(outputStream, data)
-                }
-                true
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            false
         }
     }
 
@@ -118,21 +62,31 @@ class AutoBackupWorker(
         location: String,
         fileName: String,
         data: List<com.yogeshpaliyal.deepr.Deepr>,
-    ): Boolean {
-        return try {
+    ): Boolean =
+        try {
             // For content:// URIs from document picker, create a new document in that folder
             val locationUri = location.toUri()
-            val documentFile = androidx.documentfile.provider.DocumentFile.fromTreeUri(
-                applicationContext,
-                locationUri,
-            )
-            
-            val newFile = documentFile?.createFile("text/csv", fileName)
-            
-            if (newFile != null) {
-                applicationContext.contentResolver.openOutputStream(newFile.uri)
+            val documentFile =
+                DocumentFile.fromTreeUri(
+                    context,
+                    locationUri,
+                )
+
+            val directory = DocumentFile.fromTreeUri(context, locationUri)
+            var docFile = directory?.findFile(fileName)
+            if (docFile == null) {
+                docFile =
+                    DocumentFile.fromTreeUri(context, locationUri)?.createFile(
+                        "text/csv",
+                        fileName,
+                    )
+            }
+
+            if (docFile != null) {
+                context.contentResolver
+                    .openOutputStream(docFile.uri, "wt")
                     ?.use { outputStream ->
-                        writeCsvData(outputStream, data)
+                        csvWriter.writeToCsv(outputStream, data)
                     }
                 true
             } else {
@@ -141,43 +95,4 @@ class AutoBackupWorker(
         } catch (e: Exception) {
             false
         }
-    }
-
-    private fun saveToExternalStorage(
-        location: String,
-        fileName: String,
-        data: List<com.yogeshpaliyal.deepr.Deepr>,
-    ): Boolean {
-        return try {
-            val downloadsDir = File(location)
-            if (!downloadsDir.exists()) {
-                downloadsDir.mkdirs()
-            }
-
-            val file = File(downloadsDir, fileName)
-            FileOutputStream(file).use { outputStream ->
-                writeCsvData(outputStream, data)
-            }
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun writeCsvData(
-        outputStream: OutputStream,
-        data: List<com.yogeshpaliyal.deepr.Deepr>,
-    ) {
-        outputStream.bufferedWriter().use { writer ->
-            // Write Header
-            writer.write(
-                "${Constants.Header.LINK},${Constants.Header.CREATED_AT},${Constants.Header.OPENED_COUNT},${Constants.Header.NAME}\n",
-            )
-            // Write Data
-            data.forEach { item ->
-                val row = "${item.link},${item.createdAt},${item.openedCount},${item.name}\n"
-                writer.write(row)
-            }
-        }
-    }
 }
