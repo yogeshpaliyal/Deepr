@@ -127,6 +127,7 @@ fun HomeScreen(
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
     val totalLinks = viewModel.countOfLinks.collectAsStateWithLifecycle()
+    val favouriteLinks = viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -174,7 +175,7 @@ fun HomeScreen(
                     if (searchBarState.currentValue == SearchBarValue.Collapsed) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.search) + " (" + totalLinks.value + ")",
+                            text = stringResource(R.string.search),
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -269,7 +270,7 @@ fun HomeScreen(
                             ),
                         onClick = { viewModel.setFavouriteFilter(-1) },
                         selected = favouriteFilter == -1,
-                        label = { Text(stringResource(R.string.all)) },
+                        label = { Text(stringResource(R.string.all) + " (${totalLinks.value ?: 0})") },
                     )
                     SegmentedButton(
                         shape =
@@ -279,7 +280,7 @@ fun HomeScreen(
                             ),
                         onClick = { viewModel.setFavouriteFilter(1) },
                         selected = favouriteFilter == 1,
-                        label = { Text(stringResource(R.string.favourites)) },
+                        label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks.value ?: 0})") },
                     )
                 }
             }
