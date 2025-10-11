@@ -110,9 +110,14 @@ fun HomeBottomContent(
         }
     }
 
-    val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
+    val save: (executeAfterSave: Boolean) -> Unit = save@{ executeAfterSave ->
         // Normalize the link before saving
         val normalizedLink = normalizeLink(deeprInfo.link)
+
+        if (deeprQueries.getDeeprByLink(normalizedLink).executeAsOneOrNull() != null) {
+            Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
+            return@save
+        }
 
         // Remove unselected tags
         val initialTagIds = initialSelectedTags.map { it.id }.toSet()
