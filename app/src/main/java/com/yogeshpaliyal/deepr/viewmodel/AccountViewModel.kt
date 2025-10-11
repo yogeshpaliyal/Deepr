@@ -11,6 +11,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.data.LinkInfo
@@ -70,6 +71,7 @@ class AccountViewModel(
     private val importRepository: ImportRepository,
     private val syncRepository: SyncRepository,
     private val networkRepository: NetworkRepository,
+    private val autoBackupWorker: AutoBackupWorker,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
@@ -390,6 +392,37 @@ class AccountViewModel(
         }
     }
 
+    // Auto backup preference methods
+    val autoBackupEnabled =
+        preferenceDataStore.getAutoBackupEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val autoBackupLocation =
+        preferenceDataStore.getAutoBackupLocation
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val lastBackupTime =
+        preferenceDataStore.getLastBackupTime
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
+    fun setAutoBackupEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupEnabled(enabled)
+        }
+    }
+
+    fun setAutoBackupLocation(location: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupLocation(location)
+        }
+    }
+
+    fun setAutoBackupInterval(interval: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setAutoBackupInterval(interval)
+        }
+    }
+
     // Sync preference methods
     val syncEnabled =
         preferenceDataStore.getSyncEnabled
@@ -419,6 +452,7 @@ class AccountViewModel(
 
     fun syncToMarkdown() {
         viewModelScope.launch(Dispatchers.IO) {
+            autoBackupWorker.doWork()
             val isEnabled = preferenceDataStore.getSyncEnabled.first()
             if (!isEnabled) {
                 return@launch

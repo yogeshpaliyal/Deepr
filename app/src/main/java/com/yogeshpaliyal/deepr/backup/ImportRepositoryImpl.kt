@@ -2,6 +2,7 @@ package com.yogeshpaliyal.deepr.backup
 
 import android.content.Context
 import android.net.Uri
+import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import com.opencsv.exceptions.CsvException
 import com.yogeshpaliyal.deepr.DeeprQueries
@@ -20,8 +21,12 @@ class ImportRepositoryImpl(
         try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.reader().use { reader ->
+                    val customParser =
+                        CSVParserBuilder()
+                            .build()
                     val csvReader =
                         CSVReaderBuilder(reader)
+                            .withCSVParser(customParser)
                             .build()
 
                     // verify header first
