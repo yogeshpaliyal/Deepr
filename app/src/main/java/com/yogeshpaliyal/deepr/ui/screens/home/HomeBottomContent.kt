@@ -34,7 +34,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
@@ -83,7 +83,7 @@ fun HomeBottomContent(
     var isFetchingMetadata by remember { mutableStateOf(false) }
     // Tags
     var newTagName by remember { mutableStateOf("") }
-    val allTags by viewModel.allTags.collectAsState()
+    val allTags by viewModel.allTags.collectAsStateWithLifecycle()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
     val isCreate = selectedLink.id == 0L
@@ -98,8 +98,7 @@ fun HomeBottomContent(
                         selectedLink.tagsNames
                             ?.split(",")
                             ?.getOrNull(index)
-                            ?.trim()
-                            ?.toString() ?: "Unknown",
+                            ?.trim() ?: "Unknown",
                     )
                 }
             selectedTags.clear()
@@ -130,7 +129,12 @@ fun HomeBottomContent(
             // Edit
             viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags)
         }
-        onSaveDialogInfoChange(SaveDialogInfo(deeprInfo.copy(link = normalizedLink), executeAfterSave))
+        onSaveDialogInfoChange(
+            SaveDialogInfo(
+                deeprInfo.copy(link = normalizedLink),
+                executeAfterSave,
+            ),
+        )
     }
 
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
