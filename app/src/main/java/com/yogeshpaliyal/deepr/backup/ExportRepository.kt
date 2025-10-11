@@ -9,5 +9,5 @@ data class ExportResult(
 )
 
 interface ExportRepository {
-    suspend fun exportToCsv(): RequestResult<ExportResult>
+    suspend fun exportToCsv(uri: Uri?): RequestResult<ExportResult>
 }

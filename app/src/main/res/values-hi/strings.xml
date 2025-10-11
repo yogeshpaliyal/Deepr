@@ -31,6 +31,7 @@
     <string name="remove_tag">टैग हटाएं</string>
     <string name="failed_to_fetch_metadata">मेटाडेटा प्राप्त करने में विफल</string>
     <string name="opened_count">खोला गया: %d</string>
+    <string name="last_opened">अंतिम बार खोला गया: %s</string>
     <string name="tags_label">टैग:</string>
     <string name="suggestions_label">सुझाव:</string>
     <string name="filter">फ़िल्टर</string>

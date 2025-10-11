@@ -1,8 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import android.R.attr.label
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -38,6 +36,9 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -70,6 +71,7 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
+import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
@@ -125,6 +127,7 @@ fun HomeScreen(
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
     val totalLinks = viewModel.countOfLinks.collectAsStateWithLifecycle()
+    val favouriteLinks = viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -147,7 +150,8 @@ fun HomeScreen(
         if (!sharedText?.url.isNullOrBlank() && selectedLink == null) {
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
-                selectedLink = createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
+                selectedLink =
+                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -171,7 +175,7 @@ fun HomeScreen(
                     if (searchBarState.currentValue == SearchBarValue.Collapsed) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.search) + " (" + totalLinks.value + ")",
+                            text = stringResource(R.string.search),
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -254,6 +258,31 @@ fun HomeScreen(
                         }
                     },
                 )
+
+                val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
+                // Favourite filter tabs
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    SegmentedButton(
+                        shape =
+                            SegmentedButtonDefaults.itemShape(
+                                index = 0,
+                                count = 2,
+                            ),
+                        onClick = { viewModel.setFavouriteFilter(-1) },
+                        selected = favouriteFilter == -1,
+                        label = { Text(stringResource(R.string.all) + " (${totalLinks.value ?: 0})") },
+                    )
+                    SegmentedButton(
+                        shape =
+                            SegmentedButtonDefaults.itemShape(
+                                index = 1,
+                                count = 2,
+                            ),
+                        onClick = { viewModel.setFavouriteFilter(1) },
+                        selected = favouriteFilter == 1,
+                        label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks.value ?: 0})") },
+                    )
+                }
             }
         },
         bottomBar = {
@@ -341,7 +370,7 @@ fun HomeScreen(
 
         if (isTagsSelectionActive) {
             TagSelectionBottomSheet(
-                tags = viewModel.allTags.collectAsStateWithLifecycle().value,
+                tagsWithCount = viewModel.allTagsWithCount.collectAsStateWithLifecycle().value,
                 selectedTag = selectedTag.value,
                 dismissBottomSheet = {
                     isTagsSelectionActive = false
@@ -392,6 +421,7 @@ fun Content(
         val context = LocalContext.current
         var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
         var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+        var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
         showShortcutDialog?.let { deepr ->
             CreateShortcutDialog(
@@ -406,6 +436,17 @@ fun Content(
             }
         }
 
+        showDeleteConfirmDialog?.let { deepr ->
+            DeleteConfirmationDialog(
+                deepr = deepr,
+                onDismiss = { showDeleteConfirmDialog = null },
+                onConfirm = {
+                    viewModel.deleteAccount(it.id)
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                },
+            )
+        }
+
         DeeprList(
             modifier =
                 Modifier
@@ -416,26 +457,23 @@ fun Content(
             accounts = accounts!!,
             selectedTag = selectedTag,
             onItemClick = {
-                viewModel.incrementOpenedCount(it.id)
-                openDeeplink(context, it.link)
-            },
-            onRemoveClick = {
-                viewModel.deleteAccount(it.id)
-                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-            },
-            onShortcutClick = {
-                showShortcutDialog = it
-            },
-            onEditClick = editDeepr,
-            onItemLongClick = {
-                val clipboard =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Link copied", it.link)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(context, "Link copied", Toast.LENGTH_SHORT).show()
-            },
-            onQrCodeCLick = {
-                showQrCodeDialog = it
+                when (it) {
+                    is MenuItem.Click -> {
+                        viewModel.incrementOpenedCount(it.item.id)
+                        openDeeplink(context, it.item.link)
+                    }
+                    is MenuItem.Delete -> showDeleteConfirmDialog = it.item
+                    is MenuItem.Edit -> editDeepr(it.item)
+                    is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
+                    is MenuItem.ResetCounter -> {
+                        viewModel.resetOpenedCount(it.item.id)
+                        Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+                    }
+                    is MenuItem.Shortcut -> {
+                        showShortcutDialog = it.item
+                    }
+                    is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
+                }
             },
             onTagClick = {
                 if (viewModel.selectedTagFilter.value?.name == it) {
@@ -453,12 +491,7 @@ fun DeeprList(
     accounts: List<GetLinksAndTags>,
     selectedTag: Tags?,
     contentPaddingValues: PaddingValues,
-    onItemClick: (GetLinksAndTags) -> Unit,
-    onRemoveClick: (GetLinksAndTags) -> Unit,
-    onShortcutClick: (GetLinksAndTags) -> Unit,
-    onEditClick: (GetLinksAndTags) -> Unit,
-    onItemLongClick: (GetLinksAndTags) -> Unit,
-    onQrCodeCLick: (GetLinksAndTags) -> Unit,
+    onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -522,11 +555,6 @@ fun DeeprList(
                     account = account,
                     selectedTag = selectedTag,
                     onItemClick = onItemClick,
-                    onRemoveClick = onRemoveClick,
-                    onShortcutClick = onShortcutClick,
-                    onEditClick = onEditClick,
-                    onItemLongClick = onItemLongClick,
-                    onQrCodeClick = onQrCodeCLick,
                     onTagClick = onTagClick,
                 )
             }

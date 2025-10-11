@@ -3,7 +3,8 @@ id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
 name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-openedCount INTEGER NOT NULL DEFAULT 0
+openedCount INTEGER NOT NULL DEFAULT 0,
+isFavourite INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Tags (
@@ -19,6 +20,13 @@ FOREIGN KEY (linkId) REFERENCES Deepr(id) ON DELETE CASCADE,
 FOREIGN KEY (tagId) REFERENCES Tags(id) ON DELETE CASCADE
 );
 
+CREATE TABLE DeeprOpenLog (
+id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+deeplinkId INTEGER NOT NULL,
+openedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (deeplinkId) REFERENCES Deepr(id) ON DELETE CASCADE
+);
+
 lastInsertRowId:
 SELECT last_insert_rowid();
 
@@ -32,16 +40,31 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  Deepr.isFavourite,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
 FROM
   Deepr
+  LEFT JOIN (
+        -- Subquery to find the single latest log entry per deeplink
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
   (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
   AND (
     ? = '' OR Tags.id = ?
+  )
+  AND (
+    ? = -1 OR Deepr.isFavourite = ?
   )
 GROUP BY
   Deepr.id
@@ -76,9 +99,20 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
+  LEFT JOIN (
+      -- Subquery to find the single latest log entry per deeplink
+      SELECT
+        deeplinkId,
+        MAX(openedAt) AS lastOpenedAt
+      FROM
+        DeeprOpenLog
+      GROUP BY
+        deeplinkId
+    ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 GROUP BY
@@ -91,6 +125,9 @@ DELETE FROM Deepr WHERE id = ?;
 
 incrementOpenedCount:
 UPDATE Deepr SET openedCount = openedCount + 1 WHERE id = ?;
+
+resetOpenedCount:
+UPDATE Deepr SET openedCount = 0 WHERE id = ?;
 
 updateDeeplink:
 UPDATE Deepr SET link = ? , name = ? WHERE id = ?;
@@ -112,8 +149,21 @@ SELECT * FROM Tags WHERE name = ?;
 getAllTags:
 SELECT * FROM Tags ORDER BY name;
 
+getAllTagsWithCount:
+SELECT 
+  Tags.id,
+  Tags.name,
+  COUNT(LinkTags.linkId) AS linkCount
+FROM Tags
+LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
+GROUP BY Tags.id, Tags.name
+ORDER BY Tags.name;
+
 countOfLinks:
 SELECT count(*) FROM Deepr;
+
+countOfFavouriteLinks:
+SELECT count(*) FROM Deepr WHERE isFavourite = 1;
 
 
 -- Link-Tag relations
@@ -141,3 +191,17 @@ SELECT Tags.id,Tags.name FROM Tags INNER JOIN LinkTags ON Tags.id = LinkTags.tag
 
 hasTagLinks:
 SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;
+
+-- Deeplink Open Log operations
+insertDeeprOpenLog:
+INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
+
+getLastOpenedTime:
+SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
+
+toggleFavourite:
+UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE id = ?;
+
+setFavourite:
+UPDATE Deepr SET isFavourite = ? WHERE id = ?;
+

@@ -31,6 +31,7 @@
     <string name="remove_tag">Eliminar etiqueta</string>
     <string name="failed_to_fetch_metadata">Error al obtener metadatos</string>
     <string name="opened_count">Abierto: %d</string>
+    <string name="last_opened">Último abierto: %s</string>
     <string name="tags_label">Etiquetas:</string>
     <string name="suggestions_label">Sugerencias:</string>
     <string name="filter">Filtrar</string>

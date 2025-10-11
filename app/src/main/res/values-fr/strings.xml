@@ -31,6 +31,7 @@
     <string name="remove_tag">Supprimer l\'étiquette</string>
     <string name="failed_to_fetch_metadata">Échec de la récupération des métadonnées</string>
     <string name="opened_count">Ouvert : %d</string>
+    <string name="last_opened">Dernière ouverture : %s</string>
     <string name="tags_label">Étiquettes :</string>
     <string name="suggestions_label">Suggestions :</string>
     <string name="filter">Filtrer</string>

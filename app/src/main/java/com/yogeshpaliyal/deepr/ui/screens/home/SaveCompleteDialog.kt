@@ -20,4 +20,6 @@ fun createDeeprObject(
         openedCount = openedCount,
         tagsNames = "",
         tagsIds = "",
+        lastOpenedAt = "",
+        isFavourite = 0,
     )

@@ -25,7 +25,7 @@ class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : ExportRepository {
-    override suspend fun exportToCsv(): RequestResult<ExportResult> {
+    override suspend fun exportToCsv(uri: Uri?): RequestResult<ExportResult> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
             return RequestResult.Error(context.getString(R.string.no_data_to_export))
@@ -39,6 +39,19 @@ class ExportRepositoryImpl(
         val fileName = "deepr_export_$timeStamp.csv"
 
         return withContext(Dispatchers.IO) {
+            // If URI is provided, export to that location
+            if (uri != null) {
+                return@withContext try {
+                    context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
+                        writeCsvData(outputStream, dataToExportInCsvFormat)
+                    }
+                    RequestResult.Success(context.getString(R.string.export_success, uri.toString()))
+                } catch (e: Exception) {
+                    RequestResult.Error(context.getString(R.string.export_failed))
+                }
+            }
+
+            // Default behavior: export to Downloads/Deepr folder
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val contentValues =
                     ContentValues().apply {
@@ -51,11 +64,11 @@ class ExportRepositoryImpl(
                     }
 
                 val resolver = context.contentResolver
-                val uri =
+                val defaultUri =
                     resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
 
-                if (uri != null) {
-                    resolver.openOutputStream(uri)?.use { outputStream ->
+                if (defaultUri != null) {
+                    resolver.openOutputStream(defaultUri)?.use { outputStream ->
                         writeCsvData(outputStream, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(

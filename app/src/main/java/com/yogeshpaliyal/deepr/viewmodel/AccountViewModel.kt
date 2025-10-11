@@ -8,6 +8,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.ExportRepository
@@ -83,9 +84,25 @@ class AccountViewModel(
                 viewModelScope.coroutineContext,
             ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
+    val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
+        deeprQueries
+            .getAllTagsWithCount()
+            .asFlow()
+            .mapToList(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
     val countOfLinks: StateFlow<Long?> =
         deeprQueries
             .countOfLinks()
+            .asFlow()
+            .mapToOneOrNull(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
+    val countOfFavouriteLinks: StateFlow<Long?> =
+        deeprQueries
+            .countOfFavouriteLinks()
             .asFlow()
             .mapToOneOrNull(
                 viewModelScope.coroutineContext,
@@ -118,9 +135,18 @@ class AccountViewModel(
     private val _selectedTagFilter = MutableStateFlow<Tags?>(null)
     val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
 
+    // State for favourite filter (-1 = All, 0 = Not Favourite, 1 = Favourite)
+    private val _favouriteFilter = MutableStateFlow<Int>(-1)
+    val favouriteFilter: StateFlow<Int> = _favouriteFilter
+
     // Set tag filter
     fun setTagFilter(tag: Tags?) {
         _selectedTagFilter.value = tag
+    }
+
+    // Set favourite filter
+    fun setFavouriteFilter(filter: Int) {
+        _favouriteFilter.value = filter
     }
 
     // Remove tag from link
@@ -184,18 +210,23 @@ class AccountViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accounts: StateFlow<List<GetLinksAndTags>?> =
-        combine(searchQuery, sortOrder, selectedTagFilter) { query, sorting, tag ->
-            Triple(query, sorting, tag)
+        combine(searchQuery, sortOrder, selectedTagFilter, favouriteFilter) { query, sorting, tag, favourite ->
+            listOf(query, sorting, tag, favourite)
         }.flatMapLatest { combined ->
-            val sorting = combined.second.split("_")
+            val query = combined[0] as String
+            val sorting = (combined[1] as String).split("_")
+            val tag = combined[2] as Tags?
+            val favourite = combined[3] as Int
             val sortField = sorting.getOrNull(0) ?: "createdAt"
             val sortType = sorting.getOrNull(1) ?: "DESC"
             deeprQueries
                 .getLinksAndTags(
-                    combined.first,
-                    combined.first,
-                    combined.third?.id?.toString() ?: "",
-                    combined.third?.id,
+                    query,
+                    query,
+                    tag?.id?.toString() ?: "",
+                    tag?.id,
+                    favourite.toLong(),
+                    favourite.toLong(),
                     sortType,
                     sortField,
                     sortType,
@@ -282,6 +313,19 @@ class AccountViewModel(
     fun incrementOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
+            deeprQueries.insertDeeprOpenLog(id)
+        }
+    }
+
+    fun resetOpenedCount(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.resetOpenedCount(id)
+        }
+    }
+
+    fun toggleFavourite(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deeprQueries.toggleFavourite(id)
         }
     }
 
@@ -298,9 +342,9 @@ class AccountViewModel(
         }
     }
 
-    fun exportCsvData() {
+    fun exportCsvData(uri: Uri? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = exportRepository.exportToCsv()
+            val result = exportRepository.exportToCsv(uri)
             when (result) {
                 is RequestResult.Success -> {
                     exportResultChannel.send("Export completed: ${result.data.message}")
