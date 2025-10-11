@@ -3,7 +3,8 @@ id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
 name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-openedCount INTEGER NOT NULL DEFAULT 0
+openedCount INTEGER NOT NULL DEFAULT 0,
+isFavourite INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Tags (
@@ -39,6 +40,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  Deepr.isFavourite,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
@@ -60,6 +62,9 @@ WHERE
   (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
   AND (
     ? = '' OR Tags.id = ?
+  )
+  AND (
+    ? = -1 OR Deepr.isFavourite = ?
   )
 GROUP BY
   Deepr.id
@@ -157,6 +162,9 @@ ORDER BY Tags.name;
 countOfLinks:
 SELECT count(*) FROM Deepr;
 
+countOfFavouriteLinks:
+SELECT count(*) FROM Deepr WHERE isFavourite = 1;
+
 
 -- Link-Tag relations
 addTagToLink:
@@ -190,4 +198,10 @@ INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
 
 getLastOpenedTime:
 SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
+
+toggleFavourite:
+UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE id = ?;
+
+setFavourite:
+UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 

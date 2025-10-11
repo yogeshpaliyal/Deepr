@@ -1,8 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
-import android.Manifest
 import android.content.Intent
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,8 +50,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
@@ -89,13 +85,22 @@ fun SettingsScreen(
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     val launcherActivityPickResult =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument(),
         ) { uri ->
             uri?.let {
                 viewModel.importCsvData(it)
+            }
+        }
+
+    // Launcher for picking CSV export location
+    val csvExportLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("text/csv"),
+        ) { uri ->
+            uri?.let {
+                viewModel.exportCsvData(it)
             }
         }
 
@@ -255,15 +260,8 @@ fun SettingsScreen(
                     title = stringResource(R.string.export_deeplinks),
                     description = stringResource(R.string.export_deeplinks_description),
                     onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            viewModel.exportCsvData()
-                        } else {
-                            if (storagePermissionState.status.isGranted) {
-                                viewModel.exportCsvData()
-                            } else {
-                                storagePermissionState.launchPermissionRequest()
-                            }
-                        }
+                        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
+                        csvExportLauncher.launch("deepr_export_$timeStamp.csv")
                     },
                 )
             }
