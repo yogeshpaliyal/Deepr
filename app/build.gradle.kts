@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
-    id("org.jmailen.kotlinter")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.kotlinter)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 android {
@@ -136,8 +136,8 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.zxing.scanner)
     ktlint(libs.ktlint)
-    implementation("dev.chrisbanes.haze:haze:1.6.9")
-    implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
     implementation(libs.jsoup)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
@@ -155,7 +155,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics.ndk)
 
-    // Add Firebase dependencies to pro and freePlaystore flavors specifically
+    // Add Firebase dependencies to pro and freePlayStore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)
