@@ -35,6 +35,11 @@ jobs:
           TYPE: ${{ inputs.type }}
           RELEASE_NOTES: ${{ inputs.releaseNote }}
 
+      - name: 🏗 Disable Firebase
+        id: disable-firebase
+        run: |
+          bash ./scripts/enableDisableFirebase.sh false
+
       - name: Git Add and Commit
         run: |
           git config --global user.name 'Yogesh Choudhary Paliyal'

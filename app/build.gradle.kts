@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
     id("org.jmailen.kotlinter")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+//     id("com.google.gms.google-services")
+//     id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -149,12 +149,7 @@ dependencies {
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
     implementation(libs.androidx.work.runtime.ktx)
-
-    // Firebase dependencies - use platform BOM and then add implementations
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics.ndk)
-
+    
     // Add Firebase dependencies to pro and freePlaystore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
