@@ -114,7 +114,7 @@ fun HomeBottomContent(
         // Normalize the link before saving
         val normalizedLink = normalizeLink(deeprInfo.link)
 
-        if (deeprQueries.getDeeprByLink(normalizedLink).executeAsOneOrNull() != null) {
+        if (isCreate && deeprQueries.getDeeprByLink(normalizedLink).executeAsOneOrNull() != null) {
             Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
             return@save
         }
