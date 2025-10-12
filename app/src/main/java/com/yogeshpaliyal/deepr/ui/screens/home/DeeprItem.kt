@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -43,8 +47,6 @@ import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Refresh
-import compose.icons.tablericons.Star
-import compose.icons.tablericons.StarOff
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -97,9 +99,7 @@ fun DeeprItem(
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
 
-    // Extract string resources at Composable level
-    val copyLinkText = stringResource(R.string.copy_link)
-    val linkCopiedText = stringResource(R.string.link_copied)
+    val linkCopied = stringResource(R.string.link_copied)
 
     Card(
         colors =
@@ -114,9 +114,9 @@ fun DeeprItem(
                     onLongClick = {
                         val clipboard =
                             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                        val clip = ClipData.newPlainText(linkCopied, account.link)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, linkCopiedText, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, linkCopied, Toast.LENGTH_SHORT).show()
                     },
                 ),
     ) {
@@ -161,11 +161,12 @@ fun DeeprItem(
                             onItemClick(MenuItem.FavouriteClick(account))
                         }) {
                             Icon(
-                                if (account.isFavourite == 1L) {
-                                    TablerIcons.StarOff
-                                } else {
-                                    TablerIcons.Star
-                                },
+                                imageVector =
+                                    if (account.isFavourite == 1L) {
+                                        Icons.Rounded.Star
+                                    } else {
+                                        Icons.Rounded.StarBorder
+                                    },
                                 contentDescription =
                                     if (account.isFavourite == 1L) {
                                         stringResource(R.string.remove_from_favourites)
@@ -178,6 +179,7 @@ fun DeeprItem(
                                     } else {
                                         MaterialTheme.colorScheme.onSurface
                                     },
+                                modifier = Modifier.size(28.dp),
                             )
                         }
 
@@ -193,21 +195,21 @@ fun DeeprItem(
                             onDismissRequest = { expanded = false },
                         ) {
                             DropdownMenuItem(
-                                text = { Text(copyLinkText) },
+                                text = { Text(stringResource(R.string.copy_link)) },
                                 onClick = {
                                     val clipboard =
                                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newPlainText(linkCopiedText, account.link)
+                                    val clip = ClipData.newPlainText(linkCopied, account.link)
                                     clipboard.setPrimaryClip(clip)
                                     Toast
-                                        .makeText(context, linkCopiedText, Toast.LENGTH_SHORT)
+                                        .makeText(context, linkCopied, Toast.LENGTH_SHORT)
                                         .show()
                                     expanded = false
                                 },
                                 leadingIcon = {
                                     Icon(
                                         TablerIcons.Copy,
-                                        contentDescription = copyLinkText,
+                                        contentDescription = stringResource(R.string.copy_link),
                                     )
                                 },
                             )
@@ -216,10 +218,7 @@ fun DeeprItem(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            stringResource(
-                                                R.string.last_opened,
-                                                formatDateTime(account.lastOpenedAt),
-                                            ),
+                                            stringResource(R.string.last_opened, formatDateTime(account.lastOpenedAt)),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
@@ -252,11 +251,12 @@ fun DeeprItem(
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        if (account.isFavourite == 1L) {
-                                            TablerIcons.StarOff
-                                        } else {
-                                            TablerIcons.Star
-                                        },
+                                        imageVector =
+                                            if (account.isFavourite == 1L) {
+                                                Icons.Rounded.Star
+                                            } else {
+                                                Icons.Rounded.StarBorder
+                                            },
                                         contentDescription =
                                             if (account.isFavourite == 1L) {
                                                 stringResource(R.string.remove_from_favourites)

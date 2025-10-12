@@ -216,6 +216,18 @@ fun TagSelectionBottomSheet(
                             label = { Text(stringResource(R.string.new_tag)) },
                             singleLine = true,
                             textStyle = MaterialTheme.typography.bodyLarge,
+                            suffix =
+                                if (newTagName.isNotBlank()) {
+                                    {
+                                        ClearInputIconButton(
+                                            onClick = {
+                                                newTagName = ""
+                                            },
+                                        )
+                                    }
+                                } else {
+                                    null
+                                },
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -280,7 +292,7 @@ fun TagSelectionBottomSheet(
                             },
                     )
                 }
-                items(tagsWithCount) { tag ->
+                items(tagsWithCount.sortedBy { it.name }) { tag ->
                     ListItem(
                         modifier =
                             Modifier.clickable {

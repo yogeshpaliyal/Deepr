@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
@@ -69,6 +70,7 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -223,6 +225,14 @@ fun HomeScreen(
                             FilterMenu(onSortOrderChange = {
                                 viewModel.setSortOrder(it)
                             })
+                        }
+                    } else {
+                        if (textFieldState.text.isNotEmpty()) {
+                            ClearInputIconButton(
+                                onClick = {
+                                    textFieldState.clearText()
+                                },
+                            )
                         }
                     }
                 },
