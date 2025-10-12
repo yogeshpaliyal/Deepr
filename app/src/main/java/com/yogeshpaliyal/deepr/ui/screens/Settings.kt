@@ -466,9 +466,7 @@ fun SettingsScreen(
                     viewModel.setLanguageCode(selectedLanguageCode)
                     showLanguageDialog = false
                     // Recreate activity to apply language change
-                    (context as? MainActivity)?.let { activity ->
-                        activity.recreate()
-                    }
+                    (context as? MainActivity)?.recreate()
                 },
                 onDismiss = { showLanguageDialog = false },
             )
@@ -531,9 +529,7 @@ private fun SettingsItem(
                             if (shouldShowLoading) {
                                 isLoading = true
                             }
-                            onClick({
-                                isLoading = false
-                            })
+                            onClick { isLoading = false }
                         })
                     } else {
                         Modifier
