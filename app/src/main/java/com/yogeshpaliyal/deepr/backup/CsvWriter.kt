@@ -27,7 +27,7 @@ class CsvWriter {
                     csvWriter.writeNext(
                         arrayOf(
                             item.link,
-                            item.createdAt.toString(),
+                            item.createdAt,
                             item.openedCount.toString(),
                             item.name,
                         ),

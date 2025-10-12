@@ -1,5 +1,8 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +23,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AppBarWithSearch
@@ -70,11 +73,13 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.components.ActionIcon
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
+import com.yogeshpaliyal.deepr.ui.components.SwipeableItemWithActions
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.util.QRScanner
@@ -84,12 +89,15 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Copy
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -512,8 +520,11 @@ fun DeeprList(
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val linkCopied = stringResource(R.string.link_copied)
+
     AnimatedVisibility(
-        accounts.isEmpty(),
+        visible = accounts.isEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
@@ -557,7 +568,7 @@ fun DeeprList(
         }
     }
     AnimatedVisibility(
-        accounts.isNotEmpty(),
+        visible = accounts.isNotEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
@@ -566,14 +577,60 @@ fun DeeprList(
             contentPadding = contentPaddingValues,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(accounts) { account ->
-                DeeprItem(
-                    modifier = Modifier.animateItem(),
-                    account = account,
-                    selectedTag = selectedTag,
-                    onItemClick = onItemClick,
-                    onTagClick = onTagClick,
-                )
+            items(
+                count = accounts.size,
+                key = { index -> accounts[index].id },
+            ) { index ->
+                val account = accounts[index]
+                var revealOptions by remember { mutableStateOf(false) }
+                SwipeableItemWithActions(
+                    isRevealed = revealOptions,
+                    actions = {
+                        ActionIcon(
+                            modifier = Modifier.fillMaxHeight(),
+                            onClick = {
+                                revealOptions = false
+                                onItemClick(MenuItem.Delete(account))
+                            },
+                            icon = TablerIcons.Trash,
+                            backgroundColor = Color.Red.copy(alpha = 0.5f),
+                        )
+                        ActionIcon(
+                            modifier = Modifier.fillMaxHeight(),
+                            onClick = {
+                                revealOptions = false
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText(linkCopied, account.link)
+                                clipboard.setPrimaryClip(clip)
+                                Toast
+                                    .makeText(context, linkCopied, Toast.LENGTH_SHORT)
+                                    .show()
+                            },
+                            icon = TablerIcons.Copy,
+                            backgroundColor = Color.Black,
+                        )
+                        ActionIcon(
+                            modifier = Modifier.fillMaxHeight(),
+                            onClick = {
+                                revealOptions = false
+                                onItemClick(MenuItem.Edit(account))
+                            },
+                            icon = TablerIcons.Edit,
+                            backgroundColor = Color.Gray,
+                        )
+                    },
+                    onExpand = { revealOptions = true },
+                    onCollapse = { revealOptions = false },
+                ) {
+                    DeeprItem(
+                        modifier = Modifier.animateItem(),
+                        account = account,
+                        selectedTag = selectedTag,
+                        onItemClick = onItemClick,
+                        onTagClick = onTagClick,
+                    )
+                }
             }
         }
     }

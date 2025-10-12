@@ -46,7 +46,7 @@ class ExportRepositoryImpl(
                         csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(context.getString(R.string.export_success, uri.toString()))
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     RequestResult.Error(context.getString(R.string.export_failed))
                 }
             }
