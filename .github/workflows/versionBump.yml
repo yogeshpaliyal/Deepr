@@ -14,7 +14,7 @@ on:
       releaseNote:
         description: 'Release Note'
         required: true
-        type: string
+        type: textarea
 
 permissions:
   contents: write

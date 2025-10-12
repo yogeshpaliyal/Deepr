@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import android.R.attr.label
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
@@ -70,6 +70,7 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -225,6 +226,14 @@ fun HomeScreen(
                                 viewModel.setSortOrder(it)
                             })
                         }
+                    } else {
+                        if (textFieldState.text.isNotEmpty()) {
+                            ClearInputIconButton(
+                                onClick = {
+                                    textFieldState.clearText()
+                                },
+                            )
+                        }
                     }
                 },
             )
@@ -261,7 +270,12 @@ fun HomeScreen(
 
                 val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
                 // Favourite filter tabs
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                SingleChoiceSegmentedButtonRow(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                ) {
                     SegmentedButton(
                         shape =
                             SegmentedButtonDefaults.itemShape(
@@ -462,6 +476,7 @@ fun Content(
                         viewModel.incrementOpenedCount(it.item.id)
                         openDeeplink(context, it.item.link)
                     }
+
                     is MenuItem.Delete -> showDeleteConfirmDialog = it.item
                     is MenuItem.Edit -> editDeepr(it.item)
                     is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
@@ -469,9 +484,11 @@ fun Content(
                         viewModel.resetOpenedCount(it.item.id)
                         Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
                     }
+
                     is MenuItem.Shortcut -> {
                         showShortcutDialog = it.item
                     }
+
                     is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
                 }
             },

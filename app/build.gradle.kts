@@ -18,8 +18,8 @@ android {
         applicationId = "com.yogeshpaliyal.deepr"
         minSdk = 24
         targetSdk = 36
-        versionCode = 14
-        versionName = "1.0.13"
+        versionCode = 15
+        versionName = "1.0.14"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.junit)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -136,8 +137,8 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.zxing.scanner)
     ktlint(libs.ktlint)
-    implementation("dev.chrisbanes.haze:haze:1.6.9")
-    implementation("dev.chrisbanes.haze:haze-materials:1.6.9")
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
     implementation(libs.jsoup)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
@@ -150,7 +151,7 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.androidx.work.runtime.ktx)
 
-    // Add Firebase dependencies to pro and freePlaystore flavors specifically
+    // Add Firebase dependencies to pro and freePlayStore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)

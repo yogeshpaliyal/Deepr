@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ENABLE_FIREBASE=${1:-true} # Default to true if not provided
 
 # Handle Firebase plugin lines
@@ -12,3 +14,10 @@ else
   sed -i '' 's/^[[:space:]]*\/\/[[:space:]]*\(id("com.google.gms.google-services")\)/\1/' app/build.gradle.kts
   sed -i '' 's/^[[:space:]]*\/\/[[:space:]]*\(id("com.google.firebase.crashlytics")\)/\1/' app/build.gradle.kts
 fi
+
+# Usage:
+#   bash ./scripts/enableDisableFirebase.sh false   # to comment out Firebase plugins
+#   bash ./scripts/enableDisableFirebase.sh true    # to uncomment Firebase plugins
+# Or make the script executable and run directly:
+#   chmod +x ./scripts/enableDisableFirebase.sh
+#   ./scripts/enableDisableFirebase.sh false
