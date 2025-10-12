@@ -23,6 +23,11 @@ jobs:
         run: |
           echo "${{ github.ref_name || github.event.inputs.version }}"
 
+      - name: 🏗 Enable Firebase
+        id: enable-firebase
+        run: |
+          bash ./scripts/enableDisableFirebase.sh true
+
       - name: Build Release AAB
         run: ./gradlew bundleProRelease
 
