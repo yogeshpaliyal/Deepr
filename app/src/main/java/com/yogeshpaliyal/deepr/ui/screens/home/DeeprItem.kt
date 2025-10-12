@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -33,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -159,11 +161,11 @@ fun DeeprItem(
                             onItemClick(MenuItem.FavouriteClick(account))
                         }) {
                             Icon(
-                                painter =
+                                imageVector =
                                     if (account.isFavourite == 1L) {
-                                        painterResource(R.drawable.star_icon_filled)
+                                        Icons.Rounded.Star
                                     } else {
-                                        painterResource(R.drawable.star_icon_unfilled)
+                                        Icons.Rounded.StarBorder
                                     },
                                 contentDescription =
                                     if (account.isFavourite == 1L) {
@@ -248,17 +250,20 @@ fun DeeprItem(
                                     expanded = false
                                 },
                                 leadingIcon = {
-                                    if (account.isFavourite == 1L) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.star_icon_filled),
-                                            contentDescription = stringResource(R.string.remove_from_favourites),
-                                        )
-                                    } else {
-                                        Icon(
-                                            painter = painterResource(R.drawable.star_icon_unfilled),
-                                            contentDescription = stringResource(R.string.add_to_favourites),
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector =
+                                            if (account.isFavourite == 1L) {
+                                                Icons.Rounded.Star
+                                            } else {
+                                                Icons.Rounded.StarBorder
+                                            },
+                                        contentDescription =
+                                            if (account.isFavourite == 1L) {
+                                                stringResource(R.string.remove_from_favourites)
+                                            } else {
+                                                stringResource(R.string.add_to_favourites)
+                                            },
+                                    )
                                 },
                             )
                             DropdownMenuItem(
