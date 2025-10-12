@@ -34,6 +34,7 @@ import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 
 data class SharedLink(
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {
-                        sharingLink.value = null
+                        sharingLink.update { null }
                     }
                 }
             }
@@ -104,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
                 else -> null
             }
-        sharingLink.value = sharedText
+        sharingLink.update { sharedText }
     }
 
     override fun onNewIntent(intent: Intent) {

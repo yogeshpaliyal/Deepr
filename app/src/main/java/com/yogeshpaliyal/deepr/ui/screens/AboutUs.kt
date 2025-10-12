@@ -109,7 +109,13 @@ fun AboutUsScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     Text(
                         text = stringResource(R.string.author),
                         style = MaterialTheme.typography.titleLarge,
@@ -124,13 +130,22 @@ fun AboutUsScreen(
                         val uriHandler = LocalUriHandler.current
 
                         IconButton(onClick = { uriHandler.openUri("https://twitter.com/yogeshpaliyal") }) {
-                            Icon(TablerIcons.BrandTwitter, contentDescription = stringResource(R.string.twitter))
+                            Icon(
+                                TablerIcons.BrandTwitter,
+                                contentDescription = stringResource(R.string.twitter),
+                            )
                         }
                         IconButton(onClick = { uriHandler.openUri("https://www.linkedin.com/in/yogeshpaliyal/") }) {
-                            Icon(TablerIcons.BrandLinkedin, contentDescription = stringResource(R.string.linkedin))
+                            Icon(
+                                TablerIcons.BrandLinkedin,
+                                contentDescription = stringResource(R.string.linkedin),
+                            )
                         }
                         IconButton(onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal") }) {
-                            Icon(TablerIcons.BrandGithub, contentDescription = stringResource(R.string.github))
+                            Icon(
+                                TablerIcons.BrandGithub,
+                                contentDescription = stringResource(R.string.github),
+                            )
                         }
                     }
                 }

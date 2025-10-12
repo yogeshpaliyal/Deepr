@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.sqldelight) apply false
-    id("org.jmailen.kotlinter") version "5.2.0" apply false
-    id("com.google.gms.google-services") version "4.4.3" apply false
-    id("com.google.firebase.crashlytics") version "3.0.6" apply false
+    alias(libs.plugins.kotlinter) apply false
+    alias(libs.plugins.googleServices) apply false
+    alias(libs.plugins.firebaseCrashlytics) apply false
 }
 
 tasks.register("copyGitHooks", Copy::class.java) {
