@@ -26,6 +26,11 @@ jobs:
       - name: Build Release AAB
         run: ./gradlew bundleFreePlaystoreRelease
 
+      - name: 🏗 Enable Firebase
+        id: enable-firebase
+        run: |
+          bash ./scripts/enableDisableFirebase.sh true
+
       - name: Sign Release AAB
         id: signAAB
         uses: r0adkll/sign-android-release@fix/bundle-signing

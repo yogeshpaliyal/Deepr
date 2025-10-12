@@ -37,8 +37,16 @@ jobs:
       - name: Lint Check
         run: bash ./gradlew lintKotlin
 
+      - name: 🏗 Disable Firebase
+        run: |
+          bash ./scripts/enableDisableFirebase.sh false
+
       - name: 🏗 Build Free APK
         run: bash ./gradlew assembleFreeDebug
+
+      - name: 🏗 Enable Firebase
+        run: |
+          bash ./scripts/enableDisableFirebase.sh true
 
       - name: 🏗 Build Free Play store APK
         run: bash ./gradlew assembleFreePlaystoreDebug
