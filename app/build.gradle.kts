@@ -149,7 +149,7 @@ dependencies {
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
     implementation(libs.androidx.work.runtime.ktx)
-    
+
     // Add Firebase dependencies to pro and freePlaystore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
