@@ -133,7 +133,13 @@ class LocalServerRepositoryImpl(
                             try {
                                 val request = call.receive<AddLinkRequest>()
                                 // Insert the link without tags first
-                                accountViewModel.insertAccount(request.link, request.name, false, request.tags.map { it.toDbTag() }, request.notes)
+                                accountViewModel.insertAccount(
+                                    request.link,
+                                    request.name,
+                                    false,
+                                    request.tags.map { it.toDbTag() },
+                                    request.notes,
+                                )
                                 call.respond(HttpStatusCode.Created, SuccessResponse("Link added successfully"))
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error adding link", e)
