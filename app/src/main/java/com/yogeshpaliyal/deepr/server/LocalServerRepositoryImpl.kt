@@ -118,6 +118,7 @@ class LocalServerRepositoryImpl(
                                             name = link.name,
                                             createdAt = link.createdAt,
                                             openedCount = link.openedCount,
+                                            notes = link.notes,
                                             tags = link.tagsNames?.split(", ")?.filter { it.isNotEmpty() } ?: emptyList(),
                                         )
                                     }
@@ -132,7 +133,7 @@ class LocalServerRepositoryImpl(
                             try {
                                 val request = call.receive<AddLinkRequest>()
                                 // Insert the link without tags first
-                                accountViewModel.insertAccount(request.link, request.name, false, request.tags.map { it.toDbTag() })
+                                accountViewModel.insertAccount(request.link, request.name, false, request.tags.map { it.toDbTag() }, request.notes)
                                 call.respond(HttpStatusCode.Created, SuccessResponse("Link added successfully"))
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error adding link", e)
@@ -263,6 +264,7 @@ data class LinkResponse(
     val name: String,
     val createdAt: String,
     val openedCount: Long,
+    val notes: String,
     val tags: List<String>,
 )
 
@@ -278,6 +280,7 @@ data class TagData(
 data class AddLinkRequest(
     val link: String,
     val name: String,
+    val notes: String = "",
     val tags: List<TagData> = emptyList(),
 )
 
