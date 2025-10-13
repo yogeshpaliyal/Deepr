@@ -250,9 +250,10 @@ class AccountViewModel(
         name: String,
         executed: Boolean,
         tagsList: List<Tags>,
+        notes: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0)
+            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0, notes)
             deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
                 modifyTagsForLink(it, tagsList)
             }
@@ -334,9 +335,10 @@ class AccountViewModel(
         newLink: String,
         newName: String,
         tagsList: List<Tags>,
+        notes: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, id)
+            deeprQueries.updateDeeplink(newLink, newName, notes, id)
             modifyTagsForLink(id, tagsList)
             syncToMarkdown()
         }

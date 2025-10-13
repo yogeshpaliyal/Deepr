@@ -20,6 +20,7 @@ class CsvWriter {
                         Constants.Header.CREATED_AT,
                         Constants.Header.OPENED_COUNT,
                         Constants.Header.NAME,
+                        Constants.Header.NOTES,
                     ),
                 )
                 // Write Data
@@ -30,6 +31,7 @@ class CsvWriter {
                             item.createdAt,
                             item.openedCount.toString(),
                             item.name,
+                            item.notes,
                         ),
                     )
                 }

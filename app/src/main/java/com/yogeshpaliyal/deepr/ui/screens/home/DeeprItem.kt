@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -27,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,6 +48,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
@@ -95,11 +98,33 @@ fun DeeprItem(
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var selectedNote by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
 
     val linkCopied = stringResource(R.string.link_copied)
+
+    selectedNote?.let {
+        AlertDialog(
+            {
+                selectedNote = null
+            },
+            title = {
+                Text("Note")
+            },
+            text = {
+                Text(it)
+            },
+            confirmButton = {
+                OutlinedButton({
+                    selectedNote = null
+                }) {
+                    Text("Okay")
+                }
+            },
+        )
+    }
 
     Card(
         colors =
@@ -213,12 +238,32 @@ fun DeeprItem(
                                     )
                                 },
                             )
+
+                            if (account.notes.isNotEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.view_note)) },
+                                    onClick = {
+                                        expanded = false
+                                        selectedNote = account.notes
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            TablerIcons.Note,
+                                            contentDescription = stringResource(R.string.view_note),
+                                        )
+                                    },
+                                )
+                            }
+
                             // Display last opened time
                             if (account.lastOpenedAt != null) {
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            stringResource(R.string.last_opened, formatDateTime(account.lastOpenedAt)),
+                                            stringResource(
+                                                R.string.last_opened,
+                                                formatDateTime(account.lastOpenedAt),
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
@@ -316,6 +361,7 @@ fun DeeprItem(
                             )
                         }
                     }
+
                     Text(
                         text = stringResource(R.string.opened_count, account.openedCount),
                         style = MaterialTheme.typography.bodySmall,

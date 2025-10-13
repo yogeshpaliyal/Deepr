@@ -129,10 +129,10 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags)
+            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags, deeprInfo.notes)
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags)
+            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags, deeprInfo.notes)
         }
         onSaveDialogInfoChange(
             SaveDialogInfo(
@@ -256,6 +256,32 @@ fun HomeBottomContent(
                                     onClick = {
                                         deeprInfo = deeprInfo.copy(name = "")
                                         isNameError = false
+                                    },
+                                )
+                            }
+                        },
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextField(
+                    value = deeprInfo.notes,
+                    onValueChange = {
+                        deeprInfo = deeprInfo.copy(notes = it)
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                    label = { Text(stringResource(R.string.enter_notes)) },
+                    suffix =
+                        if (deeprInfo.notes.isEmpty()) {
+                            null
+                        } else {
+                            {
+                                ClearInputIconButton(
+                                    onClick = {
+                                        deeprInfo = deeprInfo.copy(notes = "")
                                     },
                                 )
                             }
