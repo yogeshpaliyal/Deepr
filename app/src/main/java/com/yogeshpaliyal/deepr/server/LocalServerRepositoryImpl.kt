@@ -101,10 +101,11 @@ class LocalServerRepositoryImpl(
                                         .getLinksAndTags(
                                             "",
                                             "",
+                                            -1L,
+                                            -1L,
                                             "",
-                                            null,
-                                            -1L,
-                                            -1L,
+                                            "",
+                                            0L,
                                             "DESC",
                                             "createdAt",
                                             "DESC",
@@ -156,8 +157,19 @@ class LocalServerRepositoryImpl(
                                         // Count how many links use this tag
                                         val linkCount =
                                             deeprQueries
-                                                .getLinksAndTags("", "", "", tag.id, -1L, -1L, "DESC", "createdAt", "DESC", "createdAt")
-                                                .executeAsList()
+                                                .getLinksAndTags(
+                                                    "",
+                                                    "",
+                                                    -1L,
+                                                    -1L,
+                                                    tag.id.toString(),
+                                                    tag.id.toString(),
+                                                    1L,
+                                                    "DESC",
+                                                    "createdAt",
+                                                    "DESC",
+                                                    "createdAt",
+                                                ).executeAsList()
                                                 .size
                                         TagResponse(
                                             id = tag.id,

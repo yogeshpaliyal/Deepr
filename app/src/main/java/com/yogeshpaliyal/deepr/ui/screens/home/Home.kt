@@ -414,7 +414,7 @@ fun HomeScreen(
 @Composable
 fun Content(
     hazeState: HazeState,
-    selectedTag: Tags?,
+    selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
@@ -493,11 +493,8 @@ fun Content(
                 }
             },
             onTagClick = {
-                if (viewModel.selectedTagFilter.value?.name == it) {
-                    viewModel.setTagFilter(null)
-                } else {
-                    viewModel.setSelectedTagByName(it)
-                }
+                // Toggle the tag in the filter by tag name
+                viewModel.setSelectedTagByName(it)
             },
         )
     }
@@ -506,7 +503,7 @@ fun Content(
 @Composable
 fun DeeprList(
     accounts: List<GetLinksAndTags>,
-    selectedTag: Tags?,
+    selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,

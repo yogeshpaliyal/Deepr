@@ -63,10 +63,15 @@ FROM
 WHERE
   (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
   AND (
-    ? = '' OR Tags.id = ?
+    ? = -1 OR Deepr.isFavourite = ?
   )
   AND (
-    ? = -1 OR Deepr.isFavourite = ?
+    ? = '' OR (
+      SELECT COUNT(DISTINCT lt.tagId)
+      FROM LinkTags lt
+      WHERE lt.linkId = Deepr.id
+        AND (',' || ? || ',' LIKE '%,' || CAST(lt.tagId AS TEXT) || ',%')
+    ) = ?
   )
 GROUP BY
   Deepr.id

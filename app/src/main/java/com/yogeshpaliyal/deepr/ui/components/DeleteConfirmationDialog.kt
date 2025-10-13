@@ -7,6 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 
@@ -24,7 +29,20 @@ fun DeleteConfirmationDialog(
             Text(stringResource(R.string.delete_confirmation_title))
         },
         text = {
-            Text(stringResource(R.string.delete_confirmation_message))
+            val displayName = if (deepr.name.isNotEmpty()) deepr.name else deepr.link
+            val message =
+                buildAnnotatedString {
+                    append("Are you sure you want to delete ")
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("'$displayName'")
+                    }
+                    append("?")
+                }
+            Text(
+                text = message,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
         },
         confirmButton = {
             Button(onClick = {
