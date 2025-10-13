@@ -38,6 +38,9 @@
     <string name="failed_to_fetch_metadata">Failed to fetch metadata</string>
     <string name="opened_count">Opened: %d</string>
     <string name="last_opened">Last Opened: %s</string>
+    <string name="notes">Notes</string>
+    <string name="view_note">View Note</string>
+    <string name="enter_notes">Enter notes (optional)</string>
     <string name="tags_label">Tags:</string>
     <string name="suggestions_label">Suggestions:</string>
     <string name="filter">Filter</string>
