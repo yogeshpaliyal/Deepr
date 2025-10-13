@@ -46,6 +46,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Trash
 import java.text.DateFormat
@@ -313,6 +314,20 @@ fun DeeprItem(
                                         contentDescription = stringResource(R.string.delete),
                                     )
                                 },
+                            )
+                        }
+                    }
+                    // Display notes icon if notes exist
+                    if (account.notes.isNotEmpty()) {
+                        IconButton(onClick = {
+                            // Clicking the notes icon could show a tooltip or dialog
+                            // For now, we'll just make it visible as an indicator
+                        }) {
+                            Icon(
+                                TablerIcons.Note,
+                                contentDescription = stringResource(R.string.notes),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                     }
