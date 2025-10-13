@@ -109,13 +109,14 @@ class SyncRepositoryImpl(
                 writer.write("**Warning:** Please maintain the markdown table format when editing this file.\n\n")
 
                 // Write markdown table header
-                writer.write("| Name | Link | Created At | Opened Count | Tags |\n")
-                writer.write("|------|------|------------|--------------|------|\n")
+                writer.write("| Name | Link | Created At | Opened Count | Notes | Tags |\n")
+                writer.write("|------|------|------------|--------------|-------|------|\n")
 
                 // Write data rows
                 data.forEach { item ->
                     val escapedName = item.name.replace("|", "\\|").replace("\n", " ")
                     val escapedLink = item.link.replace("|", "\\|").replace("\n", " ")
+                    val escapedNotes = item.notes.replace("|", "\\|").replace("\n", " ")
 
                     // Format tags as hashtags
                     val tags =
@@ -128,7 +129,7 @@ class SyncRepositoryImpl(
                                 .joinToString(" ") { "#${it.replace(" ", "").replace("|", "")}" }
                         }
 
-                    val row = "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} | $tags |\n"
+                    val row = "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} | $escapedNotes | $tags |\n"
                     writer.write(row)
                 }
 
@@ -146,9 +147,9 @@ class SyncRepositoryImpl(
 
         for (line in lines) {
             val trimmedLine = line.trim()
-            if (trimmedLine.startsWith("| Name | Link | Created At | Opened Count | Tags |")) {
+            if (trimmedLine.startsWith("| Name | Link | Created At | Opened Count | Notes | Tags |")) {
                 foundHeader = true
-            } else if (foundHeader && trimmedLine.startsWith("|------|------|------------|--------------|------|")) {
+            } else if (foundHeader && trimmedLine.startsWith("|------|------|------------|--------------|-------|------|")) {
                 foundSeparator = true
                 break
             }

@@ -101,6 +101,7 @@ SELECT
   Deepr.name,
   Deepr.createdAt,
   Deepr.openedCount,
+  Deepr.notes,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
