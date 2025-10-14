@@ -45,33 +45,26 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
-                val fileName = "deepr_backup.csv"
-
-                val success = saveToSelectedLocation(location, fileName, dataToExport)
+                val success = saveToSelectedLocation(location = location, data = dataToExport)
 
                 if (success) {
                     // Record backup time on successful completion
                     preferenceDataStore.setLastBackupTime(System.currentTimeMillis())
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
 
     private fun saveToSelectedLocation(
         location: String,
-        fileName: String,
+        fileName: String = "deepr_backup.csv",
         data: List<com.yogeshpaliyal.deepr.Deepr>,
     ): Boolean =
         try {
             // For content:// URIs from document picker, create a new document in that folder
             val locationUri = location.toUri()
-            val documentFile =
-                DocumentFile.fromTreeUri(
-                    context,
-                    locationUri,
-                )
-
+            val documentFile = DocumentFile.fromTreeUri(context, locationUri)
             val directory = DocumentFile.fromTreeUri(context, locationUri)
             var docFile = directory?.findFile(fileName)
             if (docFile == null) {
@@ -92,7 +85,7 @@ class AutoBackupWorker(
             } else {
                 false
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
 }

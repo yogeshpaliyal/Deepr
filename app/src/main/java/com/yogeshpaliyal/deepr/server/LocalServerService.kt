@@ -43,6 +43,7 @@ class LocalServerService : Service() {
                     observeServerState()
                 }
             }
+
             ACTION_STOP -> {
                 serviceScope.launch {
                     localServerRepository.stopServer()
@@ -54,12 +55,13 @@ class LocalServerService : Service() {
         return START_STICKY
     }
 
-    private suspend fun observeServerState() {
+    private fun observeServerState() {
         serviceScope.launch {
             localServerRepository.isRunning.collect { isRunning ->
                 if (isRunning) {
                     val serverUrl = localServerRepository.serverUrl.first()
-                    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    val notificationManager =
+                        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                     notificationManager.notify(NOTIFICATION_ID, createNotification(serverUrl))
                 }
             }
@@ -78,7 +80,7 @@ class LocalServerService : Service() {
                     setShowBadge(false)
                 }
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }

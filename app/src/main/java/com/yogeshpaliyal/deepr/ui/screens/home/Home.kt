@@ -7,6 +7,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AppBarWithSearch
@@ -39,11 +40,14 @@ import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberSearchBarState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -84,12 +89,14 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -120,15 +127,16 @@ fun HomeScreen(
     var isTagsSelectionActive by remember { mutableStateOf(false) }
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    val selectedTag = viewModel.selectedTagFilter.collectAsStateWithLifecycle()
+    val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState()
     val context = LocalContext.current
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
-    val totalLinks = viewModel.countOfLinks.collectAsStateWithLifecycle()
-    val favouriteLinks = viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
+    val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
+    val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
+    val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -284,7 +292,7 @@ fun HomeScreen(
                             ),
                         onClick = { viewModel.setFavouriteFilter(-1) },
                         selected = favouriteFilter == -1,
-                        label = { Text(stringResource(R.string.all) + " (${totalLinks.value ?: 0})") },
+                        label = { Text(stringResource(R.string.all) + " (${totalLinks ?: 0})") },
                     )
                     SegmentedButton(
                         shape =
@@ -294,7 +302,7 @@ fun HomeScreen(
                             ),
                         onClick = { viewModel.setFavouriteFilter(1) },
                         selected = favouriteFilter == 1,
-                        label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks.value ?: 0})") },
+                        label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})") },
                     )
                 }
             }
@@ -360,7 +368,7 @@ fun HomeScreen(
             Content(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
-                selectedTag = selectedTag.value,
+                selectedTag = selectedTag,
                 editDeepr = {
                     selectedLink = it
                 },
@@ -384,8 +392,8 @@ fun HomeScreen(
 
         if (isTagsSelectionActive) {
             TagSelectionBottomSheet(
-                tagsWithCount = viewModel.allTagsWithCount.collectAsStateWithLifecycle().value,
-                selectedTag = selectedTag.value,
+                tagsWithCount = allTagsWithCount,
+                selectedTag = selectedTag,
                 dismissBottomSheet = {
                     isTagsSelectionActive = false
                 },
@@ -510,7 +518,7 @@ fun DeeprList(
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        accounts.isEmpty(),
+        visible = accounts.isEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
@@ -554,7 +562,7 @@ fun DeeprList(
         }
     }
     AnimatedVisibility(
-        accounts.isNotEmpty(),
+        visible = accounts.isNotEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
@@ -563,14 +571,96 @@ fun DeeprList(
             contentPadding = contentPaddingValues,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(accounts) { account ->
-                DeeprItem(
-                    modifier = Modifier.animateItem(),
-                    account = account,
-                    selectedTag = selectedTag,
-                    onItemClick = onItemClick,
-                    onTagClick = onTagClick,
-                )
+            items(
+                count = accounts.size,
+                key = { index -> accounts[index].id },
+            ) { index ->
+                val account = accounts[index]
+                val dismissState =
+                    rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                            when (value) {
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    onItemClick(MenuItem.Delete(account))
+                                    false
+                                }
+
+                                SwipeToDismissBoxValue.StartToEnd -> {
+                                    onItemClick(MenuItem.Edit(account))
+                                    false
+                                }
+
+                                else -> {
+                                    false
+                                }
+                            }
+                        },
+                    )
+
+                SwipeToDismissBox(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                    state = dismissState,
+                    backgroundContent = {
+                        when (dismissState.dismissDirection) {
+                            SwipeToDismissBoxValue.StartToEnd -> {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .background(
+                                                Color.Gray.copy(alpha = 0.5f),
+                                            ).fillMaxSize()
+                                            .clip(
+                                                RoundedCornerShape(8.dp),
+                                            ),
+                                    contentAlignment = Alignment.CenterStart,
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                        tint = Color.White,
+                                        modifier = Modifier.padding(16.dp),
+                                    )
+                                }
+                            }
+
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .background(
+                                                Color.Red.copy(alpha = 0.5f),
+                                            ).fillMaxSize()
+                                            .clip(
+                                                RoundedCornerShape(8.dp),
+                                            ),
+                                    contentAlignment = Alignment.CenterEnd,
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Trash,
+                                        contentDescription = stringResource(R.string.delete),
+                                        tint = Color.White,
+                                        modifier = Modifier.padding(16.dp),
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                Color.White
+                            }
+                        }
+                    },
+                ) {
+                    DeeprItem(
+                        modifier = Modifier.animateItem(),
+                        account = account,
+                        selectedTag = selectedTag,
+                        onItemClick = onItemClick,
+                        onTagClick = onTagClick,
+                    )
+                }
             }
         }
     }
