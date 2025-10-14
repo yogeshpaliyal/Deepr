@@ -89,12 +89,14 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -605,25 +607,53 @@ fun DeeprList(
                             .clip(RoundedCornerShape(8.dp)),
                     state = dismissState,
                     backgroundContent = {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .background(
-                                        when (dismissState.dismissDirection) {
-                                            SwipeToDismissBoxValue.StartToEnd -> {
-                                                Color.Gray.copy(alpha = 0.5f)
-                                            }
+                        when (dismissState.dismissDirection) {
+                            SwipeToDismissBoxValue.StartToEnd -> {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .background(
+                                                Color.Gray.copy(alpha = 0.5f),
+                                            ).fillMaxSize()
+                                            .clip(
+                                                RoundedCornerShape(8.dp),
+                                            ),
+                                    contentAlignment = Alignment.CenterStart,
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                        tint = Color.White,
+                                        modifier = Modifier.padding(16.dp),
+                                    )
+                                }
+                            }
 
-                                            SwipeToDismissBoxValue.EndToStart -> {
-                                                Color.Red.copy(alpha = 0.5f)
-                                            }
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .background(
+                                                Color.Red.copy(alpha = 0.5f),
+                                            ).fillMaxSize()
+                                            .clip(
+                                                RoundedCornerShape(8.dp),
+                                            ),
+                                    contentAlignment = Alignment.CenterEnd,
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Trash,
+                                        contentDescription = stringResource(R.string.delete),
+                                        tint = Color.White,
+                                        modifier = Modifier.padding(16.dp),
+                                    )
+                                }
+                            }
 
-                                            else -> {
-                                                Color.White
-                                            }
-                                        },
-                                    ).fillMaxSize(),
-                        )
+                            else -> {
+                                Color.White
+                            }
+                        }
                     },
                 ) {
                     DeeprItem(
