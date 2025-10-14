@@ -2,6 +2,8 @@ package com.yogeshpaliyal.deepr.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,10 +47,17 @@ fun DeleteConfirmationDialog(
             )
         },
         confirmButton = {
-            Button(onClick = {
-                onConfirm(deepr)
-                onDismiss()
-            }) {
+            Button(
+                onClick = {
+                    onConfirm(deepr)
+                    onDismiss()
+                },
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+            ) {
                 Text(stringResource(R.string.delete))
             }
         },

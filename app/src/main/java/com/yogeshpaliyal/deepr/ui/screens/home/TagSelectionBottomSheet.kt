@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -171,28 +172,35 @@ fun TagSelectionBottomSheet(
                 Text(text = message)
             },
             confirmButton = {
-                Button(onClick = {
-                    val result = deleteTag(Tags(tag.id, tag.name))
-                    if (result.isFailure) {
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(
-                                    R.string.failed_to_delete_tag,
-                                    result.exceptionOrNull(),
-                                ),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    } else {
-                        isTagDeleteEnable = null
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(R.string.tag_deleted_successfully),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        val result = deleteTag(Tags(tag.id, tag.name))
+                        if (result.isFailure) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.failed_to_delete_tag,
+                                        result.exceptionOrNull(),
+                                    ),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        } else {
+                            isTagDeleteEnable = null
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.tag_deleted_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                    },
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        ),
+                ) {
                     Text(stringResource(R.string.delete))
                 }
             },
