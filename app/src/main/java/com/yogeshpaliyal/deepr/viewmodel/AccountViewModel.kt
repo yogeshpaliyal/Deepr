@@ -126,17 +126,34 @@ class AccountViewModel(
     private val syncValidationChannel = Channel<String>()
     val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
-    // State for tag filter
-    private val _selectedTagFilter = MutableStateFlow<Tags?>(null)
-    val selectedTagFilter: StateFlow<Tags?> = _selectedTagFilter
+    // State for tag filter - now supports multiple tags
+    private val _selectedTagFilter = MutableStateFlow<List<Tags>>(emptyList())
+    val selectedTagFilter: StateFlow<List<Tags>> = _selectedTagFilter
 
     // State for favourite filter (-1 = All, 0 = Not Favourite, 1 = Favourite)
     private val _favouriteFilter = MutableStateFlow(-1)
     val favouriteFilter: StateFlow<Int> = _favouriteFilter
 
-    // Set tag filter
+    // Set tag filter - toggle tag in the list
     fun setTagFilter(tag: Tags?) {
-        _selectedTagFilter.update { tag }
+        if (tag == null) {
+            _selectedTagFilter.update { emptyList() }
+        } else {
+            _selectedTagFilter.update { currentList ->
+                if (currentList.any { it.id == tag.id }) {
+                    // Remove tag if already selected
+                    currentList.filter { it.id != tag.id }
+                } else {
+                    // Add tag if not selected
+                    currentList + tag
+                }
+            }
+        }
+    }
+
+    // Clear all tag filters
+    fun clearTagFilters() {
+        _selectedTagFilter.update { emptyList() }
     }
 
     // Set favourite filter
@@ -186,7 +203,9 @@ class AccountViewModel(
     fun setSelectedTagByName(tagName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
-            _selectedTagFilter.value = tag
+            if (tag != null) {
+                setTagFilter(tag)
+            }
         }
     }
 
@@ -210,23 +229,29 @@ class AccountViewModel(
             sortOrder,
             selectedTagFilter,
             favouriteFilter,
-        ) { query, sorting, tag, favourite ->
-            listOf(query, sorting, tag, favourite)
+        ) { query, sorting, tags, favourite ->
+            listOf(query, sorting, tags, favourite)
         }.flatMapLatest { combined ->
             val query = combined[0] as String
             val sorting = (combined[1] as String).split("_")
-            val tag = combined[2] as Tags?
+            val tags = combined[2] as List<Tags>
             val favourite = combined[3] as Int
             val sortField = sorting.getOrNull(0) ?: "createdAt"
             val sortType = sorting.getOrNull(1) ?: "DESC"
+
+            // Prepare tag filter parameters
+            val tagIdsString = if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
+            val tagCount = tags.size.toLong()
+
             deeprQueries
                 .getLinksAndTags(
                     query,
                     query,
-                    tag?.id?.toString() ?: "",
-                    tag?.id,
                     favourite.toLong(),
                     favourite.toLong(),
+                    tagIdsString,
+                    tagIdsString,
+                    tagCount,
                     sortType,
                     sortField,
                     sortType,

@@ -33,6 +33,7 @@
     <string name="delete">Delete</string>
     <string name="delete_confirmation_title">Delete Link?</string>
     <string name="delete_confirmation_message">Are you sure you want to delete this link?</string>
+    <string name="delete_link_confirmation_with_name">Are you sure you want to delete \'%s\'?</string>
     <string name="remove_tag">Remove tag</string>
     <string name="reset_opened_count">Reset opened count</string>
     <string name="failed_to_fetch_metadata">Failed to fetch metadata</string>
@@ -44,6 +45,8 @@
     <string name="tags_label">Tags:</string>
     <string name="suggestions_label">Suggestions:</string>
     <string name="filter">Filter</string>
+    <string name="load_more_tags">+%d more</string>
+    <string name="show_less_tags">Show less</string>
     <string name="add_shortcut">Add shortcut</string>
     <string name="edit_shortcut">Edit shortcut</string>
     <string name="show_qr_code">Show QR Code</string>
@@ -63,6 +66,7 @@
     <string name="edit_tag">Edit Tag</string>
     <string name="delete_tag">Delete Tag</string>
     <string name="delete_tag_confirmation">Are you sure you want to delete this tag?</string>
+    <string name="delete_tag_confirmation_with_name">Are you sure you want to delete \'%s\' tag?</string>
     <string name="tag_name_exists">Tag with this name already exists</string>
     <string name="failed_to_edit_tag">Failed to edit tag</string>
     <string name="tag_edited_successfully">Tag edited successfully</string>
@@ -70,6 +74,8 @@
     <string name="tag_deleted_successfully">Tag deleted successfully</string>
     <string name="edit_tag_description">Edit Tag</string>
     <string name="delete_tag_description">Delete Tag</string>
+    <string name="clear_all_filters">Clear All Filters</string>
+    <string name="selected_tags_count">%d tags selected</string>
 
     <!-- Settings Screen -->
     <string name="import_deeplinks">Import links</string>
