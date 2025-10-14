@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -41,6 +42,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
@@ -55,7 +60,7 @@ import compose.icons.tablericons.Trash
 @Composable
 fun TagSelectionBottomSheet(
     tagsWithCount: List<GetAllTagsWithCount>,
-    selectedTag: Tags?,
+    selectedTag: List<Tags>,
     dismissBottomSheet: () -> Unit,
     setTagFilter: (Tags?) -> Unit,
     editTag: (Tags) -> Result<Boolean>,
@@ -156,31 +161,46 @@ fun TagSelectionBottomSheet(
                 Text(text = stringResource(R.string.delete_tag))
             },
             text = {
-                Text(text = stringResource(R.string.delete_tag_confirmation))
+                val message =
+                    buildAnnotatedString {
+                        append("Are you sure you want to delete ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("'${tag.name}'")
+                        }
+                        append(" tag?")
+                    }
+                Text(text = message)
             },
             confirmButton = {
-                Button(onClick = {
-                    val result = deleteTag(Tags(tag.id, tag.name))
-                    if (result.isFailure) {
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(
-                                    R.string.failed_to_delete_tag,
-                                    result.exceptionOrNull(),
-                                ),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    } else {
-                        isTagDeleteEnable = null
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(R.string.tag_deleted_successfully),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        val result = deleteTag(Tags(tag.id, tag.name))
+                        if (result.isFailure) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.failed_to_delete_tag,
+                                        result.exceptionOrNull(),
+                                    ),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        } else {
+                            isTagDeleteEnable = null
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.tag_deleted_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                    },
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        ),
+                ) {
                     Text(stringResource(R.string.delete))
                 }
             },
@@ -274,31 +294,59 @@ fun TagSelectionBottomSheet(
 
             HorizontalDivider()
             LazyColumn {
+                // Show "Clear All Filters" option if any tags are selected
+                if (selectedTag.isNotEmpty()) {
+                    item {
+                        ListItem(
+                            modifier =
+                                Modifier.clickable {
+                                    setTagFilter(null)
+                                },
+                            headlineContent = {
+                                Text(
+                                    stringResource(R.string.clear_all_filters),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            },
+                        )
+                    }
+                }
+
                 item {
                     ListItem(
                         modifier =
                             Modifier.clickable {
-                                setTagFilter(null)
-                                dismissBottomSheet()
+                                // Don't dismiss, allow multi-selection
                             },
-                        headlineContent = { Text(stringResource(R.string.all)) },
-                        colors =
-                            if (selectedTag == null) {
-                                ListItemDefaults.colors(
-                                    headlineColor = MaterialTheme.colorScheme.primary,
-                                )
-                            } else {
-                                ListItemDefaults.colors(containerColor = Color.Transparent)
-                            },
+                        headlineContent = {
+                            Text(
+                                if (selectedTag.isEmpty()) {
+                                    stringResource(R.string.all)
+                                } else {
+                                    stringResource(R.string.selected_tags_count, selectedTag.size)
+                                },
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
+
                 items(tagsWithCount.sortedBy { it.name }) { tag ->
+                    val isSelected = selectedTag.any { it.id == tag.id }
                     ListItem(
                         modifier =
                             Modifier.clickable {
                                 setTagFilter(Tags(tag.id, tag.name))
-                                dismissBottomSheet()
+                                // Don't dismiss to allow multi-selection
                             },
+                        leadingContent = {
+                            androidx.compose.material3.Checkbox(
+                                checked = isSelected,
+                                onCheckedChange = {
+                                    setTagFilter(Tags(tag.id, tag.name))
+                                },
+                            )
+                        },
                         headlineContent = { Text("${tag.name} (${tag.linkCount})") },
                         trailingContent = {
                             Row {
@@ -322,7 +370,7 @@ fun TagSelectionBottomSheet(
                             }
                         },
                         colors =
-                            if (selectedTag?.id == tag.id) {
+                            if (isSelected) {
                                 ListItemDefaults.colors(
                                     headlineColor = MaterialTheme.colorScheme.primary,
                                 )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -90,11 +92,12 @@ fun DeeprItem(
     account: GetLinksAndTags,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (tag: String) -> Unit,
-    selectedTag: Tags?,
+    selectedTag: List<Tags>,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<String?>(null) }
+    var tagsExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
@@ -311,18 +314,45 @@ fun DeeprItem(
                 }
             }
 
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                selectedTags?.forEach { tag ->
-                    FilterChip(
-                        modifier = Modifier.padding(0.dp),
-                        elevation = null,
-                        selected = selectedTag?.name == tag.trim(),
-                        onClick = { onTagClick(tag.trim()) },
-                        label = { Text(tag.trim()) },
-                    )
+            Column {
+                // Determine max tags to show based on expanded state
+                val maxTagsToShow = if (tagsExpanded) selectedTags?.size ?: 0 else 9
+                val visibleTags = selectedTags?.take(maxTagsToShow) ?: emptyList()
+                val hiddenTagsCount = (selectedTags?.size ?: 0) - visibleTags.size
+
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    visibleTags.forEach { tag ->
+                        val isSelected = selectedTag.any { it.name == tag.trim() }
+                        FilterChip(
+                            modifier = Modifier.padding(0.dp),
+                            elevation = null,
+                            selected = isSelected,
+                            onClick = { onTagClick(tag.trim()) },
+                            label = { Text(tag.trim()) },
+                        )
+                    }
+                }
+
+                // Show "Load More" or "Show Less" button if there are more than 9 tags
+                if ((selectedTags?.size ?: 0) > 9) {
+                    androidx.compose.material3.TextButton(
+                        onClick = { tagsExpanded = !tagsExpanded },
+                        modifier = Modifier.padding(start = 4.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                    ) {
+                        Text(
+                            text =
+                                if (tagsExpanded) {
+                                    stringResource(R.string.show_less_tags)
+                                } else {
+                                    stringResource(R.string.load_more_tags, hiddenTagsCount)
+                                },
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        )
+                    }
                 }
             }
         }
