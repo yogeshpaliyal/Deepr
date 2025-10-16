@@ -47,7 +47,6 @@ class AccountPagingSource(
                         ).executeAsList()
                 }
 
-            // Data mapping
             val mappedData =
                 dataFromPagedQuery.map { pagedItem ->
                     GetLinksAndTags(

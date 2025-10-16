@@ -204,14 +204,8 @@ SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;
 insertDeeprOpenLog:
 INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
 
-getLastOpenedTime:
-SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
-
 toggleFavourite:
 UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE id = ?;
-
-setFavourite:
-UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 
 getLinksAndTagsPaged:
 SELECT

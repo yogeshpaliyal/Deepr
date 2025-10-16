@@ -235,7 +235,6 @@ class AccountViewModel(
             selectedTagFilter,
             favouriteFilter,
         ) { query, sorting, tags, favourite ->
-            // This map just holds the latest values of all filters
             mapOf(
                 "query" to query,
                 "sorting" to sorting,
