@@ -160,7 +160,7 @@ fun HomeScreen(
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
-        if (!sharedText?.url.isNullOrBlank() && selectedLink == null) {
+        if (!sharedText?.url.isNullOrBlank()) {
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =

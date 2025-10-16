@@ -80,8 +80,11 @@ All these sources supports cross platform app updates. for eg: if you've install
 
 * Twitter: <a href="https://twitter.com/yogeshpaliyal" target="_blank">@yogeshpaliyal</a>
 * Email: yogeshpaliyal.foss@gmail.com
-
 Feel free to ping me 😉
+
+
+## Special Thanks To
+- [ARME](https://github.com/ALE-ARME) : For the unconditional commitment to quality assurance.
 
 ## 🤝 Contributing
 
