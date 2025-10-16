@@ -260,8 +260,9 @@ class AccountViewModel(
             Pager(
                 config =
                     PagingConfig(
-                        pageSize = 7,
+                        pageSize = 20,
                         enablePlaceholders = false,
+                        prefetchDistance = 1,
                     ),
                 pagingSourceFactory = {
                     AccountPagingSource(
