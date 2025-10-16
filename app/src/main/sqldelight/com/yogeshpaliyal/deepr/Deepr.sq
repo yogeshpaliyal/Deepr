@@ -268,3 +268,33 @@ ORDER BY
         END
     END DESC
 LIMIT :limit OFFSET :offset;
+
+getLinkById:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  Deepr.isFavourite,
+  Deepr.notes,
+  DOL_Max.lastOpenedAt,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
+  GROUP_CONCAT(Tags.id, ', ') AS tagsIds
+FROM
+  Deepr
+  LEFT JOIN (
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  Deepr.id = :id
+GROUP BY
+  Deepr.id;
