@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
                 else -> null
             }
-        sharingLink.update { sharedText }
+        sharingLink.value = sharedText
     }
 
     override fun onNewIntent(intent: Intent) {
