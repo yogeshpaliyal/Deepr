@@ -13,7 +13,7 @@ ktlint = "0.4.27"
 lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.11.0"
 composeBom = "2025.09.00"
-sqldelight = "2.1.0"
+paging = "3.3.0"
 koin-bom = "4.1.1"
 tablerIcons = "1.1.1"
 nav3Core = "1.0.0-alpha09"
@@ -33,7 +33,9 @@ googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 
 [libraries]
-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
+sql-delight = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
+sql-delight-paging3 = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "androidDriver" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
@@ -91,7 +93,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "androidDriver" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }

@@ -4,6 +4,10 @@ import android.net.Uri
 import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -14,6 +18,7 @@ import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.data.AccountPagingSource
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
@@ -223,42 +228,48 @@ class AccountViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<GetLinksAndTags>?> =
+    val accounts: Flow<PagingData<GetLinksAndTags>> =
         combine(
             searchQuery,
             sortOrder,
             selectedTagFilter,
             favouriteFilter,
         ) { query, sorting, tags, favourite ->
-            listOf(query, sorting, tags, favourite)
-        }.flatMapLatest { combined ->
-            val query = combined[0] as String
-            val sorting = (combined[1] as String).split("_")
-            val tags = combined[2] as List<Tags>
-            val favourite = combined[3] as Int
+            // This map just holds the latest values of all filters
+            mapOf(
+                "query" to query,
+                "sorting" to sorting,
+                "tags" to tags,
+                "favourite" to favourite,
+            )
+        }.flatMapLatest { filters ->
+            val query = filters["query"] as String
+            val sorting = (filters["sorting"] as String).split("_")
+            val tags = filters["tags"] as List<Tags>
+            val favourite = filters["favourite"] as Int
+
             val sortField = sorting.getOrNull(0) ?: "createdAt"
             val sortType = sorting.getOrNull(1) ?: "DESC"
 
-            // Prepare tag filter parameters
-            val tagIdsString = if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
-            val tagCount = tags.size.toLong()
-
-            deeprQueries
-                .getLinksAndTags(
-                    query,
-                    query,
-                    favourite.toLong(),
-                    favourite.toLong(),
-                    tagIdsString,
-                    tagIdsString,
-                    tagCount,
-                    sortType,
-                    sortField,
-                    sortType,
-                    sortField,
-                ).asFlow()
-                .mapToList(viewModelScope.coroutineContext)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+            // Create a new Pager whenever the filters change
+            Pager(
+                config =
+                    PagingConfig(
+                        pageSize = 7,
+                        enablePlaceholders = false,
+                    ),
+                pagingSourceFactory = {
+                    AccountPagingSource(
+                        deeprQueries = deeprQueries,
+                        searchQuery = query,
+                        favouriteFilter = favourite,
+                        selectedTags = tags,
+                        sortField = sortField,
+                        sortType = sortType,
+                    )
+                },
+            ).flow
+        }.cachedIn(viewModelScope)
 
     fun search(query: String) {
         searchQuery.update { query }
