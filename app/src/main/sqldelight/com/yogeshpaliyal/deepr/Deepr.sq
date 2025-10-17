@@ -146,7 +146,6 @@ SELECT COUNT(*) FROM Deepr;
 getDeeprByLink:
 SELECT * FROM Deepr WHERE link = ?;
 
-
 -- Tag operations
 insertTag:
 INSERT OR IGNORE INTO Tags (name) VALUES (?);
@@ -173,7 +172,6 @@ SELECT count(*) FROM Deepr;
 countOfFavouriteLinks:
 SELECT count(*) FROM Deepr WHERE isFavourite = 1;
 
-
 -- Link-Tag relations
 addTagToLink:
 INSERT OR IGNORE INTO LinkTags (linkId, tagId) VALUES (?, ?);
@@ -183,7 +181,6 @@ DELETE FROM LinkTags WHERE linkId = ? AND tagId = ?;
 
 deleteLinkRelations:
 DELETE FROM LinkTags WHERE linkId = ?;
-
 
 deleteTag:
 DELETE FROM Tags WHERE id = ?;
