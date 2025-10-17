@@ -409,13 +409,13 @@ class AccountViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, notes, id)
-            modifyTagsForLink(id, tagsList)
-            syncToMarkdown()
             deeprQueries.getLinkById(id).executeAsOneOrNull()?.let { item ->
                 itemUpdates.update { currentMap ->
                     currentMap + (id to item.toGetLinksAndTags())
                 }
             }
+            modifyTagsForLink(id, tagsList)
+            syncToMarkdown()
         }
     }
 
