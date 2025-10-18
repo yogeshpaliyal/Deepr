@@ -116,7 +116,7 @@ class LocalServerService : Service() {
                 } else {
                     getString(R.string.local_server_starting)
                 },
-            ).setSmallIcon(R.drawable.ic_launcher_foreground)
+            ).setSmallIcon(R.drawable.ic_stat_name)
             .setContentIntent(pendingIntent)
             .addAction(
                 0,
