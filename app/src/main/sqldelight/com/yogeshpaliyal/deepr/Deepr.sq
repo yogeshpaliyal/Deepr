@@ -146,7 +146,6 @@ SELECT COUNT(*) FROM Deepr;
 getDeeprByLink:
 SELECT * FROM Deepr WHERE link = ?;
 
-
 -- Tag operations
 insertTag:
 INSERT OR IGNORE INTO Tags (name) VALUES (?);
@@ -173,7 +172,6 @@ SELECT count(*) FROM Deepr;
 countOfFavouriteLinks:
 SELECT count(*) FROM Deepr WHERE isFavourite = 1;
 
-
 -- Link-Tag relations
 addTagToLink:
 INSERT OR IGNORE INTO LinkTags (linkId, tagId) VALUES (?, ?);
@@ -183,7 +181,6 @@ DELETE FROM LinkTags WHERE linkId = ? AND tagId = ?;
 
 deleteLinkRelations:
 DELETE FROM LinkTags WHERE linkId = ?;
-
 
 deleteTag:
 DELETE FROM Tags WHERE id = ?;
@@ -204,12 +201,97 @@ SELECT COUNT(*) FROM LinkTags WHERE tagId = ?;
 insertDeeprOpenLog:
 INSERT INTO DeeprOpenLog (deeplinkId) VALUES (?);
 
-getLastOpenedTime:
-SELECT openedAt FROM DeeprOpenLog WHERE deeplinkId = ? ORDER BY openedAt DESC LIMIT 1;
-
 toggleFavourite:
 UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE id = ?;
 
-setFavourite:
-UPDATE Deepr SET isFavourite = ? WHERE id = ?;
+getLinksAndTagsPaged:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  Deepr.isFavourite,
+  Deepr.notes,
+  DOL_Max.lastOpenedAt,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
+  GROUP_CONCAT(Tags.id, ', ') AS tagsIds
+FROM
+  Deepr
+  LEFT JOIN (
+        -- Subquery to find the single latest log entry per deeplink
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  (Deepr.link LIKE '%' || :searchQuery || '%' OR Deepr.name LIKE '%' || :searchQuery || '%')
+  AND (
+    :favouriteFilter = -1 OR Deepr.isFavourite = :favouriteFilter
+  )
+  AND (
+    :tagIdsString = '' OR (
+      SELECT COUNT(DISTINCT lt.tagId)
+      FROM LinkTags lt
+      WHERE lt.linkId = Deepr.id
+        AND (',' || :tagIdsString || ',' LIKE '%,' || CAST(lt.tagId AS TEXT) || ',%')
+    ) = :tagCount
+  )
+GROUP BY
+  Deepr.id
+ORDER BY
+    CASE WHEN :sortType = 'ASC' THEN
+        CASE :sortField
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END ASC,
+    CASE WHEN :sortType = 'DESC' THEN
+        CASE :sortField
+            WHEN 'createdAt' THEN Deepr.createdAt
+            WHEN 'openedCount' THEN Deepr.openedCount
+            WHEN 'name' THEN Deepr.name
+            WHEN 'link' THEN Deepr.link
+            ELSE Deepr.createdAt
+        END
+    END DESC
+LIMIT :limit OFFSET :offset;
 
+getLinkById:
+SELECT
+  Deepr.id AS id,
+  Deepr.link,
+  Deepr.name,
+  Deepr.createdAt,
+  Deepr.openedCount,
+  Deepr.isFavourite,
+  Deepr.notes,
+  DOL_Max.lastOpenedAt,
+  GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
+  GROUP_CONCAT(Tags.id, ', ') AS tagsIds
+FROM
+  Deepr
+  LEFT JOIN (
+        SELECT
+          deeplinkId,
+          MAX(openedAt) AS lastOpenedAt
+        FROM
+          DeeprOpenLog
+        GROUP BY
+          deeplinkId
+      ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
+  LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
+  LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE
+  Deepr.id = :id
+GROUP BY
+  Deepr.id;
