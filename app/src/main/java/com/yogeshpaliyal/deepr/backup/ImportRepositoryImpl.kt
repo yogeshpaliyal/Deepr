@@ -46,6 +46,7 @@ class ImportRepositoryImpl(
                             val openedCount = row[2].toLongOrNull() ?: 0L
                             val name = row.getOrNull(3)?.toString() ?: ""
                             val notes = row.getOrNull(4)?.toString() ?: ""
+                            val tagsString = row.getOrNull(5)?.toString() ?: ""
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
@@ -56,6 +57,21 @@ class ImportRepositoryImpl(
                                         name = name,
                                         notes = notes,
                                     )
+                                    val linkId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                                    // Import tags if present
+                                    if (tagsString.isNotBlank()) {
+                                        val tagNames = tagsString.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                                        tagNames.forEach { tagName ->
+                                            // Insert tag if it doesn't exist
+                                            deeprQueries.insertTag(tagName)
+                                            // Get tag ID and link it
+                                            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                            if (tag != null) {
+                                                deeprQueries.addTagToLink(linkId, tag.id)
+                                            }
+                                        }
+                                    }
                                 }
                             } else {
                                 skippedCount++
