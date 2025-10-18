@@ -25,6 +25,7 @@
     
     <!-- Menu and Dialog Items -->
     <string name="more_options">مزید اختیارات</string>
+    <string name="open_with">اس کے ساتھ کھولیں</string>
     <string name="copy_link">لنک کاپی کریں</string>
     <string name="link_copied">لنک کاپی ہو گیا</string>
     <string name="delete">حذف کریں</string>

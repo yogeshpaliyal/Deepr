@@ -86,6 +86,7 @@ import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
+import com.yogeshpaliyal.deepr.util.openDeeplinkWithChooser
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -483,6 +484,11 @@ fun Content(
                     is MenuItem.Click -> {
                         viewModel.incrementOpenedCount(it.item.id)
                         openDeeplink(context, it.item.link)
+                    }
+
+                    is MenuItem.OpenWith -> {
+                        viewModel.incrementOpenedCount(it.item.id)
+                        openDeeplinkWithChooser(context, it.item.link)
                     }
 
                     is MenuItem.Delete -> showDeleteConfirmDialog = it.item
