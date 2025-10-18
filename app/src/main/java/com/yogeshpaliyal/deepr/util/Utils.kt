@@ -33,6 +33,29 @@ fun openDeeplink(
     }
 }
 
+fun openDeeplinkWithChooser(
+    context: Context,
+    link: String,
+): Boolean {
+    if (!isValidDeeplink(link)) return false
+    val normalizedLink = normalizeLink(link)
+    return try {
+        val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
+        val chooserIntent = Intent.createChooser(intent, null)
+        context.startActivity(chooserIntent)
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Toast
+            .makeText(
+                context,
+                context.getString(R.string.invalid_deeplink_toast, normalizedLink),
+                Toast.LENGTH_SHORT,
+            ).show()
+        false
+    }
+}
+
 fun getShortcutAppIcon(
     context: Context,
     link: String,

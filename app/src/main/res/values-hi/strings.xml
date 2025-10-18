@@ -25,6 +25,7 @@
     
     <!-- Menu and Dialog Items -->
     <string name="more_options">अधिक विकल्प</string>
+    <string name="open_with">इसके साथ खोलें</string>
     <string name="copy_link">लिंक कॉपी करें</string>
     <string name="link_copied">लिंक कॉपी किया गया</string>
     <string name="delete">हटाएं</string>
