@@ -58,10 +58,10 @@ class ImportRepositoryImpl(
                                         notes = notes,
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
-                                    
+
                                     // Import tags if present
                                     if (tagsString.isNotBlank()) {
-                                        val tagNames = tagsString.split(", ").map { it.trim() }.filter { it.isNotEmpty() }
+                                        val tagNames = tagsString.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                         tagNames.forEach { tagName ->
                                             // Insert tag if it doesn't exist
                                             deeprQueries.insertTag(tagName)
