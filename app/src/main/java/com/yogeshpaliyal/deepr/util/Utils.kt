@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import com.yogeshpaliyal.deepr.GetLinkById
+import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 
 fun openDeeplink(
@@ -94,3 +96,17 @@ fun isValidDeeplink(link: String): Boolean {
         false
     }
 }
+
+fun GetLinkById.toGetLinksAndTags() =
+    GetLinksAndTags(
+        id = id,
+        link = link,
+        name = name,
+        createdAt = createdAt,
+        openedCount = openedCount,
+        isFavourite = isFavourite,
+        notes = notes,
+        lastOpenedAt = lastOpenedAt,
+        tagsNames = tagsNames,
+        tagsIds = tagsIds,
+    )

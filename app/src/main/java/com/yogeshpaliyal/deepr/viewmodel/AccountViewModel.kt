@@ -4,6 +4,12 @@ import android.net.Uri
 import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -14,11 +20,13 @@ import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.data.AccountPagingSource
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
+import com.yogeshpaliyal.deepr.util.toGetLinksAndTags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -134,6 +142,9 @@ class AccountViewModel(
     private val _favouriteFilter = MutableStateFlow(-1)
     val favouriteFilter: StateFlow<Int> = _favouriteFilter
 
+    private val itemUpdates = MutableStateFlow<Map<Long, GetLinksAndTags>>(emptyMap())
+    private val deletedItems = MutableStateFlow<Set<Long>>(emptySet())
+
     // Set tag filter - toggle tag in the list
     fun setTagFilter(tag: Tags?) {
         if (tag == null) {
@@ -223,42 +234,58 @@ class AccountViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<GetLinksAndTags>?> =
+    val accounts: Flow<PagingData<GetLinksAndTags>> =
         combine(
             searchQuery,
             sortOrder,
             selectedTagFilter,
             favouriteFilter,
         ) { query, sorting, tags, favourite ->
-            listOf(query, sorting, tags, favourite)
-        }.flatMapLatest { combined ->
-            val query = combined[0] as String
-            val sorting = (combined[1] as String).split("_")
-            val tags = combined[2] as List<Tags>
-            val favourite = combined[3] as Int
+            mapOf(
+                "query" to query,
+                "sorting" to sorting,
+                "tags" to tags,
+                "favourite" to favourite,
+            )
+        }.flatMapLatest { filters ->
+            val query = filters["query"] as String
+            val sorting = (filters["sorting"] as String).split("_")
+            val tags = filters["tags"] as List<Tags>
+            val favourite = filters["favourite"] as Int
+
             val sortField = sorting.getOrNull(0) ?: "createdAt"
             val sortType = sorting.getOrNull(1) ?: "DESC"
 
-            // Prepare tag filter parameters
-            val tagIdsString = if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
-            val tagCount = tags.size.toLong()
-
-            deeprQueries
-                .getLinksAndTags(
-                    query,
-                    query,
-                    favourite.toLong(),
-                    favourite.toLong(),
-                    tagIdsString,
-                    tagIdsString,
-                    tagCount,
-                    sortType,
-                    sortField,
-                    sortType,
-                    sortField,
-                ).asFlow()
-                .mapToList(viewModelScope.coroutineContext)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+            // Create a new Pager whenever the filters change
+            Pager(
+                config =
+                    PagingConfig(
+                        pageSize = 20,
+                        enablePlaceholders = false,
+                        prefetchDistance = 1,
+                    ),
+                pagingSourceFactory = {
+                    AccountPagingSource(
+                        deeprQueries = deeprQueries,
+                        searchQuery = query,
+                        favouriteFilter = favourite,
+                        selectedTags = tags,
+                        sortField = sortField,
+                        sortType = sortType,
+                    )
+                },
+            ).flow
+        }.cachedIn(viewModelScope)
+            .combine(itemUpdates) { pagingData, updates ->
+                pagingData.map { item ->
+                    updates[item.id] ?: item
+                }
+            }.combine(deletedItems) { pagingData, deletedIds ->
+                // Filter out deleted items
+                pagingData.filter { item ->
+                    item.id !in deletedIds
+                }
+            }
 
     fun search(query: String) {
         searchQuery.update { query }
@@ -306,6 +333,9 @@ class AccountViewModel(
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                deletedItems.update { it + id }
+            }
             val tagsToDelete = mutableListOf<Long>()
 
             deeprQueries.getTagsForLink(id).executeAsList().forEach { tag ->
@@ -340,18 +370,33 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
             deeprQueries.insertDeeprOpenLog(id)
+            deeprQueries.getLinkById(id).executeAsOneOrNull()?.let { item ->
+                itemUpdates.update { currentMap ->
+                    currentMap + (id to item.toGetLinksAndTags())
+                }
+            }
         }
     }
 
     fun resetOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.resetOpenedCount(id)
+            deeprQueries.getLinkById(id).executeAsOneOrNull()?.let { item ->
+                itemUpdates.update { currentMap ->
+                    currentMap + (id to item.toGetLinksAndTags())
+                }
+            }
         }
     }
 
     fun toggleFavourite(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.toggleFavourite(id)
+            deeprQueries.getLinkById(id).executeAsOneOrNull()?.let { item ->
+                itemUpdates.update { currentMap ->
+                    currentMap + (id to item.toGetLinksAndTags())
+                }
+            }
         }
     }
 
@@ -364,6 +409,11 @@ class AccountViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, notes, id)
+            deeprQueries.getLinkById(id).executeAsOneOrNull()?.let { item ->
+                itemUpdates.update { currentMap ->
+                    currentMap + (id to item.toGetLinksAndTags())
+                }
+            }
             modifyTagsForLink(id, tagsList)
             syncToMarkdown()
         }

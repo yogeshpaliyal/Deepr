@@ -69,6 +69,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -428,89 +432,97 @@ fun Content(
     viewModel: AccountViewModel = koinViewModel(),
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
-    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val accounts = viewModel.accounts.collectAsLazyPagingItems()
 
-    if (accounts == null) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) { ContainedLoadingIndicator() }
-        return
-    }
-
-    Column(modifier.fillMaxSize()) {
-        val context = LocalContext.current
-        var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-
-        showShortcutDialog?.let { deepr ->
-            CreateShortcutDialog(
-                deepr = deepr,
-                onDismiss = { showShortcutDialog = null },
-            )
+    when (accounts.loadState.refresh) {
+        is LoadState.Loading -> {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) { ContainedLoadingIndicator() }
         }
 
-        showQrCodeDialog?.let {
-            QrCodeDialog(it) {
-                showQrCodeDialog = null
+        is LoadState.Error -> {
+        }
+
+        is LoadState.NotLoading -> {
+            Column(modifier.fillMaxSize()) {
+                val context = LocalContext.current
+                var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+                var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+                var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+
+                showShortcutDialog?.let { deepr ->
+                    CreateShortcutDialog(
+                        deepr = deepr,
+                        onDismiss = { showShortcutDialog = null },
+                    )
+                }
+
+                showQrCodeDialog?.let {
+                    QrCodeDialog(it) {
+                        showQrCodeDialog = null
+                    }
+                }
+
+                showDeleteConfirmDialog?.let { deepr ->
+                    DeleteConfirmationDialog(
+                        deepr = deepr,
+                        onDismiss = { showDeleteConfirmDialog = null },
+                        onConfirm = {
+                            viewModel.deleteAccount(it.id)
+                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                        },
+                    )
+                }
+
+                DeeprList(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .hazeSource(state = hazeState)
+                            .padding(8.dp),
+                    contentPaddingValues = contentPaddingValues,
+                    accounts = accounts,
+                    selectedTag = selectedTag,
+                    onItemClick = {
+                        when (it) {
+                            is MenuItem.Click -> {
+                                viewModel.incrementOpenedCount(it.item.id)
+                                openDeeplink(context, it.item.link)
+                            }
+
+                            is MenuItem.Delete -> showDeleteConfirmDialog = it.item
+                            is MenuItem.Edit -> editDeepr(it.item)
+                            is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
+                            is MenuItem.ResetCounter -> {
+                                viewModel.resetOpenedCount(it.item.id)
+                                Toast
+                                    .makeText(context, "Opened count reset", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            is MenuItem.Shortcut -> {
+                                showShortcutDialog = it.item
+                            }
+
+                            is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
+                        }
+                    },
+                    onTagClick = {
+                        // Toggle the tag in the filter by tag name
+                        viewModel.setSelectedTagByName(it)
+                    },
+                )
             }
         }
-
-        showDeleteConfirmDialog?.let { deepr ->
-            DeleteConfirmationDialog(
-                deepr = deepr,
-                onDismiss = { showDeleteConfirmDialog = null },
-                onConfirm = {
-                    viewModel.deleteAccount(it.id)
-                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                },
-            )
-        }
-
-        DeeprList(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .hazeSource(state = hazeState)
-                    .padding(8.dp),
-            contentPaddingValues = contentPaddingValues,
-            accounts = accounts!!,
-            selectedTag = selectedTag,
-            onItemClick = {
-                when (it) {
-                    is MenuItem.Click -> {
-                        viewModel.incrementOpenedCount(it.item.id)
-                        openDeeplink(context, it.item.link)
-                    }
-
-                    is MenuItem.Delete -> showDeleteConfirmDialog = it.item
-                    is MenuItem.Edit -> editDeepr(it.item)
-                    is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
-                    is MenuItem.ResetCounter -> {
-                        viewModel.resetOpenedCount(it.item.id)
-                        Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is MenuItem.Shortcut -> {
-                        showShortcutDialog = it.item
-                    }
-
-                    is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
-                }
-            },
-            onTagClick = {
-                // Toggle the tag in the filter by tag name
-                viewModel.setSelectedTagByName(it)
-            },
-        )
     }
 }
 
 @Composable
 fun DeeprList(
-    accounts: List<GetLinksAndTags>,
+    accounts: LazyPagingItems<GetLinksAndTags>,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
@@ -518,7 +530,7 @@ fun DeeprList(
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        visible = accounts.isEmpty(),
+        visible = (accounts.itemCount == 0),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
@@ -561,105 +573,112 @@ fun DeeprList(
             Spacer(modifier = Modifier.weight(1f)) // Push content up
         }
     }
-    AnimatedVisibility(
-        visible = accounts.isNotEmpty(),
-        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
-        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
-    ) {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = contentPaddingValues,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+    accounts.let { pagingItems ->
+        AnimatedVisibility(
+            visible = (accounts.itemCount != 0),
+            enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+            exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
         ) {
-            items(
-                count = accounts.size,
-                key = { index -> accounts[index].id },
-            ) { index ->
-                val account = accounts[index]
-                val dismissState =
-                    rememberSwipeToDismissBoxState(
-                        confirmValueChange = { value ->
-                            when (value) {
-                                SwipeToDismissBoxValue.EndToStart -> {
-                                    onItemClick(MenuItem.Delete(account))
-                                    false
-                                }
-
-                                SwipeToDismissBoxValue.StartToEnd -> {
-                                    onItemClick(MenuItem.Edit(account))
-                                    false
-                                }
-
-                                else -> {
-                                    false
-                                }
-                            }
+            LazyColumn(
+                modifier = modifier,
+                contentPadding = contentPaddingValues,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                items(
+                    count = accounts.itemCount,
+                    key =
+                        pagingItems.itemKey { item ->
+                            item.id
                         },
-                    )
+                ) { index ->
+                    val account = pagingItems[index]
+                    account?.let {
+                        val dismissState =
+                            rememberSwipeToDismissBoxState(
+                                confirmValueChange = { value ->
+                                    when (value) {
+                                        SwipeToDismissBoxValue.EndToStart -> {
+                                            onItemClick(MenuItem.Delete(account))
+                                            false
+                                        }
 
-                SwipeToDismissBox(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp)),
-                    state = dismissState,
-                    backgroundContent = {
-                        when (dismissState.dismissDirection) {
-                            SwipeToDismissBoxValue.StartToEnd -> {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .background(
-                                                Color.Gray.copy(alpha = 0.5f),
-                                            ).fillMaxSize()
-                                            .clip(
-                                                RoundedCornerShape(8.dp),
-                                            ),
-                                    contentAlignment = Alignment.CenterStart,
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Edit,
-                                        contentDescription = stringResource(R.string.edit),
-                                        tint = Color.White,
-                                        modifier = Modifier.padding(16.dp),
-                                    )
+                                        SwipeToDismissBoxValue.StartToEnd -> {
+                                            onItemClick(MenuItem.Edit(account))
+                                            false
+                                        }
+
+                                        else -> {
+                                            false
+                                        }
+                                    }
+                                },
+                            )
+
+                        SwipeToDismissBox(
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(8.dp)),
+                            state = dismissState,
+                            backgroundContent = {
+                                when (dismissState.dismissDirection) {
+                                    SwipeToDismissBoxValue.StartToEnd -> {
+                                        Box(
+                                            modifier =
+                                                Modifier
+                                                    .background(
+                                                        Color.Gray.copy(alpha = 0.5f),
+                                                    ).fillMaxSize()
+                                                    .clip(
+                                                        RoundedCornerShape(8.dp),
+                                                    ),
+                                            contentAlignment = Alignment.CenterStart,
+                                        ) {
+                                            Icon(
+                                                imageVector = TablerIcons.Edit,
+                                                contentDescription = stringResource(R.string.edit),
+                                                tint = Color.White,
+                                                modifier = Modifier.padding(16.dp),
+                                            )
+                                        }
+                                    }
+
+                                    SwipeToDismissBoxValue.EndToStart -> {
+                                        Box(
+                                            modifier =
+                                                Modifier
+                                                    .background(
+                                                        Color.Red.copy(alpha = 0.5f),
+                                                    ).fillMaxSize()
+                                                    .clip(
+                                                        RoundedCornerShape(8.dp),
+                                                    ),
+                                            contentAlignment = Alignment.CenterEnd,
+                                        ) {
+                                            Icon(
+                                                imageVector = TablerIcons.Trash,
+                                                contentDescription = stringResource(R.string.delete),
+                                                tint = Color.White,
+                                                modifier = Modifier.padding(16.dp),
+                                            )
+                                        }
+                                    }
+
+                                    else -> {
+                                        Color.White
+                                    }
                                 }
-                            }
-
-                            SwipeToDismissBoxValue.EndToStart -> {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .background(
-                                                Color.Red.copy(alpha = 0.5f),
-                                            ).fillMaxSize()
-                                            .clip(
-                                                RoundedCornerShape(8.dp),
-                                            ),
-                                    contentAlignment = Alignment.CenterEnd,
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Trash,
-                                        contentDescription = stringResource(R.string.delete),
-                                        tint = Color.White,
-                                        modifier = Modifier.padding(16.dp),
-                                    )
-                                }
-                            }
-
-                            else -> {
-                                Color.White
-                            }
+                            },
+                        ) {
+                            DeeprItem(
+                                modifier = Modifier.animateItem(),
+                                account = account,
+                                selectedTag = selectedTag,
+                                onItemClick = onItemClick,
+                                onTagClick = onTagClick,
+                            )
                         }
-                    },
-                ) {
-                    DeeprItem(
-                        modifier = Modifier.animateItem(),
-                        account = account,
-                        selectedTag = selectedTag,
-                        onItemClick = onItemClick,
-                        onTagClick = onTagClick,
-                    )
+                    }
                 }
             }
         }
