@@ -18,11 +18,11 @@
     <string name="all">सभी</string>
     <string name="add_link">लिंक जोड़ें</string>
     <string name="fetch_name_from_link">लिंक से नाम प्राप्त करें</string>
-    <string name="add_tag">टैग जोड़ें</string>
+    <string name="create_tag">टैग बनाएं</string>
     <string name="new_tag">नया टैग</string>
     <string name="no_links_saved_yet">अभी तक कोई लिंक सहेजे नहीं गए</string>
     <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें।</string>
-    
+
     <!-- Menu and Dialog Items -->
     <string name="more_options">अधिक विकल्प</string>
     <string name="copy_link">लिंक कॉपी करें</string>
@@ -39,7 +39,7 @@
     <string name="edit_shortcut">शॉर्टकट संपादित करें</string>
     <string name="show_qr_code">QR कोड दिखाएं</string>
     <string name="deeplink_already_exists">डीपलिंक पहले से मौजूद है</string>
-    
+
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">दिनांक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_date_descending">दिनांक के अनुसार अवरोही क्रम में</string>
@@ -49,7 +49,7 @@
     <string name="sort_by_name_descending">नाम के अनुसार अवरोही क्रम में</string>
     <string name="sort_by_link_ascending">लिंक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_link_descending">लिंक के अनुसार अवरोही क्रम में</string>
-    
+
     <!-- Tag Management -->
     <string name="edit_tag">टैग संपादित करें</string>
     <string name="delete_tag">टैग हटाएं</string>
@@ -119,7 +119,7 @@
     <string name="last_sync_time">अंतिम सिंक समय:</string>
     <string name="last_sync_time_never">कभी सिंक नहीं हुआ</string>
     <string name="last_sync_time_format">%s</string>
-    
+
     <!-- Sync Messages -->
     <string name="sync_disabled">सिंक अक्षम है</string>
     <string name="sync_file_not_selected">कोई सिंक फ़ाइल नहीं चुनी गई</string>
@@ -128,7 +128,7 @@
     <string name="no_file_path_provided">कोई फ़ाइल पथ प्रदान नहीं किया गया</string>
     <string name="invalid_markdown_format">अमान्य मार्कडाउन तालिका प्रारूप</string>
     <string name="file_validation_error">फ़ाइल सत्यापन त्रुटि: %s</string>
-    
+
     <!-- Additional Sync Settings -->
     <string name="sync_to_file">स्थानीय फ़ाइल में सिंक करें (बीटा)</string>
     <string name="sync_to_file_description">डीपलिंक्स को मार्कडाउन फ़ाइल में स्वचालित रूप से सिंक करें</string>

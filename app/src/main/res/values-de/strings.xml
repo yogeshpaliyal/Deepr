@@ -18,7 +18,7 @@
     <string name="all">Alle</string>
     <string name="add_link">Link hinzufügen</string>
     <string name="fetch_name_from_link">Name vom Link abrufen</string>
-    <string name="add_tag">Tag hinzufügen</string>
+    <string name="create_tag">Tag erstellen</string>
     <string name="new_tag">Neuer Tag</string>
     <string name="no_links_saved_yet">Noch keine Links gespeichert</string>
     <string name="save_your_link_below">Speichern Sie Ihren Link unten, um später schnell darauf zugreifen zu können.</string>

@@ -333,7 +333,7 @@ fun HomeBottomContent(
                         },
                         enabled = newTagName.isNotBlank(),
                     ) {
-                        Text(stringResource(R.string.add_tag))
+                        Text(stringResource(R.string.create_tag))
                     }
                 }
 

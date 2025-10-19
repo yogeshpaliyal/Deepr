@@ -18,11 +18,11 @@
     <string name="all">Tous</string>
     <string name="add_link">Ajouter un lien</string>
     <string name="fetch_name_from_link">Récupérer le nom depuis le lien</string>
-    <string name="add_tag">Ajouter une étiquette</string>
+    <string name="create_tag">Créer une étiquette</string>
     <string name="new_tag">Nouvelle étiquette</string>
     <string name="no_links_saved_yet">Aucun lien sauvegardé pour le moment</string>
     <string name="save_your_link_below">Enregistrez votre lien ci-dessous pour y accéder rapidement plus tard.</string>
-    
+
     <!-- Menu and Dialog Items -->
     <string name="more_options">Plus d\'options</string>
     <string name="copy_link">Copier le lien</string>
@@ -39,7 +39,7 @@
     <string name="edit_shortcut">Modifier le raccourci</string>
     <string name="show_qr_code">Afficher le code QR</string>
     <string name="deeplink_already_exists">Le lien profond existe déjà</string>
-    
+
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">Trier par Date Croissante</string>
     <string name="sort_by_date_descending">Trier par Date Décroissante</string>
@@ -49,7 +49,7 @@
     <string name="sort_by_name_descending">Trier par Nom Décroissant</string>
     <string name="sort_by_link_ascending">Trier par Lien Croissant</string>
     <string name="sort_by_link_descending">Trier par Lien Décroissant</string>
-    
+
     <!-- Tag Management -->
     <string name="edit_tag">Modifier le Tag</string>
     <string name="delete_tag">Supprimer le Tag</string>
@@ -119,7 +119,7 @@
     <string name="last_sync_time">Dernière synchronisation :</string>
     <string name="last_sync_time_never">Jamais synchronisé</string>
     <string name="last_sync_time_format">%s</string>
-    
+
     <!-- Sync Messages -->
     <string name="sync_disabled">La synchronisation est désactivée</string>
     <string name="sync_file_not_selected">Aucun fichier de synchronisation sélectionné</string>
@@ -128,7 +128,7 @@
     <string name="no_file_path_provided">Aucun chemin de fichier fourni</string>
     <string name="invalid_markdown_format">Format de tableau markdown invalide</string>
     <string name="file_validation_error">Erreur de validation du fichier : %s</string>
-    
+
     <!-- Additional Sync Settings -->
     <string name="sync_to_file">Synchroniser vers un fichier local (Bêta)</string>
     <string name="sync_to_file_description">Synchroniser automatiquement les liens profonds vers un fichier markdown</string>

@@ -260,37 +260,6 @@ fun DeeprItem(
                                 expanded = false
                             })
                             DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        if (account.isFavourite == 1L) {
-                                            stringResource(R.string.remove_from_favourites)
-                                        } else {
-                                            stringResource(R.string.add_to_favourites)
-                                        },
-                                    )
-                                },
-                                onClick = {
-                                    onItemClick(MenuItem.FavouriteClick(account))
-                                    expanded = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector =
-                                            if (account.isFavourite == 1L) {
-                                                Icons.Rounded.Star
-                                            } else {
-                                                Icons.Rounded.StarBorder
-                                            },
-                                        contentDescription =
-                                            if (account.isFavourite == 1L) {
-                                                stringResource(R.string.remove_from_favourites)
-                                            } else {
-                                                stringResource(R.string.add_to_favourites)
-                                            },
-                                    )
-                                },
-                            )
-                            DropdownMenuItem(
                                 text = { Text(stringResource(R.string.reset_opened_count)) },
                                 onClick = {
                                     onItemClick(MenuItem.ResetCounter(account))
