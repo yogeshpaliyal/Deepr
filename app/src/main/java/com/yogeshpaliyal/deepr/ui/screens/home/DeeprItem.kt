@@ -25,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -299,6 +300,12 @@ fun DeeprItem(
                                         contentDescription = stringResource(R.string.delete),
                                     )
                                 },
+                                colors =
+                                    MenuDefaults.itemColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                                        textColor = MaterialTheme.colorScheme.onErrorContainer,
+                                        leadingIconColor = MaterialTheme.colorScheme.onErrorContainer,
+                                    ),
                             )
                         }
                     }
