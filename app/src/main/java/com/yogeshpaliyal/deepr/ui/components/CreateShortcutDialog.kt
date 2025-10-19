@@ -32,7 +32,7 @@ fun CreateShortcutDialog(
     if (isShortcutSupported(context)) {
         var shortcutName by remember {
             mutableStateOf(
-                existingShortcut?.shortLabel?.toString() ?: "",
+                existingShortcut?.shortLabel?.toString() ?: deepr.name,
             )
         }
         AlertDialog(
