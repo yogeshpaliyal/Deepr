@@ -193,92 +193,98 @@ fun LocalNetworkServerScreen(
             }
 
             // Server URL Card
-            AnimatedVisibility(isRunning && serverUrl != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
+            AnimatedVisibility(
+                visible = isRunning && (serverUrl != null),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
                     ) {
-                        Text(
-                            text = stringResource(R.string.server_url),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-
-                        Row(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surface,
-                                        RoundedCornerShape(8.dp),
-                                    ).padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
-                                text = serverUrl ?: "",
-                                style =
-                                    MaterialTheme.typography.bodyLarge.copy(
-                                        fontFamily = FontFamily.Monospace,
-                                    ),
-                                modifier = Modifier.weight(1f),
+                                text = stringResource(R.string.server_url),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
                             )
-                            IconButton(
-                                onClick = {
-                                    copyToClipboard(context, serverUrl ?: "")
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            context.getString(R.string.copied_to_clipboard),
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                },
+
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            RoundedCornerShape(8.dp),
+                                        ).padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(
-                                    TablerIcons.Copy,
-                                    contentDescription = stringResource(R.string.copy),
+                                Text(
+                                    text = serverUrl ?: "",
+                                    style =
+                                        MaterialTheme.typography.bodyLarge.copy(
+                                            fontFamily = FontFamily.Monospace,
+                                        ),
+                                    modifier = Modifier.weight(1f),
                                 )
+                                IconButton(
+                                    onClick = {
+                                        copyToClipboard(context, serverUrl ?: "")
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getString(R.string.copied_to_clipboard),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    },
+                                ) {
+                                    Icon(
+                                        TablerIcons.Copy,
+                                        contentDescription = stringResource(R.string.copy),
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                // QR Code Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    // QR Code Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
                     ) {
-                        Text(
-                            text = stringResource(R.string.scan_qr_code),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Text(
-                            text = stringResource(R.string.scan_qr_code_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        QrCodeView(
-                            data = serverUrl ?: "",
-                            modifier = Modifier.size(200.dp),
-                        )
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.scan_qr_code),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Text(
+                                text = stringResource(R.string.scan_qr_code_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            QrCodeView(
+                                data = serverUrl ?: "",
+                                modifier = Modifier.size(200.dp),
+                            )
+                        }
                     }
                 }
             }
