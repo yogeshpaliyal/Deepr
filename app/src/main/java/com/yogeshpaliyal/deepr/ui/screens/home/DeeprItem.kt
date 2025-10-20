@@ -302,8 +302,8 @@ fun DeeprItem(
                                 },
                                 colors =
                                     MenuDefaults.itemColors(
-                                        textColor = MaterialTheme.colorScheme.onErrorContainer,
-                                        leadingIconColor = MaterialTheme.colorScheme.onErrorContainer,
+                                        textColor = MaterialTheme.colorScheme.error,
+                                        leadingIconColor = MaterialTheme.colorScheme.error,
                                     ),
                             )
                         }
