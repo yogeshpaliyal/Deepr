@@ -28,6 +28,7 @@ class AppPreferenceDataStore(
         private val AUTO_BACKUP_LOCATION = stringPreferencesKey("auto_backup_location")
         private val AUTO_BACKUP_INTERVAL = longPreferencesKey("auto_backup_interval")
         private val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
+        private val DEFAULT_PAGE_FAVOURITES = booleanPreferencesKey("default_page_favourites")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -73,6 +74,11 @@ class AppPreferenceDataStore(
     val getLastBackupTime: Flow<Long> =
         context.appDataStore.data.map { preferences ->
             preferences[LAST_BACKUP_TIME] ?: 0L // Default to 0 (never backed up)
+        }
+
+    val getDefaultPageFavourites: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[DEFAULT_PAGE_FAVOURITES] ?: false // Default to All (-1)
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -132,6 +138,12 @@ class AppPreferenceDataStore(
     suspend fun setLastBackupTime(timestamp: Long) {
         context.appDataStore.edit { prefs ->
             prefs[LAST_BACKUP_TIME] = timestamp
+        }
+    }
+
+    suspend fun setDefaultPageFavourites(favourites: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[DEFAULT_PAGE_FAVOURITES] = favourites
         }
     }
 }
