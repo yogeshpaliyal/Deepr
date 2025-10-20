@@ -67,6 +67,7 @@ import compose.icons.tablericons.Language
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
+import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
@@ -109,6 +110,9 @@ fun SettingsScreen(
     // Collect language preference state
     val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
     var showLanguageDialog by remember { mutableStateOf(false) }
+
+    // Collect default page preference state
+    val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
 
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
@@ -423,6 +427,26 @@ fun SettingsScreen(
                         },
                     onClick = {
                         showLanguageDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Star,
+                    title = stringResource(R.string.default_page),
+                    description =
+                        if (defaultPageFavourites) {
+                            stringResource(R.string.default_page_favourites)
+                        } else {
+                            stringResource(R.string.default_page_all)
+                        },
+                    onClick = {
+                        viewModel.setDefaultPageFavourites(!defaultPageFavourites)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = defaultPageFavourites,
+                            onCheckedChange = { viewModel.setDefaultPageFavourites(it) },
+                        )
                     },
                 )
 
