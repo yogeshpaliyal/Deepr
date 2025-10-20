@@ -148,6 +148,166 @@
             </div>
         </section>
 
+        <!-- API Documentation Section -->
+        <section class="glass-effect rounded-2xl shadow-xl mb-8 animate-slide-up" style="animation-delay: 0.3s">
+            <div class="p-6 sm:p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    API Documentation
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Server Info -->
+                    <div class="bg-white rounded-xl p-4 border border-gray-200">
+                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Server Information
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                <span class="text-gray-600">IP Address:</span>
+                                <code id="serverIp" class="font-mono text-gray-800 bg-white px-2 py-1 rounded border">Loading...</code>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                <span class="text-gray-600">Port:</span>
+                                <code class="font-mono text-gray-800 bg-white px-2 py-1 rounded border">8080</code>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                <span class="text-gray-600">Base URL:</span>
+                                <code id="baseUrl" class="font-mono text-gray-800 bg-white px-2 py-1 rounded border">Loading...</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Endpoints -->
+                    <div class="bg-white rounded-xl p-4 border border-gray-200">
+                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                            Available Endpoints
+                        </h3>
+                        <div class="space-y-3">
+                            <!-- GET /api/links -->
+                            <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">GET</span>
+                                    <code class="text-sm font-mono text-gray-800">/api/links</code>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">Retrieve all saved links with their metadata</p>
+                                <details class="mt-2">
+                                    <summary class="text-xs text-primary-600 cursor-pointer hover:text-primary-800">View response example</summary>
+                                    <pre class="mt-2 p-2 bg-gray-50 rounded text-xs overflow-x-auto"><code>[
+  {
+    "id": 1,
+    "link": "https://example.com",
+    "name": "Example",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "openedCount": 5,
+    "notes": "My notes",
+    "tags": ["work", "important"]
+  }
+]</code></pre>
+                                </details>
+                            </div>
+
+                            <!-- POST /api/links -->
+                            <div class="border-l-4 border-green-500 pl-4 py-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">POST</span>
+                                    <code class="text-sm font-mono text-gray-800">/api/links</code>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">Add a new link to your collection</p>
+                                <details class="mt-2">
+                                    <summary class="text-xs text-primary-600 cursor-pointer hover:text-primary-800">View request example</summary>
+                                    <pre class="mt-2 p-2 bg-gray-50 rounded text-xs overflow-x-auto"><code>{
+  "link": "https://example.com",
+  "name": "Example Site",
+  "notes": "Optional notes",
+  "tags": [
+    {"id": 0, "name": "new-tag"},
+    {"id": 1, "name": "existing-tag"}
+  ]
+}</code></pre>
+                                </details>
+                            </div>
+
+                            <!-- GET /api/tags -->
+                            <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">GET</span>
+                                    <code class="text-sm font-mono text-gray-800">/api/tags</code>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">Get all available tags with usage count</p>
+                                <details class="mt-2">
+                                    <summary class="text-xs text-primary-600 cursor-pointer hover:text-primary-800">View response example</summary>
+                                    <pre class="mt-2 p-2 bg-gray-50 rounded text-xs overflow-x-auto"><code>[
+  {
+    "id": 1,
+    "name": "work",
+    "count": 15
+  }
+]</code></pre>
+                                </details>
+                            </div>
+
+                            <!-- GET /api/link-info -->
+                            <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">GET</span>
+                                    <code class="text-sm font-mono text-gray-800">/api/link-info?url={url}</code>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">Fetch metadata (title, image) for any URL</p>
+                                <details class="mt-2">
+                                    <summary class="text-xs text-primary-600 cursor-pointer hover:text-primary-800">View response example</summary>
+                                    <pre class="mt-2 p-2 bg-gray-50 rounded text-xs overflow-x-auto"><code>{
+  "title": "Page Title",
+  "imageUrl": "https://example.com/image.jpg"
+}</code></pre>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Examples -->
+                    <div class="bg-white rounded-xl p-4 border border-gray-200">
+                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            Usage Examples
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-700 mb-1">Fetch all links using cURL:</p>
+                                <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs overflow-x-auto">
+                                    curl <span id="curlGetLinks">http://YOUR_IP:8080</span>/api/links
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-700 mb-1">Add a link using cURL:</p>
+                                <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs overflow-x-auto">
+                                    curl -X POST <span id="curlPostLink">http://YOUR_IP:8080</span>/api/links \<br>
+                                    &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+                                    &nbsp;&nbsp;-d '{"link":"https://example.com","name":"Example"}'
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-700 mb-1">Fetch link metadata:</p>
+                                <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs overflow-x-auto">
+                                    curl "<span id="curlLinkInfo">http://YOUR_IP:8080</span>/api/link-info?url=https://example.com"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Links Section -->
         <section class="glass-effect rounded-2xl shadow-xl animate-slide-up" style="animation-delay: 0.4s">
             <div class="p-6 sm:p-8">
@@ -719,8 +879,25 @@
             return div.innerHTML;
         }
 
+        // Function to update server info in API documentation
+        function updateServerInfo() {
+            const currentUrl = window.location.origin;
+            const serverIp = window.location.hostname;
+            
+            // Update server info display
+            document.getElementById('serverIp').textContent = serverIp;
+            document.getElementById('baseUrl').textContent = currentUrl;
+            
+            // Update cURL examples
+            document.getElementById('curlGetLinks').textContent = currentUrl;
+            document.getElementById('curlPostLink').textContent = currentUrl;
+            document.getElementById('curlLinkInfo').textContent = currentUrl;
+        }
+
         // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize server info
+            updateServerInfo();
             // Search input with debounce
             const searchInput = document.getElementById('searchInput');
             const debouncedFilter = debounce(filterAndDisplayLinks, 300);

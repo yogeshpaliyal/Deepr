@@ -194,91 +194,188 @@ fun LocalNetworkServerScreen(
 
             // Server URL Card
             AnimatedVisibility(isRunning && serverUrl != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // Server Address Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
                     ) {
-                        Text(
-                            text = stringResource(R.string.server_url),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-
-                        Row(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surface,
-                                        RoundedCornerShape(8.dp),
-                                    ).padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
-                                text = serverUrl ?: "",
-                                style =
-                                    MaterialTheme.typography.bodyLarge.copy(
-                                        fontFamily = FontFamily.Monospace,
-                                    ),
-                                modifier = Modifier.weight(1f),
+                                text = stringResource(R.string.server_address),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
                             )
-                            IconButton(
-                                onClick = {
-                                    copyToClipboard(context, serverUrl ?: "")
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            context.getString(R.string.copied_to_clipboard),
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                },
+
+                            // IP Address
+                            val ipAddress = serverUrl?.substringAfter("//")?.substringBefore(":") ?: ""
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            RoundedCornerShape(8.dp),
+                                        ).padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(
-                                    TablerIcons.Copy,
-                                    contentDescription = stringResource(R.string.copy),
-                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.ip_address),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        text = ipAddress,
+                                        style =
+                                            MaterialTheme.typography.bodyLarge.copy(
+                                                fontFamily = FontFamily.Monospace,
+                                            ),
+                                    )
+                                </Column>
+                                IconButton(
+                                    onClick = {
+                                        copyToClipboard(context, ipAddress)
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getString(R.string.copied_to_clipboard),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    },
+                                ) {
+                                    Icon(
+                                        TablerIcons.Copy,
+                                        contentDescription = stringResource(R.string.copy),
+                                    )
+                                }
+                            }
+
+                            // Full URL
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            RoundedCornerShape(8.dp),
+                                        ).padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.server_url),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        text = serverUrl ?: "",
+                                        style =
+                                            MaterialTheme.typography.bodyLarge.copy(
+                                                fontFamily = FontFamily.Monospace,
+                                            ),
+                                    )
+                                </Column>
+                                IconButton(
+                                    onClick = {
+                                        copyToClipboard(context, serverUrl ?: "")
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getString(R.string.copied_to_clipboard),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    },
+                                ) {
+                                    Icon(
+                                        TablerIcons.Copy,
+                                        contentDescription = stringResource(R.string.copy),
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                // QR Code Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    // QR Code Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
                     ) {
-                        Text(
-                            text = stringResource(R.string.scan_qr_code),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Text(
-                            text = stringResource(R.string.scan_qr_code_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        QrCodeView(
-                            data = serverUrl ?: "",
-                            modifier = Modifier.size(200.dp),
-                        )
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.scan_qr_code),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Text(
+                                text = stringResource(R.string.scan_qr_code_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            QrCodeView(
+                                data = serverUrl ?: "",
+                                modifier = Modifier.size(200.dp),
+                            )
+                        }
+                    }
+
+                    // API Information Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.api_endpoints),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Text(
+                                text = stringResource(R.string.api_endpoints_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+
+                            Column(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surface,
+                                            RoundedCornerShape(8.dp),
+                                        ).padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                ApiEndpointItem("GET", "/api/links", stringResource(R.string.api_get_links))
+                                ApiEndpointItem("POST", "/api/links", stringResource(R.string.api_add_link))
+                                ApiEndpointItem("GET", "/api/tags", stringResource(R.string.api_get_tags))
+                                ApiEndpointItem("GET", "/api/link-info", stringResource(R.string.api_get_link_info))
+                                ApiEndpointItem("GET", "/api/server-info", stringResource(R.string.api_get_server_info))
+                            }
+                        }
                     }
                 }
             }
@@ -318,4 +415,54 @@ private fun copyToClipboard(
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("Server URL", text)
     clipboard.setPrimaryClip(clip)
+}
+
+@Composable
+private fun ApiEndpointItem(
+    method: String,
+    path: String,
+    description: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Text(
+            text = method,
+            style = MaterialTheme.typography.labelSmall,
+            color =
+                when (method) {
+                    "GET" -> MaterialTheme.colorScheme.primary
+                    "POST" -> MaterialTheme.colorScheme.tertiary
+                    else -> MaterialTheme.colorScheme.secondary
+                },
+            modifier =
+                Modifier
+                    .background(
+                        when (method) {
+                            "GET" -> MaterialTheme.colorScheme.primaryContainer
+                            "POST" -> MaterialTheme.colorScheme.tertiaryContainer
+                            else -> MaterialTheme.colorScheme.secondaryContainer
+                        },
+                        RoundedCornerShape(4.dp),
+                    ).padding(horizontal = 6.dp, vertical = 2.dp),
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = path,
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily.Monospace,
+                    ),
+                fontSize = 12.sp,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp,
+            )
+        }
+    }
 }

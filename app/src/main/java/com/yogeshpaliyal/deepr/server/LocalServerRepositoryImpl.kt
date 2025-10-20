@@ -213,6 +213,50 @@ class LocalServerRepositoryImpl(
                                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting link info: ${e.message}"))
                             }
                         }
+
+                        get("/api/server-info") {
+                            try {
+                                val ipAddress = getIpAddress()
+                                val serverInfo =
+                                    ServerInfoResponse(
+                                        ipAddress = ipAddress ?: "Unknown",
+                                        port = port,
+                                        baseUrl = if (ipAddress != null) "http://$ipAddress:$port" else null,
+                                        endpoints =
+                                            listOf(
+                                                ApiEndpoint(
+                                                    method = "GET",
+                                                    path = "/api/links",
+                                                    description = "Retrieve all saved links with their metadata",
+                                                ),
+                                                ApiEndpoint(
+                                                    method = "POST",
+                                                    path = "/api/links",
+                                                    description = "Add a new link to your collection",
+                                                ),
+                                                ApiEndpoint(
+                                                    method = "GET",
+                                                    path = "/api/tags",
+                                                    description = "Get all available tags with usage count",
+                                                ),
+                                                ApiEndpoint(
+                                                    method = "GET",
+                                                    path = "/api/link-info",
+                                                    description = "Fetch metadata (title, image) for any URL",
+                                                ),
+                                                ApiEndpoint(
+                                                    method = "GET",
+                                                    path = "/api/server-info",
+                                                    description = "Get server information and available API endpoints",
+                                                ),
+                                            ),
+                                    )
+                                call.respond(HttpStatusCode.OK, serverInfo)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error getting server info", e)
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting server info: ${e.message}"))
+                            }
+                        }
                     }
                 }
 
@@ -323,4 +367,19 @@ data class TagResponse(
     val id: Long,
     val name: String,
     val count: Int,
+)
+
+@Serializable
+data class ServerInfoResponse(
+    val ipAddress: String,
+    val port: Int,
+    val baseUrl: String?,
+    val endpoints: List<ApiEndpoint>,
+)
+
+@Serializable
+data class ApiEndpoint(
+    val method: String,
+    val path: String,
+    val description: String,
 )
