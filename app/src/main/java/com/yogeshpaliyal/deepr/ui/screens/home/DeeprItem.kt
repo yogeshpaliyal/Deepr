@@ -28,6 +28,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,8 +48,10 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Refresh
+import compose.icons.tablericons.Trash
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -271,6 +274,37 @@ fun DeeprItem(
                                         contentDescription = stringResource(R.string.reset_opened_count),
                                     )
                                 },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                onClick = {
+                                    onItemClick(MenuItem.Edit(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.delete)) },
+                                onClick = {
+                                    onItemClick(MenuItem.Delete(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Trash,
+                                        contentDescription = stringResource(R.string.delete),
+                                    )
+                                },
+                                colors =
+                                    MenuDefaults.itemColors(
+                                        textColor = MaterialTheme.colorScheme.error,
+                                        leadingIconColor = MaterialTheme.colorScheme.error,
+                                    ),
                             )
                         }
                     }
