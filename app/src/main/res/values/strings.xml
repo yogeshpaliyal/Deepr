@@ -22,7 +22,7 @@
     <string name="add_link">Add Link</string>
     <string name="fetch_name_from_link">Fetch name from link</string>
     <string name="create_tag">Create Tag</string>
-    <string name="new_tag">New tag</string>
+    <string name="new_tag">New tag (Optional)</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access them later.</string>
     
@@ -113,7 +113,7 @@
     <!-- Save Dialog -->
     <string name="save_deeplink">Save Link</string>
     <string name="save_deeplink_message">Save the link: %s ?</string>
-    <string name="enter_link_name">Please enter name for the link</string>
+    <string name="enter_link_name">Enter name for the link (Optional)</string>
     <string name="enter_link_name_error">Please enter name for the link.</string>
     <string name="save_and_execute">Save &amp; Execute</string>
 
