@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.http.ContentType
@@ -24,6 +25,7 @@ import io.ktor.server.routing.routing
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
@@ -35,7 +37,8 @@ class LocalServerRepositoryImpl(
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
 ) : LocalServerRepository {
-    private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
+    private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
+        null
     private val _isRunning = MutableStateFlow(false)
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
 
@@ -45,7 +48,7 @@ class LocalServerRepositoryImpl(
     private val port = 8080
 
     override suspend fun startServer() {
-        if (_isRunning.value) {
+        if (isRunning.value) {
             Log.d("LocalServer", "Server is already running")
             return
         }
@@ -120,13 +123,19 @@ class LocalServerRepositoryImpl(
                                             createdAt = link.createdAt,
                                             openedCount = link.openedCount,
                                             notes = link.notes,
-                                            tags = link.tagsNames?.split(", ")?.filter { it.isNotEmpty() } ?: emptyList(),
+                                            tags =
+                                                link.tagsNames
+                                                    ?.split(", ")
+                                                    ?.filter { it.isNotEmpty() } ?: emptyList(),
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting links", e)
-                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting links: ${e.message}"))
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error getting links: ${e.message}"),
+                                )
                             }
                         }
 
@@ -141,10 +150,16 @@ class LocalServerRepositoryImpl(
                                     request.tags.map { it.toDbTag() },
                                     request.notes,
                                 )
-                                call.respond(HttpStatusCode.Created, SuccessResponse("Link added successfully"))
+                                call.respond(
+                                    HttpStatusCode.Created,
+                                    SuccessResponse("Link added successfully"),
+                                )
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error adding link", e)
-                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error adding link: ${e.message}"))
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error adding link: ${e.message}"),
+                                )
                             }
                         }
 
@@ -180,7 +195,10 @@ class LocalServerRepositoryImpl(
                                 call.respond(HttpStatusCode.OK, response)
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting tags", e)
-                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting tags: ${e.message}"))
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error getting tags: ${e.message}"),
+                                )
                             }
                         }
 
@@ -188,7 +206,10 @@ class LocalServerRepositoryImpl(
                             try {
                                 val url = call.request.queryParameters["url"]
                                 if (url.isNullOrBlank()) {
-                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("URL parameter is required"))
+                                    call.respond(
+                                        HttpStatusCode.BadRequest,
+                                        ErrorResponse("URL parameter is required"),
+                                    )
                                     return@get
                                 }
 
@@ -210,20 +231,23 @@ class LocalServerRepositoryImpl(
                                 }
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting link info", e)
-                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Error getting link info: ${e.message}"))
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error getting link info: ${e.message}"),
+                                )
                             }
                         }
                     }
                 }
 
             server?.start(wait = false)
-            _isRunning.value = true
-            _serverUrl.value = "http://$ipAddress:$port"
+            _isRunning.update { true }
+            _serverUrl.update { "http://$ipAddress:$port" }
             Log.d("LocalServer", "Server started at ${_serverUrl.value}")
         } catch (e: Exception) {
             Log.e("LocalServer", "Error starting server", e)
-            _isRunning.value = false
-            _serverUrl.value = null
+            _isRunning.update { false }
+            _serverUrl.update { null }
         }
     }
 
@@ -231,8 +255,8 @@ class LocalServerRepositoryImpl(
         try {
             server?.stop(1000, 2000)
             server = null
-            _isRunning.value = false
-            _serverUrl.value = null
+            _isRunning.update { false }
+            _serverUrl.update { null }
             Log.d("LocalServer", "Server stopped")
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
@@ -242,7 +266,8 @@ class LocalServerRepositoryImpl(
     private fun getIpAddress(): String? {
         try {
             // Try to get WiFi IP first
-            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+            val wifiManager =
+                context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
             wifiManager?.connectionInfo?.ipAddress?.let { ipInt ->
                 if (ipInt != 0) {
                     return String.format(
@@ -291,7 +316,7 @@ data class TagData(
     val id: Long,
     val name: String,
 ) {
-    fun toDbTag() = com.yogeshpaliyal.deepr.Tags(id, name)
+    fun toDbTag() = Tags(id, name)
 }
 
 @Serializable

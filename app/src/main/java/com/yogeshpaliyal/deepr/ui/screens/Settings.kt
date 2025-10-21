@@ -393,6 +393,14 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.transfer_link_local_network_server),
+                    onClick = {
+                        backStack.add(TransferLinkLocalNetworkServer)
+                    },
+                )
+
+                SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
                     description =

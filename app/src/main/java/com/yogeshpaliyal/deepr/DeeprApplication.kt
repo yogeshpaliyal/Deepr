@@ -15,10 +15,13 @@ import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.server.LocalServerRepository
 import com.yogeshpaliyal.deepr.server.LocalServerRepositoryImpl
+import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerRepository
+import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerRepositoryImpl
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.sync.SyncRepositoryImpl
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
+import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import org.koin.android.ext.koin.androidContext
@@ -85,8 +88,16 @@ class DeeprApplication : Application() {
                     LocalServerRepositoryImpl(androidContext(), get(), get(), get())
                 }
 
+                single<TransferLinkLocalServerRepository> {
+                    TransferLinkLocalServerRepositoryImpl(androidContext(), get(), get(), get())
+                }
+
                 viewModel {
                     LocalServerViewModel(get())
+                }
+
+                viewModel {
+                    TransferLinkLocalServerViewModel(get())
                 }
             }
 
