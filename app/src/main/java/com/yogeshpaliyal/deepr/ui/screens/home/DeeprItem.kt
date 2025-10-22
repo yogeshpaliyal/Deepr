@@ -24,17 +24,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -62,10 +57,7 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
-import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
-import compose.icons.tablericons.Note
-import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Trash
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -129,36 +121,14 @@ fun DeeprItem(
     onTagClick: (tag: String) -> Unit,
     selectedTag: List<Tags>,
     modifier: Modifier = Modifier,
+    dropdownMenu: (@Composable () -> Unit)? = null,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedNote by remember { mutableStateOf<String?>(null) }
     var tagsExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
 
     val linkCopied = stringResource(R.string.link_copied)
-
-    selectedNote?.let {
-        AlertDialog(
-            {
-                selectedNote = null
-            },
-            title = {
-                Text("Note")
-            },
-            text = {
-                Text(it)
-            },
-            confirmButton = {
-                OutlinedButton({
-                    selectedNote = null
-                }) {
-                    Text("Okay")
-                }
-            },
-        )
-    }
 
     val dismissState =
         rememberSwipeToDismissBoxState(
@@ -340,103 +310,7 @@ fun DeeprItem(
                                 )
                             }
 
-                            IconButton(onClick = { expanded = true }) {
-                                Icon(
-                                    TablerIcons.DotsVertical,
-                                    contentDescription = stringResource(R.string.more_options),
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                if (account.notes.isNotEmpty()) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.view_note)) },
-                                        onClick = {
-                                            expanded = false
-                                            selectedNote = account.notes
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                TablerIcons.Note,
-                                                contentDescription = stringResource(R.string.view_note),
-                                            )
-                                        },
-                                    )
-                                }
-
-                                // Display last opened time
-                                if (account.lastOpenedAt != null) {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                stringResource(
-                                                    R.string.last_opened,
-                                                    formatDateTime(account.lastOpenedAt),
-                                                ),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        },
-                                        onClick = { },
-                                        enabled = false,
-                                    )
-                                }
-                                ShortcutMenuItem(account, {
-                                    onItemClick(MenuItem.Shortcut(it))
-                                    expanded = false
-                                })
-                                ShowQRCodeMenuItem(account, {
-                                    onItemClick(MenuItem.ShowQrCode(it))
-                                    expanded = false
-                                })
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.reset_opened_count)) },
-                                    onClick = {
-                                        onItemClick(MenuItem.ResetCounter(account))
-                                        expanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            TablerIcons.Refresh,
-                                            contentDescription = stringResource(R.string.reset_opened_count),
-                                        )
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.edit)) },
-                                    onClick = {
-                                        onItemClick(MenuItem.Edit(account))
-                                        expanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            TablerIcons.Edit,
-                                            contentDescription = stringResource(R.string.edit),
-                                        )
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.delete)) },
-                                    onClick = {
-                                        onItemClick(MenuItem.Delete(account))
-                                        expanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            TablerIcons.Trash,
-                                            contentDescription = stringResource(R.string.delete),
-                                        )
-                                    },
-                                    colors =
-                                        MenuDefaults.itemColors(
-                                            textColor = MaterialTheme.colorScheme.error,
-                                            leadingIconColor = MaterialTheme.colorScheme.error,
-                                        ),
-                                )
-                            }
+                            dropdownMenu?.invoke()
                         }
 
                         Text(
@@ -493,7 +367,7 @@ fun DeeprItem(
     }
 }
 
-private fun formatDateTime(dateTimeString: String): String {
+fun formatDateTime(dateTimeString: String): String {
     try {
         val dbFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         dbFormatter.timeZone = TimeZone.getTimeZone("UTC")

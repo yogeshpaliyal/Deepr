@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
+import android.text.format.DateUtils.formatDateTime
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,10 +21,15 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
@@ -31,6 +38,8 @@ import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -83,12 +92,17 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
+import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -117,6 +131,7 @@ fun HomeScreen(
     resetSharedText: () -> Unit,
 ) {
     var isTagsSelectionActive by remember { mutableStateOf(false) }
+    var currentViewType by remember { mutableStateOf(ViewType.LIST) }
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -214,17 +229,32 @@ fun HomeScreen(
                 },
                 trailingIcon = {
                     if (searchBarState.currentValue == SearchBarValue.Collapsed) {
-                        TooltipBox(
-                            positionProvider =
-                                TooltipDefaults.rememberTooltipPositionProvider(
-                                    TooltipAnchorPosition.Below,
-                                ),
-                            tooltip = { PlainTooltip { Text(stringResource(R.string.sorting)) } },
-                            state = rememberTooltipState(),
-                        ) {
-                            FilterMenu(onSortOrderChange = {
-                                viewModel.setSortOrder(it)
-                            })
+                        Row {
+                            TooltipBox(
+                                positionProvider =
+                                    TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Below,
+                                    ),
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.sorting)) } },
+                                state = rememberTooltipState(),
+                            ) {
+                                FilterMenu(onSortOrderChange = {
+                                    viewModel.setSortOrder(it)
+                                })
+                            }
+
+                            TooltipBox(
+                                positionProvider =
+                                    TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Below,
+                                    ),
+                                tooltip = { PlainTooltip { Text("View Type") } },
+                                state = rememberTooltipState(),
+                            ) {
+                                ViewTypeMenu(currentViewType, {
+                                    currentViewType = it
+                                })
+                            }
                         }
                     } else {
                         if (textFieldState.text.isNotEmpty()) {
@@ -361,6 +391,7 @@ fun HomeScreen(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
                 selectedTag = selectedTag,
+                currentViewType = currentViewType,
                 editDeepr = {
                     selectedLink = it
                 },
@@ -416,6 +447,7 @@ fun Content(
     hazeState: HazeState,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
+    currentViewType: ViewType,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     editDeepr: (GetLinksAndTags) -> Unit = {},
@@ -470,6 +502,7 @@ fun Content(
             contentPaddingValues = contentPaddingValues,
             accounts = accounts!!,
             selectedTag = selectedTag,
+            viewType = currentViewType,
             onItemClick = {
                 when (it) {
                     is MenuItem.Click -> {
@@ -508,7 +541,10 @@ fun DeeprList(
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    viewType: ViewType = ViewType.LIST,
 ) {
+    var expandedItemId by remember { mutableStateOf<Long?>(null) }
+
     AnimatedVisibility(
         visible = accounts.isEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
@@ -553,30 +589,223 @@ fun DeeprList(
             Spacer(modifier = Modifier.weight(1f)) // Push content up
         }
     }
+    val dropDownMenu = {
+    }
+
     AnimatedVisibility(
         visible = accounts.isNotEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
         exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
     ) {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = contentPaddingValues,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            items(
-                count = accounts.size,
-                key = { index -> accounts[index].id },
-            ) { index ->
-                val account = accounts[index]
+        when (viewType) {
+            ViewType.LIST -> {
+                LazyColumn(
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
 
-                DeeprItem(
-                    modifier = Modifier.animateItem(),
-                    account = account,
-                    selectedTag = selectedTag,
-                    onItemClick = onItemClick,
-                    onTagClick = onTagClick,
+                        DeeprItem(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            selectedTag = selectedTag,
+                            onItemClick = onItemClick,
+                            onTagClick = onTagClick,
+                            dropdownMenu = {
+                                DropdownMenu(account, onItemClick)
+                            },
+                        )
+                    }
+                }
+            }
+            ViewType.GRID -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
+
+                        DeeprItemGrid(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            selectedTag = selectedTag,
+                            onItemClick = onItemClick,
+                            onTagClick = onTagClick,
+                            dropdownMenu = {
+                                DropdownMenu(account, onItemClick)
+                            },
+                        )
+                    }
+                }
+            }
+            ViewType.COMPACT -> {
+                LazyColumn(
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
+
+                        DeeprItemCompact(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            selectedTag = selectedTag,
+                            onItemClick = onItemClick,
+                            onTagClick = onTagClick,
+                            dropdownMenu = {
+                                DropdownMenu(account, onItemClick)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DropdownMenu(
+    account: GetLinksAndTags,
+    onItemClick: (MenuItem) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedNote by remember { mutableStateOf<String?>(null) }
+
+    selectedNote?.let {
+        AlertDialog(
+            {
+                selectedNote = null
+            },
+            title = {
+                Text("Note")
+            },
+            text = {
+                Text(it)
+            },
+            confirmButton = {
+                OutlinedButton({
+                    selectedNote = null
+                }) {
+                    Text("Okay")
+                }
+            },
+        )
+    }
+
+    Box(modifier = modifier) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                TablerIcons.DotsVertical,
+                contentDescription = stringResource(R.string.more_options),
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            if (account.notes.isNotEmpty()) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.view_note)) },
+                    onClick = {
+                        expanded = false
+                        selectedNote = account.notes
+                    },
+                    leadingIcon = {
+                        Icon(
+                            TablerIcons.Note,
+                            contentDescription = stringResource(R.string.view_note),
+                        )
+                    },
                 )
             }
+
+            // Display last opened time
+            if (account.lastOpenedAt != null) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            stringResource(
+                                R.string.last_opened,
+                                formatDateTime(account.lastOpenedAt),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    onClick = { },
+                    enabled = false,
+                )
+            }
+            ShortcutMenuItem(account, {
+                onItemClick(MenuItem.Shortcut(it))
+                expanded = false
+            })
+            ShowQRCodeMenuItem(account, {
+                onItemClick(MenuItem.ShowQrCode(it))
+                expanded = false
+            })
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.reset_opened_count)) },
+                onClick = {
+                    onItemClick(MenuItem.ResetCounter(account))
+                    expanded = false
+                },
+                leadingIcon = {
+                    Icon(
+                        TablerIcons.Refresh,
+                        contentDescription = stringResource(R.string.reset_opened_count),
+                    )
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    onItemClick(MenuItem.Edit(account))
+                    expanded = false
+                },
+                leadingIcon = {
+                    Icon(
+                        TablerIcons.Edit,
+                        contentDescription = stringResource(R.string.edit),
+                    )
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
+                onClick = {
+                    onItemClick(MenuItem.Delete(account))
+                    expanded = false
+                },
+                leadingIcon = {
+                    Icon(
+                        TablerIcons.Trash,
+                        contentDescription = stringResource(R.string.delete),
+                    )
+                },
+                colors =
+                    MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.error,
+                        leadingIconColor = MaterialTheme.colorScheme.error,
+                    ),
+            )
         }
     }
 }
