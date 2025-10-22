@@ -88,6 +88,30 @@ fun HomeBottomContent(
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
     val isCreate = selectedLink.id == 0L
 
+    val fetchTitle: () -> Unit = {
+        isFetchingMetadata = true
+        viewModel.fetchMetaData(deeprInfo.link) {
+            isFetchingMetadata = false
+            if (it != null) {
+                deeprInfo = deeprInfo.copy(name = it.title ?: "")
+                isNameError = false
+            } else {
+                Toast
+                    .makeText(
+                        context,
+                        fetchMetadataErrorText,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+            }
+        }
+    }
+
+    LaunchedEffect(selectedLink) {
+        if (isValidDeeplink(selectedLink.link) && selectedLink.name.isEmpty()) {
+            fetchTitle()
+        }
+    }
+
     // Initialize selected tags if in edit mode
     LaunchedEffect(isCreate) {
         if (isCreate.not()) {
@@ -201,23 +225,7 @@ fun HomeBottomContent(
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = deeprInfo.link.isNotBlank() && !isFetchingMetadata,
-                    onClick = {
-                        isFetchingMetadata = true
-                        viewModel.fetchMetaData(deeprInfo.link) {
-                            isFetchingMetadata = false
-                            if (it != null) {
-                                deeprInfo = deeprInfo.copy(name = it.title ?: "")
-                                isNameError = false
-                            } else {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        fetchMetadataErrorText,
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                            }
-                        }
-                    },
+                    onClick = fetchTitle,
                 ) {
                     if (isFetchingMetadata) {
                         CircularProgressIndicator(
