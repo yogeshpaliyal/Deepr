@@ -18,11 +18,11 @@
     <string name="all">تمام</string>
     <string name="add_link">لنک شامل کریں</string>
     <string name="fetch_name_from_link">لنک سے نام حاصل کریں</string>
-    <string name="add_tag">ٹیگ شامل کریں</string>
+    <string name="create_tag">ٹیگ بنائیں</string>
     <string name="new_tag">نیا ٹیگ</string>
     <string name="no_links_saved_yet">ابھی تک کوئی لنک محفوظ نہیں</string>
     <string name="save_your_link_below">بعد میں تیزی سے رسائی کے لیے اپنا لنک نیچے محفوظ کریں۔</string>
-    
+
     <!-- Menu and Dialog Items -->
     <string name="more_options">مزید اختیارات</string>
     <string name="open_with">اس کے ساتھ کھولیں</string>
@@ -40,7 +40,7 @@
     <string name="edit_shortcut">شارٹ کٹ میں تبدیلی</string>
     <string name="show_qr_code">QR کوڈ دکھائیں</string>
     <string name="deeplink_already_exists">ڈیپ لنک پہلے سے موجود ہے</string>
-    
+
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">تاریخ کے حساب سے صاعد ترتیب</string>
     <string name="sort_by_date_descending">تاریخ کے حساب سے نازل ترتیب</string>
@@ -50,7 +50,7 @@
     <string name="sort_by_name_descending">نام کے حساب سے نازل ترتیب</string>
     <string name="sort_by_link_ascending">لنک کے حساب سے صاعد ترتیب</string>
     <string name="sort_by_link_descending">لنک کے حساب سے نازل ترتیب</string>
-    
+
     <!-- Tag Management -->
     <string name="edit_tag">ٹیگ ایڈٹ کریں</string>
     <string name="delete_tag">ٹیگ حذف کریں</string>
@@ -62,7 +62,7 @@
     <string name="tag_deleted_successfully">ٹیگ کامیابی سے حذف ہوگیا</string>
     <string name="edit_tag_description">ٹیگ ایڈٹ کریں</string>
     <string name="delete_tag_description">ٹیگ حذف کریں</string>
-    
+
     <!-- Settings Screen -->
     <string name="import_deeplinks">Deeplinks درآمد کریں</string>
     <string name="import_deeplinks_description">CSV فائل سے Deeplinks درآمد کریں</string>
@@ -120,7 +120,7 @@
     <string name="last_sync_time">آخری ہم آہنگی:</string>
     <string name="last_sync_time_never">کبھی ہم آہنگ نہیں ہوا</string>
     <string name="last_sync_time_format">%s</string>
-    
+
     <!-- Sync Messages -->
     <string name="sync_disabled">ہم آہنگی غیر فعال ہے</string>
     <string name="sync_file_not_selected">کوئی ہم آہنگی فائل منتخب نہیں</string>
@@ -129,7 +129,7 @@
     <string name="no_file_path_provided">کوئی فائل کا راستہ فراہم نہیں کیا گیا</string>
     <string name="invalid_markdown_format">غلط مارک ڈاؤن ٹیبل فارمیٹ</string>
     <string name="file_validation_error">فائل توثیق کی خرابی: %s</string>
-    
+
     <!-- Additional Sync Settings -->
     <string name="sync_to_file">مقامی فائل سے ہم آہنگ کریں (بیٹا)</string>
     <string name="sync_to_file_description">ڈیپ لنکس کو مارک ڈاؤن فائل میں خودکار طور پر ہم آہنگ کریں</string>

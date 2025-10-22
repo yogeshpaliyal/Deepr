@@ -131,8 +131,17 @@ class AccountViewModel(
     val selectedTagFilter: StateFlow<List<Tags>> = _selectedTagFilter
 
     // State for favourite filter (-1 = All, 0 = Not Favourite, 1 = Favourite)
+    private val defaultPageFavourites: Flow<Boolean> = preferenceDataStore.getDefaultPageFavourites
     private val _favouriteFilter = MutableStateFlow(-1)
     val favouriteFilter: StateFlow<Int> = _favouriteFilter
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            defaultPageFavourites.collect { isFavouritesDefault ->
+                _favouriteFilter.update { if (isFavouritesDefault) 1 else -1 }
+            }
+        }
+    }
 
     // Set tag filter - toggle tag in the list
     fun setTagFilter(tag: Tags?) {
@@ -422,6 +431,17 @@ class AccountViewModel(
     fun setLanguageCode(code: String) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setLanguageCode(code)
+        }
+    }
+
+    // Default page preference methods
+    val defaultPageFavouritesEnabled =
+        preferenceDataStore.getDefaultPageFavourites
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun setDefaultPageFavourites(favourites: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setDefaultPageFavourites(favourites)
         }
     }
 

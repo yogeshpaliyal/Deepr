@@ -282,7 +282,7 @@ fun TagSelectionBottomSheet(
                         ) {
                             Icon(
                                 imageVector = TablerIcons.Plus,
-                                contentDescription = stringResource(R.string.add_tag),
+                                contentDescription = stringResource(R.string.create_tag),
                             )
                         }
                     }

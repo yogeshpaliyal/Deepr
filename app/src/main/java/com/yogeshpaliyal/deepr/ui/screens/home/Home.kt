@@ -7,7 +7,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AppBarWithSearch
@@ -40,14 +38,11 @@ import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberSearchBarState
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +54,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -90,14 +84,12 @@ import com.yogeshpaliyal.deepr.util.openDeeplinkWithChooser
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
-import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -582,91 +574,14 @@ fun DeeprList(
                 key = { index -> accounts[index].id },
             ) { index ->
                 val account = accounts[index]
-                val dismissState =
-                    rememberSwipeToDismissBoxState(
-                        confirmValueChange = { value ->
-                            when (value) {
-                                SwipeToDismissBoxValue.EndToStart -> {
-                                    onItemClick(MenuItem.Delete(account))
-                                    false
-                                }
 
-                                SwipeToDismissBoxValue.StartToEnd -> {
-                                    onItemClick(MenuItem.Edit(account))
-                                    false
-                                }
-
-                                else -> {
-                                    false
-                                }
-                            }
-                        },
-                    )
-
-                SwipeToDismissBox(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp)),
-                    state = dismissState,
-                    backgroundContent = {
-                        when (dismissState.dismissDirection) {
-                            SwipeToDismissBoxValue.StartToEnd -> {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .background(
-                                                Color.Gray.copy(alpha = 0.5f),
-                                            ).fillMaxSize()
-                                            .clip(
-                                                RoundedCornerShape(8.dp),
-                                            ),
-                                    contentAlignment = Alignment.CenterStart,
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Edit,
-                                        contentDescription = stringResource(R.string.edit),
-                                        tint = Color.White,
-                                        modifier = Modifier.padding(16.dp),
-                                    )
-                                }
-                            }
-
-                            SwipeToDismissBoxValue.EndToStart -> {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .background(
-                                                Color.Red.copy(alpha = 0.5f),
-                                            ).fillMaxSize()
-                                            .clip(
-                                                RoundedCornerShape(8.dp),
-                                            ),
-                                    contentAlignment = Alignment.CenterEnd,
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Trash,
-                                        contentDescription = stringResource(R.string.delete),
-                                        tint = Color.White,
-                                        modifier = Modifier.padding(16.dp),
-                                    )
-                                }
-                            }
-
-                            else -> {
-                                Color.White
-                            }
-                        }
-                    },
-                ) {
-                    DeeprItem(
-                        modifier = Modifier.animateItem(),
-                        account = account,
-                        selectedTag = selectedTag,
-                        onItemClick = onItemClick,
-                        onTagClick = onTagClick,
-                    )
-                }
+                DeeprItem(
+                    modifier = Modifier.animateItem(),
+                    account = account,
+                    selectedTag = selectedTag,
+                    onItemClick = onItemClick,
+                    onTagClick = onTagClick,
+                )
             }
         }
     }

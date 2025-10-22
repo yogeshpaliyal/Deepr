@@ -21,8 +21,8 @@
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="add_link">Add Link</string>
     <string name="fetch_name_from_link">Fetch name from link</string>
-    <string name="add_tag">Add Tag</string>
-    <string name="new_tag">New tag</string>
+    <string name="create_tag">Create Tag</string>
+    <string name="new_tag">New tag (Optional)</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access them later.</string>
     
@@ -97,6 +97,9 @@
     <string name="french">Français</string>
     <string name="german">Deutsch</string>
     <string name="urdu">اردو</string>
+    <string name="default_page">Default Page</string>
+    <string name="default_page_all">Start with All links</string>
+    <string name="default_page_favourites">Start with Favourites</string>
     <string name="app_version">App Version: %s</string>
     <string name="made_with_love">Made with ❤️ in India</string>
 
@@ -106,6 +109,9 @@
     <string name="app_description">A simple app to save, organize, and launch links.</string>
     <string name="author">Author</string>
     <string name="author_name">Yogesh Choudhary</string>
+    <string name="contributors">Contributors</string>
+    <string name="contributors_thank_you">Thank you to all the amazing contributors who have helped make Deepr better! 🙏</string>
+    <string name="view_contributors">View Contributors</string>
     <string name="twitter">Twitter</string>
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
@@ -114,7 +120,7 @@
     <!-- Save Dialog -->
     <string name="save_deeplink">Save Link</string>
     <string name="save_deeplink_message">Save the link: %s ?</string>
-    <string name="enter_link_name">Please enter name for the link</string>
+    <string name="enter_link_name">Enter name for the link (Optional)</string>
     <string name="enter_link_name_error">Please enter name for the link.</string>
     <string name="save_and_execute">Save &amp; Execute</string>
 
@@ -179,6 +185,8 @@
     <string name="server_running">Server is running and accessible on your local network</string>
     <string name="server_running_tap_to_configure">Server Running - Tap to configure</string>
     <string name="server_stopped">Server is not running</string>
+    <string name="server_address">Server Address</string>
+    <string name="ip_address">IP Address</string>
     <string name="server_url">Server URL</string>
     <string name="copy">Copy</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -187,9 +195,12 @@
     <string name="how_to_use">How to Use</string>
     <string name="local_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Use the URL or scan the QR code from another device\n4. Access the web interface or use the API endpoints to manage your links</string>
     <string name="api_endpoints">API Endpoints</string>
+    <string name="api_endpoints_description">Available REST API endpoints for programmatic access</string>
     <string name="api_get_links">Get all saved links</string>
     <string name="api_add_link">Add a new link (JSON: {"link": "url", "name": "name"})</string>
+    <string name="api_get_tags">Get all available tags</string>
     <string name="api_get_link_info">Get metadata for a URL</string>
+    <string name="api_get_server_info">Get server information and API documentation</string>
     <string name="local_server_notification_channel_name">Local Server</string>
     <string name="local_server_notification_channel_description">Notifications for local server status</string>
     <string name="local_server_notification_text">Server URL: %s</string>
