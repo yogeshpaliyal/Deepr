@@ -256,6 +256,7 @@ class AccountViewModel(
                 .getLinksAndTags(
                     query,
                     query,
+                    query,
                     favourite.toLong(),
                     favourite.toLong(),
                     tagIdsString,

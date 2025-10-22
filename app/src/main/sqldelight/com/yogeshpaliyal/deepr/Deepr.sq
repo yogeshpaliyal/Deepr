@@ -61,7 +61,7 @@ FROM
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
-  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
+  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
   AND (
     ? = -1 OR Deepr.isFavourite = ?
   )
