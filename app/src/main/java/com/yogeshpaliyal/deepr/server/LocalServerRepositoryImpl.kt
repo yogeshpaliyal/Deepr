@@ -101,6 +101,7 @@ class LocalServerRepositoryImpl(
                                         .getLinksAndTags(
                                             "",
                                             "",
+                                            "",
                                             -1L,
                                             -1L,
                                             "",
@@ -158,6 +159,7 @@ class LocalServerRepositoryImpl(
                                         val linkCount =
                                             deeprQueries
                                                 .getLinksAndTags(
+                                                    "",
                                                     "",
                                                     "",
                                                     -1L,

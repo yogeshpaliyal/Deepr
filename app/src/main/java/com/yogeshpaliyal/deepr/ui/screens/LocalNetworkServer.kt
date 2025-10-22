@@ -254,82 +254,75 @@ fun LocalNetworkServerScreen(
                 }
             }
 
-            // Server Details Section
-            AnimatedVisibility(
-                visible = isRunning && serverUrl != null,
+            // API Documentation Card
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // API Documentation Card
-                    OutlinedCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors =
-                            CardDefaults.outlinedCardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                            ),
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Column(
-                            modifier = Modifier.padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Icon(
-                                    TablerIcons.InfoCircle,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                                Text(
-                                    text = stringResource(R.string.api_endpoints),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                            Text(
-                                text = stringResource(R.string.api_endpoints_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                        Icon(
+                            TablerIcons.InfoCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Text(
+                            text = stringResource(R.string.api_endpoints),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.api_endpoints_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
 
-                            Column(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
-                                            RoundedCornerShape(12.dp),
-                                        ).padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                ApiEndpointItem(
-                                    "GET",
-                                    "/api/links",
-                                    stringResource(R.string.api_get_links),
-                                )
-                                ApiEndpointItem(
-                                    "POST",
-                                    "/api/links",
-                                    stringResource(R.string.api_add_link),
-                                )
-                                ApiEndpointItem(
-                                    "GET",
-                                    "/api/tags",
-                                    stringResource(R.string.api_get_tags),
-                                )
-                                ApiEndpointItem(
-                                    "GET",
-                                    "/api/link-info",
-                                    stringResource(R.string.api_get_link_info),
-                                )
-                                ApiEndpointItem(
-                                    "GET",
-                                    "/api/server-info",
-                                    stringResource(R.string.api_get_server_info),
-                                )
-                            }
-                        }
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
+                                    RoundedCornerShape(12.dp),
+                                ).padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        ApiEndpointItem(
+                            "GET",
+                            "/api/links",
+                            stringResource(R.string.api_get_links),
+                        )
+                        ApiEndpointItem(
+                            "POST",
+                            "/api/links",
+                            stringResource(R.string.api_add_link),
+                        )
+                        ApiEndpointItem(
+                            "GET",
+                            "/api/tags",
+                            stringResource(R.string.api_get_tags),
+                        )
+                        ApiEndpointItem(
+                            "GET",
+                            "/api/link-info",
+                            stringResource(R.string.api_get_link_info),
+                        )
+                        ApiEndpointItem(
+                            "GET",
+                            "/api/server-info",
+                            stringResource(R.string.api_get_server_info),
+                        )
                     }
                 }
             }
