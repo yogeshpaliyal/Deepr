@@ -90,6 +90,7 @@ fun HomeBottomContent(
     val allTags by viewModel.allTags.collectAsStateWithLifecycle()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
 
     val fetchMetadata: () -> Unit = {
@@ -243,7 +244,7 @@ fun HomeBottomContent(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (deeprInfo.thumbnail.isNotEmpty()) {
+                if (deeprInfo.thumbnail.isNotEmpty() && isThumbnailEnable) {
                     AsyncImage(
                         model = deeprInfo.thumbnail,
                         contentDescription = deeprInfo.name,

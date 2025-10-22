@@ -442,9 +442,19 @@ class AccountViewModel(
         preferenceDataStore.getDefaultPageFavourites
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isThumbnailEnable =
+        preferenceDataStore.isThumbnailEnable
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun setDefaultPageFavourites(favourites: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setDefaultPageFavourites(favourites)
+        }
+    }
+
+    fun setIsThumbnailEnable(thumbnail: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setThumbnailEnable(thumbnail)
         }
     }
 

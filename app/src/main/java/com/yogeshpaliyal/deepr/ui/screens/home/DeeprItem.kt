@@ -118,6 +118,7 @@ private fun DeeprItemPreview() {
         {},
         {},
         listOf(),
+        isThumbnailEnable = true,
     )
 }
 
@@ -128,6 +129,7 @@ fun DeeprItem(
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (tag: String) -> Unit,
     selectedTag: List<Tags>,
+    isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -263,7 +265,7 @@ fun DeeprItem(
                         },
                     ),
         ) {
-            if (account.thumbnail.isNotEmpty()) {
+            if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
                 AsyncImage(
                     model = account.thumbnail,
                     contentDescription = account.name,

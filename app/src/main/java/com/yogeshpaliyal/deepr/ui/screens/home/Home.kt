@@ -421,6 +421,7 @@ fun Content(
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
 
     if (accounts == null) {
         Column(
@@ -496,6 +497,7 @@ fun Content(
                 // Toggle the tag in the filter by tag name
                 viewModel.setSelectedTagByName(it)
             },
+            isThumbnailEnable = isThumbnailEnable,
         )
     }
 }
@@ -507,6 +509,7 @@ fun DeeprList(
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,
+    isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
@@ -575,6 +578,7 @@ fun DeeprList(
                     selectedTag = selectedTag,
                     onItemClick = onItemClick,
                     onTagClick = onTagClick,
+                    isThumbnailEnable = isThumbnailEnable,
                 )
             }
         }
