@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,11 +50,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
@@ -99,6 +103,22 @@ sealed class MenuItem(
     class Delete(
         item: GetLinksAndTags,
     ) : MenuItem(item)
+}
+
+@Composable
+@Preview
+private fun DeeprItemPreview() {
+    DeeprItem(
+        account =
+            createDeeprObject(
+                name = "Yogesh Paliyal",
+                link = "https://yogeshpaliyal.com",
+                thumbnail = "https://yogeshpaliyal.com/og.png",
+            ),
+        {},
+        {},
+        listOf(),
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -243,6 +263,20 @@ fun DeeprItem(
                         },
                     ),
         ) {
+            if (account.thumbnail.isNotEmpty()) {
+                AsyncImage(
+                    model = account.thumbnail,
+                    contentDescription = account.name,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1.91f)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    placeholder = null,
+                    error = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
             Column(
                 modifier =
                     Modifier
