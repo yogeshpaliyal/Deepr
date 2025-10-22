@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -84,7 +85,7 @@ fun AboutUsScreen(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
             Image(
-                painter = painterResource(id = R.drawable.app_logo),
+                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = stringResource(R.string.app_logo),
                 modifier =
                     Modifier
@@ -150,7 +151,43 @@ fun AboutUsScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.contributors),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.contributors_thank_you),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    val uriHandler = LocalUriHandler.current
+                    OutlinedButton(
+                        onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal/Deepr/graphs/contributors") },
+                    ) {
+                        Icon(
+                            TablerIcons.BrandGithub,
+                            contentDescription = stringResource(R.string.contributors),
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                        Text(stringResource(R.string.view_contributors))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
             val uriHandler = LocalUriHandler.current
             Button(onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal/Deepr") }) {
                 Icon(

@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
@@ -58,6 +60,7 @@ import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
+import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Download
@@ -67,6 +70,7 @@ import compose.icons.tablericons.Language
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
+import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import kotlinx.coroutines.flow.collectLatest
@@ -446,6 +450,83 @@ fun SettingsScreen(
                         Switch(
                             checked = defaultPageFavourites,
                             onCheckedChange = { viewModel.setDefaultPageFavourites(it) },
+                        )
+                    },
+                )
+            }
+
+            SettingsSection("About") {
+                val appName = stringResource(R.string.app_name)
+                // Report a problem or feedback via email on yogeshpaliyal.foss+shelfy@gmail.com
+                SettingsItem(
+                    icon = TablerIcons.AlertTriangle,
+                    title = "Report a Problem / Feedback",
+                    shouldShowLoading = false,
+                    description = "Help us improve by reporting issues or sharing feedback",
+                    onClick = {
+                        val emailIntent =
+                            Intent(Intent.ACTION_SENDTO).apply {
+                                data = "mailto:".toUri()
+                                putExtra(
+                                    Intent.EXTRA_EMAIL,
+                                    arrayOf("yogeshpaliyal.foss+deepr@gmail.com"),
+                                )
+                                putExtra(Intent.EXTRA_SUBJECT, "$appName App Feedback/Issue")
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "Describe your issue or feedback here:\n App Version : ${BuildConfig.VERSION_NAME}\n",
+                                )
+                            }
+                        context.startActivity(
+                            Intent.createChooser(
+                                emailIntent,
+                                "Send email via...",
+                            ),
+                        )
+                    },
+                )
+
+                // Rate and review open playstore link
+                SettingsItem(
+                    icon = TablerIcons.Star,
+                    title = "Rate & Review",
+                    description = "Rate us on the Play Store",
+                    shouldShowLoading = false,
+                    onClick = {
+                        val appPackageName = BuildConfig.APPLICATION_ID
+                        try {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://play.google.com/store/apps/details?id=$appPackageName".toUri(),
+                                ),
+                            )
+                        } catch (e: ActivityNotFoundException) {
+                        }
+                    },
+                )
+
+                // Create share app item
+                SettingsItem(
+                    icon = TablerIcons.Share,
+                    title = "Share $appName",
+                    shouldShowLoading = false,
+                    description = "Share $appName with your friends",
+                    onClick = {
+                        val shareIntent =
+                            Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "Check out $appName - Your link organizer and Read Later App! Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                )
+                                type = "text/plain"
+                            }
+                        context.startActivity(
+                            Intent.createChooser(
+                                shareIntent,
+                                "Share via",
+                            ),
                         )
                     },
                 )
