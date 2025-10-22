@@ -12,6 +12,7 @@ fun createDeeprObject(
     link: String = "",
     openedCount: Long = 0,
     notes: String = "",
+    thumbnail: String = "",
 ): GetLinksAndTags =
     GetLinksAndTags(
         id = 0,
@@ -24,4 +25,5 @@ fun createDeeprObject(
         lastOpenedAt = "",
         isFavourite = 0,
         notes = notes,
+        thumbnail = thumbnail,
     )

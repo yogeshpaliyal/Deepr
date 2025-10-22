@@ -29,6 +29,7 @@ class AppPreferenceDataStore(
         private val AUTO_BACKUP_INTERVAL = longPreferencesKey("auto_backup_interval")
         private val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
         private val DEFAULT_PAGE_FAVOURITES = booleanPreferencesKey("default_page_favourites")
+        private val IS_THUMBNAIL_ENABLE = booleanPreferencesKey("is_thumbnail_enable")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -79,6 +80,11 @@ class AppPreferenceDataStore(
     val getDefaultPageFavourites: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[DEFAULT_PAGE_FAVOURITES] ?: false // Default to All (-1)
+        }
+
+    val isThumbnailEnable: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[IS_THUMBNAIL_ENABLE] ?: false
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -144,6 +150,12 @@ class AppPreferenceDataStore(
     suspend fun setDefaultPageFavourites(favourites: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[DEFAULT_PAGE_FAVOURITES] = favourites
+        }
+    }
+
+    suspend fun setThumbnailEnable(thumbnail: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[IS_THUMBNAIL_ENABLE] = thumbnail
         }
     }
 }

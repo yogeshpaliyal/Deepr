@@ -67,6 +67,7 @@ import compose.icons.tablericons.Download
 import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
+import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
@@ -117,6 +118,7 @@ fun SettingsScreen(
 
     // Collect default page preference state
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
 
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
@@ -450,6 +452,21 @@ fun SettingsScreen(
                         Switch(
                             checked = defaultPageFavourites,
                             onCheckedChange = { viewModel.setDefaultPageFavourites(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Photo,
+                    title = "Show thumbnails for links",
+                    description = "If enabled, thumbnails will be displayed for saved links where available",
+                    onClick = {
+                        viewModel.setIsThumbnailEnable(!isThumbnailEnable)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = isThumbnailEnable,
+                            onCheckedChange = { viewModel.setIsThumbnailEnable(it) },
                         )
                     },
                 )
