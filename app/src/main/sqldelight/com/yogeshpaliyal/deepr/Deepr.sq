@@ -5,7 +5,8 @@ name TEXT NOT NULL DEFAULT '',
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 openedCount INTEGER NOT NULL DEFAULT 0,
 isFavourite INTEGER NOT NULL DEFAULT 0,
-notes TEXT NOT NULL DEFAULT ''
+notes TEXT NOT NULL DEFAULT '',
+thumbnail TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE Tags (
@@ -32,7 +33,7 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertDeepr:
-INSERT INTO Deepr (link, name, openedCount, notes) VALUES (?, ?, ?, ?);
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail) VALUES (?, ?, ?, ?, ?);
 
 getLinksAndTags:
 SELECT
@@ -43,6 +44,7 @@ SELECT
   Deepr.openedCount,
   Deepr.isFavourite,
   Deepr.notes,
+  Deepr.thumbnail,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds
@@ -61,7 +63,7 @@ FROM
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
-  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%')
+  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
   AND (
     ? = -1 OR Deepr.isFavourite = ?
   )
@@ -107,6 +109,7 @@ SELECT
   Deepr.createdAt,
   Deepr.openedCount,
   Deepr.notes,
+  Deepr.thumbnail,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
@@ -138,7 +141,7 @@ resetOpenedCount:
 UPDATE Deepr SET openedCount = 0 WHERE id = ?;
 
 updateDeeplink:
-UPDATE Deepr SET link = ? , name = ?, notes = ? WHERE id = ?;
+UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ? WHERE id = ?;
 
 countDeepr:
 SELECT COUNT(*) FROM Deepr;

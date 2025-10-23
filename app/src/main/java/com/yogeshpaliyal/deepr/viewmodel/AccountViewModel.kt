@@ -256,6 +256,7 @@ class AccountViewModel(
                 .getLinksAndTags(
                     query,
                     query,
+                    query,
                     favourite.toLong(),
                     favourite.toLong(),
                     tagIdsString,
@@ -285,9 +286,10 @@ class AccountViewModel(
         executed: Boolean,
         tagsList: List<Tags>,
         notes: String = "",
+        thumbnail: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0, notes)
+            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail)
             deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
                 modifyTagsForLink(it, tagsList)
             }
@@ -370,9 +372,10 @@ class AccountViewModel(
         newName: String,
         tagsList: List<Tags>,
         notes: String = "",
+        thumbnail: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, notes, id)
+            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, id)
             modifyTagsForLink(id, tagsList)
             syncToMarkdown()
         }
@@ -439,9 +442,19 @@ class AccountViewModel(
         preferenceDataStore.getDefaultPageFavourites
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isThumbnailEnable =
+        preferenceDataStore.isThumbnailEnable
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun setDefaultPageFavourites(favourites: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setDefaultPageFavourites(favourites)
+        }
+    }
+
+    fun setIsThumbnailEnable(thumbnail: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setThumbnailEnable(thumbnail)
         }
     }
 

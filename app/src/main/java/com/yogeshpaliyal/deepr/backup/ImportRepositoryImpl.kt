@@ -47,6 +47,7 @@ class ImportRepositoryImpl(
                             val name = row.getOrNull(3)?.toString() ?: ""
                             val notes = row.getOrNull(4)?.toString() ?: ""
                             val tagsString = row.getOrNull(5)?.toString() ?: ""
+                            val thumbnail = row.getOrNull(6)?.toString() ?: ""
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
@@ -56,6 +57,7 @@ class ImportRepositoryImpl(
                                         openedCount = openedCount,
                                         name = name,
                                         notes = notes,
+                                        thumbnail = thumbnail,
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 

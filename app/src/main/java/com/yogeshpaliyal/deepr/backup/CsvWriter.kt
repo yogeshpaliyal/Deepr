@@ -22,6 +22,7 @@ class CsvWriter {
                         Constants.Header.NAME,
                         Constants.Header.NOTES,
                         Constants.Header.TAGS,
+                        Constants.Header.THUMBNAIL,
                     ),
                 )
                 // Write Data
@@ -34,6 +35,7 @@ class CsvWriter {
                             item.name,
                             item.notes,
                             item.tagsNames ?: "",
+                            item.thumbnail,
                         ),
                     )
                 }

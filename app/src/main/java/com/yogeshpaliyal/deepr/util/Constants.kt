@@ -8,5 +8,6 @@ object Constants {
         const val CREATED_AT = "CreatedAt"
         const val NOTES = "Notes"
         const val TAGS = "Tags"
+        const val THUMBNAIL = "Thumbnail"
     }
 }
