@@ -89,7 +89,7 @@ class DeeprApplication : Application() {
                 }
 
                 single<TransferLinkLocalServerRepository> {
-                    TransferLinkLocalServerRepositoryImpl(androidContext(), get(), get(), get())
+                    TransferLinkLocalServerRepositoryImpl(androidContext(), get(), get())
                 }
 
                 viewModel {

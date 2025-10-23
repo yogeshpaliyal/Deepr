@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,13 +53,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.journeyapps.barcodescanner.ScanOptions
 import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerService
+import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Copy
+import compose.icons.tablericons.Scan
 import compose.icons.tablericons.Server
 import org.koin.androidx.compose.koinViewModel
 
@@ -76,6 +80,18 @@ fun TransferLinkLocalServerScreen(
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
     val qrCodeData by viewModel.qrCodeData.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    val qrScanner =
+        rememberLauncherForActivityResult(
+            QRScanner(),
+        ) { result ->
+            if (result.contents == null) {
+                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
+            } else {
+                viewModel.import(result.contents)
+                Toast.makeText(context, result.contents, Toast.LENGTH_SHORT).show()
+            }
+        }
 
     // Track if user wants to start the server (used for permission flow)
     var pendingStart by remember { mutableStateOf(false) }
@@ -308,10 +324,39 @@ fun TransferLinkLocalServerScreen(
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
-                        text = stringResource(R.string.local_server_instructions),
+                        text = stringResource(R.string.transfer_link_server_instructions),
                         style = MaterialTheme.typography.bodyMedium,
                         lineHeight = 20.sp,
                     )
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.scan_qr_to_get_data),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 2,
+                    )
+                    IconButton(modifier = Modifier.weight(1f), onClick = {
+                        qrScanner.launch(ScanOptions())
+                    }) {
+                        Icon(
+                            TablerIcons.Scan,
+                            contentDescription = stringResource(R.string.qr_scanner),
+                        )
+                    }
                 }
             }
         }

@@ -5,8 +5,15 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLProtocol
+import io.ktor.http.isSuccess
+import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
@@ -14,11 +21,15 @@ import io.ktor.server.cio.CIOApplicationEngine
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
@@ -26,9 +37,8 @@ import java.util.Locale
 
 class TransferLinkLocalServerRepositoryImpl(
     private val context: Context,
+    private val httpClient: HttpClient,
     private val deeprQueries: DeeprQueries,
-    private val accountViewModel: AccountViewModel,
-    private val networkRepository: NetworkRepository,
 ) : TransferLinkLocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
@@ -70,6 +80,63 @@ class TransferLinkLocalServerRepositoryImpl(
                     }
 
                     routing {
+                        get("/api/export") {
+                            try {
+                                // Get all links
+                                val links =
+                                    deeprQueries
+                                        .getLinksAndTags(
+                                            "",
+                                            "",
+                                            -1L,
+                                            -1L,
+                                            "",
+                                            "",
+                                            0L,
+                                            "DESC",
+                                            "createdAt",
+                                            "DESC",
+                                            "createdAt",
+                                        ).executeAsList()
+
+                                // Get all tags
+                                val tags = deeprQueries.getAllTags().executeAsList()
+
+                                // Create export response
+                                val exportData =
+                                    ExportDataResponse(
+                                        appVersion = BuildConfig.VERSION_NAME,
+                                        exportedAt = System.currentTimeMillis(),
+                                        links =
+                                            links.map { link ->
+                                                LinkResponse(
+                                                    id = link.id,
+                                                    link = link.link,
+                                                    name = link.name,
+                                                    createdAt = link.createdAt,
+                                                    openedCount = link.openedCount,
+                                                    notes = link.notes,
+                                                    tags =
+                                                        link.tagsNames
+                                                            ?.split(", ")
+                                                            ?.filter { it.isNotEmpty() } ?: emptyList(),
+                                                )
+                                            },
+                                        tags =
+                                            tags.map { tag ->
+                                                TagData(id = tag.id, name = tag.name)
+                                            },
+                                    )
+
+                                call.respond(HttpStatusCode.OK, exportData)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error exporting data", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error exporting data: ${e.message}"),
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -93,6 +160,76 @@ class TransferLinkLocalServerRepositoryImpl(
             Log.d("LocalServer", "Server stopped")
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
+        }
+    }
+
+    override suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse =
+                    httpClient.get {
+                        url {
+                            protocol = URLProtocol.HTTP
+                            host = qrTransferInfo.ip
+                            port = qrTransferInfo.port
+                            path("export")
+                        }
+                        timeout {
+                            requestTimeoutMillis = 30000 // 30 seconds
+                        }
+                    }
+
+                if (!response.status.isSuccess()) {
+                    return@withContext Result.failure(
+                        Exception("Failed to fetch data: ${response.status}"),
+                    )
+                }
+
+                val exportedData: ExportedData = response.body()
+
+                importToDatabase(exportedData)
+
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private fun importToDatabase(data: ExportedData) {
+        deeprQueries.transaction {
+            data.deeplinks.forEach { deeplink ->
+                deeprQueries.insertDeepr(
+                    link = deeplink.link,
+                    name = deeplink.name,
+                    openedCount = deeplink.openedCount,
+                    notes = deeplink.notes,
+                )
+
+                val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                deeplink.tags.forEach { tagName ->
+                    deeprQueries.insertTag(name = tagName)
+
+                    val tag = deeprQueries.getTagByName(tagName).executeAsOne()
+
+                    deeprQueries.addTagToLink(
+                        linkId = insertedId,
+                        tagId = tag.id,
+                    )
+                }
+
+                if (deeplink.isFavourite) {
+                    deeprQueries.setFavourite(
+                        isFavourite = 1,
+                        id = insertedId,
+                    )
+                }
+            }
+
+            data.tags.forEach { tagName ->
+                deeprQueries.insertTag(name = tagName)
+            }
         }
     }
 
@@ -164,4 +301,22 @@ data class QRTransferInfo(
     val ip: String,
     val port: Int,
     val appVersion: String,
+)
+
+@Serializable
+data class ExportedData(
+    val deeplinks: List<ExportedDeeplink>,
+    val tags: List<String>,
+    val exportedAt: Long,
+)
+
+@Serializable
+data class ExportedDeeplink(
+    val link: String,
+    val name: String,
+    val notes: String,
+    val tags: List<String>,
+    val openedCount: Long,
+    val isFavourite: Boolean,
+    val createdAt: String,
 )

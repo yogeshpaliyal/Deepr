@@ -199,4 +199,6 @@
     <string name="stop">Stop</string>
 
     <string name="transfer_link_local_network_server">Transfer Link Local Network Server</string>
+    <string name="transfer_link_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Scan the QR code from import links option in another device</string>
+    <string name="scan_qr_to_get_data">Scan to get links from another device</string>
 </resources>

@@ -10,4 +10,6 @@ interface TransferLinkLocalServerRepository {
     suspend fun startServer()
 
     suspend fun stopServer()
+
+    suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit>
 }
