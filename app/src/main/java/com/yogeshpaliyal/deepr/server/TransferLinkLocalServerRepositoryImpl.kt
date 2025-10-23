@@ -88,6 +88,7 @@ class TransferLinkLocalServerRepositoryImpl(
                                         .getLinksAndTags(
                                             "",
                                             "",
+                                            "",
                                             -1L,
                                             -1L,
                                             "",
@@ -119,7 +120,8 @@ class TransferLinkLocalServerRepositoryImpl(
                                                     tags =
                                                         link.tagsNames
                                                             ?.split(", ")
-                                                            ?.filter { it.isNotEmpty() } ?: emptyList(),
+                                                            ?.filter { it.isNotEmpty() }
+                                                            ?: emptyList(),
                                                 )
                                             },
                                         tags =
@@ -204,6 +206,7 @@ class TransferLinkLocalServerRepositoryImpl(
                     name = deeplink.name,
                     openedCount = deeplink.openedCount,
                     notes = deeplink.notes,
+                    thumbnail = deeplink.thumbnail,
                 )
 
                 val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
@@ -319,4 +322,5 @@ data class ExportedDeeplink(
     val openedCount: Long,
     val isFavourite: Boolean,
     val createdAt: String,
+    val thumbnail: String,
 )
