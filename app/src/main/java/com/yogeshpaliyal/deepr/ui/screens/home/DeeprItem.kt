@@ -63,6 +63,7 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Refresh
@@ -77,6 +78,10 @@ sealed class MenuItem(
     val item: GetLinksAndTags,
 ) {
     class Click(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class OpenWith(
         item: GetLinksAndTags,
     ) : MenuItem(item)
 
@@ -407,6 +412,22 @@ fun DeeprItem(
                                         )
                                     },
                                 )
+                            }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.open_with)) },
+                                onClick = {
+                                    onItemClick(MenuItem.OpenWith(account))
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.ExternalLink,
+                                        contentDescription = stringResource(R.string.open_with),
+                                    )
+                                },
+                            )
+
+
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.edit)) },
                                     onClick = {

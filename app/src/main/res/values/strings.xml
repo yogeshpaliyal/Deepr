@@ -28,6 +28,7 @@
     
     <!-- Menu and Dialog Items -->
     <string name="more_options">More options</string>
+    <string name="open_with">Open with</string>
     <string name="copy_link">Copy link</string>
     <string name="link_copied">Link copied</string>
     <string name="delete">Delete</string>
