@@ -16,7 +16,7 @@ class ChromeBookmarkImporter(
 
     override fun extractBookmarks(document: Document): List<Bookmark> {
         val bookmarks = mutableListOf<Bookmark>()
-        
+
         // Chrome bookmarks use <a> tags inside <dt> elements
         val links = document.select("dt > a[href]")
 
@@ -28,11 +28,12 @@ class ChromeBookmarkImporter(
             val tags = link.attr("tags")
 
             if (url.isNotBlank()) {
-                val tagList = if (tags.isNotBlank()) {
-                    tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                } else {
-                    null
-                }
+                val tagList =
+                    if (tags.isNotBlank()) {
+                        tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    } else {
+                        null
+                    }
 
                 bookmarks.add(
                     Bookmark(
@@ -58,10 +59,10 @@ class ChromeBookmarkImporter(
             if (h3 != null && current.tagName() == "dt") {
                 folders.add(h3.text())
             }
-            
+
             // Move up the tree
             current = current.parent()
-            
+
             // Stop at the root bookmark folder
             if (current?.tagName() == "dl" && current.parent()?.tagName() == "html") {
                 break

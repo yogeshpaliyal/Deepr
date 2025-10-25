@@ -19,9 +19,7 @@ class BookmarkImporterTest {
         runTest {
             val testImporter =
                 object : BookmarkImporter {
-                    override suspend fun import(uri: Uri): RequestResult<ImportResult> {
-                        return RequestResult.Success(ImportResult(0, 0))
-                    }
+                    override suspend fun import(uri: Uri): RequestResult<ImportResult> = RequestResult.Success(ImportResult(0, 0))
 
                     override fun getDisplayName(): String = "Test"
 
@@ -65,4 +63,3 @@ class BookmarkImporterTest {
         assertArrayEquals(htmlMimeTypes, htmlMimeTypes)
     }
 }
-

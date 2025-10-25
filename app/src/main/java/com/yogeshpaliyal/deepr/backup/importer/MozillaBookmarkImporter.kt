@@ -16,7 +16,7 @@ class MozillaBookmarkImporter(
 
     override fun extractBookmarks(document: Document): List<Bookmark> {
         val bookmarks = mutableListOf<Bookmark>()
-        
+
         // Firefox bookmarks use <a> tags
         val links = document.select("a[href]")
 
@@ -24,7 +24,7 @@ class MozillaBookmarkImporter(
             val url = link.attr("href")
             val title = link.text()
             val folder = extractMozillaFolder(link)
-            
+
             // Firefox-specific attributes
             val addDate = link.attr("add_date")
             val lastModified = link.attr("last_modified")
@@ -32,11 +32,12 @@ class MozillaBookmarkImporter(
             val tags = link.attr("tags")
 
             if (url.isNotBlank() && !url.startsWith("place:")) {
-                val tagList = if (tags.isNotBlank()) {
-                    tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                } else {
-                    null
-                }
+                val tagList =
+                    if (tags.isNotBlank()) {
+                        tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    } else {
+                        null
+                    }
 
                 bookmarks.add(
                     Bookmark(

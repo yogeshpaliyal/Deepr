@@ -17,9 +17,7 @@ class ImportRepositoryImpl(
     private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries)
     private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries)
 
-    override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> {
-        return csvImporter.import(uri)
-    }
+    override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> = csvImporter.import(uri)
 
     override fun getAvailableImporters(): List<BookmarkImporter> =
         listOf(
@@ -31,7 +29,5 @@ class ImportRepositoryImpl(
     override suspend fun importBookmarks(
         uri: Uri,
         importer: BookmarkImporter,
-    ): RequestResult<ImportResult> {
-        return importer.import(uri)
-    }
+    ): RequestResult<ImportResult> = importer.import(uri)
 }
