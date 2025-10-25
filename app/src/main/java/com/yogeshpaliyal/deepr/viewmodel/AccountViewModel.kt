@@ -416,6 +416,30 @@ class AccountViewModel(
         }
     }
 
+    fun importBookmarks(
+        uri: Uri,
+        importer: com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            importResultChannel.send("Importing ${importer.getDisplayName()}, please wait...")
+            val result = importRepository.importBookmarks(uri, importer)
+
+            when (result) {
+                is RequestResult.Success -> {
+                    importResultChannel.send(
+                        "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
+                    )
+                }
+
+                is RequestResult.Error -> {
+                    importResultChannel.send("Import failed: ${result.message}")
+                }
+            }
+        }
+    }
+
+    fun getAvailableImporters() = importRepository.getAvailableImporters()
+
     // Shortcut icon preference methods
     val useLinkBasedIcons =
         preferenceDataStore.getUseLinkBasedIcons
