@@ -28,6 +28,8 @@ import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServerScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
+import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalNetworkServer
+import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalServerScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
@@ -158,6 +160,11 @@ fun Dashboard(
                     is LocalNetworkServer ->
                         NavEntry(key) {
                             LocalNetworkServerScreen(backStack)
+                        }
+
+                    is TransferLinkLocalNetworkServer ->
+                        NavEntry(key) {
+                            TransferLinkLocalServerScreen(backStack)
                         }
 
                     else -> NavEntry(Unit) { Text("Unknown route") }

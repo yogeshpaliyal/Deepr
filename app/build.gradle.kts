@@ -146,6 +146,7 @@ dependencies {
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.content.negotiation)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
