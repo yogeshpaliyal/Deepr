@@ -232,7 +232,7 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("CSV Management") {
+            SettingsSection("Import & Export") {
                 SettingsItem(
                     TablerIcons.Download,
                     title = stringResource(R.string.import_deeplinks),
@@ -258,6 +258,13 @@ fun SettingsScreen(
                                 Locale.US,
                             ).format(Date())
                         csvExportLauncher.launch("deepr_export_$timeStamp.csv")
+                    },
+                )
+                SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.transfer_link_to_another_device),
+                    onClick = {
+                        backStack.add(TransferLinkLocalNetworkServer)
                     },
                 )
             }
@@ -399,14 +406,6 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.Server,
-                    title = stringResource(R.string.transfer_link_local_network_server),
-                    onClick = {
-                        backStack.add(TransferLinkLocalNetworkServer)
-                    },
-                )
-
-                SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
                     description =
@@ -526,7 +525,7 @@ fun SettingsScreen(
                                     "https://play.google.com/store/apps/details?id=$appPackageName".toUri(),
                                 ),
                             )
-                        } catch (e: ActivityNotFoundException) {
+                        } catch (_: ActivityNotFoundException) {
                         }
                     },
                 )
