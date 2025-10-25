@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult

@@ -1,10 +1,9 @@
-package com.yogeshpaliyal.deepr.review
-
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.core.net.toUri
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.review.ReviewManager
 
 class PlayStoreReviewManager : ReviewManager {
     override fun requestReview(activity: Activity) {

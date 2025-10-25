@@ -1,5 +1,5 @@
 package com.yogeshpaliyal.deepr.review
 
 object ReviewManagerFactory {
-    fun create(): ReviewManager = InAppReviewManager()
+    fun create(): ReviewManager = PlayStoreReviewManager()
 }
