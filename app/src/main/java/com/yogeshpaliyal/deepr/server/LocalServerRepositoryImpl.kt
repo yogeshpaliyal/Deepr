@@ -5,6 +5,7 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.data.NetworkRepository
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -21,9 +22,12 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
@@ -34,6 +38,7 @@ class LocalServerRepositoryImpl(
     private val deeprQueries: DeeprQueries,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
+    private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
     private val _isRunning = MutableStateFlow(false)
@@ -42,7 +47,29 @@ class LocalServerRepositoryImpl(
     private val _serverUrl = MutableStateFlow<String?>(null)
     override val serverUrl: StateFlow<String?> = _serverUrl.asStateFlow()
 
-    private val port = 8080
+    private val _serverPort = MutableStateFlow(8080)
+    override val serverPort: StateFlow<Int> = _serverPort.asStateFlow()
+
+    init {
+        // Load saved port on initialization
+        CoroutineScope(Dispatchers.IO).launch {
+            preferenceDataStore.getServerPort.collect { portString ->
+                val port = portString.toIntOrNull()
+                if (port != null && port in 1024..65535) {
+                    _serverPort.value = port
+                } else {
+                    _serverPort.value = 8080
+                }
+            }
+        }
+    }
+
+    override suspend fun setServerPort(port: Int) {
+        if (port in 1024..65535) {
+            _serverPort.value = port
+            preferenceDataStore.setServerPort(port.toString())
+        }
+    }
 
     override suspend fun startServer() {
         if (_isRunning.value) {
@@ -56,6 +83,8 @@ class LocalServerRepositoryImpl(
                 Log.e("LocalServer", "Unable to get IP address")
                 return
             }
+
+            val port = _serverPort.value
 
             server =
                 embeddedServer(CIO, host = "0.0.0.0", port = port) {
