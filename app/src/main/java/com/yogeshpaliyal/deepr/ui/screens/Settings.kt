@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -510,16 +509,7 @@ fun SettingsScreen(
                     description = "Rate us on the Play Store",
                     shouldShowLoading = false,
                     onClick = {
-                        val appPackageName = BuildConfig.APPLICATION_ID
-                        try {
-                            context.startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    "https://play.google.com/store/apps/details?id=$appPackageName".toUri(),
-                                ),
-                            )
-                        } catch (e: ActivityNotFoundException) {
-                        }
+                        viewModel.requestReview(context as MainActivity)
                     },
                 )
 
