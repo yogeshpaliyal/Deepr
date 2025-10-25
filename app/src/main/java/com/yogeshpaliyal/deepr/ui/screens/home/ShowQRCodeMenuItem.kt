@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import androidx.compose.material3.DropdownMenuItem
+import android.graphics.pdf.models.ListItem
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,13 +18,13 @@ fun ShowQRCodeMenuItem(
     onQrCodeClick: (GetLinksAndTags) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    DropdownMenuItem(
-        modifier = modifier,
-        text = { Text(stringResource(R.string.show_qr_code)) },
-        onClick = {
-            onQrCodeClick(account)
-        },
-        leadingIcon = {
+    androidx.compose.material3.ListItem(
+        modifier =
+            modifier.clickable {
+                onQrCodeClick(account)
+            },
+        headlineContent = { Text(stringResource(R.string.show_qr_code)) },
+        leadingContent = {
             Icon(
                 TablerIcons.Qrcode,
                 contentDescription = stringResource(R.string.show_qr_code),
