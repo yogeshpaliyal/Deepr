@@ -32,6 +32,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +65,7 @@ import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.Scan
 import compose.icons.tablericons.Server
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
 data object TransferLinkLocalNetworkServer
@@ -80,6 +82,12 @@ fun TransferLinkLocalServerScreen(
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
     val qrCodeData by viewModel.qrCodeData.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    LaunchedEffect(true) {
+        viewModel.transferResultFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val qrScanner =
         rememberLauncherForActivityResult(

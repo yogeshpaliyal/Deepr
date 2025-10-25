@@ -24,6 +24,9 @@ import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModel
@@ -71,7 +74,18 @@ class DeeprApplication : Application() {
                 single<AutoBackupWorker> { AutoBackupWorker(androidContext(), get(), get()) }
 
                 single {
-                    HttpClient(CIO)
+                    HttpClient(CIO) {
+                        install(ContentNegotiation) {
+                            // FIX: Explicitly call the Json function from kotlinx.serialization.json
+                            json(
+                                Json {
+                                    prettyPrint = true
+                                    isLenient = true
+                                    ignoreUnknownKeys = true
+                                },
+                            )
+                        }
+                    }
                 }
 
                 viewModel { AccountViewModel(get(), get(), get(), get(), get(), get()) }

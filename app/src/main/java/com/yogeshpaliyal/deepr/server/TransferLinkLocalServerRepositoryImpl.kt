@@ -55,7 +55,7 @@ class TransferLinkLocalServerRepositoryImpl(
 
     override suspend fun startServer() {
         if (isRunning.value) {
-            generateQRCode()
+            generateQRCode()?.let { qrData -> _qrCodeData.update { qrData } }
             Log.d("LocalServer", "Server is already running")
             return
         }
@@ -110,8 +110,7 @@ class TransferLinkLocalServerRepositoryImpl(
                                         exportedAt = System.currentTimeMillis(),
                                         links =
                                             links.map { link ->
-                                                LinkResponse(
-                                                    id = link.id,
+                                                ExportedDeeplink(
                                                     link = link.link,
                                                     name = link.name,
                                                     createdAt = link.createdAt,
@@ -122,6 +121,8 @@ class TransferLinkLocalServerRepositoryImpl(
                                                             ?.split(", ")
                                                             ?.filter { it.isNotEmpty() }
                                                             ?: emptyList(),
+                                                    isFavourite = link.isFavourite == 1L,
+                                                    thumbnail = link.thumbnail,
                                                 )
                                             },
                                         tags =
@@ -143,6 +144,8 @@ class TransferLinkLocalServerRepositoryImpl(
                 }
 
             server?.start(wait = false)
+            val generatedQrData = generateQRCode()
+            _qrCodeData.update { generatedQrData }
             _isRunning.update { true }
             _serverUrl.update { "http://$ipAddress:$port" }
             Log.d("LocalServer", "Server started at ${_serverUrl.value}")
@@ -174,14 +177,14 @@ class TransferLinkLocalServerRepositoryImpl(
                             protocol = URLProtocol.HTTP
                             host = qrTransferInfo.ip
                             port = qrTransferInfo.port
-                            path("export")
+                            path("api/export")
                         }
                         timeout {
                             requestTimeoutMillis = 30000 // 30 seconds
                         }
                     }
 
-                if (!response.status.isSuccess()) {
+                if (response.status.isSuccess().not()) {
                     return@withContext Result.failure(
                         Exception("Failed to fetch data: ${response.status}"),
                     )
@@ -200,7 +203,7 @@ class TransferLinkLocalServerRepositoryImpl(
 
     private fun importToDatabase(data: ExportedData) {
         deeprQueries.transaction {
-            data.deeplinks.forEach { deeplink ->
+            data.links.forEach { deeplink ->
                 deeprQueries.insertDeepr(
                     link = deeplink.link,
                     name = deeplink.name,
@@ -295,7 +298,7 @@ class TransferLinkLocalServerRepositoryImpl(
 data class ExportDataResponse(
     val appVersion: String,
     val exportedAt: Long,
-    val links: List<LinkResponse>,
+    val links: List<ExportedDeeplink>,
     val tags: List<TagData>,
 )
 
@@ -308,7 +311,7 @@ data class QRTransferInfo(
 
 @Serializable
 data class ExportedData(
-    val deeplinks: List<ExportedDeeplink>,
+    val links: List<ExportedDeeplink>,
     val tags: List<String>,
     val exportedAt: Long,
 )
