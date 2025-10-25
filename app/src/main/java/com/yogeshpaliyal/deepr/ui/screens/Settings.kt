@@ -89,12 +89,22 @@ fun SettingsScreen(
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val launcherActivityPickResult =
+
+    // Get available importers from the view model
+    val availableImporters = remember { viewModel.getAvailableImporters() }
+
+    // Track which importer is being used for the current file picker
+    var selectedImporter by remember { mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(null) }
+
+    // Launcher for picking files to import
+    val importFileLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument(),
         ) { uri ->
             uri?.let {
-                viewModel.importCsvData(it)
+                selectedImporter?.let { importer ->
+                    viewModel.importBookmarks(it, importer)
+                }
             }
         }
 
@@ -231,21 +241,20 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("CSV Management") {
-                SettingsItem(
-                    TablerIcons.Download,
-                    title = stringResource(R.string.import_deeplinks),
-                    description = stringResource(R.string.import_deeplinks_description),
-                    onClick = {
-                        launcherActivityPickResult.launch(
-                            arrayOf(
-                                "text/csv",
-                                "text/comma-separated-values",
-                                "application/csv",
-                            ),
-                        )
-                    },
-                )
+            SettingsSection("Import & Export") {
+                // Add import options for each available importer
+                availableImporters.forEach { importer ->
+                    SettingsItem(
+                        TablerIcons.Download,
+                        title = "Import from ${importer.getDisplayName()}",
+                        description = "Import bookmarks from ${importer.getDisplayName()} file",
+                        onClick = {
+                            selectedImporter = importer
+                            importFileLauncher.launch(importer.getSupportedMimeTypes())
+                        },
+                    )
+                }
+
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.export_deeplinks),
