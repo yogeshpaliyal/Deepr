@@ -204,32 +204,34 @@ class TransferLinkLocalServerRepositoryImpl(
     private fun importToDatabase(data: ExportedData) {
         deeprQueries.transaction {
             data.links.forEach { deeplink ->
-                deeprQueries.insertDeepr(
-                    link = deeplink.link,
-                    name = deeplink.name,
-                    openedCount = deeplink.openedCount,
-                    notes = deeplink.notes,
-                    thumbnail = deeplink.thumbnail,
-                )
-
-                val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                deeplink.tags.forEach { tagName ->
-                    deeprQueries.insertTag(name = tagName)
-
-                    val tag = deeprQueries.getTagByName(tagName).executeAsOne()
-
-                    deeprQueries.addTagToLink(
-                        linkId = insertedId,
-                        tagId = tag.id,
+                if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
+                    deeprQueries.insertDeepr(
+                        link = deeplink.link,
+                        name = deeplink.name,
+                        openedCount = deeplink.openedCount,
+                        notes = deeplink.notes,
+                        thumbnail = deeplink.thumbnail,
                     )
-                }
 
-                if (deeplink.isFavourite) {
-                    deeprQueries.setFavourite(
-                        isFavourite = 1,
-                        id = insertedId,
-                    )
+                    val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                    deeplink.tags.forEach { tagName ->
+                        deeprQueries.insertTag(name = tagName)
+
+                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
+
+                        deeprQueries.addTagToLink(
+                            linkId = insertedId,
+                            tagId = tag.id,
+                        )
+                    }
+
+                    if (deeplink.isFavourite) {
+                        deeprQueries.setFavourite(
+                            isFavourite = 1,
+                            id = insertedId,
+                        )
+                    }
                 }
             }
 

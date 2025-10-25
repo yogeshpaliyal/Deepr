@@ -97,7 +97,6 @@ fun TransferLinkLocalServerScreen(
                 Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
             } else {
                 viewModel.import(result.contents)
-                Toast.makeText(context, result.contents, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -347,19 +346,26 @@ fun TransferLinkLocalServerScreen(
                     ),
             ) {
                 Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.scan_qr_to_get_data),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 2,
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                fontFamily = FontFamily.Monospace,
+                            ),
+                        modifier = Modifier.weight(1f),
                     )
-                    IconButton(modifier = Modifier.weight(1f), onClick = {
-                        qrScanner.launch(ScanOptions())
-                    }) {
+                    IconButton(
+                        onClick = {
+                            qrScanner.launch(ScanOptions())
+                        },
+                    ) {
                         Icon(
                             TablerIcons.Scan,
                             contentDescription = stringResource(R.string.qr_scanner),
