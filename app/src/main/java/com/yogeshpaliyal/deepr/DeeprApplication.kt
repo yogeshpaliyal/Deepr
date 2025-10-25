@@ -13,6 +13,8 @@ import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
 import com.yogeshpaliyal.deepr.data.HtmlParser
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.review.ReviewManager
+import com.yogeshpaliyal.deepr.review.ReviewManagerFactory
 import com.yogeshpaliyal.deepr.server.LocalServerRepository
 import com.yogeshpaliyal.deepr.server.LocalServerRepositoryImpl
 import com.yogeshpaliyal.deepr.sync.SyncRepository
@@ -87,6 +89,10 @@ class DeeprApplication : Application() {
 
                 viewModel {
                     LocalServerViewModel(get())
+                }
+
+                single<ReviewManager> {
+                    ReviewManagerFactory.create()
                 }
             }
 
