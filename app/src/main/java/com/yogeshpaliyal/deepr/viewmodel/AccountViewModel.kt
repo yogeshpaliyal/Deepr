@@ -76,6 +76,7 @@ class AccountViewModel(
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
+    private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
     // State for tags
@@ -554,5 +555,9 @@ class AccountViewModel(
                 }
             }
         }
+    }
+
+    fun requestReview(activity: android.app.Activity) {
+        reviewManager.requestReview(activity)
     }
 }
