@@ -120,7 +120,7 @@ fun HomeScreen(
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
-    val hazeState = rememberHazeState()
+    val hazeState = rememberHazeState(blurEnabled = true)
     val context = LocalContext.current
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
