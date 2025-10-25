@@ -355,10 +355,7 @@ fun TransferLinkLocalServerScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.scan_qr_to_get_data),
-                        style =
-                            MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = FontFamily.Monospace,
-                            ),
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f),
                     )
                     IconButton(
