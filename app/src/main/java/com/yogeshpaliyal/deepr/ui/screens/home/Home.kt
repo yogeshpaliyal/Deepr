@@ -7,11 +7,14 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +22,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +35,12 @@ import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -42,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
@@ -56,13 +67,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -83,12 +98,16 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Link
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
+import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -410,7 +429,7 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Content(
     hazeState: HazeState,
@@ -422,6 +441,8 @@ fun Content(
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
     if (accounts == null) {
         Column(
@@ -432,36 +453,63 @@ fun Content(
         return
     }
 
-    Column(modifier.fillMaxSize()) {
-        val context = LocalContext.current
-        var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    val context = LocalContext.current
+    var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
-        showShortcutDialog?.let { deepr ->
-            CreateShortcutDialog(
-                deepr = deepr,
-                onDismiss = { showShortcutDialog = null },
-            )
+    showShortcutDialog?.let { deepr ->
+        CreateShortcutDialog(
+            deepr = deepr,
+            onDismiss = { showShortcutDialog = null },
+        )
+    }
+
+    showQrCodeDialog?.let {
+        QrCodeDialog(it) {
+            showQrCodeDialog = null
         }
+    }
 
-        showQrCodeDialog?.let {
-            QrCodeDialog(it) {
-                showQrCodeDialog = null
+    showDeleteConfirmDialog?.let { deepr ->
+        DeleteConfirmationDialog(
+            deepr = deepr,
+            onDismiss = { showDeleteConfirmDialog = null },
+            onConfirm = {
+                viewModel.deleteAccount(it.id)
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+            },
+        )
+    }
+
+    val onItemClick: (MenuItem) -> Unit = {
+        showMoreSelectedItem = null
+        when (it) {
+            is MenuItem.Click -> {
+                viewModel.incrementOpenedCount(it.item.id)
+                openDeeplink(context, it.item.link)
+            }
+
+            is MenuItem.Delete -> showDeleteConfirmDialog = it.item
+            is MenuItem.Edit -> editDeepr(it.item)
+            is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
+            is MenuItem.ResetCounter -> {
+                viewModel.resetOpenedCount(it.item.id)
+                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+            }
+
+            is MenuItem.Shortcut -> {
+                showShortcutDialog = it.item
+            }
+
+            is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
+            is MenuItem.MoreOptionsBottomSheet -> {
+                showMoreSelectedItem = it.item
             }
         }
+    }
 
-        showDeleteConfirmDialog?.let { deepr ->
-            DeleteConfirmationDialog(
-                deepr = deepr,
-                onDismiss = { showDeleteConfirmDialog = null },
-                onConfirm = {
-                    viewModel.deleteAccount(it.id)
-                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                },
-            )
-        }
-
+    Column(modifier.fillMaxSize()) {
         DeeprList(
             modifier =
                 Modifier
@@ -471,28 +519,7 @@ fun Content(
             contentPaddingValues = contentPaddingValues,
             accounts = accounts!!,
             selectedTag = selectedTag,
-            onItemClick = {
-                when (it) {
-                    is MenuItem.Click -> {
-                        viewModel.incrementOpenedCount(it.item.id)
-                        openDeeplink(context, it.item.link)
-                    }
-
-                    is MenuItem.Delete -> showDeleteConfirmDialog = it.item
-                    is MenuItem.Edit -> editDeepr(it.item)
-                    is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
-                    is MenuItem.ResetCounter -> {
-                        viewModel.resetOpenedCount(it.item.id)
-                        Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is MenuItem.Shortcut -> {
-                        showShortcutDialog = it.item
-                    }
-
-                    is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
-                }
-            },
+            onItemClick = onItemClick,
             onTagClick = {
                 // Toggle the tag in the filter by tag name
                 viewModel.setSelectedTagByName(it)
@@ -500,6 +527,182 @@ fun Content(
             isThumbnailEnable = isThumbnailEnable,
         )
     }
+
+    showMoreSelectedItem?.let { account ->
+        ModalBottomSheet(sheetState = showMoreBottomSheet, onDismissRequest = {
+            showMoreSelectedItem = null
+        }) {
+            val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+            LazyColumn {
+                item {
+                    ListItem(
+                        headlineContent = {
+                            Column {
+                                Text(
+                                    text = account.name,
+                                )
+                                Text(
+                                    text = account.link,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    onItemClick(MenuItem.Click(account))
+                                },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+
+                if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
+                    item {
+                        AsyncImage(
+                            model = account.thumbnail,
+                            contentDescription = account.name,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1.91f)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                            placeholder = null,
+                            error = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+                }
+
+                if (account.notes.isNotEmpty()) {
+                    item {
+                        MenuListItem(
+                            text = account.notes,
+                            icon = TablerIcons.Note,
+                            selectable = true,
+                        )
+                    }
+                }
+
+                item {
+                    ShortcutMenuItem(account, {
+                        onItemClick(MenuItem.Shortcut(it))
+                    })
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.show_qr_code),
+                        icon = TablerIcons.Qrcode,
+                        onClick = {
+                            onItemClick(MenuItem.ShowQrCode(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.reset_opened_count),
+                        icon = TablerIcons.Refresh,
+                        onClick = {
+                            onItemClick(MenuItem.ResetCounter(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.edit),
+                        icon = TablerIcons.Edit,
+                        onClick = {
+                            onItemClick(MenuItem.Edit(account))
+                        },
+                    )
+                }
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.delete),
+                        icon = TablerIcons.Trash,
+                        onClick = {
+                            onItemClick(MenuItem.Delete(account))
+                        },
+                        colors =
+                            ListItemDefaults.colors(
+                                headlineColor = MaterialTheme.colorScheme.error,
+                                leadingIconColor = MaterialTheme.colorScheme.error,
+                                containerColor = Color.Transparent,
+                            ),
+                    )
+                }
+
+                // Display last opened time
+                if (account.lastOpenedAt != null) {
+                    item {
+                        MenuListItem(
+                            text =
+                                stringResource(
+                                    R.string.last_opened,
+                                    formatDateTime(account.lastOpenedAt),
+                                ),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            onClick = {
+                                onItemClick(MenuItem.Edit(account))
+                            },
+                            icon = null,
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MenuListItem(
+    text: String,
+    icon: ImageVector?,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    colors: ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    onClick: (() -> Unit)? = null,
+    selectable: Boolean = false,
+) {
+    ListItem(
+        headlineContent = {
+            if (selectable) {
+                SelectionContainer {
+                    Text(
+                        text = text,
+                        style = textStyle,
+                    )
+                }
+            } else {
+                Text(
+                    text = text,
+                    style = textStyle,
+                )
+            }
+        },
+        modifier =
+            modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
+                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        leadingContent = {
+            if (icon != null) {
+                Icon(
+                    icon,
+                    contentDescription = text,
+                )
+            }
+        },
+        colors = colors,
+    )
 }
 
 @Composable

@@ -157,10 +157,12 @@ dependencies {
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)
+    "proImplementation"(libs.play.core)
 
     "freePlaystoreImplementation"(platform(libs.firebase.bom))
     "freePlaystoreImplementation"(libs.firebase.analytics)
     "freePlaystoreImplementation"(libs.firebase.crashlytics.ndk)
+    "freePlaystoreImplementation"(libs.play.core)
 }
 
 kotlinter {
