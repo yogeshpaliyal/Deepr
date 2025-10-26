@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
+const val PORT = "port"
+
 class LocalServerService : Service() {
     private val localServerRepository: LocalServerRepository by inject()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -38,8 +40,9 @@ class LocalServerService : Service() {
             ACTION_START -> {
                 // Start foreground immediately to avoid ANR
                 startForeground(NOTIFICATION_ID, createNotification(null))
+                val port = intent.getIntExtra(PORT, 8080)
                 serviceScope.launch {
-                    localServerRepository.startServer()
+                    localServerRepository.startServer(port)
                     observeServerState()
                 }
             }
@@ -60,6 +63,16 @@ class LocalServerService : Service() {
             localServerRepository.isRunning.collect { isRunning ->
                 if (isRunning) {
                     val serverUrl = localServerRepository.serverUrl.first()
+                    val notificationManager =
+                        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.notify(NOTIFICATION_ID, createNotification(serverUrl))
+                }
+            }
+        }
+        serviceScope.launch {
+            localServerRepository.isTransferLinkServerRunning.collect { isRunning ->
+                if (isRunning) {
+                    val serverUrl = localServerRepository.transferLinkServerUrl.first()
                     val notificationManager =
                         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                     notificationManager.notify(NOTIFICATION_ID, createNotification(serverUrl))
@@ -139,10 +152,14 @@ class LocalServerService : Service() {
         const val ACTION_START = "com.yogeshpaliyal.deepr.ACTION_START_SERVER"
         const val ACTION_STOP = "com.yogeshpaliyal.deepr.ACTION_STOP_SERVER"
 
-        fun startService(context: Context) {
+        fun startService(
+            context: Context,
+            port: Int,
+        ) {
             val intent =
                 Intent(context, LocalServerService::class.java).apply {
                     action = ACTION_START
+                    putExtra(PORT, port)
                 }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)

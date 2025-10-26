@@ -3,19 +3,19 @@ package com.yogeshpaliyal.deepr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.server.LocalServerRepository
 import com.yogeshpaliyal.deepr.server.QRTransferInfo
-import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class TransferLinkLocalServerViewModel(
-    private val transferLinkLocalServerRepository: TransferLinkLocalServerRepository,
+    private val localServerRepository: LocalServerRepository,
 ) : ViewModel() {
-    val isRunning = transferLinkLocalServerRepository.isRunning
-    val serverUrl = transferLinkLocalServerRepository.serverUrl
-    val qrCodeData = transferLinkLocalServerRepository.qrCodeData
+    val isRunning = localServerRepository.isTransferLinkServerRunning
+    val serverUrl = localServerRepository.transferLinkServerUrl
+    val qrCodeData = localServerRepository.qrCodeData
 
     private val transferResultChannel = Channel<String>()
     val transferResultFlow = transferResultChannel.receiveAsFlow()
@@ -30,7 +30,7 @@ class TransferLinkLocalServerViewModel(
                     return@launch
                 }
 
-                val result = transferLinkLocalServerRepository.fetchAndImportFromSender(qrInfo)
+                val result = localServerRepository.fetchAndImportFromSender(qrInfo)
 
                 result
                     .onSuccess {

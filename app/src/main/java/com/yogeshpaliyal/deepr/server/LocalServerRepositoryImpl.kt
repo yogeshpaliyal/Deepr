@@ -3,12 +3,21 @@ package com.yogeshpaliyal.deepr.server
 import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
+import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLProtocol
+import io.ktor.http.isSuccess
+import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
@@ -22,10 +31,12 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
@@ -34,6 +45,7 @@ import java.util.Locale
 class LocalServerRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
+    private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
 ) : LocalServerRepository {
@@ -45,10 +57,21 @@ class LocalServerRepositoryImpl(
     private val _serverUrl = MutableStateFlow<String?>(null)
     override val serverUrl: StateFlow<String?> = _serverUrl.asStateFlow()
 
-    private val port = 8080
+    private val _qrCodeData = MutableStateFlow<String?>(null)
+    override val qrCodeData: StateFlow<String?> = _qrCodeData
 
-    override suspend fun startServer() {
-        if (isRunning.value) {
+    private val _isTransferLinkServerRunning = MutableStateFlow(false)
+    override val isTransferLinkServerRunning: StateFlow<Boolean> =
+        _isTransferLinkServerRunning.asStateFlow()
+
+    private val _transferLinkServerUrl = MutableStateFlow<String?>(null)
+    override val transferLinkServerUrl: StateFlow<String?> = _transferLinkServerUrl.asStateFlow()
+
+    override suspend fun startServer(port: Int) {
+        if (isRunning.value || isTransferLinkServerRunning.value) {
+            if (port == 9000) {
+                generateQRCode(port)?.let { qrData -> _qrCodeData.update { qrData } }
+            }
             Log.d("LocalServer", "Server is already running")
             return
         }
@@ -243,13 +266,26 @@ class LocalServerRepositoryImpl(
                 }
 
             server?.start(wait = false)
-            _isRunning.update { true }
-            _serverUrl.update { "http://$ipAddress:$port" }
-            Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+            if (port == 9000) {
+                val generatedQrData = generateQRCode(port)
+                _qrCodeData.update { generatedQrData }
+                _isTransferLinkServerRunning.update { true }
+                _transferLinkServerUrl.update { "http://$ipAddress:$port" }
+                Log.d("LocalServer", "Server started at ${_transferLinkServerUrl.value}")
+            } else {
+                _isRunning.update { true }
+                _serverUrl.update { "http://$ipAddress:$port" }
+                Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+            }
         } catch (e: Exception) {
             Log.e("LocalServer", "Error starting server", e)
-            _isRunning.update { false }
-            _serverUrl.update { null }
+            if (port == 9000) {
+                _isTransferLinkServerRunning.update { false }
+                _transferLinkServerUrl.update { null }
+            } else {
+                _isRunning.update { false }
+                _serverUrl.update { null }
+            }
         }
     }
 
@@ -259,9 +295,104 @@ class LocalServerRepositoryImpl(
             server = null
             _isRunning.update { false }
             _serverUrl.update { null }
+            _isTransferLinkServerRunning.update { false }
+            _transferLinkServerUrl.update { null }
             Log.d("LocalServer", "Server stopped")
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
+        }
+    }
+
+    override suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse =
+                    httpClient.get {
+                        url {
+                            protocol = URLProtocol.HTTP
+                            host = qrTransferInfo.ip
+                            port = qrTransferInfo.port
+                            path("api/export")
+                        }
+                        timeout {
+                            requestTimeoutMillis = 30000 // 30 seconds
+                        }
+                    }
+
+                Log.d("Anas", response.toString())
+
+                if (response.status.isSuccess().not()) {
+                    return@withContext Result.failure(
+                        Exception("Failed to fetch data: ${response.status}"),
+                    )
+                }
+
+                val exportedData: ExportedData = response.body()
+
+                importToDatabase(exportedData)
+
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private fun importToDatabase(data: ExportedData) {
+        deeprQueries.transaction {
+            data.links.forEach { deeplink ->
+                if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
+                    deeprQueries.insertDeepr(
+                        link = deeplink.link,
+                        name = deeplink.name,
+                        openedCount = deeplink.openedCount,
+                        notes = deeplink.notes,
+                        thumbnail = deeplink.thumbnail,
+                    )
+
+                    val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                    deeplink.tags.forEach { tagName ->
+                        deeprQueries.insertTag(name = tagName)
+
+                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
+
+                        deeprQueries.addTagToLink(
+                            linkId = insertedId,
+                            tagId = tag.id,
+                        )
+                    }
+
+                    if (deeplink.isFavourite) {
+                        deeprQueries.setFavourite(
+                            isFavourite = 1,
+                            id = insertedId,
+                        )
+                    }
+                }
+            }
+
+            data.tags.forEach { tagName ->
+                deeprQueries.insertTag(name = tagName)
+            }
+        }
+    }
+
+    private fun generateQRCode(port: Int): String? {
+        val ipAddress = getIpAddress() ?: return null
+
+        val qrInfo =
+            QRTransferInfo(
+                ip = ipAddress,
+                port = port,
+                appVersion = BuildConfig.VERSION_NAME,
+            )
+
+        return try {
+            Json.encodeToString(QRTransferInfo.serializer(), qrInfo)
+        } catch (e: Exception) {
+            Log.e("LocalServer", "Error generating QR code data", e)
+            null
         }
     }
 
@@ -350,4 +481,38 @@ data class TagResponse(
     val id: Long,
     val name: String,
     val count: Int,
+)
+
+@Serializable
+data class ExportDataResponse(
+    val appVersion: String,
+    val exportedAt: Long,
+    val links: List<ExportedDeeplink>,
+    val tags: List<TagData>,
+)
+
+@Serializable
+data class QRTransferInfo(
+    val ip: String,
+    val port: Int,
+    val appVersion: String,
+)
+
+@Serializable
+data class ExportedData(
+    val links: List<ExportedDeeplink>,
+    val tags: List<String>,
+    val exportedAt: Long,
+)
+
+@Serializable
+data class ExportedDeeplink(
+    val link: String,
+    val name: String,
+    val notes: String,
+    val tags: List<String>,
+    val openedCount: Long,
+    val isFavourite: Boolean,
+    val createdAt: String,
+    val thumbnail: String,
 )

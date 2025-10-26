@@ -51,7 +51,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -98,7 +97,7 @@ fun LocalNetworkServerScreen(
             rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
                 if (pendingStart) {
                     pendingStart = false
-                    LocalServerService.startService(context)
+                    LocalServerService.startService(context = context, port = 8080)
                 }
             }
         } else {
@@ -330,7 +329,6 @@ fun LocalNetworkServerScreen(
     }
 }
 
-@Preview()
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun ServerSwitch(
@@ -355,7 +353,10 @@ private fun ServerSwitch(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
         ) {
             Box(
                 modifier =
@@ -418,7 +419,7 @@ private fun ServerSwitch(
                             setPendingStart(true)
                             notificationPermissionState.launchPermissionRequest()
                         } else {
-                            LocalServerService.startService(context)
+                            LocalServerService.startService(context = context, port = 8080)
                         }
                     } else {
                         LocalServerService.stopService(context)

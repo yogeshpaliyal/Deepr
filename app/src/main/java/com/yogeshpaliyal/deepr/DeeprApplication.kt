@@ -17,8 +17,6 @@ import com.yogeshpaliyal.deepr.review.ReviewManager
 import com.yogeshpaliyal.deepr.review.ReviewManagerFactory
 import com.yogeshpaliyal.deepr.server.LocalServerRepository
 import com.yogeshpaliyal.deepr.server.LocalServerRepositoryImpl
-import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerRepository
-import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerRepositoryImpl
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.sync.SyncRepositoryImpl
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
@@ -101,11 +99,7 @@ class DeeprApplication : Application() {
                 }
 
                 single<LocalServerRepository> {
-                    LocalServerRepositoryImpl(androidContext(), get(), get(), get())
-                }
-
-                single<TransferLinkLocalServerRepository> {
-                    TransferLinkLocalServerRepositoryImpl(androidContext(), get(), get())
+                    LocalServerRepositoryImpl(androidContext(), get(), get(), get(), get())
                 }
 
                 viewModel {

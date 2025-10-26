@@ -57,7 +57,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.journeyapps.barcodescanner.ScanOptions
 import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.server.TransferLinkLocalServerService
+import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import compose.icons.TablerIcons
@@ -109,7 +109,7 @@ fun TransferLinkLocalServerScreen(
             rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
                 if (pendingStart) {
                     pendingStart = false
-                    TransferLinkLocalServerService.startService(context)
+                    LocalServerService.startService(context = context, port = 9000)
                 }
             }
         } else {
@@ -121,7 +121,7 @@ fun TransferLinkLocalServerScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.local_network_server))
+                    Text(stringResource(R.string.transfer_link_server))
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -194,10 +194,13 @@ fun TransferLinkLocalServerScreen(
                                         pendingStart = true
                                         notificationPermissionState.launchPermissionRequest()
                                     } else {
-                                        TransferLinkLocalServerService.startService(context)
+                                        LocalServerService.startService(
+                                            context = context,
+                                            port = 9000,
+                                        )
                                     }
                                 } else {
-                                    TransferLinkLocalServerService.stopService(context)
+                                    LocalServerService.stopService(context)
                                 }
                             },
                         )
