@@ -132,6 +132,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
+    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = koinInject(),
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
@@ -281,6 +282,7 @@ fun HomeScreen(
                 ServerStatusBar(
                     onServerStatusClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
+                        analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
                         if (backStack.lastOrNull() !is LocalNetworkServer) {
                             backStack.add(LocalNetworkServer)
                         }
@@ -332,6 +334,7 @@ fun HomeScreen(
                     colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
                     content = {
                         IconButton(onClick = {
+                            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SCAN_QR_CODE)
                             qrScanner.launch(ScanOptions())
                         }) {
                             Icon(
@@ -349,6 +352,7 @@ fun HomeScreen(
                         }
                         IconButton(onClick = {
                             // Settings action
+                            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.NAVIGATE_SETTINGS)
                             backStack.add(Settings)
                         }) {
                             Icon(
@@ -488,21 +492,39 @@ fun Content(
             is MenuItem.Click -> {
                 viewModel.incrementOpenedCount(it.item.id)
                 openDeeplink(context, it.item.link)
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.OPEN_LINK,
+                    mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to it.item.id),
+                )
             }
 
-            is MenuItem.Delete -> showDeleteConfirmDialog = it.item
-            is MenuItem.Edit -> editDeepr(it.item)
-            is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
+            is MenuItem.Delete -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_DELETE)
+                showDeleteConfirmDialog = it.item
+            }
+            is MenuItem.Edit -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_EDIT)
+                editDeepr(it.item)
+            }
+            is MenuItem.FavouriteClick -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_FAVOURITE)
+                viewModel.toggleFavourite(it.item.id)
+            }
             is MenuItem.ResetCounter -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
                 viewModel.resetOpenedCount(it.item.id)
                 Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
             }
 
             is MenuItem.Shortcut -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_SHORTCUT)
                 showShortcutDialog = it.item
             }
 
-            is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
+            is MenuItem.ShowQrCode -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_QR_CODE)
+                showQrCodeDialog = it.item
+            }
             is MenuItem.MoreOptionsBottomSheet -> {
                 showMoreSelectedItem = it.item
             }

@@ -5,6 +5,8 @@ import android.util.Log
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import app.cash.sqldelight.logs.LogSqliteDriver
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManagerFactory
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
@@ -73,7 +75,7 @@ class DeeprApplication : Application() {
                     HttpClient(CIO)
                 }
 
-                viewModel { AccountViewModel(get(), get(), get(), get(), get(), get()) }
+                viewModel { AccountViewModel(get(), get(), get(), get(), get(), get(), get()) }
 
                 single {
                     HtmlParser()
@@ -84,7 +86,7 @@ class DeeprApplication : Application() {
                 }
 
                 single<LocalServerRepository> {
-                    LocalServerRepositoryImpl(androidContext(), get(), get(), get())
+                    LocalServerRepositoryImpl(androidContext(), get(), get(), get(), get())
                 }
 
                 viewModel {
@@ -93,6 +95,10 @@ class DeeprApplication : Application() {
 
                 single<ReviewManager> {
                     ReviewManagerFactory.create()
+                }
+
+                single<AnalyticsManager> {
+                    AnalyticsManagerFactory.create(androidContext())
                 }
             }
 
