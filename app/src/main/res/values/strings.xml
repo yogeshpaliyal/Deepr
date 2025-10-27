@@ -205,4 +205,12 @@
     <string name="local_server_notification_text">Server URL: %s</string>
     <string name="local_server_starting">Starting server…</string>
     <string name="stop">Stop</string>
+    <string name="server_port">Server Port</string>
+    <string name="custom_port">Custom Port</string>
+    <string name="port_number">Port Number</string>
+    <string name="default_port">Default: 8080</string>
+    <string name="port_range_hint">Enter port (1024-65535)</string>
+    <string name="invalid_port">Invalid port number. Must be between 1024 and 65535.</string>
+    <string name="port_changed_restart">Port changed. Please restart the server to apply changes.</string>
+    <string name="change_port">Change Port</string>
 </resources>
