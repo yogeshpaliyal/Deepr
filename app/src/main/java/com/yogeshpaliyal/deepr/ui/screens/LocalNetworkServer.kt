@@ -398,7 +398,13 @@ fun LocalNetworkServerScreen(
                             Toast
                                 .makeText(
                                     context,
-                                    if (isRunning) context.getString(R.string.port_changed_restart) else context.getString(R.string.saved),
+                                    if (isRunning) {
+                                        context.getString(R.string.port_changed_restart)
+                                    } else {
+                                        context.getString(
+                                            R.string.saved,
+                                        )
+                                    },
                                     Toast.LENGTH_SHORT,
                                 ).show()
                         } else {
@@ -676,7 +682,10 @@ private fun PortConfigurationCard(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
         ) {
             Icon(
                 TablerIcons.Server,

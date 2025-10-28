@@ -514,14 +514,6 @@ data class TagResponse(
 )
 
 @Serializable
-data class ExportDataResponse(
-    val appVersion: String,
-    val exportedAt: Long,
-    val links: List<ExportedDeeplink>,
-    val tags: List<TagData>,
-)
-
-@Serializable
 data class QRTransferInfo(
     val ip: String,
     val port: Int,
