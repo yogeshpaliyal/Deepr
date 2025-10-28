@@ -30,6 +30,7 @@ class AppPreferenceDataStore(
         private val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
         private val DEFAULT_PAGE_FAVOURITES = booleanPreferencesKey("default_page_favourites")
         private val IS_THUMBNAIL_ENABLE = booleanPreferencesKey("is_thumbnail_enable")
+        private val SERVER_PORT = stringPreferencesKey("server_port")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -85,6 +86,11 @@ class AppPreferenceDataStore(
     val isThumbnailEnable: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[IS_THUMBNAIL_ENABLE] ?: false
+        }
+
+    val getServerPort: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SERVER_PORT] ?: "" // Default to empty string
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -156,6 +162,12 @@ class AppPreferenceDataStore(
     suspend fun setThumbnailEnable(thumbnail: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[IS_THUMBNAIL_ENABLE] = thumbnail
+        }
+    }
+
+    suspend fun setServerPort(port: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[SERVER_PORT] = port
         }
     }
 }

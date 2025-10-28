@@ -67,6 +67,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Copy
 import compose.icons.tablericons.DeviceMobile
+import compose.icons.tablericons.Edit
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Server
@@ -86,10 +87,16 @@ fun LocalNetworkServerScreen(
     val hapticFeedback = LocalHapticFeedback.current
     val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
+    val serverPort by viewModel.serverPort.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     // Track if user wants to start the server (used for permission flow)
     var pendingStart by remember { mutableStateOf(false) }
+
+    // Port configuration dialog
+    var showPortDialog by remember { mutableStateOf(false) }
+    var portInput by remember { mutableStateOf("") }
+    var portError by remember { mutableStateOf(false) }
 
     // Request notification permission for Android 13+
     val notificationPermissionState =
@@ -141,8 +148,18 @@ fun LocalNetworkServerScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Server Status Card
-
             ServerSwitch(isRunning, { pendingStart = it }, notificationPermissionState)
+
+            // Port Configuration Card
+            PortConfigurationCard(
+                currentPort = serverPort,
+                isServerRunning = isRunning,
+                onChangePort = {
+                    portInput = serverPort.toString()
+                    portError = false
+                    showPortDialog = true
+                },
+            )
 
             // Server Details Section
             AnimatedVisibility(
@@ -327,13 +344,85 @@ fun LocalNetworkServerScreen(
             }
         }
     }
+
+    // Port Configuration Dialog
+    if (showPortDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showPortDialog = false },
+            title = { Text(stringResource(R.string.change_port)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.port_range_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    androidx.compose.material3.OutlinedTextField(
+                        value = portInput,
+                        onValueChange = {
+                            portInput = it
+                            portError = false
+                        },
+                        label = { Text(stringResource(R.string.port_number)) },
+                        placeholder = { Text(stringResource(R.string.default_port)) },
+                        isError = portError,
+                        supportingText =
+                            if (portError) {
+                                { Text(stringResource(R.string.invalid_port)) }
+                            } else {
+                                null
+                            },
+                        keyboardOptions =
+                            androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                            ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    if (isRunning) {
+                        Text(
+                            text = stringResource(R.string.port_changed_restart),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        val port = portInput.toIntOrNull()
+                        if (port != null && port in 1024..65535) {
+                            viewModel.setServerPort(port)
+                            showPortDialog = false
+                            Toast
+                                .makeText(
+                                    context,
+                                    if (isRunning) context.getString(R.string.port_changed_restart) else context.getString(R.string.saved),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        } else {
+                            portError = true
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showPortDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun ServerSwitch(
-    isRunning: Boolean,
-    setPendingStart: (Boolean) -> Unit,
+    isRunning: Boolean = false,
+    setPendingStart: (Boolean) -> Unit = {},
     notificationPermissionState: PermissionState? = null,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -566,6 +655,61 @@ private fun ApiEndpointItem(
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
             )
+        }
+    }
+}
+
+@Composable
+private fun PortConfigurationCard(
+    currentPort: Int,
+    isServerRunning: Boolean,
+    onChangePort: () -> Unit,
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+        ) {
+            Icon(
+                TablerIcons.Server,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.server_port),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "$currentPort",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+            IconButton(
+                onClick = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onChangePort()
+                },
+                modifier = Modifier.size(40.dp),
+            ) {
+                Icon(
+                    TablerIcons.Edit,
+                    contentDescription = stringResource(R.string.change_port),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }
