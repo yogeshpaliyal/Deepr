@@ -128,6 +128,7 @@ fun DeeprItem(
     selectedTag: List<Tags>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
+    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -231,6 +232,10 @@ fun DeeprItem(
                     .combinedClickable(
                         onClick = { onItemClick(MenuItem.Click(account)) },
                         onLongClick = {
+                            analyticsManager.logEvent(
+                                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.COPY_LINK,
+                                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to account.id),
+                            )
                             val clipboard =
                                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             val clip = ClipData.newPlainText(linkCopied, account.link)

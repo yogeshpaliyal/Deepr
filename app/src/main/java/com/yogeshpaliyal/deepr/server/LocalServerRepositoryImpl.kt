@@ -38,6 +38,7 @@ class LocalServerRepositoryImpl(
     private val deeprQueries: DeeprQueries,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
+    private val analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager,
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
@@ -251,6 +252,10 @@ class LocalServerRepositoryImpl(
             _isRunning.value = true
             _serverUrl.value = "http://$ipAddress:$port"
             Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.START_LOCAL_SERVER,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.SERVER_PORT to port),
+            )
         } catch (e: Exception) {
             Log.e("LocalServer", "Error starting server", e)
             _isRunning.value = false
@@ -265,6 +270,7 @@ class LocalServerRepositoryImpl(
             _isRunning.value = false
             _serverUrl.value = null
             Log.d("LocalServer", "Server stopped")
+            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.STOP_LOCAL_SERVER)
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
         }
