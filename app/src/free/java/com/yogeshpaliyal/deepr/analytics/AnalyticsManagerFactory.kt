@@ -3,7 +3,5 @@ package com.yogeshpaliyal.deepr.analytics
 import android.content.Context
 
 object AnalyticsManagerFactory {
-    fun create(context: Context): AnalyticsManager {
-        return NoOpAnalyticsManager()
-    }
+    fun create(context: Context): AnalyticsManager = NoOpAnalyticsManager()
 }

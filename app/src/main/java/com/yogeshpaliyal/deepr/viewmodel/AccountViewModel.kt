@@ -166,7 +166,7 @@ class AccountViewModel(
         }
 
         viewModelScope.launch {
-            preferenceDataStore.getThumbnailEnable.collect { enabled ->
+            preferenceDataStore.isThumbnailEnable.collect { enabled ->
                 analyticsManager.setUserProperty(
                     com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.THUMBNAIL_ENABLED,
                     enabled.toString(),

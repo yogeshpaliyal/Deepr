@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 
-class FirebaseAnalyticsManager(context: Context) : AnalyticsManager {
+class FirebaseAnalyticsManager(
+    context: Context,
+) : AnalyticsManager {
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
     override fun logEvent(
