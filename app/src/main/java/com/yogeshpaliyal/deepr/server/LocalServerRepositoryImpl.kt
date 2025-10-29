@@ -67,13 +67,6 @@ class LocalServerRepositoryImpl(
     private val _qrCodeData = MutableStateFlow<String?>(null)
     override val qrCodeData: StateFlow<String?> = _qrCodeData
 
-    private val _isTransferLinkServerRunning = MutableStateFlow(false)
-    override val isTransferLinkServerRunning: StateFlow<Boolean> =
-        _isTransferLinkServerRunning.asStateFlow()
-
-    private val _transferLinkServerUrl = MutableStateFlow<String?>(null)
-    override val transferLinkServerUrl: StateFlow<String?> = _transferLinkServerUrl.asStateFlow()
-
     init {
         // Load saved port on initialization
         CoroutineScope(Dispatchers.IO).launch {
@@ -96,10 +89,7 @@ class LocalServerRepositoryImpl(
     }
 
     override suspend fun startServer(port: Int) {
-        if (isRunning.value || isTransferLinkServerRunning.value) {
-            if (port == 9000) {
-                generateQRCode(port)?.let { qrData -> _qrCodeData.update { qrData } }
-            }
+        if (isRunning.value) {
             Log.d("LocalServer", "Server is already running")
             return
         }
@@ -111,7 +101,7 @@ class LocalServerRepositoryImpl(
                 return
             }
 
-            val port = _serverPort.value
+            val port = port
 
             server =
                 embeddedServer(CIO, host = "0.0.0.0", port = port) {
@@ -296,26 +286,19 @@ class LocalServerRepositoryImpl(
                 }
 
             server?.start(wait = false)
+
+            _isRunning.update { true }
+            _serverUrl.update { "http://$ipAddress:$port" }
+            Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+
             if (port == 9000) {
-                val generatedQrData = generateQRCode(port)
-                _qrCodeData.update { generatedQrData }
-                _isTransferLinkServerRunning.update { true }
-                _transferLinkServerUrl.update { "http://$ipAddress:$port" }
-                Log.d("LocalServer", "Server started at ${_transferLinkServerUrl.value}")
-            } else {
-                _isRunning.update { true }
-                _serverUrl.update { "http://$ipAddress:$port" }
-                Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+                generateQRCode(port)?.let { qrData -> _qrCodeData.update { qrData } }
             }
         } catch (e: Exception) {
             Log.e("LocalServer", "Error starting server", e)
-            if (port == 9000) {
-                _isTransferLinkServerRunning.update { false }
-                _transferLinkServerUrl.update { null }
-            } else {
-                _isRunning.update { false }
-                _serverUrl.update { null }
-            }
+
+            _isRunning.update { false }
+            _serverUrl.update { null }
         }
     }
 
@@ -325,8 +308,6 @@ class LocalServerRepositoryImpl(
             server = null
             _isRunning.update { false }
             _serverUrl.update { null }
-            _isTransferLinkServerRunning.update { false }
-            _transferLinkServerUrl.update { null }
             Log.d("LocalServer", "Server stopped")
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)

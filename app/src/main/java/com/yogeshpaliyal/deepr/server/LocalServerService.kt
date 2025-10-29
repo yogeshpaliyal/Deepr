@@ -69,16 +69,6 @@ class LocalServerService : Service() {
                 }
             }
         }
-        serviceScope.launch {
-            localServerRepository.isTransferLinkServerRunning.collect { isRunning ->
-                if (isRunning) {
-                    val serverUrl = localServerRepository.transferLinkServerUrl.first()
-                    val notificationManager =
-                        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.notify(NOTIFICATION_ID, createNotification(serverUrl))
-                }
-            }
-        }
     }
 
     private fun createNotificationChannel() {
