@@ -25,7 +25,7 @@
     <string name="new_tag">New tag (Optional)</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access them later.</string>
-    
+
     <!-- Menu and Dialog Items -->
     <string name="more_options">More options</string>
     <string name="copy_link">Copy link</string>
@@ -51,7 +51,7 @@
     <string name="edit_shortcut">Edit shortcut</string>
     <string name="show_qr_code">Show QR Code</string>
     <string name="deeplink_already_exists">Link already exists</string>
-    
+
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">Sort by Date Ascending</string>
     <string name="sort_by_date_descending">Sort by Date Descending</string>
@@ -61,7 +61,7 @@
     <string name="sort_by_name_descending">Sort by Name Descending</string>
     <string name="sort_by_link_ascending">Sort by Link Ascending</string>
     <string name="sort_by_link_descending">Sort by Link Descending</string>
-    
+
     <!-- Tag Management -->
     <string name="edit_tag">Edit Tag</string>
     <string name="delete_tag">Delete Tag</string>
@@ -133,7 +133,7 @@
     <string name="no_data_available_export">No data available to export after mapping.</string>
     <string name="export_success">Successfully exported to %s</string>
     <string name="export_failed">Failed to create CSV file.</string>
-    
+
     <!-- Sync Settings -->
     <string name="sync_to_file">Sync to Local File (Beta)</string>
     <string name="sync_to_file_description">Automatically sync links to a markdown file</string>
@@ -148,7 +148,7 @@
     <string name="last_sync_time">Last Sync</string>
     <string name="last_sync_time_never">Never synced</string>
     <string name="last_sync_time_format">%s</string>
-    
+
     <!-- Sync Messages -->
     <string name="sync_disabled">Sync is disabled</string>
     <string name="sync_file_not_selected">No sync file selected</string>
@@ -157,7 +157,7 @@
     <string name="no_file_path_provided">No file path provided</string>
     <string name="invalid_markdown_format">Invalid markdown table format</string>
     <string name="file_validation_error">File validation error: %s</string>
-    
+
     <!-- Auto Backup Settings -->
     <string name="auto_backup">Auto Backup</string>
     <string name="auto_backup_description">Automatically backup links to CSV file</string>
@@ -176,7 +176,7 @@
     <string name="backup_location_not_selected">No backup location selected</string>
     <string name="select_interval">Select Interval</string>
     <string name="backup_interval_dialog_title">Select Backup Interval</string>
-    
+
     <!-- Local Network Server -->
     <string name="local_network_server">Local Network Server</string>
     <string name="local_server_running">Local Server Running</string>
@@ -209,8 +209,14 @@
     <string name="custom_port">Custom Port</string>
     <string name="port_number">Port Number</string>
     <string name="default_port">Default: 8080</string>
-    <string name="port_range_hint">Enter port (1024-65535)</string>
+    <string name="port_range_hint">Enter port (1024–65535)</string>
     <string name="invalid_port">Invalid port number. Must be between 1024 and 65535.</string>
     <string name="port_changed_restart">Port changed. Please restart the server to apply changes.</string>
     <string name="change_port">Change Port</string>
+
+    <!-- Transfer Link Server -->
+    <string name="transfer_link_server">Transfer Link Server</string>
+    <string name="transfer_link_to_another_device">Transfer Link to another Device</string>
+    <string name="transfer_link_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Scan the QR code from import links option in another device</string>
+    <string name="scan_qr_to_get_data">Scan to get links from another device</string>
 </resources>

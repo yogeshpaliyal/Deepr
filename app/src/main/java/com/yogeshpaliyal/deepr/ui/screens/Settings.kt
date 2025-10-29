@@ -94,7 +94,11 @@ fun SettingsScreen(
     val availableImporters = remember { viewModel.getAvailableImporters() }
 
     // Track which importer is being used for the current file picker
-    var selectedImporter by remember { mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(null) }
+    var selectedImporter by remember {
+        mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(
+            null,
+        )
+    }
 
     // Launcher for picking files to import
     val importFileLauncher =
@@ -266,6 +270,13 @@ fun SettingsScreen(
                                 Locale.US,
                             ).format(Date())
                         csvExportLauncher.launch("deepr_export_$timeStamp.csv")
+                    },
+                )
+                SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.transfer_link_to_another_device),
+                    onClick = {
+                        backStack.add(TransferLinkLocalNetworkServer)
                     },
                 )
             }
