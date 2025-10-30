@@ -86,6 +86,8 @@
     <string name="selected_tags_count">%d tags selected</string>
 
     <!-- Settings Screen -->
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
     <string name="import_deeplinks">Import links</string>
     <string name="import_deeplinks_description">Import links from CSV file</string>
     <string name="export_deeplinks">Export links</string>
