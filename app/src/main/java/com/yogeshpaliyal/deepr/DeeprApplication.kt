@@ -101,7 +101,15 @@ class DeeprApplication : Application() {
                 }
 
                 single<LocalServerRepository> {
-                    LocalServerRepositoryImpl(androidContext(), get(), get(), get(), get(), get())
+                    LocalServerRepositoryImpl(
+                        androidContext(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                    )
                 }
 
                 viewModel {
