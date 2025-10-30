@@ -51,6 +51,7 @@ open class LocalServerRepositoryImpl(
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
+    private val analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager,
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
@@ -319,6 +320,11 @@ open class LocalServerRepositoryImpl(
             if (port == 9000) {
                 generateQRCode(port)?.let { qrData -> _qrCodeData.update { qrData } }
             }
+
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.START_LOCAL_SERVER,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.SERVER_PORT to port),
+            )
         } catch (e: Exception) {
             Log.e("LocalServer", "Error starting server", e)
 
@@ -334,6 +340,7 @@ open class LocalServerRepositoryImpl(
             _isRunning.update { false }
             _serverUrl.update { null }
             Log.d("LocalServer", "Server stopped")
+            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.STOP_LOCAL_SERVER)
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
         }

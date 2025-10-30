@@ -23,6 +23,7 @@ fun CreateShortcutDialog(
     deepr: GetLinksAndTags,
     onDismiss: () -> Unit,
     viewModel: AccountViewModel = koinViewModel(),
+    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     val context = LocalContext.current
     val existingShortcut = getShortcut(context, deepr.id)
@@ -68,6 +69,10 @@ fun CreateShortcutDialog(
                             shortcutName,
                             existingShortcut != null,
                             useLinkBasedIcons,
+                        )
+                        analyticsManager.logEvent(
+                            com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CREATE_SHORTCUT,
+                            mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to deepr.id),
                         )
                     },
                     enabled = shortcutName.isNotBlank(),
