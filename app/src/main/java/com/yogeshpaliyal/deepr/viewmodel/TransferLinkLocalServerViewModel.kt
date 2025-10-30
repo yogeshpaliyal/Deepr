@@ -13,10 +13,6 @@ import kotlinx.serialization.json.Json
 class TransferLinkLocalServerViewModel(
     private val localServerRepository: LocalServerRepository,
 ) : ViewModel() {
-    val isRunning = localServerRepository.isRunning
-    val serverUrl = localServerRepository.serverUrl
-    val qrCodeData = localServerRepository.qrCodeData
-
     private val transferResultChannel = Channel<String>()
     val transferResultFlow = transferResultChannel.receiveAsFlow()
 
