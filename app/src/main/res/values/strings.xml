@@ -25,7 +25,15 @@
     <string name="new_tag">New tag (Optional)</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access them later.</string>
-    
+    <string name="no_favourites_found">No favourites yet</string>
+    <string name="no_favourites_description">Mark links as favourites to see them here.</string>
+    <string name="no_search_results">No results found</string>
+    <string name="no_search_results_description">Try searching with different keywords.</string>
+    <string name="no_links_with_tags">No links with selected tags</string>
+    <string name="no_links_with_tags_description">Try selecting different tags or clear filters.</string>
+    <string name="no_favourites_with_tags">No favourites in selected tags</string>
+    <string name="no_favourites_with_tags_description">Mark links with these tags as favourites or try different tags.</string>
+
     <!-- Menu and Dialog Items -->
     <string name="more_options">More options</string>
     <string name="copy_link">Copy link</string>
