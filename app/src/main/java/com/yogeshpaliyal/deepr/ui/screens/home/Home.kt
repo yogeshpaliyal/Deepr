@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -133,7 +132,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
-    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = koinInject(),
+    analyticsManager: AnalyticsManager = koinInject(),
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
@@ -504,14 +503,17 @@ fun Content(
                 analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_DELETE)
                 showDeleteConfirmDialog = it.item
             }
+
             is MenuItem.Edit -> {
                 analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_EDIT)
                 editDeepr(it.item)
             }
+
             is MenuItem.FavouriteClick -> {
                 analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_FAVOURITE)
                 viewModel.toggleFavourite(it.item.id)
             }
+
             is MenuItem.ResetCounter -> {
                 analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
                 viewModel.resetOpenedCount(it.item.id)
@@ -527,6 +529,7 @@ fun Content(
                 analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_QR_CODE)
                 showQrCodeDialog = it.item
             }
+
             is MenuItem.MoreOptionsBottomSheet -> {
                 showMoreSelectedItem = it.item
             }

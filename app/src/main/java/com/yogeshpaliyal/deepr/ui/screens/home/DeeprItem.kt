@@ -321,7 +321,13 @@ fun DeeprItem(
                                 )
                             }
 
-                            IconButton(onClick = { onItemClick(MenuItem.MoreOptionsBottomSheet(account)) }) {
+                            IconButton(onClick = {
+                                onItemClick(
+                                    MenuItem.MoreOptionsBottomSheet(
+                                        account,
+                                    ),
+                                )
+                            }) {
                                 Icon(
                                     TablerIcons.DotsVertical,
                                     contentDescription = stringResource(R.string.more_options),

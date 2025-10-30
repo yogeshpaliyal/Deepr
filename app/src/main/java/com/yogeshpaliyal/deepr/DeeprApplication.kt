@@ -78,7 +78,6 @@ class DeeprApplication : Application() {
                 single {
                     HttpClient(CIO) {
                         install(ContentNegotiation) {
-                            // FIX: Explicitly call the Json function from kotlinx.serialization.json
                             json(
                                 Json {
                                     prettyPrint = true
@@ -121,7 +120,7 @@ class DeeprApplication : Application() {
                 }
 
                 single<AnalyticsManager> {
-                    AnalyticsManagerFactory.create(androidContext())
+                    AnalyticsManagerFactory.create()
                 }
 
                 viewModel {

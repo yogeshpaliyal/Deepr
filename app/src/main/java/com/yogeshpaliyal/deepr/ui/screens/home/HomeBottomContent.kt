@@ -158,10 +158,24 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.insertAccount(
+                normalizedLink,
+                deeprInfo.name,
+                executeAfterSave,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.updateDeeplink(
+                deeprInfo.id,
+                normalizedLink,
+                deeprInfo.name,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         }
         onSaveDialogInfoChange(
             SaveDialogInfo(

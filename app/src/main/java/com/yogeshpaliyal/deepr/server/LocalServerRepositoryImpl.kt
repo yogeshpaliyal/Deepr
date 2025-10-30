@@ -6,6 +6,7 @@ import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
@@ -51,7 +52,7 @@ class LocalServerRepositoryImpl(
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
-    private val analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager,
+    private val analyticsManager: AnalyticsManager,
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =

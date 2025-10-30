@@ -11,6 +11,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
@@ -73,7 +74,7 @@ class AccountViewModel(
     private val syncRepository: SyncRepository,
     private val networkRepository: NetworkRepository,
     private val autoBackupWorker: AutoBackupWorker,
-    private val analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager,
+    private val analyticsManager: AnalyticsManager,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
@@ -295,7 +296,8 @@ class AccountViewModel(
             val sortType = sorting.getOrNull(1) ?: "DESC"
 
             // Prepare tag filter parameters
-            val tagIdsString = if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
+            val tagIdsString =
+                if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
             val tagCount = tags.size.toLong()
 
             deeprQueries
