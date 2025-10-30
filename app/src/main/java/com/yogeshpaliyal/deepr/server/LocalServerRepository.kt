@@ -10,7 +10,7 @@ interface LocalServerRepository {
 
     suspend fun startServer(port: Int)
 
-    suspend fun stopServer()
+    fun stopServer()
 
     suspend fun setServerPort(port: Int)
 

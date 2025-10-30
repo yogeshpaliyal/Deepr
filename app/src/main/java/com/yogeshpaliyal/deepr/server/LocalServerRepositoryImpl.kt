@@ -45,7 +45,7 @@ import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
 import java.util.Locale
 
-class LocalServerRepositoryImpl(
+open class LocalServerRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
     private val httpClient: HttpClient,
@@ -167,6 +167,7 @@ class LocalServerRepositoryImpl(
                                             createdAt = link.createdAt,
                                             openedCount = link.openedCount,
                                             notes = link.notes,
+                                            thumbnail = link.thumbnail,
                                             tags =
                                                 link.tagsNames
                                                     ?.split(", ")
@@ -179,6 +180,30 @@ class LocalServerRepositoryImpl(
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
                                     ErrorResponse("Error getting links: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links") {
+                            try {
+                                val request = call.receive<AddLinkRequest>()
+                                // Insert the link without tags first
+                                accountViewModel.insertAccount(
+                                    request.link,
+                                    request.name,
+                                    false,
+                                    request.tags.map { it.toDbTag() },
+                                    request.notes,
+                                )
+                                call.respond(
+                                    HttpStatusCode.Created,
+                                    SuccessResponse("Link added successfully"),
+                                )
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error adding link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error adding link: ${e.message}"),
                                 )
                             }
                         }
@@ -302,7 +327,7 @@ class LocalServerRepositoryImpl(
         }
     }
 
-    override suspend fun stopServer() {
+    override fun stopServer() {
         try {
             server?.stop(1000, 2000)
             server = null
@@ -323,14 +348,12 @@ class LocalServerRepositoryImpl(
                             protocol = URLProtocol.HTTP
                             host = qrTransferInfo.ip
                             port = qrTransferInfo.port
-                            path("api/export")
+                            path("api/links")
                         }
                         timeout {
                             requestTimeoutMillis = 30000 // 30 seconds
                         }
                     }
-
-                Log.d("Anas", response.toString())
 
                 if (response.status.isSuccess().not()) {
                     return@withContext Result.failure(
@@ -338,7 +361,7 @@ class LocalServerRepositoryImpl(
                     )
                 }
 
-                val exportedData: ExportedData = response.body()
+                val exportedData: List<LinkResponse> = response.body()
 
                 importToDatabase(exportedData)
 
@@ -349,9 +372,9 @@ class LocalServerRepositoryImpl(
         }
     }
 
-    private fun importToDatabase(data: ExportedData) {
+    private fun importToDatabase(links: List<LinkResponse>) {
         deeprQueries.transaction {
-            data.links.forEach { deeplink ->
+            links.forEach { deeplink ->
                 if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
                     deeprQueries.insertDeepr(
                         link = deeplink.link,
@@ -365,9 +388,7 @@ class LocalServerRepositoryImpl(
 
                     deeplink.tags.forEach { tagName ->
                         deeprQueries.insertTag(name = tagName)
-
                         val tag = deeprQueries.getTagByName(tagName).executeAsOne()
-
                         deeprQueries.addTagToLink(
                             linkId = insertedId,
                             tagId = tag.id,
@@ -381,10 +402,6 @@ class LocalServerRepositoryImpl(
                         )
                     }
                 }
-            }
-
-            data.tags.forEach { tagName ->
-                deeprQueries.insertTag(name = tagName)
             }
         }
     }
@@ -452,6 +469,8 @@ data class LinkResponse(
     val createdAt: String,
     val openedCount: Long,
     val notes: String,
+    val thumbnail: String,
+    val isFavourite: Boolean = false,
     val tags: List<String>,
 )
 
@@ -499,23 +518,4 @@ data class QRTransferInfo(
     val ip: String,
     val port: Int,
     val appVersion: String,
-)
-
-@Serializable
-data class ExportedData(
-    val links: List<ExportedDeeplink>,
-    val tags: List<String>,
-    val exportedAt: Long,
-)
-
-@Serializable
-data class ExportedDeeplink(
-    val link: String,
-    val name: String,
-    val notes: String,
-    val tags: List<String>,
-    val openedCount: Long,
-    val isFavourite: Boolean,
-    val createdAt: String,
-    val thumbnail: String,
 )

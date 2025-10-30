@@ -32,10 +32,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -52,12 +54,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.journeyapps.barcodescanner.ScanOptions
 import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.server.LocalServerService
+import com.yogeshpaliyal.deepr.server.LocalServerTransferLink
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import compose.icons.TablerIcons
@@ -66,7 +68,9 @@ import compose.icons.tablericons.Copy
 import compose.icons.tablericons.Scan
 import compose.icons.tablericons.Server
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 data object TransferLinkLocalNetworkServer
 
@@ -78,10 +82,18 @@ fun TransferLinkLocalServerScreen(
     viewModel: TransferLinkLocalServerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
-    val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
-    val qrCodeData by viewModel.qrCodeData.collectAsStateWithLifecycle()
+    val localServerInstance = koinInject<LocalServerTransferLink>()
+    val isRunning by localServerInstance.isRunning.collectAsStateWithLifecycle()
+    val serverUrl by localServerInstance.serverUrl.collectAsStateWithLifecycle()
+    val qrCodeData by localServerInstance.qrCodeData.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val coroutine = rememberCoroutineScope()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            localServerInstance.stopServer()
+        }
+    }
 
     LaunchedEffect(true) {
         viewModel.transferResultFlow.collectLatest { message ->
@@ -104,17 +116,16 @@ fun TransferLinkLocalServerScreen(
     var pendingStart by remember { mutableStateOf(false) }
 
     // Request notification permission for Android 13+
-    val notificationPermissionState =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
-                if (pendingStart) {
-                    pendingStart = false
-                    LocalServerService.startService(context = context, port = 9000)
-                }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
+            if (pendingStart) {
+                pendingStart = false
+                LocalServerService.startService(context = context, port = 9000)
             }
-        } else {
-            null
         }
+    } else {
+        null
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -186,21 +197,13 @@ fun TransferLinkLocalServerScreen(
                         Switch(
                             checked = isRunning,
                             onCheckedChange = {
-                                if (it) {
-                                    // Check if notification permission is required and granted
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                                        notificationPermissionState?.status?.isGranted == false
-                                    ) {
-                                        pendingStart = true
-                                        notificationPermissionState.launchPermissionRequest()
+                                coroutine.launch {
+                                    if (it) {
+                                        // Check if notification permission is required and granted
+                                        localServerInstance.startServer(9000)
                                     } else {
-                                        LocalServerService.startService(
-                                            context = context,
-                                            port = 9000,
-                                        )
+                                        localServerInstance.stopServer()
                                     }
-                                } else {
-                                    LocalServerService.stopService(context)
                                 }
                             },
                         )
