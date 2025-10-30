@@ -1,10 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
 import android.content.Intent
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +28,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,21 +58,15 @@ import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Download
-import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Photo
-import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
-import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 data object Settings
 
@@ -90,38 +79,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
 
-    // Get available importers from the view model
-    val availableImporters = remember { viewModel.getAvailableImporters() }
-
-    // Track which importer is being used for the current file picker
-    var selectedImporter by remember {
-        mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(
-            null,
-        )
-    }
-
-    // Launcher for picking files to import
-    val importFileLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument(),
-        ) { uri ->
-            uri?.let {
-                selectedImporter?.let { importer ->
-                    viewModel.importBookmarks(it, importer)
-                }
-            }
-        }
-
-    // Launcher for picking CSV export location
-    val csvExportLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CreateDocument("text/csv"),
-        ) { uri ->
-            uri?.let {
-                viewModel.exportCsvData(it)
-            }
-        }
-
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
 
@@ -132,70 +89,6 @@ fun SettingsScreen(
     // Collect default page preference state
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-
-    // Collect sync preference states
-    val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
-    val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
-    val lastSyncTime by viewModel.lastSyncTime.collectAsStateWithLifecycle()
-
-    // Collect auto backup preference states
-    val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
-    val autoBackupLocation by viewModel.autoBackupLocation.collectAsStateWithLifecycle()
-    val lastBackupTime by viewModel.lastBackupTime.collectAsStateWithLifecycle()
-
-    // Launcher for picking sync file location
-    val syncFileLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CreateDocument("text/markdown"),
-        ) { uri ->
-            uri?.let {
-                val contentResolver = context.contentResolver
-
-                val takeFlags: Int =
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                // Check for the freshest data.
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
-                viewModel.setSyncFilePath(it.toString())
-            }
-        }
-
-    // Launcher for picking auto backup location
-    val backupLocationLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocumentTree(),
-        ) { uri ->
-            uri?.let {
-                val contentResolver = context.contentResolver
-
-                val takeFlags: Int =
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                // Check for the freshest data.
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
-                viewModel.setAutoBackupLocation(it.toString())
-            }
-        }
-
-    LaunchedEffect(true) {
-        viewModel.exportResultFlow.collectLatest { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    LaunchedEffect(true) {
-        viewModel.importResultFlow.collectLatest { message ->
-            if (message.isNotBlank()) {
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    LaunchedEffect(true) {
-        viewModel.syncResultFlow.collectLatest { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -245,167 +138,24 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("Import & Export") {
-                // Add import options for each available importer
-                availableImporters.forEach { importer ->
-                    SettingsItem(
-                        TablerIcons.Download,
-                        title = "Import from ${importer.getDisplayName()}",
-                        description = "Import bookmarks from ${importer.getDisplayName()} file",
-                        onClick = {
-                            selectedImporter = importer
-                            importFileLauncher.launch(importer.getSupportedMimeTypes())
-                        },
-                    )
-                }
-
+            SettingsSection("Data Management") {
                 SettingsItem(
                     TablerIcons.Upload,
-                    title = stringResource(R.string.export_deeplinks),
-                    description = stringResource(R.string.export_deeplinks_description),
+                    title = stringResource(R.string.backup),
+                    description = "Export to CSV, Local file sync, Auto backup",
                     onClick = {
-                        val timeStamp =
-                            SimpleDateFormat(
-                                "yyyyMMdd_HHmmss",
-                                Locale.US,
-                            ).format(Date())
-                        csvExportLauncher.launch("deepr_export_$timeStamp.csv")
+                        backStack.add(BackupScreen)
                     },
                 )
+
                 SettingsItem(
-                    TablerIcons.Server,
-                    title = stringResource(R.string.transfer_link_to_another_device),
+                    TablerIcons.Download,
+                    title = stringResource(R.string.restore),
+                    description = "Import from CSV, Bookmarks, and other formats",
                     onClick = {
-                        backStack.add(TransferLinkLocalNetworkServer)
+                        backStack.add(RestoreScreen)
                     },
                 )
-            }
-
-            SettingsSection("Local File Sync") {
-                SettingsItem(
-                    TablerIcons.Refresh,
-                    title = stringResource(R.string.sync_to_file),
-                    description = stringResource(R.string.sync_to_file_description),
-                    onClick = {
-                        viewModel.setSyncEnabled(!syncEnabled)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = syncEnabled,
-                            onCheckedChange = { viewModel.setSyncEnabled(it) },
-                        )
-                    },
-                )
-
-                AnimatedVisibility(syncEnabled) {
-                    Column {
-                        SettingsItem(
-                            TablerIcons.FileText,
-                            title = stringResource(R.string.select_sync_file),
-                            description =
-                                if (syncFilePath.isNotEmpty()) {
-                                    syncFilePath
-                                        .substringAfterLast("/")
-                                        .replace("%2F", "/")
-                                        .replace("%20", " ")
-                                        .replace("%3A", ":")
-                                } else {
-                                    stringResource(R.string.select_sync_file_description)
-                                },
-                            onClick = {
-                                syncFileLauncher.launch("deeplinks.md")
-                            },
-                        )
-
-                        SettingsItem(
-                            TablerIcons.InfoCircle,
-                            title = stringResource(R.string.last_sync_time),
-                            description =
-                                if (lastSyncTime > 0) {
-                                    val formatter =
-                                        SimpleDateFormat(
-                                            "MMM dd, yyyy 'at' HH:mm",
-                                            Locale.getDefault(),
-                                        )
-                                    stringResource(
-                                        R.string.last_sync_time_format,
-                                        formatter.format(Date(lastSyncTime)),
-                                    )
-                                } else {
-                                    stringResource(R.string.last_sync_time_never)
-                                },
-                        )
-
-                        AnimatedVisibility(syncFilePath.isNotEmpty()) {
-                            SettingsItem(
-                                TablerIcons.Upload,
-                                title = stringResource(R.string.sync_now),
-                                description = stringResource(R.string.sync_now_description),
-                                onClick = {
-                                    viewModel.syncToMarkdown()
-                                },
-                            )
-                        }
-                    }
-                }
-            }
-
-            SettingsSection("Auto Backup") {
-                SettingsItem(
-                    TablerIcons.Upload,
-                    title = stringResource(R.string.auto_backup),
-                    description = stringResource(R.string.auto_backup_description),
-                    onClick = {
-                        viewModel.setAutoBackupEnabled(!autoBackupEnabled)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = autoBackupEnabled,
-                            onCheckedChange = { viewModel.setAutoBackupEnabled(it) },
-                        )
-                    },
-                )
-
-                AnimatedVisibility(autoBackupEnabled) {
-                    Column {
-                        SettingsItem(
-                            TablerIcons.FileText,
-                            title = stringResource(R.string.select_backup_location),
-                            description =
-                                if (autoBackupLocation.isNotEmpty()) {
-                                    autoBackupLocation
-                                        .substringAfterLast("/")
-                                        .replace("%2F", "/")
-                                        .replace("%20", " ")
-                                        .replace("%3A", ":")
-                                } else {
-                                    stringResource(R.string.select_backup_location_description)
-                                },
-                            onClick = {
-                                backupLocationLauncher.launch(null)
-                            },
-                        )
-
-                        SettingsItem(
-                            TablerIcons.InfoCircle,
-                            title = stringResource(R.string.last_backup_time),
-                            description =
-                                if (lastBackupTime > 0) {
-                                    val formatter =
-                                        SimpleDateFormat(
-                                            "MMM dd, yyyy 'at' HH:mm",
-                                            Locale.getDefault(),
-                                        )
-                                    stringResource(
-                                        R.string.last_backup_time_format,
-                                        formatter.format(Date(lastBackupTime)),
-                                    )
-                                } else {
-                                    stringResource(R.string.last_backup_time_never)
-                                },
-                        )
-                    }
-                }
             }
 
             SettingsSection("Others") {
