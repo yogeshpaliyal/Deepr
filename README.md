@@ -74,7 +74,7 @@ All these sources supports cross platform app updates. for eg: if you've install
 
 ## Language  
 [![Translation status](https://hosted.weblate.org/widget/deepr/horizontal-auto.svg)](https://hosted.weblate.org/engage/deepr/)  
-Want to contribute to translations? [Contribute](https://hosted.weblate.org/projects/Deepr/app/)
+Want to contribute to translations? [Contribute](https://hosted.weblate.org/engage/deepr/)
 
 ## ✍️ Author
 
