@@ -51,6 +51,7 @@ class LocalServerRepositoryImpl(
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
+    private val analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager,
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
@@ -302,6 +303,10 @@ class LocalServerRepositoryImpl(
                 _isTransferLinkServerRunning.update { true }
                 _transferLinkServerUrl.update { "http://$ipAddress:$port" }
                 Log.d("LocalServer", "Server started at ${_transferLinkServerUrl.value}")
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.START_LOCAL_SERVER,
+                    mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.SERVER_PORT to port),
+                )
             } else {
                 _isRunning.update { true }
                 _serverUrl.update { "http://$ipAddress:$port" }
@@ -328,6 +333,7 @@ class LocalServerRepositoryImpl(
             _isTransferLinkServerRunning.update { false }
             _transferLinkServerUrl.update { null }
             Log.d("LocalServer", "Server stopped")
+            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.STOP_LOCAL_SERVER)
         } catch (e: Exception) {
             Log.e("LocalServer", "Error stopping server", e)
         }
