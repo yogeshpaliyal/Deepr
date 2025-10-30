@@ -71,6 +71,11 @@ All these sources supports cross platform app updates. for eg: if you've install
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 - Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
+
+## Language  
+[![Translation status](https://hosted.weblate.org/widget/deepr/horizontal-auto.svg)](https://hosted.weblate.org/engage/deepr/)  
+Want to contribute to translations? [Contribute](https://hosted.weblate.org/projects/Deepr/app/)
+
 ## ✍️ Author
 
 👤 **Yogesh Choudhary Paliyal**
