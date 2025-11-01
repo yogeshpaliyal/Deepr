@@ -10,8 +10,8 @@ import com.yogeshpaliyal.deepr.backup.importer.MozillaBookmarkImporter
 import com.yogeshpaliyal.deepr.util.RequestResult
 
 class ImportRepositoryImpl(
-    private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    context: Context,
+    deeprQueries: DeeprQueries,
 ) : ImportRepository {
     private val csvImporter = CsvBookmarkImporter(context, deeprQueries)
     private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries)

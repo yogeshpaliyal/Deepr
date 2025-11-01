@@ -45,7 +45,12 @@ class ExportRepositoryImpl(
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
                         csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                     }
-                    RequestResult.Success(context.getString(R.string.export_success, uri.toString()))
+                    RequestResult.Success(
+                        context.getString(
+                            R.string.export_success,
+                            uri.toString(),
+                        ),
+                    )
                 } catch (_: Exception) {
                     RequestResult.Error(context.getString(R.string.export_failed))
                 }
@@ -71,7 +76,12 @@ class ExportRepositoryImpl(
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
                         csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
                     }
-                    RequestResult.Success(context.getString(R.string.export_success, "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName"))
+                    RequestResult.Success(
+                        context.getString(
+                            R.string.export_success,
+                            "${Environment.DIRECTORY_DOWNLOADS}/Deepr/$fileName",
+                        ),
+                    )
                 } else {
                     RequestResult.Error(context.getString(R.string.export_failed))
                 }

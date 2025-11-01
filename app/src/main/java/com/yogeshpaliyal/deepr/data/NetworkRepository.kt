@@ -19,7 +19,12 @@ class NetworkRepository(
             // Return the response body as text
             return Result.success(httpParser.getTitleAndImageFromHtml(response.bodyAsText()))
         } catch (e: Exception) {
-            return Result.failure(Exception("Error fetching data from $normalizedUrl: ${e.message}", e))
+            return Result.failure(
+                Exception(
+                    "Error fetching data from $normalizedUrl: ${e.message}",
+                    e,
+                ),
+            )
         }
     }
 }

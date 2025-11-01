@@ -468,8 +468,7 @@ class AccountViewModel(
 
     fun exportCsvData(uri: Uri? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = exportRepository.exportToCsv(uri)
-            when (result) {
+            when (val result = exportRepository.exportToCsv(uri)) {
                 is RequestResult.Success -> {
                     exportResultChannel.send("Export completed: ${result.data}")
                     analyticsManager.logEvent(
@@ -487,9 +486,7 @@ class AccountViewModel(
     fun importCsvData(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             importResultChannel.send("Importing, please wait...")
-            val result = importRepository.importFromCsv(uri)
-
-            when (result) {
+            when (val result = importRepository.importFromCsv(uri)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
@@ -516,9 +513,7 @@ class AccountViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             importResultChannel.send("Importing ${importer.getDisplayName()}, please wait...")
-            val result = importRepository.importBookmarks(uri, importer)
-
-            when (result) {
+            when (val result = importRepository.importBookmarks(uri, importer)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
@@ -642,8 +637,7 @@ class AccountViewModel(
             if (!isEnabled) {
                 return@launch
             }
-            val result = syncRepository.syncToMarkdown()
-            when (result) {
+            when (val result = syncRepository.syncToMarkdown()) {
                 is RequestResult.Success -> {
                     syncResultChannel.send(result.data)
                 }
@@ -658,8 +652,7 @@ class AccountViewModel(
     fun validateSyncFile(filePath: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             val pathToValidate = filePath.ifEmpty { syncFilePath.value }
-            val result = syncRepository.validateMarkdownFile(pathToValidate)
-            when (result) {
+            when (val result = syncRepository.validateMarkdownFile(pathToValidate)) {
                 is RequestResult.Success -> {
                     if (result.data) {
                         syncValidationChannel.send("valid")

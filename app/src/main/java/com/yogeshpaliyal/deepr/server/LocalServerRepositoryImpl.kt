@@ -75,9 +75,9 @@ open class LocalServerRepositoryImpl(
             preferenceDataStore.getServerPort.collect { portString ->
                 val port = portString.toIntOrNull()
                 if (port != null && port in 1024..65535) {
-                    _serverPort.value = port
+                    _serverPort.update { port }
                 } else {
-                    _serverPort.value = 8080
+                    _serverPort.update { 8080 }
                 }
             }
         }
@@ -85,7 +85,7 @@ open class LocalServerRepositoryImpl(
 
     override suspend fun setServerPort(port: Int) {
         if (port in 1024..65535) {
-            _serverPort.value = port
+            _serverPort.update { port }
             preferenceDataStore.setServerPort(port.toString())
         }
     }
@@ -316,7 +316,7 @@ open class LocalServerRepositoryImpl(
 
             _isRunning.update { true }
             _serverUrl.update { "http://$ipAddress:$port" }
-            Log.d("LocalServer", "Server started at ${_serverUrl.value}")
+            Log.d("LocalServer", "Server started at ${serverUrl.value}")
 
             if (port == 9000) {
                 generateQRCode(port)?.let { qrData -> _qrCodeData.update { qrData } }

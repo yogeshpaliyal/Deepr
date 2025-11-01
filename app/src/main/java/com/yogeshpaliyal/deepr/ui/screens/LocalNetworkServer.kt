@@ -153,7 +153,6 @@ fun LocalNetworkServerScreen(
             // Port Configuration Card
             PortConfigurationCard(
                 currentPort = serverPort,
-                isServerRunning = isRunning,
                 onChangePort = {
                     portInput = serverPort.toString()
                     portError = false
@@ -668,7 +667,6 @@ private fun ApiEndpointItem(
 @Composable
 private fun PortConfigurationCard(
     currentPort: Int,
-    isServerRunning: Boolean,
     onChangePort: () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current

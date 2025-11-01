@@ -101,7 +101,8 @@ class SyncRepositoryImpl(
         file.use { outputStream ->
             outputStream.bufferedWriter().use { writer ->
                 // Write header comment with sync time
-                val syncTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val syncTime =
+                    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 writer.write("<!-- Deepr Sync File - Do not modify the table structure -->\n")
                 writer.write("<!-- Last Synced: $syncTime -->\n")
                 writer.write("# Deeplinks\n\n")
@@ -129,7 +130,8 @@ class SyncRepositoryImpl(
                                 .joinToString(" ") { "#${it.replace(" ", "").replace("|", "")}" }
                         }
 
-                    val row = "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} | $escapedNotes | $tags |\n"
+                    val row =
+                        "| $escapedName | $escapedLink | ${item.createdAt} | ${item.openedCount} | $escapedNotes | $tags |\n"
                     writer.write(row)
                 }
 

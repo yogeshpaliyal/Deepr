@@ -58,7 +58,11 @@ fun RestoreScreenContent(
     val availableImporters = remember { viewModel.getAvailableImporters() }
 
     // Track which importer is being used for the current file picker
-    var selectedImporter by remember { mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(null) }
+    var selectedImporter by remember {
+        mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(
+            null,
+        )
+    }
 
     // Launcher for picking files to import
     val importFileLauncher =
