@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text

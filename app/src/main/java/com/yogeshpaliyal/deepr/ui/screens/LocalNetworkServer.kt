@@ -51,7 +51,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,7 +104,7 @@ fun LocalNetworkServerScreen(
             rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
                 if (pendingStart) {
                     pendingStart = false
-                    LocalServerService.startService(context)
+                    LocalServerService.startService(context = context, port = 8080)
                 }
             }
         } else {
@@ -154,7 +153,6 @@ fun LocalNetworkServerScreen(
             // Port Configuration Card
             PortConfigurationCard(
                 currentPort = serverPort,
-                isServerRunning = isRunning,
                 onChangePort = {
                     portInput = serverPort.toString()
                     portError = false
@@ -399,7 +397,13 @@ fun LocalNetworkServerScreen(
                             Toast
                                 .makeText(
                                     context,
-                                    if (isRunning) context.getString(R.string.port_changed_restart) else context.getString(R.string.saved),
+                                    if (isRunning) {
+                                        context.getString(R.string.port_changed_restart)
+                                    } else {
+                                        context.getString(
+                                            R.string.saved,
+                                        )
+                                    },
                                     Toast.LENGTH_SHORT,
                                 ).show()
                         } else {
@@ -419,7 +423,6 @@ fun LocalNetworkServerScreen(
     }
 }
 
-@Preview()
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun ServerSwitch(
@@ -444,7 +447,10 @@ private fun ServerSwitch(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
         ) {
             Box(
                 modifier =
@@ -507,7 +513,7 @@ private fun ServerSwitch(
                             setPendingStart(true)
                             notificationPermissionState.launchPermissionRequest()
                         } else {
-                            LocalServerService.startService(context)
+                            LocalServerService.startService(context = context, port = 8080)
                         }
                     } else {
                         LocalServerService.stopService(context)
@@ -661,7 +667,6 @@ private fun ApiEndpointItem(
 @Composable
 private fun PortConfigurationCard(
     currentPort: Int,
-    isServerRunning: Boolean,
     onChangePort: () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -675,7 +680,10 @@ private fun PortConfigurationCard(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
         ) {
             Icon(
                 TablerIcons.Server,

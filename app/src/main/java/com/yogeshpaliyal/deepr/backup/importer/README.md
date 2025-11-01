@@ -4,13 +4,15 @@ This directory contains the extensible bookmark import interface and its impleme
 
 ## Overview
 
-The `BookmarkImporter` interface provides a standard way to import bookmarks from various sources. This design allows easy extension to support new import formats without modifying existing code.
+The `BookmarkImporter` interface provides a standard way to import bookmarks from various sources.
+This design allows easy extension to support new import formats without modifying existing code.
 
 ## Architecture
 
 ### Base Interface
 
 **BookmarkImporter** - The main interface that all importers must implement:
+
 - `import(uri: Uri)`: Imports bookmarks from a given URI
 - `getDisplayName()`: Returns a human-readable name for the importer
 - `getSupportedMimeTypes()`: Returns an array of MIME types the importer can handle
@@ -18,22 +20,22 @@ The `BookmarkImporter` interface provides a standard way to import bookmarks fro
 ### Implementations
 
 1. **CsvBookmarkImporter** - Imports from CSV files exported by Deepr
-   - Supports: `text/csv`, `text/comma-separated-values`, `application/csv`
-   - Imports: link, name, notes, tags, thumbnail, opened count
+    - Supports: `text/csv`, `text/comma-separated-values`, `application/csv`
+    - Imports: link, name, notes, tags, thumbnail, opened count
 
 2. **HtmlBookmarkImporter** - Abstract base class for HTML-based bookmark imports
-   - Supports: `text/html`, `application/xhtml+xml`
-   - Provides common HTML parsing logic that can be extended
+    - Supports: `text/html`, `application/xhtml+xml`
+    - Provides common HTML parsing logic that can be extended
 
 3. **ChromeBookmarkImporter** - Imports Chrome/Chromium browser bookmarks
-   - Extends: `HtmlBookmarkImporter`
-   - Handles Chrome-specific HTML bookmark format
-   - Extracts folder structure and tags
+    - Extends: `HtmlBookmarkImporter`
+    - Handles Chrome-specific HTML bookmark format
+    - Extracts folder structure and tags
 
 4. **MozillaBookmarkImporter** - Imports Mozilla/Firefox browser bookmarks
-   - Extends: `HtmlBookmarkImporter`
-   - Handles Firefox-specific HTML bookmark format
-   - Filters out special Firefox folders
+    - Extends: `HtmlBookmarkImporter`
+    - Handles Firefox-specific HTML bookmark format
+    - Filters out special Firefox folders
 
 ## Usage
 
@@ -97,6 +99,7 @@ Tests for the import interface are located in:
 `app/src/test/java/com/yogeshpaliyal/deepr/backup/importer/BookmarkImporterTest.kt`
 
 The tests verify:
+
 - Interface implementation compliance
 - Correct display names
 - Proper MIME type support
@@ -105,6 +108,7 @@ The tests verify:
 ## Future Enhancements
 
 Potential additions to the import system:
+
 - Safari bookmarks support
 - Edge bookmarks support
 - JSON-based bookmark formats

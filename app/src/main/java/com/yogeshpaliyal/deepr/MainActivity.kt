@@ -32,6 +32,8 @@ import com.yogeshpaliyal.deepr.ui.screens.RestoreScreen
 import com.yogeshpaliyal.deepr.ui.screens.RestoreScreenContent
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
+import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalNetworkServer
+import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalServerScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Home
 import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
@@ -109,7 +111,7 @@ class MainActivity : ComponentActivity() {
 
                 else -> null
             }
-        sharingLink.value = sharedText
+        sharingLink.update { sharedText }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -162,6 +164,11 @@ fun Dashboard(
                     is LocalNetworkServer ->
                         NavEntry(key) {
                             LocalNetworkServerScreen(backStack)
+                        }
+
+                    is TransferLinkLocalNetworkServer ->
+                        NavEntry(key) {
+                            TransferLinkLocalServerScreen(backStack)
                         }
 
                     is BackupScreen ->

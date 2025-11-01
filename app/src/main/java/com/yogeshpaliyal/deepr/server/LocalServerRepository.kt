@@ -6,10 +6,13 @@ interface LocalServerRepository {
     val isRunning: StateFlow<Boolean>
     val serverUrl: StateFlow<String?>
     val serverPort: StateFlow<Int>
+    val qrCodeData: StateFlow<String?>
 
-    suspend fun startServer()
+    suspend fun startServer(port: Int)
 
-    suspend fun stopServer()
+    fun stopServer()
 
     suspend fun setServerPort(port: Int)
+
+    suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit>
 }

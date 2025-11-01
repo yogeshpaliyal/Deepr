@@ -315,6 +315,17 @@ fun BackupScreenContent(
                 }
             }
 
+            SettingsSection("Transfer Links") {
+                SettingsItem(
+                    TablerIcons.Upload,
+                    title = stringResource(R.string.transfer_link_to_another_device),
+                    description = "",
+                    onClick = {
+                        backStack.add(TransferLinkLocalNetworkServer)
+                    },
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

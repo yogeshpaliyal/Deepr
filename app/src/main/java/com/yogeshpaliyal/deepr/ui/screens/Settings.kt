@@ -51,8 +51,6 @@ import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
-import com.yogeshpaliyal.deepr.ui.components.SettingsItem
-import com.yogeshpaliyal.deepr.ui.components.SettingsSection
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons

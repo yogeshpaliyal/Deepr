@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.widget.Toast
@@ -21,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
@@ -158,10 +155,24 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.insertAccount(
+                normalizedLink,
+                deeprInfo.name,
+                executeAfterSave,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.updateDeeplink(
+                deeprInfo.id,
+                normalizedLink,
+                deeprInfo.name,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         }
         onSaveDialogInfoChange(
             SaveDialogInfo(
