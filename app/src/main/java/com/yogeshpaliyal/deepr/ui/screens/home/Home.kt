@@ -149,6 +149,7 @@ fun HomeScreen(
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
     val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -289,7 +290,6 @@ fun HomeScreen(
                     },
                 )
 
-                val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
                 // Favourite filter tabs
                 SingleChoiceSegmentedButtonRow(
                     modifier =
@@ -384,6 +384,8 @@ fun HomeScreen(
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
                 selectedTag = selectedTag,
+                searchQuery = textFieldState.text.toString(),
+                favouriteFilter = favouriteFilter,
                 editDeepr = {
                     selectedLink = it
                 },
@@ -439,6 +441,8 @@ fun Content(
     hazeState: HazeState,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
+    searchQuery: String,
+    favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     editDeepr: (GetLinksAndTags) -> Unit = {},
@@ -552,6 +556,8 @@ fun Content(
                 viewModel.setSelectedTagByName(it)
             },
             isThumbnailEnable = isThumbnailEnable,
+            searchQuery = searchQuery,
+            favouriteFilter = favouriteFilter,
         )
     }
 
@@ -740,8 +746,15 @@ fun DeeprList(
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,
     isThumbnailEnable: Boolean,
+    searchQuery: String,
+    favouriteFilter: Int,
     modifier: Modifier = Modifier,
 ) {
+    // Determine which empty state to show
+    val isSearchActive = searchQuery.isNotBlank()
+    val isFavouriteFilterActive = favouriteFilter == 1
+    val isTagFilterActive = selectedTag.isNotEmpty()
+
     AnimatedVisibility(
         visible = accounts.isEmpty(),
         enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
@@ -759,9 +772,39 @@ fun DeeprList(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(16.dp),
             ) {
+                // Choose appropriate icon and messages based on state
+                val (icon, titleRes, descriptionRes) =
+                    when {
+                        isSearchActive ->
+                            Triple(
+                                TablerIcons.Search,
+                                R.string.no_search_results,
+                                R.string.no_search_results_description,
+                            )
+                        isTagFilterActive ->
+                            Triple(
+                                TablerIcons.Tag,
+                                R.string.no_links_with_tags,
+                                R.string.no_links_with_tags_description,
+                            )
+                        isFavouriteFilterActive ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_favourites_found,
+                                R.string.no_favourites_description,
+                            )
+
+                        else ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_links_saved_yet,
+                                R.string.save_your_link_below,
+                            )
+                    }
+
                 Icon(
-                    TablerIcons.Link,
-                    contentDescription = "No links",
+                    icon,
+                    contentDescription = stringResource(titleRes),
                     modifier =
                         Modifier
                             .size(80.dp)
@@ -769,13 +812,13 @@ fun DeeprList(
                     tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = stringResource(R.string.no_links_saved_yet),
+                    text = stringResource(titleRes),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.save_your_link_below),
+                    text = stringResource(descriptionRes),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
