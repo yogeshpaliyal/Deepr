@@ -8,11 +8,14 @@
 [![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
 [![Android Weekly](https://img.shields.io/badge/Android%20Weekly-%23685-2CA3E6.svg?style=for-the-badge)](http://androidweekly.net/issues/issue-685)    
-[![BlueSky Follow](https://img.shields.io/badge/Bluesky-Follow-blue?style=for-the-badge&logo=bluesky&logoColor=%23fff&color=%23333&labelColor=%230285FF)](https://bsky.app/profile/yogeshpaliyal.com)
-[![Twitter Follow](https://img.shields.io/twitter/follow/yogeshpaliyal?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=yogeshpaliyal)
-![GitHub followers](https://img.shields.io/github/followers/yogeshpaliyal)
 
-## 🎩 🪄 Features:wq
+
+
+[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
+[![Kotlin](https://img.shields.io/badge/Language-Kotlin-blue.svg)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-orange.svg)](https://developer.android.com/jetpack/compose)
+[![Material 3](https://img.shields.io/badge/Design-Material%203-purple.svg)](https://m3.material.io/)
+## 🎩 🪄 Features
 
 - Search
 - Sort
@@ -32,30 +35,7 @@
 | Firebase Analytics                | ❌              | ✅          | ❌       |
 | Google Drive Backup (Coming Soon) | ❌              | ✅          | ❌       |
 
-### 🌐 Local Network Server
 
-The local network server feature allows you to access and manage your links from other devices on
-the same network. This is useful for:
-
-- Adding links from your desktop browser to your mobile device
-- Viewing your saved links on a bigger screen
-- Integrating with automation tools and scripts
-
-**Usage:**
-
-1. Open the app and go to Settings
-2. Tap on "Local Network Server"
-3. Toggle the server switch to start it
-4. Use the displayed URL or scan the QR code from another device
-5. Access the web interface or use the REST API
-
-**API Endpoints:**
-
-- `GET /api/links` - Get all saved links
-- `POST /api/links` - Add a new link (JSON body: `{"link": "url", "name": "name"}`)
-- `GET /api/link-info?url=<url>` - Get metadata for a URL
-
-**Note:** Both devices must be on the same Wi-Fi network.
 
 ## 🏗️ Tech Stack
 
@@ -102,3 +82,12 @@ Want to contribute to translations? [Contribute](https://hosted.weblate.org/enga
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=yogeshpaliyal/Deepr&type=date&legend=bottom-right" />
  </picture>
 </a>
+
+
+---
+
+<div align="center">
+  <strong>Made with ❤️ using Android & Jetpack Compose</strong>
+  <br/>
+  <sub>Star ⭐ this repository if you find it helpful!</sub>
+</div>
