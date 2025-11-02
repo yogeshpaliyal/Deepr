@@ -5,6 +5,8 @@ import android.util.Log
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import app.cash.sqldelight.logs.LogSqliteDriver
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManagerFactoryImpl
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
@@ -136,6 +138,9 @@ class DeeprApplication : Application() {
 
                 viewModel {
                     TransferLinkLocalServerViewModel(get())
+                }
+                single<AnalyticsManager> {
+                    AnalyticsManagerFactoryImpl.create(get())
                 }
             }
 
