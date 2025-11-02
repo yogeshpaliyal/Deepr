@@ -52,8 +52,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.compose.koinInject
 
 data class ImportPreviewScreen(val uri: Uri)
 
@@ -64,6 +63,7 @@ fun ImportPreviewScreenContent(
     backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    textFileImporter: TextFileImporter = koinInject(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -77,10 +77,6 @@ fun ImportPreviewScreenContent(
     LaunchedEffect(uri) {
         scope.launch {
             withContext(Dispatchers.IO) {
-                val textFileImporter: TextFileImporter = object : KoinComponent {
-                    fun getImporter() = get<TextFileImporter>()
-                }.getImporter()
-
                 when (val result = textFileImporter.parseForPreview(uri)) {
                     is RequestResult.Success -> {
                         candidates = result.data
@@ -230,10 +226,6 @@ fun ImportPreviewScreenContent(
                             isImporting = true
                             scope.launch {
                                 withContext(Dispatchers.IO) {
-                                    val textFileImporter: TextFileImporter = object : KoinComponent {
-                                        fun getImporter() = get<TextFileImporter>()
-                                    }.getImporter()
-
                                     when (val result = textFileImporter.importSelected(selectedLinks)) {
                                         is RequestResult.Success -> {
                                             withContext(Dispatchers.Main) {

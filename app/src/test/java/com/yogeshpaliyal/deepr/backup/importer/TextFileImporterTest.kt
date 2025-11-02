@@ -128,16 +128,39 @@ class TextFileImporterTest {
         assertEquals("tel:+1234567890", links[2])
     }
 
+    @Test
+    fun textFileImporter_handlesUrlsWithCommasInQueryParams() {
+        // URLs with commas in query parameters should be treated as newline-separated
+        val content = """
+            https://example.com?tags=a,b,c
+            https://google.com?items=x,y,z
+        """.trimIndent()
+
+        val links = extractLinksFromContent(content)
+
+        // Should split by newline, not comma
+        assertEquals(2, links.size)
+        assertEquals("https://example.com?tags=a,b,c", links[0])
+        assertEquals("https://google.com?items=x,y,z", links[1])
+    }
+
     // Helper function that mimics the TextFileImporter's extractLinks logic
     private fun extractLinksFromContent(content: String): List<String> {
         val links = mutableListOf<String>()
 
-        // First, try to split by commas
-        val commaSeparated = content.split(",")
+        // Split by commas to check if comma-separated format is used
+        val commaSeparated = content.split(",").map { it.trim() }
 
-        // If we have multiple items from comma split, use those
-        if (commaSeparated.size > 1) {
-            links.addAll(commaSeparated.map { it.trim() })
+        // Check if comma separation produces valid results
+        // We consider it comma-separated if:
+        // 1. We have multiple items after split
+        // 2. Most items look like they could be links (contain :// or .)
+        val isCommaSeparated =
+            commaSeparated.size > 1 &&
+                commaSeparated.count { it.contains("://") || (it.contains(".") && !it.contains("\n")) } >= commaSeparated.size * 0.5
+
+        if (isCommaSeparated) {
+            links.addAll(commaSeparated)
         } else {
             // Otherwise, split by newlines
             links.addAll(content.split("\n").map { it.trim() })

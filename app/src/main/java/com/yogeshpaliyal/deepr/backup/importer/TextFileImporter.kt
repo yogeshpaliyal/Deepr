@@ -150,12 +150,19 @@ class TextFileImporter(
     private fun extractLinks(content: String): List<String> {
         val links = mutableListOf<String>()
 
-        // First, try to split by commas
-        val commaSeparated = content.split(",")
-        
-        // If we have multiple items from comma split, use those
-        if (commaSeparated.size > 1) {
-            links.addAll(commaSeparated.map { it.trim() })
+        // Split by commas to check if comma-separated format is used
+        val commaSeparated = content.split(",").map { it.trim() }
+
+        // Check if comma separation produces valid results
+        // We consider it comma-separated if:
+        // 1. We have multiple items after split
+        // 2. Most items look like they could be links (contain :// or .)
+        val isCommaSeparated =
+            commaSeparated.size > 1 &&
+                commaSeparated.count { it.contains("://") || (it.contains(".") && !it.contains("\n")) } >= commaSeparated.size * 0.5
+
+        if (isCommaSeparated) {
+            links.addAll(commaSeparated)
         } else {
             // Otherwise, split by newlines
             links.addAll(content.split("\n").map { it.trim() })
