@@ -7,6 +7,7 @@ import com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.ChromeBookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.CsvBookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.MozillaBookmarkImporter
+import com.yogeshpaliyal.deepr.backup.importer.TextFileImporter
 import com.yogeshpaliyal.deepr.util.RequestResult
 
 class ImportRepositoryImpl(
@@ -16,6 +17,7 @@ class ImportRepositoryImpl(
     private val csvImporter = CsvBookmarkImporter(context, deeprQueries)
     private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries)
     private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries)
+    private val textFileImporter = TextFileImporter(context, deeprQueries)
 
     override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> = csvImporter.import(uri)
 
@@ -24,6 +26,7 @@ class ImportRepositoryImpl(
             csvImporter,
             chromeImporter,
             mozillaImporter,
+            textFileImporter,
         )
 
     override suspend fun importBookmarks(

@@ -12,6 +12,7 @@ import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
+import com.yogeshpaliyal.deepr.backup.importer.TextFileImporter
 import com.yogeshpaliyal.deepr.data.HtmlParser
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
@@ -71,6 +72,8 @@ class DeeprApplication : Application() {
                 single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
 
                 single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
+
+                single { TextFileImporter(androidContext(), get()) }
 
                 single<SyncRepository> { SyncRepositoryImpl(androidContext(), get(), get()) }
 
