@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -72,6 +73,8 @@ import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Wifi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 data object LocalNetworkServer
@@ -89,6 +92,7 @@ fun LocalNetworkServerScreen(
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
     val serverPort by viewModel.serverPort.collectAsStateWithLifecycle()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val coroutine = rememberCoroutineScope()
 
     // Track if user wants to start the server (used for permission flow)
     var pendingStart by remember { mutableStateOf(false) }
@@ -104,7 +108,7 @@ fun LocalNetworkServerScreen(
             rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
                 if (pendingStart) {
                     pendingStart = false
-                    LocalServerService.startService(context = context, port = 8080)
+                    LocalServerService.startService(context = context, port = serverPort)
                 }
             }
         } else {
@@ -148,7 +152,7 @@ fun LocalNetworkServerScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Server Status Card
-            ServerSwitch(isRunning, { pendingStart = it }, notificationPermissionState)
+            ServerSwitch(isRunning, serverPort, { pendingStart = it }, notificationPermissionState)
 
             // Port Configuration Card
             PortConfigurationCard(
@@ -378,13 +382,6 @@ fun LocalNetworkServerScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    if (isRunning) {
-                        Text(
-                            text = stringResource(R.string.port_changed_restart),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
                 }
             },
             confirmButton = {
@@ -394,6 +391,13 @@ fun LocalNetworkServerScreen(
                         if (port != null && port in 1024..65535) {
                             viewModel.setServerPort(port)
                             showPortDialog = false
+                            if (isRunning) {
+                                coroutine.launch {
+                                    LocalServerService.stopService(context)
+                                    delay(200)
+                                    LocalServerService.startService(context = context, port = port)
+                                }
+                            }
                             Toast
                                 .makeText(
                                     context,
@@ -427,6 +431,7 @@ fun LocalNetworkServerScreen(
 @Composable
 private fun ServerSwitch(
     isRunning: Boolean = false,
+    currentPort: Int = 8080,
     setPendingStart: (Boolean) -> Unit = {},
     notificationPermissionState: PermissionState? = null,
 ) {
@@ -513,7 +518,7 @@ private fun ServerSwitch(
                             setPendingStart(true)
                             notificationPermissionState.launchPermissionRequest()
                         } else {
-                            LocalServerService.startService(context = context, port = 8080)
+                            LocalServerService.startService(context = context, port = currentPort)
                         }
                     } else {
                         LocalServerService.stopService(context)
