@@ -221,7 +221,7 @@
     <string name="default_port">Default: 8080</string>
     <string name="port_range_hint">Enter port (1024–65535)</string>
     <string name="invalid_port">Invalid port number. Must be between 1024 and 65535.</string>
-    <string name="port_changed_restart">Port changed. Please restart the server to apply changes.</string>
+    <string name="port_changed_restart">Port changed. Server restarting...</string>
     <string name="change_port">Change Port</string>
 
     <!-- Transfer Link Server -->
