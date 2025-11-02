@@ -31,7 +31,7 @@ haze = "1.6.10"
 kotlinter = "5.2.0"
 googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
-playCore = "1.10.3"
+playCore = "2.0.2"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -84,7 +84,7 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
-play-core = { module = "com.google.android.play:core", version.ref = "playCore" }
+play-review = { module = "com.google.android.play:review", version.ref = "playCore" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
