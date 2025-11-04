@@ -35,6 +35,9 @@ SELECT last_insert_rowid();
 insertDeepr:
 INSERT INTO Deepr (link, name, openedCount, notes, thumbnail) VALUES (?, ?, ?, ?, ?);
 
+importDeepr:
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?);
+
 getLinksAndTags:
 SELECT
   Deepr.id AS id,
@@ -110,6 +113,7 @@ SELECT
   Deepr.openedCount,
   Deepr.notes,
   Deepr.thumbnail,
+  Deepr.isFavourite,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
