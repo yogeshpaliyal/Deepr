@@ -167,6 +167,7 @@ open class LocalServerRepositoryImpl(
                                             link = link.link,
                                             name = link.name,
                                             createdAt = link.createdAt,
+                                            isFavourite = link.isFavourite,
                                             openedCount = link.openedCount,
                                             notes = link.notes,
                                             thumbnail = link.thumbnail,
@@ -384,12 +385,14 @@ open class LocalServerRepositoryImpl(
         deeprQueries.transaction {
             links.forEach { deeplink ->
                 if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
-                    deeprQueries.insertDeepr(
+                    deeprQueries.importDeepr(
                         link = deeplink.link,
                         name = deeplink.name,
                         openedCount = deeplink.openedCount,
                         notes = deeplink.notes,
                         thumbnail = deeplink.thumbnail,
+                        isFavourite = deeplink.isFavourite,
+                        createdAt = deeplink.createdAt,
                     )
 
                     val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
@@ -400,13 +403,6 @@ open class LocalServerRepositoryImpl(
                         deeprQueries.addTagToLink(
                             linkId = insertedId,
                             tagId = tag.id,
-                        )
-                    }
-
-                    if (deeplink.isFavourite) {
-                        deeprQueries.setFavourite(
-                            isFavourite = 1,
-                            id = insertedId,
                         )
                     }
                 }
@@ -478,7 +474,7 @@ data class LinkResponse(
     val openedCount: Long,
     val notes: String,
     val thumbnail: String,
-    val isFavourite: Boolean = false,
+    val isFavourite: Long,
     val tags: List<String>,
 )
 
