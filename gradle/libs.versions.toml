@@ -32,6 +32,7 @@ kotlinter = "5.2.0"
 googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 playCore = "2.0.2"
+orchestrator = "1.4.2"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -88,6 +89,7 @@ play-review = { module = "com.google.android.play:review", version.ref = "playCo
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
+orchestrator = { group = "androidx.test", name = "orchestrator", version.ref = "orchestrator" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

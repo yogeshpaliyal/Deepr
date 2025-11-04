@@ -1,7 +1,6 @@
 package com.yogeshpaliyal.deepr.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -32,13 +31,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTestApi::class)
 class DeeprIntegratedTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    private fun getString(resId: Int): String {
-        return composeTestRule.activity.getString(resId)
-    }
+    private fun getString(resId: Int): String = composeTestRule.activity.getString(resId)
 
     @Test
     fun testAddNewLink() {
@@ -46,22 +42,26 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Click the FAB to add a new link
-        composeTestRule.onNodeWithContentDescription(getString(R.string.add_link))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_link))
             .performClick()
 
         // Wait for the bottom sheet to appear
         composeTestRule.waitForIdle()
 
         // Enter a deeplink
-        composeTestRule.onNodeWithText(getString(R.string.enter_deeplink_command))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_deeplink_command))
             .performTextInput("myapp://test")
 
         // Enter a name
-        composeTestRule.onNodeWithText(getString(R.string.enter_link_name))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput("Test Link")
 
         // Click save button
-        composeTestRule.onNodeWithText(getString(R.string.save))
+        composeTestRule
+            .onNodeWithText(getString(R.string.save))
             .performScrollTo()
             .performClick()
 
@@ -69,7 +69,8 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Verify the link appears in the list
-        composeTestRule.onNodeWithText("Test Link")
+        composeTestRule
+            .onNodeWithText("Test Link")
             .assertIsDisplayed()
     }
 
@@ -82,7 +83,8 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Find the link and swipe right to edit
-        composeTestRule.onNodeWithText("Test Link")
+        composeTestRule
+            .onNodeWithText("Test Link")
             .performTouchInput {
                 swipeRight()
             }
@@ -91,7 +93,8 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Verify we're in edit mode by checking for the Edit title
-        composeTestRule.onNodeWithText(getString(R.string.edit))
+        composeTestRule
+            .onNodeWithText(getString(R.string.edit))
             .assertIsDisplayed()
 
         // Clear and update the name
@@ -100,7 +103,8 @@ class DeeprIntegratedTest {
         nameField.performTextInput("Updated Test Link")
 
         // Save changes
-        composeTestRule.onNodeWithText(getString(R.string.save))
+        composeTestRule
+            .onNodeWithText(getString(R.string.save))
             .performScrollTo()
             .performClick()
 
@@ -108,7 +112,8 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Verify the updated link appears
-        composeTestRule.onNodeWithText("Updated Test Link")
+        composeTestRule
+            .onNodeWithText("Updated Test Link")
             .assertIsDisplayed()
     }
 
@@ -121,7 +126,8 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Swipe left to delete
-        composeTestRule.onNodeWithText("Test Link")
+        composeTestRule
+            .onNodeWithText("Test Link")
             .performTouchInput {
                 swipeLeft()
             }
@@ -130,14 +136,16 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Confirm deletion by clicking the Delete button in the dialog
-        composeTestRule.onNodeWithText(getString(R.string.delete))
+        composeTestRule
+            .onNodeWithText(getString(R.string.delete))
             .performClick()
 
         // Wait for deletion to complete
         composeTestRule.waitForIdle()
 
         // Verify the link is no longer displayed
-        composeTestRule.onNodeWithText("Test Link")
+        composeTestRule
+            .onNodeWithText("Test Link")
             .assertDoesNotExist()
     }
 
@@ -150,19 +158,22 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Click on the search bar to expand it
-        composeTestRule.onNodeWithContentDescription(getString(R.string.search))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.search))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Enter search query
-        composeTestRule.onNodeWithText(getString(R.string.search))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.search))
             .performTextInput("First")
 
         composeTestRule.waitForIdle()
 
         // Verify only the matching link is displayed
-        composeTestRule.onNodeWithText("First Test Link")
+        composeTestRule
+            .onNodeWithText("First Test Link")
             .assertIsDisplayed()
     }
 
@@ -174,23 +185,27 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Find and click the favorite button
-        composeTestRule.onNodeWithContentDescription(getString(R.string.add_to_favourites))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_to_favourites))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Verify the favorite icon changed
-        composeTestRule.onNodeWithContentDescription(getString(R.string.remove_from_favourites))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.remove_from_favourites))
             .assertIsDisplayed()
 
         // Click again to remove from favorites
-        composeTestRule.onNodeWithContentDescription(getString(R.string.remove_from_favourites))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.remove_from_favourites))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Verify it's back to unfavorited state
-        composeTestRule.onNodeWithContentDescription(getString(R.string.add_to_favourites))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_to_favourites))
             .assertIsDisplayed()
     }
 
@@ -202,38 +217,48 @@ class DeeprIntegratedTest {
         composeTestRule.waitForIdle()
 
         // Verify the link is displayed
-        composeTestRule.onNodeWithText("Tagged Link")
+        composeTestRule
+            .onNodeWithText("Tagged Link")
             .assertIsDisplayed()
 
         // Click on the tag to filter
-        composeTestRule.onNodeWithText("TestTag")
+        composeTestRule
+            .onNodeWithText("TestTag")
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Verify only the tagged link is displayed
-        composeTestRule.onNodeWithText("Tagged Link")
+        composeTestRule
+            .onNodeWithText("Tagged Link")
             .assertIsDisplayed()
     }
 
     // Helper method to add a link with specific details
-    private fun addLinkWithDetails(link: String, name: String) {
+    private fun addLinkWithDetails(
+        link: String,
+        name: String,
+    ) {
         // Click the FAB
-        composeTestRule.onNodeWithContentDescription(getString(R.string.add_link))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_link))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Enter deeplink
-        composeTestRule.onNodeWithText(getString(R.string.enter_deeplink_command))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_deeplink_command))
             .performTextInput(link)
 
         // Enter name
-        composeTestRule.onNodeWithText(getString(R.string.enter_link_name))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput(name)
 
         // Save
-        composeTestRule.onNodeWithText(getString(R.string.save))
+        composeTestRule
+            .onNodeWithText(getString(R.string.save))
             .performScrollTo()
             .performClick()
 
@@ -241,32 +266,42 @@ class DeeprIntegratedTest {
     }
 
     // Helper method to add a link with a tag
-    private fun addLinkWithTag(link: String, name: String, tag: String) {
+    private fun addLinkWithTag(
+        link: String,
+        name: String,
+        tag: String,
+    ) {
         // Click the FAB
-        composeTestRule.onNodeWithContentDescription(getString(R.string.add_link))
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_link))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Enter deeplink
-        composeTestRule.onNodeWithText(getString(R.string.enter_deeplink_command))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_deeplink_command))
             .performTextInput(link)
 
         // Enter name
-        composeTestRule.onNodeWithText(getString(R.string.enter_link_name))
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput(name)
 
         // Add tag
-        composeTestRule.onNodeWithText(getString(R.string.new_tag))
+        composeTestRule
+            .onNodeWithText(getString(R.string.new_tag))
             .performTextInput(tag)
 
-        composeTestRule.onNodeWithText(getString(R.string.create_tag))
+        composeTestRule
+            .onNodeWithText(getString(R.string.create_tag))
             .performClick()
 
         composeTestRule.waitForIdle()
 
         // Save
-        composeTestRule.onNodeWithText(getString(R.string.save))
+        composeTestRule
+            .onNodeWithText(getString(R.string.save))
             .performScrollTo()
             .performClick()
 
