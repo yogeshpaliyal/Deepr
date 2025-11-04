@@ -55,9 +55,8 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
+          emulator-boot-timeout: 600
           script: ./gradlew connectedFreeDebugAndroidTest --stacktrace
-          env:
-            ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 120
 
       - name: Upload test results
         if: always()
