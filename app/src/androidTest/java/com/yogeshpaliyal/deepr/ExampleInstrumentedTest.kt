@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.yogeshpaliyal.deepr", appContext.packageName)
+        assertEquals("com.yogeshpaliyal.deepr.debug", appContext.packageName)
     }
 }
