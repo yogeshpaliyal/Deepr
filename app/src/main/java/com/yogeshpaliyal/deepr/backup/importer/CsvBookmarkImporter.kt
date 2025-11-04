@@ -47,21 +47,25 @@ class CsvBookmarkImporter(
                     csvReader.forEach { row ->
                         if (row.size >= 3) {
                             val link = row[0]
+                            val createdAt = row[1]
                             val openedCount = row[2].toLongOrNull() ?: 0L
                             val name = row.getOrNull(3) ?: ""
                             val notes = row.getOrNull(4) ?: ""
                             val tagsString = row.getOrNull(5) ?: ""
                             val thumbnail = row.getOrNull(6) ?: ""
+                            val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
                                 deeprQueries.transaction {
-                                    deeprQueries.insertDeepr(
+                                    deeprQueries.importDeepr(
                                         link = link,
                                         openedCount = openedCount,
                                         name = name,
                                         notes = notes,
                                         thumbnail = thumbnail,
+                                        isFavourite = isFavourite,
+                                        createdAt = createdAt,
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 

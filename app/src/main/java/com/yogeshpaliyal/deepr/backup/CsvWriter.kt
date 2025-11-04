@@ -23,6 +23,7 @@ class CsvWriter {
                         Constants.Header.NOTES,
                         Constants.Header.TAGS,
                         Constants.Header.THUMBNAIL,
+                        Constants.Header.IS_FAVOURITE,
                     ),
                 )
                 // Write Data
@@ -36,6 +37,7 @@ class CsvWriter {
                             item.notes,
                             item.tagsNames ?: "",
                             item.thumbnail,
+                            item.isFavourite.toString(),
                         ),
                     )
                 }
