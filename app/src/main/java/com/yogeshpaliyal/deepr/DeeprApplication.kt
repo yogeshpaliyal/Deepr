@@ -27,6 +27,7 @@ import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -78,6 +79,9 @@ class DeeprApplication : Application() {
 
                 single {
                     HttpClient(CIO) {
+                        install(UserAgent) {
+                            agent = "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                        }
                         install(ContentNegotiation) {
                             json(
                                 Json {
