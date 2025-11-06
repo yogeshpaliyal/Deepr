@@ -256,18 +256,34 @@ fun HomeBottomContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (deeprInfo.thumbnail.isNotEmpty() && isThumbnailEnable) {
-                    AsyncImage(
-                        model = deeprInfo.thumbnail,
-                        contentDescription = deeprInfo.name,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1.91f)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                        placeholder = null,
-                        error = null,
-                        contentScale = ContentScale.Crop,
-                    )
+                    Column {
+                        AsyncImage(
+                            model = deeprInfo.thumbnail,
+                            contentDescription = deeprInfo.name,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1.91f)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                            placeholder = null,
+                            error = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                deeprInfo = deeprInfo.copy(thumbnail = "")
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(
+                                imageVector = TablerIcons.X,
+                                contentDescription = stringResource(R.string.remove_thumbnail),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.remove_thumbnail))
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

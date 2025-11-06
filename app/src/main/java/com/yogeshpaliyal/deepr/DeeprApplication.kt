@@ -97,7 +97,7 @@ class DeeprApplication : Application() {
                 }
 
                 single {
-                    NetworkRepository(get(), get())
+                    NetworkRepository(get())
                 }
 
                 single<LocalServerRepository> {
