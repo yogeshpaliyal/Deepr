@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Deepr</string>
-
     <!-- Navigation and UI Labels -->
     <string name="settings">Einstellungen</string>
     <string name="about_us">Über uns</string>
@@ -22,7 +22,6 @@
     <string name="new_tag">Neuer Tag</string>
     <string name="no_links_saved_yet">Noch keine Links gespeichert</string>
     <string name="save_your_link_below">Speichern Sie Ihren Link unten, um später schnell darauf zugreifen zu können.</string>
-    
     <!-- Menu and Dialog Items -->
     <string name="more_options">Weitere Optionen</string>
     <string name="copy_link">Link kopieren</string>
@@ -39,7 +38,6 @@
     <string name="edit_shortcut">Verknüpfung bearbeiten</string>
     <string name="show_qr_code">QR-Code anzeigen</string>
     <string name="deeplink_already_exists">Deeplink existiert bereits</string>
-
     <!-- Tag Management -->
     <string name="edit_tag">Tag Bearbeiten</string>
     <string name="delete_tag">Tag Löschen</string>
@@ -51,7 +49,6 @@
     <string name="tag_deleted_successfully">Tag erfolgreich gelöscht</string>
     <string name="edit_tag_description">Tag Bearbeiten</string>
     <string name="delete_tag_description">Tag Löschen</string>
-    
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">Nach Datum aufsteigend sortieren</string>
     <string name="sort_by_date_descending">Nach Datum absteigend sortieren</string>
@@ -61,7 +58,6 @@
     <string name="sort_by_name_descending">Nach Name absteigend sortieren</string>
     <string name="sort_by_link_ascending">Nach Link aufsteigend sortieren</string>
     <string name="sort_by_link_descending">Nach Link absteigend sortieren</string>
-
     <!-- Settings Screen -->
     <string name="import_deeplinks">Deeplinks importieren</string>
     <string name="import_deeplinks_description">Deeplinks aus CSV-Datei importieren</string>
@@ -83,7 +79,6 @@
     <string name="urdu">اردو</string>
     <string name="app_version">App-Version: %s</string>
     <string name="made_with_love">Mit ❤️ in Indien gemacht</string>
-
     <!-- About Us Screen -->
     <string name="app_logo">App-Logo</string>
     <string name="version_format">Version %s</string>
@@ -94,32 +89,27 @@
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
     <string name="view_on_github">Auf GitHub ansehen</string>
-
     <!-- Save Dialog -->
     <string name="save_deeplink">Deeplink speichern</string>
     <string name="save_deeplink_message">Deeplink speichern: %s ?</string>
     <string name="enter_link_name">Bitte geben Sie den Namen des Links ein</string>
     <string name="enter_link_name_error">Bitte geben Sie den Namen des Links ein.</string>
     <string name="save_and_execute">Speichern und ausführen</string>
-
     <!-- Home Screen -->
     <string name="enter_deeplink_command">Link eingeben</string>
     <string name="invalid_empty_deeplink">Ungültiger oder leerer Deeplink.</string>
-
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">Ungültiger Deeplink: %s</string>
     <string name="no_data_to_export">Keine Daten in der Datenbank zum Exportieren gefunden.</string>
     <string name="no_data_available_export">Keine Daten zum Exportieren nach Mapping verfügbar.</string>
     <string name="export_success">Erfolgreich exportiert nach %s</string>
     <string name="export_failed">Fehler beim Erstellen der CSV-Datei.</string>
-
     <!-- Sync Settings -->
     <string name="select_sync_file">Synchronisationsdatei auswählen</string>
     <string name="sync_now">Jetzt synchronisieren</string>
     <string name="last_sync_time">Letzte Synchronisation:</string>
     <string name="last_sync_time_never">Noch nie synchronisiert</string>
     <string name="last_sync_time_format">%s</string>
-    
     <!-- Sync Messages -->
     <string name="sync_disabled">Synchronisation ist deaktiviert</string>
     <string name="sync_file_not_selected">Keine Synchronisationsdatei ausgewählt</string>
@@ -128,7 +118,6 @@
     <string name="no_file_path_provided">Kein Dateipfad angegeben</string>
     <string name="invalid_markdown_format">Ungültiges Markdown-Tabellenformat</string>
     <string name="file_validation_error">Dateivalidierungsfehler: %s</string>
-    
     <!-- Additional Sync Settings -->
     <string name="sync_to_file">Mit lokaler Datei synchronisieren (Beta)</string>
     <string name="sync_to_file_description">Deeplinks automatisch mit einer Markdown-Datei synchronisieren</string>
