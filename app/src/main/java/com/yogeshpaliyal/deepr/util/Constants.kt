@@ -9,5 +9,6 @@ object Constants {
         const val NOTES = "Notes"
         const val TAGS = "Tags"
         const val THUMBNAIL = "Thumbnail"
+        const val IS_FAVOURITE = "isFavourite"
     }
 }

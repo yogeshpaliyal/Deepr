@@ -20,7 +20,7 @@
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="add_link">Add Link</string>
-    <string name="fetch_name_from_link">Fetch name from link</string>
+    <string name="fetch_name_from_link">Fetch meta from link</string>
     <string name="create_tag">Create Tag</string>
     <string name="new_tag">New tag (Optional)</string>
     <string name="no_links_saved_yet">No links saved yet</string>
@@ -33,6 +33,7 @@
     <string name="no_links_with_tags_description">Try selecting different tags or clear filters.</string>
     <string name="no_favourites_with_tags">No favourites in selected tags</string>
     <string name="no_favourites_with_tags_description">Mark links with these tags as favourites or try different tags.</string>
+    <string name="remove_thumbnail">Remove thumbnail</string>
 
     <!-- Menu and Dialog Items -->
     <string name="more_options">More options</string>
@@ -221,7 +222,7 @@
     <string name="default_port">Default: 8080</string>
     <string name="port_range_hint">Enter port (1024–65535)</string>
     <string name="invalid_port">Invalid port number. Must be between 1024 and 65535.</string>
-    <string name="port_changed_restart">Port changed. Please restart the server to apply changes.</string>
+    <string name="port_changed_restart">Port changed. Server restarting...</string>
     <string name="change_port">Change Port</string>
 
     <!-- Transfer Link Server -->

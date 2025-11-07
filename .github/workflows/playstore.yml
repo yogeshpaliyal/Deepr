@@ -52,6 +52,8 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr
           releaseFiles: app/build/outputs/bundle/freePlaystoreRelease/*.aab
-          track: alpha
+          track: production
+          userFraction: 0.01
+          status: inProgress
           whatsNewDirectory: whatsnew/
 
