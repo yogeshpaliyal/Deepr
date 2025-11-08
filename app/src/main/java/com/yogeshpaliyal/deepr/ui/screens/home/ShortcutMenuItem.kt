@@ -1,11 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -19,7 +15,6 @@ import compose.icons.tablericons.Plus
 fun ShortcutMenuItem(
     account: GetLinksAndTags,
     onShortcutClick: (GetLinksAndTags) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val shortcutExists = remember(account.id) { hasShortcut(context, account.id) }
@@ -28,17 +23,11 @@ fun ShortcutMenuItem(
     val editShortcutText = stringResource(R.string.edit_shortcut)
 
     if (isShortcutSupported(LocalContext.current)) {
-        DropdownMenuItem(
-            modifier = modifier,
-            text = { Text(if (shortcutExists) editShortcutText else addShortcutText) },
+        MenuListItem(
+            text = if (shortcutExists) editShortcutText else addShortcutText,
+            icon = TablerIcons.Plus,
             onClick = {
                 onShortcutClick(account)
-            },
-            leadingIcon = {
-                Icon(
-                    TablerIcons.Plus,
-                    contentDescription = if (shortcutExists) editShortcutText else addShortcutText,
-                )
             },
         )
     }

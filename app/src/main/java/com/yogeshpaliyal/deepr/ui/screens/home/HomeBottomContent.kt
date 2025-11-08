@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.widget.Toast
@@ -21,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
@@ -90,6 +87,7 @@ fun HomeBottomContent(
     val allTags by viewModel.allTags.collectAsStateWithLifecycle()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
 
     val fetchMetadata: () -> Unit = {
@@ -157,10 +155,24 @@ fun HomeBottomContent(
 
         if (deeprInfo.id == 0L) {
             // New Account
-            viewModel.insertAccount(normalizedLink, deeprInfo.name, executeAfterSave, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.insertAccount(
+                normalizedLink,
+                deeprInfo.name,
+                executeAfterSave,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         } else {
             // Edit
-            viewModel.updateDeeplink(deeprInfo.id, normalizedLink, deeprInfo.name, selectedTags, deeprInfo.notes, deeprInfo.thumbnail)
+            viewModel.updateDeeplink(
+                deeprInfo.id,
+                normalizedLink,
+                deeprInfo.name,
+                selectedTags,
+                deeprInfo.notes,
+                deeprInfo.thumbnail,
+            )
         }
         onSaveDialogInfoChange(
             SaveDialogInfo(
@@ -243,19 +255,35 @@ fun HomeBottomContent(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (deeprInfo.thumbnail.isNotEmpty()) {
-                    AsyncImage(
-                        model = deeprInfo.thumbnail,
-                        contentDescription = deeprInfo.name,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1.91f)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                        placeholder = null,
-                        error = null,
-                        contentScale = ContentScale.Crop,
-                    )
+                if (deeprInfo.thumbnail.isNotEmpty() && isThumbnailEnable) {
+                    Column {
+                        AsyncImage(
+                            model = deeprInfo.thumbnail,
+                            contentDescription = deeprInfo.name,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1.91f)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                            placeholder = null,
+                            error = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                deeprInfo = deeprInfo.copy(thumbnail = "")
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(
+                                imageVector = TablerIcons.X,
+                                contentDescription = stringResource(R.string.remove_thumbnail),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.remove_thumbnail))
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

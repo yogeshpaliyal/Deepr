@@ -51,7 +51,8 @@ fun getShortcut(
 ): ShortcutInfo? {
     // On Android 10+ (API 29+), we can check for pinned shortcuts
     if (isShortcutSupported(context)) {
-        val shortcutManager = context.getSystemService(Context.SHORTCUT_SERVICE) as android.content.pm.ShortcutManager?
+        val shortcutManager =
+            context.getSystemService(Context.SHORTCUT_SERVICE) as android.content.pm.ShortcutManager?
 
         // Get all pinned shortcuts if available
         val shortcuts = shortcutManager?.pinnedShortcuts

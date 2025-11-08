@@ -8,12 +8,15 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.DropdownMenu
@@ -37,9 +41,14 @@ import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -51,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
@@ -65,19 +75,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
@@ -127,6 +142,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
+    analyticsManager: AnalyticsManager = koinInject(),
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
@@ -135,7 +151,7 @@ fun HomeScreen(
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
-    val hazeState = rememberHazeState()
+    val hazeState = rememberHazeState(blurEnabled = true)
     val context = LocalContext.current
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
@@ -144,6 +160,7 @@ fun HomeScreen(
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
     val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -292,13 +309,13 @@ fun HomeScreen(
                 ServerStatusBar(
                     onServerStatusClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
+                        analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
                         if (backStack.lastOrNull() !is LocalNetworkServer) {
                             backStack.add(LocalNetworkServer)
                         }
                     },
                 )
 
-                val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
                 // Favourite filter tabs
                 SingleChoiceSegmentedButtonRow(
                     modifier =
@@ -343,6 +360,7 @@ fun HomeScreen(
                     colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
                     content = {
                         IconButton(onClick = {
+                            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SCAN_QR_CODE)
                             qrScanner.launch(ScanOptions())
                         }) {
                             Icon(
@@ -360,6 +378,7 @@ fun HomeScreen(
                         }
                         IconButton(onClick = {
                             // Settings action
+                            analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.NAVIGATE_SETTINGS)
                             backStack.add(Settings)
                         }) {
                             Icon(
@@ -392,6 +411,8 @@ fun HomeScreen(
                 contentPaddingValues = contentPadding,
                 selectedTag = selectedTag,
                 currentViewType = currentViewType,
+                searchQuery = textFieldState.text.toString(),
+                favouriteFilter = favouriteFilter,
                 editDeepr = {
                     selectedLink = it
                 },
@@ -441,18 +462,24 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Content(
     hazeState: HazeState,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
     currentViewType: ViewType,
+    searchQuery: String,
+    favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    val analyticsManager = koinInject<AnalyticsManager>()
 
     if (accounts == null) {
         Column(
@@ -463,36 +490,85 @@ fun Content(
         return
     }
 
-    Column(modifier.fillMaxSize()) {
-        val context = LocalContext.current
-        var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-        var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    val context = LocalContext.current
+    var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
-        showShortcutDialog?.let { deepr ->
-            CreateShortcutDialog(
-                deepr = deepr,
-                onDismiss = { showShortcutDialog = null },
-            )
+    showShortcutDialog?.let { deepr ->
+        CreateShortcutDialog(
+            deepr = deepr,
+            onDismiss = { showShortcutDialog = null },
+        )
+    }
+
+    showQrCodeDialog?.let {
+        QrCodeDialog(it) {
+            showQrCodeDialog = null
         }
+    }
 
-        showQrCodeDialog?.let {
-            QrCodeDialog(it) {
-                showQrCodeDialog = null
+    showDeleteConfirmDialog?.let { deepr ->
+        DeleteConfirmationDialog(
+            deepr = deepr,
+            onDismiss = { showDeleteConfirmDialog = null },
+            onConfirm = {
+                viewModel.deleteAccount(it.id)
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+            },
+        )
+    }
+
+    val onItemClick: (MenuItem) -> Unit = {
+        showMoreSelectedItem = null
+        when (it) {
+            is MenuItem.Click -> {
+                viewModel.incrementOpenedCount(it.item.id)
+                openDeeplink(context, it.item.link)
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.OPEN_LINK,
+                    mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to it.item.id),
+                )
+            }
+
+            is MenuItem.Delete -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_DELETE)
+                showDeleteConfirmDialog = it.item
+            }
+
+            is MenuItem.Edit -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_EDIT)
+                editDeepr(it.item)
+            }
+
+            is MenuItem.FavouriteClick -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_FAVOURITE)
+                viewModel.toggleFavourite(it.item.id)
+            }
+
+            is MenuItem.ResetCounter -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
+                viewModel.resetOpenedCount(it.item.id)
+                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+            }
+
+            is MenuItem.Shortcut -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_SHORTCUT)
+                showShortcutDialog = it.item
+            }
+
+            is MenuItem.ShowQrCode -> {
+                analyticsManager.logEvent(com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ITEM_MENU_QR_CODE)
+                showQrCodeDialog = it.item
+            }
+
+            is MenuItem.MoreOptionsBottomSheet -> {
+                showMoreSelectedItem = it.item
             }
         }
+    }
 
-        showDeleteConfirmDialog?.let { deepr ->
-            DeleteConfirmationDialog(
-                deepr = deepr,
-                onDismiss = { showDeleteConfirmDialog = null },
-                onConfirm = {
-                    viewModel.deleteAccount(it.id)
-                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                },
-            )
-        }
-
+    Column(modifier.fillMaxSize()) {
         DeeprList(
             modifier =
                 Modifier
@@ -503,6 +579,7 @@ fun Content(
             accounts = accounts!!,
             selectedTag = selectedTag,
             viewType = currentViewType,
+            viewType = currentViewType,
             onItemClick = {
                 when (it) {
                     is MenuItem.Click -> {
@@ -510,27 +587,181 @@ fun Content(
                         openDeeplink(context, it.item.link)
                     }
 
-                    is MenuItem.Delete -> showDeleteConfirmDialog = it.item
-                    is MenuItem.Edit -> editDeepr(it.item)
-                    is MenuItem.FavouriteClick -> viewModel.toggleFavourite(it.item.id)
-                    is MenuItem.ResetCounter -> {
-                        viewModel.resetOpenedCount(it.item.id)
-                        Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is MenuItem.Shortcut -> {
-                        showShortcutDialog = it.item
-                    }
-
-                    is MenuItem.ShowQrCode -> showQrCodeDialog = it.item
+    showMoreSelectedItem?.let { account ->
+        ModalBottomSheet(sheetState = showMoreBottomSheet, onDismissRequest = {
+            showMoreSelectedItem = null
+        }) {
+            val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+            LazyColumn {
+                item {
+                    ListItem(
+                        headlineContent = {
+                            Column {
+                                Text(
+                                    text = account.name,
+                                )
+                                Text(
+                                    text = account.link,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    onItemClick(MenuItem.Click(account))
+                                },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
                 }
-            },
-            onTagClick = {
-                // Toggle the tag in the filter by tag name
-                viewModel.setSelectedTagByName(it)
-            },
-        )
+
+                if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
+                    item {
+                        AsyncImage(
+                            model = account.thumbnail,
+                            contentDescription = account.name,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1.91f)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                            placeholder = null,
+                            error = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+                }
+
+                if (account.notes.isNotEmpty()) {
+                    item {
+                        MenuListItem(
+                            text = account.notes,
+                            icon = TablerIcons.Note,
+                            selectable = true,
+                        )
+                    }
+                }
+
+                item {
+                    ShortcutMenuItem(account, {
+                        onItemClick(MenuItem.Shortcut(it))
+                    })
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.show_qr_code),
+                        icon = TablerIcons.Qrcode,
+                        onClick = {
+                            onItemClick(MenuItem.ShowQrCode(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.reset_opened_count),
+                        icon = TablerIcons.Refresh,
+                        onClick = {
+                            onItemClick(MenuItem.ResetCounter(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.edit),
+                        icon = TablerIcons.Edit,
+                        onClick = {
+                            onItemClick(MenuItem.Edit(account))
+                        },
+                    )
+                }
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.delete),
+                        icon = TablerIcons.Trash,
+                        onClick = {
+                            onItemClick(MenuItem.Delete(account))
+                        },
+                        colors =
+                            ListItemDefaults.colors(
+                                headlineColor = MaterialTheme.colorScheme.error,
+                                leadingIconColor = MaterialTheme.colorScheme.error,
+                                containerColor = Color.Transparent,
+                            ),
+                    )
+                }
+
+                // Display last opened time
+                if (account.lastOpenedAt != null) {
+                    item {
+                        MenuListItem(
+                            text =
+                                stringResource(
+                                    R.string.last_opened,
+                                    formatDateTime(account.lastOpenedAt),
+                                ),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            onClick = {
+                                onItemClick(MenuItem.Edit(account))
+                            },
+                            icon = null,
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
+                        )
+                    }
+                }
+            }
+        }
     }
+}
+
+@Composable
+fun MenuListItem(
+    text: String,
+    icon: ImageVector?,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    colors: ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    onClick: (() -> Unit)? = null,
+    selectable: Boolean = false,
+) {
+    ListItem(
+        headlineContent = {
+            if (selectable) {
+                SelectionContainer {
+                    Text(
+                        text = text,
+                        style = textStyle,
+                    )
+                }
+            } else {
+                Text(
+                    text = text,
+                    style = textStyle,
+                )
+            }
+        },
+        modifier =
+            modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
+                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        leadingContent = {
+            if (icon != null) {
+                Icon(
+                    icon,
+                    contentDescription = text,
+                )
+            }
+        },
+        colors = colors,
+    )
 }
 
 @Composable
@@ -540,10 +771,17 @@ fun DeeprList(
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,
+    isThumbnailEnable: Boolean,
+    searchQuery: String,
+    favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewType: ViewType = ViewType.LIST,
 ) {
     var expandedItemId by remember { mutableStateOf<Long?>(null) }
+    // Determine which empty state to show
+    val isSearchActive = searchQuery.isNotBlank()
+    val isFavouriteFilterActive = favouriteFilter == 1
+    val isTagFilterActive = selectedTag.isNotEmpty()
 
     AnimatedVisibility(
         visible = accounts.isEmpty(),
@@ -562,9 +800,39 @@ fun DeeprList(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(16.dp),
             ) {
+                // Choose appropriate icon and messages based on state
+                val (icon, titleRes, descriptionRes) =
+                    when {
+                        isSearchActive ->
+                            Triple(
+                                TablerIcons.Search,
+                                R.string.no_search_results,
+                                R.string.no_search_results_description,
+                            )
+                        isTagFilterActive ->
+                            Triple(
+                                TablerIcons.Tag,
+                                R.string.no_links_with_tags,
+                                R.string.no_links_with_tags_description,
+                            )
+                        isFavouriteFilterActive ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_favourites_found,
+                                R.string.no_favourites_description,
+                            )
+
+                        else ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_links_saved_yet,
+                                R.string.save_your_link_below,
+                            )
+                    }
+
                 Icon(
-                    TablerIcons.Link,
-                    contentDescription = "No links",
+                    icon,
+                    contentDescription = stringResource(titleRes),
                     modifier =
                         Modifier
                             .size(80.dp)
@@ -572,13 +840,13 @@ fun DeeprList(
                     tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = stringResource(R.string.no_links_saved_yet),
+                    text = stringResource(titleRes),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.save_your_link_below),
+                    text = stringResource(descriptionRes),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -721,37 +989,19 @@ fun DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            if (account.notes.isNotEmpty()) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.view_note)) },
-                    onClick = {
-                        expanded = false
-                        selectedNote = account.notes
-                    },
-                    leadingIcon = {
-                        Icon(
-                            TablerIcons.Note,
-                            contentDescription = stringResource(R.string.view_note),
-                        )
-                    },
-                )
-            }
+            items(
+                count = accounts.size,
+                key = { index -> accounts[index].id },
+            ) { index ->
+                val account = accounts[index]
 
-            // Display last opened time
-            if (account.lastOpenedAt != null) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            stringResource(
-                                R.string.last_opened,
-                                formatDateTime(account.lastOpenedAt),
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    onClick = { },
-                    enabled = false,
+                DeeprItem(
+                    modifier = Modifier.animateItem(),
+                    account = account,
+                    selectedTag = selectedTag,
+                    onItemClick = onItemClick,
+                    onTagClick = onTagClick,
+                    isThumbnailEnable = isThumbnailEnable,
                 )
             }
             ShortcutMenuItem(account, {

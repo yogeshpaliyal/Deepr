@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Deepr</string>
-
     <!-- Navigation and UI Labels -->
     <string name="settings">Configuración</string>
     <string name="about_us">Acerca de nosotros</string>
@@ -22,7 +22,6 @@
     <string name="new_tag">Nueva etiqueta</string>
     <string name="no_links_saved_yet">Aún no hay enlaces guardados</string>
     <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde.</string>
-    
     <!-- Menu and Dialog Items -->
     <string name="more_options">Más opciones</string>
     <string name="copy_link">Copiar enlace</string>
@@ -39,7 +38,6 @@
     <string name="edit_shortcut">Editar acceso directo</string>
     <string name="show_qr_code">Mostrar código QR</string>
     <string name="deeplink_already_exists">El enlace profundo ya existe</string>
-    
     <!-- Sort Menu Items -->
     <string name="sort_by_date_ascending">Ordenar por Fecha Ascendente</string>
     <string name="sort_by_date_descending">Ordenar por Fecha Descendente</string>
@@ -49,7 +47,6 @@
     <string name="sort_by_name_descending">Ordenar por Nombre Descendente</string>
     <string name="sort_by_link_ascending">Ordenar por Enlace Ascendente</string>
     <string name="sort_by_link_descending">Ordenar por Enlace Descendente</string>
-    
     <!-- Tag Management -->
     <string name="edit_tag">Editar Etiqueta</string>
     <string name="delete_tag">Eliminar Etiqueta</string>
@@ -61,7 +58,6 @@
     <string name="tag_deleted_successfully">Etiqueta eliminada exitosamente</string>
     <string name="edit_tag_description">Editar Etiqueta</string>
     <string name="delete_tag_description">Eliminar Etiqueta</string>
-
     <!-- Settings Screen -->
     <string name="import_deeplinks">Importar Deeplinks</string>
     <string name="import_deeplinks_description">Importar Deeplinks desde archivo CSV</string>
@@ -83,7 +79,6 @@
     <string name="urdu">اردو</string>
     <string name="app_version">Versión de la aplicación: %s</string>
     <string name="made_with_love">Hecho con ❤️ en India</string>
-
     <!-- About Us Screen -->
     <string name="app_logo">Logo de la aplicación</string>
     <string name="version_format">Versión %s</string>
@@ -94,32 +89,27 @@
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
     <string name="view_on_github">Ver en GitHub</string>
-
     <!-- Save Dialog -->
     <string name="save_deeplink">Guardar enlace profundo</string>
     <string name="save_deeplink_message">¿Guardar el enlace profundo: %s?</string>
     <string name="enter_link_name">Por favor, ingresa el nombre del enlace</string>
     <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace.</string>
     <string name="save_and_execute">Guardar y ejecutar</string>
-
     <!-- Home Screen -->
     <string name="enter_deeplink_command">Introducir enlace</string>
     <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío.</string>
-
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">Enlace profundo inválido: %s</string>
     <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar.</string>
     <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo.</string>
     <string name="export_success">Exportado exitosamente a %s</string>
     <string name="export_failed">Error al crear archivo CSV.</string>
-
     <!-- Sync Settings -->
     <string name="select_sync_file">Seleccionar archivo de sincronización</string>
     <string name="sync_now">Sincronizar ahora</string>
     <string name="last_sync_time">Última sincronización:</string>
     <string name="last_sync_time_never">Nunca sincronizado</string>
     <string name="last_sync_time_format">%s</string>
-    
     <!-- Sync Messages -->
     <string name="sync_disabled">Sincronización deshabilitada</string>
     <string name="sync_file_not_selected">No se seleccionó archivo de sincronización</string>
@@ -128,7 +118,6 @@
     <string name="no_file_path_provided">No se proporcionó ruta de archivo</string>
     <string name="invalid_markdown_format">Formato de tabla markdown inválido</string>
     <string name="file_validation_error">Error de validación de archivo: %s</string>
-    
     <!-- Additional Sync Settings -->
     <string name="sync_to_file">Sincronizar a archivo local (Beta)</string>
     <string name="sync_to_file_description">Sincronizar automáticamente enlaces profundos a un archivo markdown</string>

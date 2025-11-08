@@ -11,6 +11,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
@@ -73,9 +74,11 @@ class AccountViewModel(
     private val syncRepository: SyncRepository,
     private val networkRepository: NetworkRepository,
     private val autoBackupWorker: AutoBackupWorker,
+    private val analyticsManager: AnalyticsManager,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
+    private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
     // State for tags
@@ -141,12 +144,45 @@ class AccountViewModel(
                 _favouriteFilter.update { if (isFavouritesDefault) 1 else -1 }
             }
         }
+
+        // Track user properties for total links and tags
+        viewModelScope.launch {
+            countOfLinks.collect { count ->
+                count?.let {
+                    analyticsManager.setUserProperty(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.TOTAL_LINKS,
+                        it.toString(),
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            allTags.collect { tags ->
+                analyticsManager.setUserProperty(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.TOTAL_TAGS,
+                    tags.size.toString(),
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            preferenceDataStore.isThumbnailEnable.collect { enabled ->
+                analyticsManager.setUserProperty(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.THUMBNAIL_ENABLED,
+                    enabled.toString(),
+                )
+            }
+        }
     }
 
     // Set tag filter - toggle tag in the list
     fun setTagFilter(tag: Tags?) {
         if (tag == null) {
             _selectedTagFilter.update { emptyList() }
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CLEAR_TAG_FILTER,
+            )
         } else {
             _selectedTagFilter.update { currentList ->
                 if (currentList.any { it.id == tag.id }) {
@@ -157,6 +193,13 @@ class AccountViewModel(
                     currentList + tag
                 }
             }
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SELECT_TAG_FILTER,
+                mapOf(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_ID to tag.id,
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_NAME to tag.name,
+                ),
+            )
         }
     }
 
@@ -168,6 +211,10 @@ class AccountViewModel(
     // Set favourite filter
     fun setFavouriteFilter(filter: Int) {
         _favouriteFilter.update { filter }
+        analyticsManager.logEvent(
+            com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.FILTER_FAVOURITES,
+            mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.IS_FAVOURITE to (filter == 1)),
+        )
     }
 
     // Remove tag from link
@@ -249,7 +296,8 @@ class AccountViewModel(
             val sortType = sorting.getOrNull(1) ?: "DESC"
 
             // Prepare tag filter parameters
-            val tagIdsString = if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
+            val tagIdsString =
+                if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
             val tagCount = tags.size.toLong()
 
             deeprQueries
@@ -272,11 +320,21 @@ class AccountViewModel(
 
     fun search(query: String) {
         searchQuery.update { query }
+        if (query.isNotEmpty()) {
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SEARCH_LINKS,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.SEARCH_QUERY to query),
+            )
+        }
     }
 
     fun setSortOrder(type: @SortType String) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setSortingOrder(type)
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CHANGE_SORT_ORDER,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.SORT_ORDER to type),
+            )
         }
     }
 
@@ -292,6 +350,13 @@ class AccountViewModel(
             deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail)
             deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
                 modifyTagsForLink(it, tagsList)
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ADD_LINK,
+                    mapOf(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to it,
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.HAS_THUMBNAIL to thumbnail.isNotEmpty(),
+                    ),
+                )
             }
             syncToMarkdown()
         }
@@ -331,6 +396,11 @@ class AccountViewModel(
             tagsToDelete.forEach { tagId ->
                 deeprQueries.deleteTag(tagId)
             }
+
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.DELETE_LINK,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
+            )
         }
     }
 
@@ -357,12 +427,20 @@ class AccountViewModel(
     fun resetOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.resetOpenedCount(id)
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.RESET_COUNTER,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
+            )
         }
     }
 
     fun toggleFavourite(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deeprQueries.toggleFavourite(id)
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.TOGGLE_FAVOURITE,
+                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
+            )
         }
     }
 
@@ -378,15 +456,24 @@ class AccountViewModel(
             deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, id)
             modifyTagsForLink(id, tagsList)
             syncToMarkdown()
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.EDIT_LINK,
+                mapOf(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id,
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsParams.HAS_THUMBNAIL to thumbnail.isNotEmpty(),
+                ),
+            )
         }
     }
 
     fun exportCsvData(uri: Uri? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = exportRepository.exportToCsv(uri)
-            when (result) {
+            when (val result = exportRepository.exportToCsv(uri)) {
                 is RequestResult.Success -> {
                     exportResultChannel.send("Export completed: ${result.data}")
+                    analyticsManager.logEvent(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.EXPORT_CSV,
+                    )
                 }
 
                 is RequestResult.Error -> {
@@ -399,9 +486,34 @@ class AccountViewModel(
     fun importCsvData(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             importResultChannel.send("Importing, please wait...")
-            val result = importRepository.importFromCsv(uri)
+            when (val result = importRepository.importFromCsv(uri)) {
+                is RequestResult.Success -> {
+                    importResultChannel.send(
+                        "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
+                    )
+                    analyticsManager.logEvent(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.IMPORT_CSV,
+                        mapOf(
+                            "imported_count" to result.data.importedCount,
+                            "skipped_count" to result.data.skippedCount,
+                        ),
+                    )
+                }
 
-            when (result) {
+                is RequestResult.Error -> {
+                    importResultChannel.send("Import failed: ${result.message}")
+                }
+            }
+        }
+    }
+
+    fun importBookmarks(
+        uri: Uri,
+        importer: com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            importResultChannel.send("Importing ${importer.getDisplayName()}, please wait...")
+            when (val result = importRepository.importBookmarks(uri, importer)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
@@ -414,6 +526,8 @@ class AccountViewModel(
             }
         }
     }
+
+    fun getAvailableImporters() = importRepository.getAvailableImporters()
 
     // Shortcut icon preference methods
     val useLinkBasedIcons =
@@ -442,9 +556,19 @@ class AccountViewModel(
         preferenceDataStore.getDefaultPageFavourites
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isThumbnailEnable =
+        preferenceDataStore.isThumbnailEnable
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun setDefaultPageFavourites(favourites: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setDefaultPageFavourites(favourites)
+        }
+    }
+
+    fun setIsThumbnailEnable(thumbnail: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setThumbnailEnable(thumbnail)
         }
     }
 
@@ -513,8 +637,7 @@ class AccountViewModel(
             if (!isEnabled) {
                 return@launch
             }
-            val result = syncRepository.syncToMarkdown()
-            when (result) {
+            when (val result = syncRepository.syncToMarkdown()) {
                 is RequestResult.Success -> {
                     syncResultChannel.send(result.data)
                 }
@@ -529,8 +652,7 @@ class AccountViewModel(
     fun validateSyncFile(filePath: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             val pathToValidate = filePath.ifEmpty { syncFilePath.value }
-            val result = syncRepository.validateMarkdownFile(pathToValidate)
-            when (result) {
+            when (val result = syncRepository.validateMarkdownFile(pathToValidate)) {
                 is RequestResult.Success -> {
                     if (result.data) {
                         syncValidationChannel.send("valid")
@@ -544,5 +666,9 @@ class AccountViewModel(
                 }
             }
         }
+    }
+
+    fun requestReview(activity: android.app.Activity) {
+        reviewManager.requestReview(activity)
     }
 }

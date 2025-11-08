@@ -18,10 +18,17 @@ android {
         applicationId = "com.yogeshpaliyal.deepr"
         minSdk = 24
         targetSdk = 36
-        versionCode = 18
-        versionName = "1.0.17"
+        versionCode = 19
+        versionName = "1.0.18"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments += mapOf(
+            "clearPackageData" to "true",
+        )
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     productFlavors {
@@ -115,6 +122,7 @@ dependencies {
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
+    androidTestUtil(libs.orchestrator)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
@@ -146,6 +154,7 @@ dependencies {
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.content.negotiation)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor3)
     implementation(libs.ktor.client.android)
@@ -156,10 +165,12 @@ dependencies {
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)
+    "proImplementation"(libs.play.review)
 
     "freePlaystoreImplementation"(platform(libs.firebase.bom))
     "freePlaystoreImplementation"(libs.firebase.analytics)
     "freePlaystoreImplementation"(libs.firebase.crashlytics.ndk)
+    "freePlaystoreImplementation"(libs.play.review)
 }
 
 kotlinter {

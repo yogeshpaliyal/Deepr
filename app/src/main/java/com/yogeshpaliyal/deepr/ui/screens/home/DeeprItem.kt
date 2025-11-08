@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,6 +96,27 @@ sealed class MenuItem(
     class Delete(
         item: GetLinksAndTags,
     ) : MenuItem(item)
+
+    class MoreOptionsBottomSheet(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+}
+
+@Composable
+@Preview
+private fun DeeprItemPreview() {
+    DeeprItem(
+        account =
+            createDeeprObject(
+                name = "Yogesh Paliyal",
+                link = "https://yogeshpaliyal.com",
+                thumbnail = "https://yogeshpaliyal.com/og.png",
+            ),
+        {},
+        {},
+        listOf(),
+        isThumbnailEnable = true,
+    )
 }
 
 @Composable
@@ -120,8 +142,10 @@ fun DeeprItem(
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (tag: String) -> Unit,
     selectedTag: List<Tags>,
+    isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
     dropdownMenu: (@Composable () -> Unit)? = null,
+    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -221,10 +245,15 @@ fun DeeprItem(
                 ),
             modifier =
                 Modifier
+                    .testTag("DeeprItem")
                     .fillMaxWidth()
                     .combinedClickable(
                         onClick = { onItemClick(MenuItem.Click(account)) },
                         onLongClick = {
+                            analyticsManager.logEvent(
+                                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.COPY_LINK,
+                                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to account.id),
+                            )
                             val clipboard =
                                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             val clip = ClipData.newPlainText(linkCopied, account.link)
@@ -233,7 +262,7 @@ fun DeeprItem(
                         },
                     ),
         ) {
-            if (account.thumbnail.isNotEmpty()) {
+            if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
                 AsyncImage(
                     model = account.thumbnail,
                     contentDescription = account.name,
@@ -310,7 +339,18 @@ fun DeeprItem(
                                 )
                             }
 
-                            dropdownMenu?.invoke()
+                            IconButton(onClick = {
+                                onItemClick(
+                                    MenuItem.MoreOptionsBottomSheet(
+                                        account,
+                                    ),
+                                )
+                            }) {
+                                Icon(
+                                    TablerIcons.DotsVertical,
+                                    contentDescription = stringResource(R.string.more_options),
+                                )
+                            }
                         }
 
                         Text(
