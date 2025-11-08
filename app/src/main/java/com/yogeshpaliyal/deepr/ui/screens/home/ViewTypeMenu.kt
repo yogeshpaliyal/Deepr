@@ -21,8 +21,8 @@ import compose.icons.tablericons.LayoutRows
 
 @Composable
 fun ViewTypeMenu(
-    currentViewType: ViewType,
-    setViewType: (ViewType) -> Unit,
+    currentViewType: @ViewType Int,
+    setViewType: (@ViewType Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -33,6 +33,7 @@ fun ViewTypeMenu(
                     ViewType.LIST -> TablerIcons.LayoutList
                     ViewType.GRID -> TablerIcons.LayoutGrid
                     ViewType.COMPACT -> TablerIcons.LayoutRows
+                    else -> TablerIcons.LayoutList
                 },
                 contentDescription = "View Type",
             )

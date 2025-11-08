@@ -19,6 +19,7 @@ import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
+import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -581,6 +582,10 @@ class AccountViewModel(
         preferenceDataStore.getAutoBackupLocation
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
+    val viewType =
+        preferenceDataStore.viewType
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ViewType.LIST)
+
     val lastBackupTime =
         preferenceDataStore.getLastBackupTime
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
@@ -588,6 +593,12 @@ class AccountViewModel(
     fun setAutoBackupEnabled(enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setAutoBackupEnabled(enabled)
+        }
+    }
+
+    fun setViewType(viewType: @ViewType Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setViewType(viewType)
         }
     }
 

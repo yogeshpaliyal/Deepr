@@ -5,9 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,11 +33,17 @@ class AppPreferenceDataStore(
         private val DEFAULT_PAGE_FAVOURITES = booleanPreferencesKey("default_page_favourites")
         private val IS_THUMBNAIL_ENABLE = booleanPreferencesKey("is_thumbnail_enable")
         private val SERVER_PORT = stringPreferencesKey("server_port")
+        private val VIEW_TYPE = intPreferencesKey("view_type")
     }
 
     val getSortingOrder: Flow<@SortType String> =
         context.appDataStore.data.map { preferences ->
             preferences[SORTING_ORDER] ?: SortType.SORT_CREATED_BY_DESC
+        }
+
+    val viewType: Flow<@ViewType Int> =
+        context.appDataStore.data.map { preferences ->
+            preferences[VIEW_TYPE] ?: ViewType.LIST
         }
 
     val getUseLinkBasedIcons: Flow<Boolean> =
@@ -108,6 +116,12 @@ class AppPreferenceDataStore(
     suspend fun setSyncEnabled(enabled: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[SYNC_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setViewType(viewType: @ViewType Int) {
+        context.appDataStore.edit { prefs ->
+            prefs[VIEW_TYPE] = viewType
         }
     }
 
