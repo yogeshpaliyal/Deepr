@@ -55,6 +55,7 @@
     <string name="suggestions_label">Suggestions:</string>
     <string name="filter">Filter</string>
     <string name="load_more_tags">+%d more</string>
+    <string name="number_tags">Tags: %d</string>
     <string name="show_less_tags">Show less</string>
     <string name="add_shortcut">Add shortcut</string>
     <string name="edit_shortcut">Edit shortcut</string>
