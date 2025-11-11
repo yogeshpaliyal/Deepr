@@ -34,6 +34,7 @@ class AppPreferenceDataStore(
         private val IS_THUMBNAIL_ENABLE = booleanPreferencesKey("is_thumbnail_enable")
         private val SERVER_PORT = stringPreferencesKey("server_port")
         private val VIEW_TYPE = intPreferencesKey("view_type")
+        private val THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -99,6 +100,11 @@ class AppPreferenceDataStore(
     val getServerPort: Flow<String> =
         context.appDataStore.data.map { preferences ->
             preferences[SERVER_PORT] ?: "" // Default to empty string
+        }
+
+    val getThemeMode: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[THEME_MODE] ?: "light" // Default to light theme
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -182,6 +188,12 @@ class AppPreferenceDataStore(
     suspend fun setServerPort(port: String) {
         context.appDataStore.edit { prefs ->
             prefs[SERVER_PORT] = port
+        }
+    }
+
+    suspend fun setThemeMode(mode: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[THEME_MODE] = mode
         }
     }
 }
