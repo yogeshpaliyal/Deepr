@@ -51,6 +51,7 @@ import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
+import com.yogeshpaliyal.deepr.ui.components.ThemeSelectionDialog
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
@@ -60,6 +61,7 @@ import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
+import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
@@ -85,6 +87,10 @@ fun SettingsScreen(
     // Collect language preference state
     val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
     var showLanguageDialog by remember { mutableStateOf(false) }
+
+    // Collect theme preference state
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+    var showThemeDialog by remember { mutableStateOf(false) }
 
     // Collect default page preference state
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
@@ -202,6 +208,20 @@ fun SettingsScreen(
                         },
                     onClick = {
                         showLanguageDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Moon,
+                    title = "Theme",
+                    description =
+                        when (themeMode) {
+                            "light" -> "Light"
+                            "dark" -> "Dark"
+                            else -> "System default"
+                        },
+                    onClick = {
+                        showThemeDialog = true
                     },
                 )
 
@@ -351,6 +371,18 @@ fun SettingsScreen(
                     (context as? MainActivity)?.recreate()
                 },
                 onDismiss = { showLanguageDialog = false },
+            )
+        }
+
+        // Theme Selection Dialog
+        if (showThemeDialog) {
+            ThemeSelectionDialog(
+                currentThemeMode = themeMode,
+                onThemeSelect = { selectedTheme ->
+                    viewModel.setThemeMode(selectedTheme)
+                    showThemeDialog = false
+                },
+                onDismiss = { showThemeDialog = false },
             )
         }
     }

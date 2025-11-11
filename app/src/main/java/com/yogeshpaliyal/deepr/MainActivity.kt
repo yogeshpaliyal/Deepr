@@ -80,7 +80,10 @@ class MainActivity : ComponentActivity() {
         getLinkFromIntent(intent)
 
         setContent {
-            DeeprTheme {
+            val preferenceDataStore = remember { AppPreferenceDataStore(this) }
+            val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(initialValue = "system")
+
+            DeeprTheme(themeMode = themeMode) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {

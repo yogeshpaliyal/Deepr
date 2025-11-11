@@ -573,6 +573,17 @@ class AccountViewModel(
         }
     }
 
+    // Theme preference methods
+    val themeMode =
+        preferenceDataStore.getThemeMode
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
+    fun setThemeMode(mode: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setThemeMode(mode)
+        }
+    }
+
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceDataStore.getAutoBackupEnabled
