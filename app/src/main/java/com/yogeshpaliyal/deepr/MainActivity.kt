@@ -26,6 +26,8 @@ import com.yogeshpaliyal.deepr.ui.screens.AboutUs
 import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
 import com.yogeshpaliyal.deepr.ui.screens.BackupScreen
 import com.yogeshpaliyal.deepr.ui.screens.BackupScreenContent
+import com.yogeshpaliyal.deepr.ui.screens.ImportPreviewScreen
+import com.yogeshpaliyal.deepr.ui.screens.ImportPreviewScreenContent
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServerScreen
 import com.yogeshpaliyal.deepr.ui.screens.RestoreScreen
@@ -179,6 +181,11 @@ fun Dashboard(
                     is RestoreScreen ->
                         NavEntry(key) {
                             RestoreScreenContent(backStack)
+                        }
+
+                    is ImportPreviewScreen ->
+                        NavEntry(key) {
+                            ImportPreviewScreenContent(key.uri, backStack)
                         }
 
                     else -> NavEntry(Unit) { Text("Unknown route") }

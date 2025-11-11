@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.backup.importer.TextFileImporter
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.components.SettingsSection
@@ -57,6 +58,14 @@ fun RestoreScreenContent(
     // Get available importers from the view model
     val availableImporters = remember { viewModel.getAvailableImporters() }
 
+    // Separate text file importer for special handling
+    val textFileImporter = remember {
+        availableImporters.firstOrNull { it is TextFileImporter }
+    }
+    val otherImporters = remember {
+        availableImporters.filterNot { it is TextFileImporter }
+    }
+
     // Track which importer is being used for the current file picker
     var selectedImporter by remember {
         mutableStateOf<com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter?>(
@@ -64,7 +73,17 @@ fun RestoreScreenContent(
         )
     }
 
-    // Launcher for picking files to import
+    // Launcher for picking text files to preview
+    val textFilePreviewLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            uri?.let {
+                backStack.add(ImportPreviewScreen(it))
+            }
+        }
+
+    // Launcher for picking files to import directly
     val importFileLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument(),
@@ -132,8 +151,20 @@ fun RestoreScreenContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             SettingsSection("Import") {
-                // Add import options for each available importer
-                availableImporters.forEach { importer ->
+                // Add special handling for text file import with preview
+                textFileImporter?.let { importer ->
+                    SettingsItem(
+                        TablerIcons.Download,
+                        title = "Import from ${importer.getDisplayName()}",
+                        description = "Import links from ${importer.getDisplayName()} with preview",
+                        onClick = {
+                            textFilePreviewLauncher.launch(importer.getSupportedMimeTypes())
+                        },
+                    )
+                }
+
+                // Add import options for other importers (direct import)
+                otherImporters.forEach { importer ->
                     SettingsItem(
                         TablerIcons.Download,
                         title = "Import from ${importer.getDisplayName()}",
