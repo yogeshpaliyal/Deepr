@@ -73,7 +73,7 @@ import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import org.koin.androidx.compose.koinViewModel
 
-object Settings: TopLevelRoute {
+object Settings : TopLevelRoute {
     @Composable
     override fun Content() {
         SettingsScreen()
@@ -81,7 +81,6 @@ object Settings: TopLevelRoute {
 
     override val icon: ImageVector
         get() = TablerIcons.Settings
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)

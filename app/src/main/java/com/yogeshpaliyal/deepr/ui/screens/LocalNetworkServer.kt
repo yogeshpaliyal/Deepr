@@ -78,12 +78,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-object LocalNetworkServer: Screen {
+object LocalNetworkServer : Screen {
     @Composable
     override fun Content() {
         LocalNetworkServerScreen()
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)

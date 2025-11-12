@@ -45,8 +45,7 @@ import compose.icons.tablericons.BrandGithub
 import compose.icons.tablericons.BrandLinkedin
 import compose.icons.tablericons.BrandTwitter
 
-object AboutUs: Screen {
-
+object AboutUs : Screen {
     @Composable
     override fun Content() {
         AboutUsScreen()
@@ -55,9 +54,7 @@ object AboutUs: Screen {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutUsScreen(
-    modifier: Modifier = Modifier,
-) {
+fun AboutUsScreen(modifier: Modifier = Modifier) {
     val backStack = LocalNavigator.current
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 

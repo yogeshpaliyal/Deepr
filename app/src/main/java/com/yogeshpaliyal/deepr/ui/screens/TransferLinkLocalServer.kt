@@ -73,12 +73,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
-object TransferLinkLocalNetworkServer: Screen {
+object TransferLinkLocalNetworkServer : Screen {
     @Composable
     override fun Content() {
         TransferLinkLocalServerScreen()
     }
-
 }
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)

@@ -6,10 +6,9 @@ import com.yogeshpaliyal.deepr.TopLevelRoute
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 
-class ScanQRVirtualScreen: TopLevelRoute {
+class ScanQRVirtualScreen : TopLevelRoute {
     @Composable
     override fun Content() {
-
     }
 
     override val icon: ImageVector

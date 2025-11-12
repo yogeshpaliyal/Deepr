@@ -44,12 +44,11 @@ import compose.icons.tablericons.Download
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
-object RestoreScreen: Screen {
+object RestoreScreen : Screen {
     @Composable
     override fun Content() {
         RestoreScreenContent()
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

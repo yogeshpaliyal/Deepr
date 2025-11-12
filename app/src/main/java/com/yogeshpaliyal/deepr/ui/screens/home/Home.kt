@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
@@ -88,7 +87,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.LocalNavigator
@@ -114,7 +112,6 @@ import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.MoreOptionsBottomSheet
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ResetCounter
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Shortcut
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ShowQrCode
-import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -144,7 +141,6 @@ import org.koin.compose.koinInject
 
 data object Home
 
-
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeMaterialsApi::class,
@@ -163,10 +159,9 @@ class Dashboard2(
         HomeScreen(
             mSelectedLink = mSelectedLink,
             sharedText = sharedText,
-            resetSharedText = resetSharedText
+            resetSharedText = resetSharedText,
         )
     }
-
 }
 
 @OptIn(
@@ -200,7 +195,6 @@ fun HomeScreen(
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
     val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
     val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
-
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
@@ -320,8 +314,7 @@ fun HomeScreen(
                         .hazeEffect(
                             state = hazeState,
                             style = HazeMaterials.ultraThin(),
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             ) {
                 AppBarWithSearch(
                     windowInsets = WindowInsets(),
@@ -393,7 +386,6 @@ fun HomeScreen(
                                 contentDescription = stringResource(R.string.tags),
                             )
                         }
-
                     },
                     floatingActionButton = {
                         FloatingToolbarDefaults.VibrantFloatingActionButton(onClick = {

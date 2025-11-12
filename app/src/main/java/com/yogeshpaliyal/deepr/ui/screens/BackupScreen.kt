@@ -51,7 +51,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-object BackupScreen: Screen {
+object BackupScreen : Screen {
     @Composable
     override fun Content() {
         BackupScreenContent()

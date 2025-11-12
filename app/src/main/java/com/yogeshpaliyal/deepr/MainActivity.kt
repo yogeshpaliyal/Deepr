@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val preferenceDataStore = remember { AppPreferenceDataStore(this) }
             val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
-                initialValue = "system"
+                initialValue = "system",
             )
 
             DeeprTheme(themeMode = themeMode) {
@@ -151,15 +151,16 @@ interface TopLevelRoute : Screen {
     val icon: ImageVector
 }
 
-
 private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Dashboard2 {}, ScanQRVirtualScreen(), Settings)
 
-class TopLevelBackStack<T : Any>(startKey: T) {
-
+class TopLevelBackStack<T : Any>(
+    startKey: T,
+) {
     // Maintain a stack for each top level route
-    private var topLevelStacks: LinkedHashMap<T, SnapshotStateList<T>> = linkedMapOf(
-        startKey to mutableStateListOf(startKey)
-    )
+    private var topLevelStacks: LinkedHashMap<T, SnapshotStateList<T>> =
+        linkedMapOf(
+            startKey to mutableStateListOf(startKey),
+        )
 
     // Expose the current top level route for consumers
     var topLevelKey by mutableStateOf(startKey)
@@ -174,14 +175,12 @@ class TopLevelBackStack<T : Any>(startKey: T) {
             addAll(topLevelStacks.flatMap { it.value })
         }
 
-
     fun clearStackAndAdd(key: T) {
         topLevelStacks.clear()
         addTopLevel(key)
     }
 
     fun addTopLevel(key: T) {
-
         // If the top level doesn't exist, add it
         if (topLevelStacks[key] == null) {
             topLevelStacks.put(key, mutableStateListOf(key))
@@ -243,13 +242,12 @@ fun Dashboard(
         }
 
     CompositionLocalProvider(LocalNavigator provides backStack) {
-
         Scaffold(
             bottomBar = {
                 AnimatedVisibility(
                     (TOP_LEVEL_ROUTES.any { it::class == current::class }),
                     enter = slideInVertically(initialOffsetY = { it }),
-                    exit = slideOutVertically(targetOffsetY = { it })
+                    exit = slideOutVertically(targetOffsetY = { it }),
                 ) {
                     BottomAppBar(scrollBehavior = scrollBehavior) {
                         TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
@@ -266,26 +264,26 @@ fun Dashboard(
                                 icon = {
                                     Icon(
                                         imageVector = topLevelRoute.icon,
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
-                                }
+                                },
                             )
                         }
                     }
                 }
-            }
+            },
         ) { contentPadding ->
             NavDisplay(
                 modifier = Modifier.padding(contentPadding),
                 backStack = backStack.backStack,
                 entryDecorators =
-                listOf(
-                    // Add the default decorators for managing scenes and saving state
-                    rememberSceneSetupNavEntryDecorator(),
-                    rememberSavedStateNavEntryDecorator(),
-                    // Then add the view model store decorator
-                    rememberViewModelStoreNavEntryDecorator(),
-                ),
+                    listOf(
+                        // Add the default decorators for managing scenes and saving state
+                        rememberSceneSetupNavEntryDecorator(),
+                        rememberSavedStateNavEntryDecorator(),
+                        // Then add the view model store decorator
+                        rememberViewModelStoreNavEntryDecorator(),
+                    ),
                 onBack = {
                     backStack.removeLast()
                 },
@@ -293,7 +291,7 @@ fun Dashboard(
                     NavEntry(it) {
                         it.Content()
                     }
-                }
+                },
             )
         }
     }
