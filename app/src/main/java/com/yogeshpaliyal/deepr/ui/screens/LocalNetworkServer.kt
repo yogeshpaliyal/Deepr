@@ -60,9 +60,9 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.lightspark.composeqr.QrCodeView
-import com.yogeshpaliyal.deepr.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Screen
+import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import compose.icons.TablerIcons

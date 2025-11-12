@@ -48,10 +48,10 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.TopLevelRoute
+import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.ThemeSelectionDialog
@@ -81,6 +81,8 @@ object Settings : TopLevelRoute {
 
     override val icon: ImageVector
         get() = TablerIcons.Settings
+    override val label: Int
+        get() = R.string.settings
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -185,6 +187,8 @@ fun SettingsScreen(
                         navigatorContext.add(LocalNetworkServer)
                     },
                 )
+
+                ScanQRCode()
 
                 SettingsItem(
                     TablerIcons.Settings,

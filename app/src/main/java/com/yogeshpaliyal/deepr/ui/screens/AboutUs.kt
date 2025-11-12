@@ -36,9 +36,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Screen
+import com.yogeshpaliyal.deepr.ui.Screen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.BrandGithub

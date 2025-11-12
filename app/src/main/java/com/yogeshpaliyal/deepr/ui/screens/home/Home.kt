@@ -39,6 +39,7 @@ import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -89,11 +90,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
-import com.yogeshpaliyal.deepr.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
-import com.yogeshpaliyal.deepr.TopLevelRoute
+import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
@@ -135,9 +136,8 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 data object Home
 
@@ -153,6 +153,8 @@ class Dashboard2(
 ) : TopLevelRoute {
     override val icon: ImageVector
         get() = TablerIcons.Home
+    override val label: Int
+        get() = R.string.home
 
     @Composable
     override fun Content() {
@@ -172,14 +174,13 @@ class Dashboard2(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
     mSelectedLink: GetLinksAndTags? = null,
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
-    var isTagsSelectionActive by remember { mutableStateOf(false) }
+    val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
 
@@ -193,7 +194,6 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
-    val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
     val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
 
     // Handle shared text from other apps
@@ -366,40 +366,16 @@ fun HomeScreen(
                 }
             }
         },
-        bottomBar = {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
-                HorizontalFloatingToolbar(
-                    expanded = true,
-                    scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = FloatingToolbarExitDirection.Bottom),
-                    colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
-                    content = {
-                        IconButton(onClick = {
-                            isTagsSelectionActive = true
-                        }) {
-                            Icon(
-                                TablerIcons.Tag,
-                                contentDescription = stringResource(R.string.tags),
-                            )
-                        }
-                    },
-                    floatingActionButton = {
-                        FloatingToolbarDefaults.VibrantFloatingActionButton(onClick = {
-                            selectedLink = createDeeprObject()
-                        }) {
-                            Icon(
-                                TablerIcons.Plus,
-                                contentDescription = stringResource(R.string.add_link),
-                            )
-                        }
-                    },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                selectedLink = createDeeprObject()
+            }) {
+                Icon(
+                    TablerIcons.Plus,
+                    contentDescription = stringResource(R.string.add_link),
                 )
             }
-        },
+        }
     ) { contentPadding ->
         Box(
             modifier =
@@ -407,6 +383,7 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             Content(
+                viewModel = viewModel,
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
                 selectedTag = selectedTag,
@@ -433,32 +410,6 @@ fun HomeScreen(
                 resetSharedText()
             }
         }
-
-        if (isTagsSelectionActive) {
-            TagSelectionBottomSheet(
-                tagsWithCount = allTagsWithCount,
-                selectedTag = selectedTag,
-                dismissBottomSheet = {
-                    isTagsSelectionActive = false
-                },
-                setTagFilter = { viewModel.setTagFilter(it) },
-                editTag = { tag ->
-                    runBlocking {
-                        try {
-                            viewModel.updateTag(tag)
-                            Result.success(true)
-                        } catch (e: Exception) {
-                            return@runBlocking Result.failure(e)
-                        }
-                    }
-                },
-                deleteTag = {
-                    viewModel.deleteTag(it.id)
-                    Result.success(true)
-                },
-                deeprQueries = deeprQueries,
-            )
-        }
     }
 }
 
@@ -472,7 +423,7 @@ fun Content(
     searchQuery: String,
     favouriteFilter: Int,
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = koinViewModel(),
+    viewModel: AccountViewModel,
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()

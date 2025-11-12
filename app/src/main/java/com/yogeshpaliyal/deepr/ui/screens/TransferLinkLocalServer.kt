@@ -56,9 +56,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.journeyapps.barcodescanner.ScanOptions
 import com.lightspark.composeqr.QrCodeView
-import com.yogeshpaliyal.deepr.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Screen
+import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.server.LocalServerTransferLink
 import com.yogeshpaliyal.deepr.util.QRScanner

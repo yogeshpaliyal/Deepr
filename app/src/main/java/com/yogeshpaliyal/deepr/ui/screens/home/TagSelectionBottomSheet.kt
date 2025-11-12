@@ -24,14 +24,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -47,175 +46,44 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Plus
+import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
+import kotlinx.coroutines.runBlocking
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinActivityViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TagSelectionBottomSheet(
-    tagsWithCount: List<GetAllTagsWithCount>,
-    selectedTag: List<Tags>,
-    dismissBottomSheet: () -> Unit,
-    setTagFilter: (Tags?) -> Unit,
-    editTag: (Tags) -> Result<Boolean>,
-    deleteTag: (Tags) -> Result<Boolean>,
-    deeprQueries: com.yogeshpaliyal.deepr.DeeprQueries,
-    modifier: Modifier = Modifier,
-) {
-    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
-    var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
-    var tagEditError by remember { mutableStateOf<String?>(null) }
-    val context = LocalContext.current
-    var newTagName by remember { mutableStateOf("") }
 
-    isTagEditEnable?.let { tag ->
-        AlertDialog(
-            onDismissRequest = {
-                isTagEditEnable = null
-                tagEditError = null
-            },
-            title = {
-                Text(text = stringResource(R.string.edit_tag))
-            },
-            text = {
-                Column {
-                    TextField(
-                        value = tag.name,
-                        onValueChange = {
-                            isTagEditEnable = tag.copy(name = it)
-                        },
-                        isError = tagEditError != null,
-                        supportingText = {
-                            tagEditError?.let {
-                                Text(text = it)
-                            }
-                        },
-                        suffix =
-                            if (isTagEditEnable?.name.isNullOrEmpty()) {
-                                null
-                            } else {
-                                {
-                                    ClearInputIconButton(
-                                        onClick = {
-                                            isTagEditEnable = tag.copy(name = "")
-                                        },
-                                    )
-                                }
-                            },
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val result = editTag(Tags(tag.id, tag.name))
-                    if (result.isFailure) {
-                        val exception = result.exceptionOrNull()
-                        tagEditError =
-                            when (exception) {
-                                is SQLiteConstraintException -> {
-                                    context.getString(R.string.tag_name_exists)
-                                }
+object TagSelectionScreen : TopLevelRoute {
+    override val icon: ImageVector
+        get() = TablerIcons.Tag
+    override val label: Int
+        get() = R.string.tags
 
-                                else -> {
-                                    context.getString(R.string.failed_to_edit_tag)
-                                }
-                            }
-                    } else {
-                        isTagEditEnable = null
-                        tagEditError = null
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(R.string.tag_edited_successfully),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    }
-                }) {
-                    Text(stringResource(R.string.edit))
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    isTagEditEnable = null
-                    tagEditError = null
-                }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-        )
-    }
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() {
+        val viewModel: AccountViewModel = koinActivityViewModel()
+        val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
+        var newTagName by remember { mutableStateOf("") }
+        val tagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+        val context = LocalContext.current
+        val deeprQueries: DeeprQueries = koinInject()
+        var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
+        var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
+        var tagEditError by remember { mutableStateOf<String?>(null) }
 
-    isTagDeleteEnable?.let { tag ->
-        AlertDialog(
-            onDismissRequest = {
-                isTagDeleteEnable = null
-            },
-            title = {
-                Text(text = stringResource(R.string.delete_tag))
-            },
-            text = {
-                val message =
-                    buildAnnotatedString {
-                        append("Are you sure you want to delete ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("'${tag.name}'")
-                        }
-                        append(" tag?")
-                    }
-                Text(text = message)
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val result = deleteTag(Tags(tag.id, tag.name))
-                        if (result.isFailure) {
-                            Toast
-                                .makeText(
-                                    context,
-                                    context.getString(
-                                        R.string.failed_to_delete_tag,
-                                        result.exceptionOrNull(),
-                                    ),
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        } else {
-                            isTagDeleteEnable = null
-                            Toast
-                                .makeText(
-                                    context,
-                                    context.getString(R.string.tag_deleted_successfully),
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        }
-                    },
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                        ),
-                ) {
-                    Text(stringResource(R.string.delete))
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = {
-                    isTagDeleteEnable = null
-                }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-        )
-    }
-
-    ModalBottomSheet(sheetState = modalBottomSheetState, onDismissRequest = dismissBottomSheet) {
-        Column(modifier) {
+        Column {
             TopAppBar(
                 title = {
                     Row(
@@ -300,7 +168,7 @@ fun TagSelectionBottomSheet(
                         ListItem(
                             modifier =
                                 Modifier.clickable {
-                                    setTagFilter(null)
+                                    viewModel.setTagFilter(null)
                                 },
                             headlineContent = {
                                 Text(
@@ -336,14 +204,14 @@ fun TagSelectionBottomSheet(
                     ListItem(
                         modifier =
                             Modifier.clickable {
-                                setTagFilter(Tags(tag.id, tag.name))
+                                viewModel.setTagFilter(Tags(tag.id, tag.name))
                                 // Don't dismiss to allow multi-selection
                             },
                         leadingContent = {
                             androidx.compose.material3.Checkbox(
                                 checked = isSelected,
                                 onCheckedChange = {
-                                    setTagFilter(Tags(tag.id, tag.name))
+                                    viewModel.setTagFilter(Tags(tag.id, tag.name))
                                 },
                             )
                         },
@@ -380,6 +248,141 @@ fun TagSelectionBottomSheet(
                     )
                 }
             }
+        }
+
+        isTagEditEnable?.let { tag ->
+            AlertDialog(
+                onDismissRequest = {
+                    isTagEditEnable = null
+                    tagEditError = null
+                },
+                title = {
+                    Text(text = stringResource(R.string.edit_tag))
+                },
+                text = {
+                    Column {
+                        TextField(
+                            value = tag.name,
+                            onValueChange = {
+                                isTagEditEnable = tag.copy(name = it)
+                            },
+                            isError = tagEditError != null,
+                            supportingText = {
+                                tagEditError?.let {
+                                    Text(text = it)
+                                }
+                            },
+                            suffix =
+                                if (isTagEditEnable?.name.isNullOrEmpty()) {
+                                    null
+                                } else {
+                                    {
+                                        ClearInputIconButton(
+                                            onClick = {
+                                                isTagEditEnable = tag.copy(name = "")
+                                            },
+                                        )
+                                    }
+                                },
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        val result = runBlocking {
+                            try {
+                                viewModel.updateTag(Tags(tag.id, tag.name))
+                                Result.success(true)
+                            } catch (e: Exception) {
+                                return@runBlocking Result.failure(e)
+                            }
+                        }
+                        if (result.isFailure) {
+                            val exception = result.exceptionOrNull()
+                            tagEditError =
+                                when (exception) {
+                                    is SQLiteConstraintException -> {
+                                        context.getString(R.string.tag_name_exists)
+                                    }
+
+                                    else -> {
+                                        context.getString(R.string.failed_to_edit_tag)
+                                    }
+                                }
+                        } else {
+                            isTagEditEnable = null
+                            tagEditError = null
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.tag_edited_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                    }) {
+                        Text(stringResource(R.string.edit))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        isTagEditEnable = null
+                        tagEditError = null
+                    }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+            )
+        }
+
+        isTagDeleteEnable?.let { tag ->
+            AlertDialog(
+                onDismissRequest = {
+                    isTagDeleteEnable = null
+                },
+                title = {
+                    Text(text = stringResource(R.string.delete_tag))
+                },
+                text = {
+                    val message =
+                        buildAnnotatedString {
+                            append("Are you sure you want to delete ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("'${tag.name}'")
+                            }
+                            append(" tag?")
+                        }
+                    Text(text = message)
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteTag(tag.id)
+
+                            isTagDeleteEnable = null
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.tag_deleted_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        },
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                            ),
+                    ) {
+                        Text(stringResource(R.string.delete))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = {
+                        isTagDeleteEnable = null
+                    }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+            )
         }
     }
 }
