@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -47,8 +48,10 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.LocalNavigator
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.ThemeSelectionDialog
@@ -70,16 +73,25 @@ import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import org.koin.androidx.compose.koinViewModel
 
-data object Settings
+object Settings: TopLevelRoute {
+    @Composable
+    override fun Content() {
+        SettingsScreen()
+    }
+
+    override val icon: ImageVector
+        get() = TablerIcons.Settings
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val navigatorContext = LocalNavigator.current
 
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
@@ -97,10 +109,12 @@ fun SettingsScreen(
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(),
         modifier = modifier.fillMaxSize(),
         topBar = {
             Column {
                 TopAppBar(
+                    windowInsets = WindowInsets(),
                     title = {
                         Text(stringResource(R.string.settings))
                     },
@@ -108,7 +122,7 @@ fun SettingsScreen(
                         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
                         IconButton(onClick = {
-                            backStack.removeLastOrNull()
+                            navigatorContext.removeLast()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
@@ -126,8 +140,8 @@ fun SettingsScreen(
                 ServerStatusBar(
                     onServerStatusClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
-                        if (backStack.lastOrNull() !is LocalNetworkServer) {
-                            backStack.add(LocalNetworkServer)
+                        if (navigatorContext.getLast() !is LocalNetworkServer) {
+                            navigatorContext.add(LocalNetworkServer)
                         }
                     },
                 )
@@ -150,7 +164,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.backup),
                     description = "Export to CSV, Local file sync, Auto backup",
                     onClick = {
-                        backStack.add(BackupScreen)
+                        navigatorContext.add(BackupScreen)
                     },
                 )
 
@@ -159,7 +173,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.restore),
                     description = "Import from CSV, Bookmarks, and other formats",
                     onClick = {
-                        backStack.add(RestoreScreen)
+                        navigatorContext.add(RestoreScreen)
                     },
                 )
             }
@@ -169,7 +183,7 @@ fun SettingsScreen(
                     TablerIcons.Server,
                     title = stringResource(R.string.local_network_server),
                     onClick = {
-                        backStack.add(LocalNetworkServer)
+                        navigatorContext.add(LocalNetworkServer)
                     },
                 )
 
@@ -332,7 +346,7 @@ fun SettingsScreen(
                     TablerIcons.InfoCircle,
                     title = stringResource(R.string.about_us),
                     onClick = {
-                        backStack.add(AboutUs)
+                        navigatorContext.add(AboutUs)
                     },
                 )
             }

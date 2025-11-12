@@ -39,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -61,7 +60,9 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.lightspark.composeqr.QrCodeView
+import com.yogeshpaliyal.deepr.LocalNavigator
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.Screen
 import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import compose.icons.TablerIcons
@@ -77,16 +78,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-data object LocalNetworkServer
+object LocalNetworkServer: Screen {
+    @Composable
+    override fun Content() {
+        LocalNetworkServerScreen()
+    }
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LocalNetworkServerScreen(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: LocalServerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val navigatorContext = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
     val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
     val serverUrl by viewModel.serverUrl.collectAsStateWithLifecycle()
@@ -130,7 +137,7 @@ fun LocalNetworkServerScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        backStack.removeLastOrNull()
+                        navigatorContext.removeLast()
                     }) {
                         Icon(
                             TablerIcons.ArrowLeft,

@@ -19,11 +19,11 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -72,7 +72,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -92,9 +91,11 @@ import coil3.compose.AsyncImage
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.LocalNavigator
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.TopLevelRoute
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
@@ -104,7 +105,6 @@ import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
-import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Click
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Copy
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Delete
@@ -122,13 +122,13 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Edit
+import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
-import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
@@ -144,6 +144,31 @@ import org.koin.compose.koinInject
 
 data object Home
 
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalHazeMaterialsApi::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+)
+class Dashboard2(
+    val mSelectedLink: GetLinksAndTags? = null,
+    val sharedText: SharedLink? = null,
+    val resetSharedText: () -> Unit,
+) : TopLevelRoute {
+    override val icon: ImageVector
+        get() = TablerIcons.Home
+
+    @Composable
+    override fun Content() {
+        HomeScreen(
+            mSelectedLink = mSelectedLink,
+            sharedText = sharedText,
+            resetSharedText = resetSharedText
+        )
+    }
+
+}
+
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeMaterialsApi::class,
@@ -151,18 +176,19 @@ data object Home
 )
 @Composable
 fun HomeScreen(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
     deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
+    mSelectedLink: GetLinksAndTags? = null,
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
     var isTagsSelectionActive by remember { mutableStateOf(false) }
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
+    val localNavigator = LocalNavigator.current
 
-    var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState(blurEnabled = true)
     val context = LocalContext.current
@@ -175,21 +201,6 @@ fun HomeScreen(
     val allTagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
     val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
 
-    val qrScanner =
-        rememberLauncherForActivityResult(
-            QRScanner(),
-        ) { result ->
-            if (result.contents == null) {
-                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
-            } else {
-                val normalizedLink = normalizeLink(result.contents)
-                if (isValidDeeplink(normalizedLink)) {
-                    selectedLink = createDeeprObject(link = normalizedLink)
-                } else {
-                    Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
@@ -300,6 +311,7 @@ fun HomeScreen(
         }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(),
         modifier = modifier.fillMaxSize(),
         topBar = {
             Column(
@@ -308,9 +320,11 @@ fun HomeScreen(
                         .hazeEffect(
                             state = hazeState,
                             style = HazeMaterials.ultraThin(),
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             ) {
                 AppBarWithSearch(
+                    windowInsets = WindowInsets(),
                     scrollBehavior = scrollBehavior,
                     state = searchBarState,
                     inputField = inputField,
@@ -323,8 +337,8 @@ fun HomeScreen(
                     onServerStatusClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
                         analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
-                        if (backStack.lastOrNull() !is LocalNetworkServer) {
-                            backStack.add(LocalNetworkServer)
+                        if (localNavigator.getLast() !is LocalNetworkServer) {
+                            localNavigator.add(LocalNetworkServer)
                         }
                     },
                 )
@@ -363,8 +377,7 @@ fun HomeScreen(
             Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding(),
+                        .fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
                 HorizontalFloatingToolbar(
@@ -373,15 +386,6 @@ fun HomeScreen(
                     colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
                     content = {
                         IconButton(onClick = {
-                            analyticsManager.logEvent(AnalyticsEvents.SCAN_QR_CODE)
-                            qrScanner.launch(ScanOptions())
-                        }) {
-                            Icon(
-                                TablerIcons.Qrcode,
-                                contentDescription = stringResource(R.string.qr_scanner),
-                            )
-                        }
-                        IconButton(onClick = {
                             isTagsSelectionActive = true
                         }) {
                             Icon(
@@ -389,16 +393,7 @@ fun HomeScreen(
                                 contentDescription = stringResource(R.string.tags),
                             )
                         }
-                        IconButton(onClick = {
-                            // Settings action
-                            analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_SETTINGS)
-                            backStack.add(Settings)
-                        }) {
-                            Icon(
-                                TablerIcons.Settings,
-                                contentDescription = stringResource(R.string.settings),
-                            )
-                        }
+
                     },
                     floatingActionButton = {
                         FloatingToolbarDefaults.VibrantFloatingActionButton(onClick = {
@@ -549,7 +544,7 @@ fun Content(
                 showDeleteConfirmDialog = it.item
             }
 
-            is MenuItem.Edit -> {
+            is Edit -> {
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_EDIT)
                 editDeepr(it.item)
             }
@@ -598,7 +593,7 @@ fun Content(
                 Modifier
                     .weight(1f)
                     .hazeSource(state = hazeState)
-                    .padding(8.dp),
+                    .padding(horizontal = 8.dp),
             contentPaddingValues = contentPaddingValues,
             accounts = accounts!!,
             selectedTag = selectedTag,
