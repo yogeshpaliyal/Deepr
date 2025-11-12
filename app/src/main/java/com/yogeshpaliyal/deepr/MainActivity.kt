@@ -129,10 +129,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
     listOf(Dashboard2 {}, TagSelectionScreen, Settings)
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,14 +139,15 @@ fun Dashboard(
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
-    val backStack = remember {
-        TopLevelBackStack<Screen>(
-            Dashboard2(
-                sharedText = sharedText,
-                resetSharedText = resetSharedText
+    val backStack =
+        remember {
+            TopLevelBackStack<Screen>(
+                Dashboard2(
+                    sharedText = sharedText,
+                    resetSharedText = resetSharedText,
+                ),
             )
-        )
-    }
+        }
     val current = backStack.getLast()
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
     val hapticFeedback = LocalHapticFeedback.current

@@ -63,7 +63,6 @@ import kotlinx.coroutines.runBlocking
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
-
 object TagSelectionScreen : TopLevelRoute {
     override val icon: ImageVector
         get() = TablerIcons.Tag
@@ -289,14 +288,15 @@ object TagSelectionScreen : TopLevelRoute {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        val result = runBlocking {
-                            try {
-                                viewModel.updateTag(Tags(tag.id, tag.name))
-                                Result.success(true)
-                            } catch (e: Exception) {
-                                return@runBlocking Result.failure(e)
+                        val result =
+                            runBlocking {
+                                try {
+                                    viewModel.updateTag(Tags(tag.id, tag.name))
+                                    Result.success(true)
+                                } catch (e: Exception) {
+                                    return@runBlocking Result.failure(e)
+                                }
                             }
-                        }
                         if (result.isFailure) {
                             val exception = result.exceptionOrNull()
                             tagEditError =

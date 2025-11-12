@@ -11,6 +11,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,8 +27,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -38,11 +43,8 @@ import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarExitDirection
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -59,6 +61,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
@@ -67,6 +70,7 @@ import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,14 +94,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
-import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
-import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
@@ -195,6 +199,19 @@ fun HomeScreen(
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
     val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
+    val listState = if (currentViewType == ViewType.GRID) rememberLazyStaggeredGridState() else rememberLazyListState()
+    val isExpanded by remember(listState) {
+        // Example: expanded only when at the very top of the list
+        derivedStateOf {
+            if (listState is LazyStaggeredGridState) {
+                listState.firstVisibleItemIndex == 0
+            } else if (listState is LazyListState) {
+                listState.firstVisibleItemIndex == 0
+            } else {
+                true
+            }
+        }
+    }
 
     // Handle shared text from other apps
     LaunchedEffect(sharedText) {
@@ -367,15 +384,22 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                selectedLink = createDeeprObject()
-            }) {
-                Icon(
-                    TablerIcons.Plus,
-                    contentDescription = stringResource(R.string.add_link),
-                )
-            }
-        }
+            ExtendedFloatingActionButton(
+                icon = {
+                    Icon(
+                        TablerIcons.Plus,
+                        contentDescription = stringResource(R.string.add_link),
+                    )
+                },
+                text = {
+                    Text(stringResource(R.string.add_link))
+                },
+                expanded = isExpanded,
+                onClick = {
+                    selectedLink = createDeeprObject()
+                },
+            )
+        },
     ) { contentPadding ->
         Box(
             modifier =
@@ -383,6 +407,7 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             Content(
+                listState = listState,
                 viewModel = viewModel,
                 hazeState = hazeState,
                 contentPaddingValues = contentPadding,
@@ -416,14 +441,15 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Content(
+    listState: ScrollableState,
     hazeState: HazeState,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
     currentViewType: @ViewType Int,
     searchQuery: String,
     favouriteFilter: Int,
-    modifier: Modifier = Modifier,
     viewModel: AccountViewModel,
+    modifier: Modifier = Modifier,
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
@@ -532,6 +558,7 @@ fun Content(
 
     Column(modifier.fillMaxSize()) {
         DeeprList(
+            listState = listState,
             modifier =
                 Modifier
                     .weight(1f)
@@ -730,7 +757,7 @@ fun Content(
 
                         // Show "Load More" or "Show Less" button if there are more than 9 tags
                         if ((selectedTags?.size ?: 0) > 9) {
-                            androidx.compose.material3.TextButton(
+                            TextButton(
                                 onClick = { tagsExpanded = !tagsExpanded },
                                 modifier = Modifier.padding(start = 4.dp),
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
@@ -798,6 +825,7 @@ fun MenuListItem(
 
 @Composable
 fun DeeprList(
+    listState: ScrollableState,
     accounts: List<GetLinksAndTags>,
     selectedTag: List<Tags>,
     contentPaddingValues: PaddingValues,
@@ -899,6 +927,7 @@ fun DeeprList(
         when (viewType) {
             ViewType.LIST -> {
                 LazyColumn(
+                    state = listState as? LazyListState ?: rememberLazyListState(),
                     modifier = modifier,
                     contentPadding = contentPaddingValues,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -923,6 +952,7 @@ fun DeeprList(
 
             ViewType.GRID -> {
                 LazyVerticalStaggeredGrid(
+                    state = listState as? LazyStaggeredGridState ?: rememberLazyStaggeredGridState(),
                     columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
                     modifier = modifier,
                     contentPadding = contentPaddingValues,
@@ -946,6 +976,7 @@ fun DeeprList(
 
             ViewType.COMPACT -> {
                 LazyColumn(
+                    state = listState as? LazyListState ?: rememberLazyListState(),
                     modifier = modifier,
                     contentPadding = contentPaddingValues,
                     verticalArrangement = Arrangement.spacedBy(4.dp),

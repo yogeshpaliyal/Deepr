@@ -12,7 +12,6 @@ import androidx.navigation3.runtime.NavKey
 import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import kotlin.collections.remove
 
-
 val LocalNavigator =
     compositionLocalOf<TopLevelBackStack<Screen>> { TopLevelBackStack(Dashboard2 {}) }
 

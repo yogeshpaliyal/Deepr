@@ -17,7 +17,6 @@ import com.yogeshpaliyal.deepr.util.normalizeLink
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 
-
 @Composable
 fun ScanQRCode() {
     val navigatorContext = LocalNavigator.current
@@ -34,10 +33,12 @@ fun ScanQRCode() {
                 if (isValidDeeplink(normalizedLink)) {
                     navigatorContext.clearStackAndAdd(
                         Dashboard2(
-                            mSelectedLink = createDeeprObject(
-                                link = normalizedLink
-                            )
-                        ) {})
+                            mSelectedLink =
+                                createDeeprObject(
+                                    link = normalizedLink,
+                                ),
+                        ) {},
+                    )
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
                 }
@@ -51,5 +52,4 @@ fun ScanQRCode() {
             qrScanner.launch(ScanOptions())
         },
     )
-
 }
