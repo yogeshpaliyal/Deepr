@@ -39,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -60,6 +59,8 @@ import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.server.LocalServerTransferLink
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import compose.icons.TablerIcons
@@ -72,16 +73,21 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
-data object TransferLinkLocalNetworkServer
+object TransferLinkLocalNetworkServer : Screen {
+    @Composable
+    override fun Content() {
+        TransferLinkLocalServerScreen()
+    }
+}
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TransferLinkLocalServerScreen(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: TransferLinkLocalServerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val backStack = LocalNavigator.current
     val localServerInstance = koinInject<LocalServerTransferLink>()
     val isRunning by localServerInstance.isRunning.collectAsStateWithLifecycle()
     val serverUrl by localServerInstance.serverUrl.collectAsStateWithLifecycle()
@@ -136,7 +142,7 @@ fun TransferLinkLocalServerScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        backStack.removeLastOrNull()
+                        backStack.removeLast()
                     }) {
                         Icon(
                             TablerIcons.ArrowLeft,

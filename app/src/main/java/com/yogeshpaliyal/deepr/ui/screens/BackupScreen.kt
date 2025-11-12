@@ -24,7 +24,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +33,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.components.SettingsSection
@@ -50,15 +51,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data object BackupScreen
+object BackupScreen : Screen {
+    @Composable
+    override fun Content() {
+        BackupScreenContent()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupScreenContent(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
+    val backStack = LocalNavigator.current
     val context = LocalContext.current
 
     // Launcher for picking CSV export location
@@ -137,7 +143,7 @@ fun BackupScreenContent(
                         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
                         IconButton(onClick = {
-                            backStack.removeLastOrNull()
+                            backStack.removeLast()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
@@ -154,7 +160,7 @@ fun BackupScreenContent(
                 )
                 ServerStatusBar(
                     onServerStatusClick = {
-                        if (backStack.lastOrNull() !is LocalNetworkServer) {
+                        if (backStack.getLast() !is LocalNetworkServer) {
                             backStack.add(LocalNetworkServer)
                         }
                     },

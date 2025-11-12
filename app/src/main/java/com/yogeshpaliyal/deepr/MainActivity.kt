@@ -6,15 +6,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -22,20 +35,14 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import com.yogeshpaliyal.deepr.ui.screens.AboutUs
-import com.yogeshpaliyal.deepr.ui.screens.AboutUsScreen
-import com.yogeshpaliyal.deepr.ui.screens.BackupScreen
-import com.yogeshpaliyal.deepr.ui.screens.BackupScreenContent
-import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
-import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServerScreen
-import com.yogeshpaliyal.deepr.ui.screens.RestoreScreen
-import com.yogeshpaliyal.deepr.ui.screens.RestoreScreenContent
+import com.yogeshpaliyal.deepr.ui.BaseScreen
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.Screen
+import com.yogeshpaliyal.deepr.ui.TopLevelBackStack
+import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.screens.Settings
-import com.yogeshpaliyal.deepr.ui.screens.SettingsScreen
-import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalNetworkServer
-import com.yogeshpaliyal.deepr.ui.screens.TransferLinkLocalServerScreen
-import com.yogeshpaliyal.deepr.ui.screens.home.Home
-import com.yogeshpaliyal.deepr.ui.screens.home.HomeScreen
+import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
+import com.yogeshpaliyal.deepr.ui.screens.home.TagSelectionScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,7 +88,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val preferenceDataStore = remember { AppPreferenceDataStore(this) }
-            val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(initialValue = "system")
+            val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
+                initialValue = "system",
+            )
 
             DeeprTheme(themeMode = themeMode) {
                 Surface {
@@ -123,70 +132,96 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
+    listOf(Dashboard2(), TagSelectionScreen, Settings)
+
+val LocalSharedText =
+    compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(
     modifier: Modifier = Modifier,
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
-    val backStack = remember(sharedText) { mutableStateListOf<Any>(Home) }
+    val backStack =
+        remember {
+            TopLevelBackStack<BaseScreen>(
+                Dashboard2(),
+            )
+        }
+    val current = backStack.getLast()
+    val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+    val hapticFeedback = LocalHapticFeedback.current
+    val layoutDirection = LocalLayoutDirection.current
 
-    Column(modifier = modifier) {
-        NavDisplay(
-            backStack = backStack,
-            entryDecorators =
-                listOf(
-                    // Add the default decorators for managing scenes and saving state
-                    rememberSceneSetupNavEntryDecorator(),
-                    rememberSavedStateNavEntryDecorator(),
-                    // Then add the view model store decorator
-                    rememberViewModelStoreNavEntryDecorator(),
-                ),
-            onBack = { backStack.removeLastOrNull() },
-            entryProvider = { key ->
-                when (key) {
-                    is Home ->
-                        NavEntry(key) {
-                            HomeScreen(
-                                backStack,
-                                sharedText = sharedText,
-                                resetSharedText = resetSharedText,
-                            )
+    CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
+        CompositionLocalProvider(LocalNavigator provides backStack) {
+            Scaffold(
+                modifier = modifier,
+                bottomBar = {
+                    AnimatedVisibility(
+                        (TOP_LEVEL_ROUTES.any { it::class == current::class }),
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it }),
+                    ) {
+                        BottomAppBar(scrollBehavior = scrollBehavior) {
+                            TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
+                                val isSelected =
+                                    topLevelRoute::class == backStack.topLevelKey::class
+                                NavigationBarItem(
+                                    selected = isSelected,
+                                    onClick = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        backStack.addTopLevel(topLevelRoute)
+                                    },
+                                    label = {
+                                        Text(stringResource(topLevelRoute.label))
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = topLevelRoute.icon,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                )
+                            }
                         }
-
-                    is Settings ->
-                        NavEntry(key) {
-                            SettingsScreen(backStack)
+                    }
+                },
+            ) { contentPadding ->
+                NavDisplay(
+                    backStack = backStack.backStack,
+                    entryDecorators =
+                        listOf(
+                            // Add the default decorators for managing scenes and saving state
+                            rememberSceneSetupNavEntryDecorator(),
+                            rememberSavedStateNavEntryDecorator(),
+                            // Then add the view model store decorator
+                            rememberViewModelStoreNavEntryDecorator(),
+                        ),
+                    onBack = {
+                        backStack.removeLast()
+                    },
+                    entryProvider = {
+                        NavEntry(it) { entryItem ->
+                            if (entryItem is TopLevelRoute) {
+                                entryItem.Content(
+                                    WindowInsets(
+                                        left = contentPadding.calculateLeftPadding(layoutDirection),
+                                        right = contentPadding.calculateRightPadding(layoutDirection),
+                                        top = contentPadding.calculateTopPadding(),
+                                        bottom = contentPadding.calculateBottomPadding(),
+                                    ),
+                                )
+                            } else if (entryItem is Screen) {
+                                entryItem.Content()
+                            }
                         }
-
-                    is AboutUs ->
-                        NavEntry(key) {
-                            AboutUsScreen(backStack)
-                        }
-
-                    is LocalNetworkServer ->
-                        NavEntry(key) {
-                            LocalNetworkServerScreen(backStack)
-                        }
-
-                    is TransferLinkLocalNetworkServer ->
-                        NavEntry(key) {
-                            TransferLinkLocalServerScreen(backStack)
-                        }
-
-                    is BackupScreen ->
-                        NavEntry(key) {
-                            BackupScreenContent(backStack)
-                        }
-
-                    is RestoreScreen ->
-                        NavEntry(key) {
-                            RestoreScreenContent(backStack)
-                        }
-
-                    else -> NavEntry(Unit) { Text("Unknown route") }
-                }
-            },
-        )
+                    },
+                )
+            }
+        }
     }
 }

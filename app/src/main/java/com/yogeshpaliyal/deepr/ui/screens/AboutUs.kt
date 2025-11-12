@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,20 +37,25 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.Screen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.BrandGithub
 import compose.icons.tablericons.BrandLinkedin
 import compose.icons.tablericons.BrandTwitter
 
-data object AboutUs
+object AboutUs : Screen {
+    @Composable
+    override fun Content() {
+        AboutUsScreen()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutUsScreen(
-    backStack: SnapshotStateList<Any>,
-    modifier: Modifier = Modifier,
-) {
+fun AboutUsScreen(modifier: Modifier = Modifier) {
+    val backStack = LocalNavigator.current
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
@@ -62,7 +66,7 @@ fun AboutUsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        backStack.removeLastOrNull()
+                        backStack.removeLast()
                     }) {
                         Icon(
                             TablerIcons.ArrowLeft,

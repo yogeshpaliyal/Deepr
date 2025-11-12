@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.ui.LocalNavigator
+import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.components.SettingsSection
@@ -43,16 +44,21 @@ import compose.icons.tablericons.Download
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
-data object RestoreScreen
+object RestoreScreen : Screen {
+    @Composable
+    override fun Content() {
+        RestoreScreenContent()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestoreScreenContent(
-    backStack: SnapshotStateList<Any>,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val backStack = LocalNavigator.current
 
     // Get available importers from the view model
     val availableImporters = remember { viewModel.getAvailableImporters() }
@@ -96,7 +102,7 @@ fun RestoreScreenContent(
                         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
                         IconButton(onClick = {
-                            backStack.removeLastOrNull()
+                            backStack.removeLast()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
@@ -113,7 +119,7 @@ fun RestoreScreenContent(
                 )
                 ServerStatusBar(
                     onServerStatusClick = {
-                        if (backStack.lastOrNull() !is LocalNetworkServer) {
+                        if (backStack.getLast() !is LocalNetworkServer) {
                             backStack.add(LocalNetworkServer)
                         }
                     },
