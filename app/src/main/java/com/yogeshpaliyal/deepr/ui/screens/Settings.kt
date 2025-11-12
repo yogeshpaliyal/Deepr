@@ -74,20 +74,21 @@ import compose.icons.tablericons.Upload
 import org.koin.androidx.compose.koinViewModel
 
 object Settings : TopLevelRoute {
-    @Composable
-    override fun Content() {
-        SettingsScreen()
-    }
-
     override val icon: ImageVector
         get() = TablerIcons.Settings
     override val label: Int
         get() = R.string.settings
+
+    @Composable
+    override fun Content(windowInsets: WindowInsets) {
+        SettingsScreen(windowInsets)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
+    windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
@@ -110,12 +111,11 @@ fun SettingsScreen(
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
 
     Scaffold(
-        contentWindowInsets = WindowInsets(),
+        contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
         topBar = {
             Column {
                 TopAppBar(
-                    windowInsets = WindowInsets(),
                     title = {
                         Text(stringResource(R.string.settings))
                     },

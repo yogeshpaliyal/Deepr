@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -13,17 +14,22 @@ import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import kotlin.collections.remove
 
 val LocalNavigator =
-    compositionLocalOf<TopLevelBackStack<Screen>> { TopLevelBackStack(Dashboard2 {}) }
+    compositionLocalOf<TopLevelBackStack<BaseScreen>> { TopLevelBackStack(Dashboard2()) }
 
-interface Screen : NavKey {
+sealed interface BaseScreen : NavKey
+
+interface Screen : BaseScreen {
     @Composable
     fun Content()
 }
 
-interface TopLevelRoute : Screen {
+interface TopLevelRoute : BaseScreen {
     val icon: ImageVector
 
     val label: Int
+
+    @Composable
+    fun Content(windowInsets: WindowInsets)
 }
 
 class TopLevelBackStack<T : Any>(

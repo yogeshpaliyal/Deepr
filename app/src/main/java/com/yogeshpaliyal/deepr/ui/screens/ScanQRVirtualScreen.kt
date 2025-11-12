@@ -37,7 +37,7 @@ fun ScanQRCode() {
                                 createDeeprObject(
                                     link = normalizedLink,
                                 ),
-                        ) {},
+                        ),
                     )
                 } else {
                     Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()

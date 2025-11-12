@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
@@ -33,6 +34,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -60,6 +62,7 @@ import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipAnchorPosition
@@ -81,8 +84,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -94,6 +99,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.Tags
@@ -153,8 +159,6 @@ data object Home
 )
 class Dashboard2(
     val mSelectedLink: GetLinksAndTags? = null,
-    val sharedText: SharedLink? = null,
-    val resetSharedText: () -> Unit,
 ) : TopLevelRoute {
     override val icon: ImageVector
         get() = TablerIcons.Home
@@ -162,12 +166,18 @@ class Dashboard2(
         get() = R.string.home
 
     @Composable
-    override fun Content() {
-        HomeScreen(
-            mSelectedLink = mSelectedLink,
-            sharedText = sharedText,
-            resetSharedText = resetSharedText,
-        )
+    override fun Content(windowInsets: WindowInsets) {
+        val localSharedText = LocalSharedText.current
+        Surface(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
+            HomeScreen(
+                windowInsets,
+                mSelectedLink = mSelectedLink,
+                sharedText = localSharedText?.first,
+                resetSharedText = {
+                    localSharedText?.second?.invoke()
+                },
+            )
+        }
     }
 }
 
@@ -178,6 +188,7 @@ class Dashboard2(
 )
 @Composable
 fun HomeScreen(
+    windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
@@ -188,6 +199,7 @@ fun HomeScreen(
     val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
+    val hapticFeedback = LocalHapticFeedback.current
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -211,6 +223,17 @@ fun HomeScreen(
             } else {
                 true
             }
+        }
+    }
+
+    BackHandler(enabled = selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+        if (searchBarState.currentValue == SearchBarValue.Expanded) {
+            scope.launch {
+                searchBarState.animateToCollapsed()
+            }
+        } else if (selectedTag.isNotEmpty()) {
+            viewModel.setTagFilter(null)
         }
     }
 
@@ -323,7 +346,7 @@ fun HomeScreen(
         }
 
     Scaffold(
-        contentWindowInsets = WindowInsets(),
+        contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
         topBar = {
             Column(
@@ -335,7 +358,6 @@ fun HomeScreen(
                         ).fillMaxWidth(),
             ) {
                 AppBarWithSearch(
-                    windowInsets = WindowInsets(),
                     scrollBehavior = scrollBehavior,
                     state = searchBarState,
                     inputField = inputField,

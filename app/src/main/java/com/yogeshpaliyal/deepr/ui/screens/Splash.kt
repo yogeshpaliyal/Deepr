@@ -31,7 +31,7 @@ object Splash : Screen {
 //            if (isFirstTime) {
 //                navigator.add(IntroScreen)
 //            } else {
-            navigator.clearStackAndAdd(Dashboard2 {})
+            navigator.clearStackAndAdd(Dashboard2())
 //            }
         }
 
