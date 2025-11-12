@@ -133,6 +133,7 @@ import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -381,6 +382,43 @@ fun HomeScreen(
                         label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})") },
                     )
                 }
+
+                // Selected tags filter chips
+                AnimatedVisibility(
+                    visible = selectedTag.isNotEmpty(),
+                    enter = expandVertically(expandFrom = Alignment.Top),
+                    exit = shrinkVertically(shrinkTowards = Alignment.Top),
+                ) {
+                    FlowRow(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        selectedTag.forEach { tag ->
+                            FilterChip(
+                                selected = true,
+                                onClick = { viewModel.setTagFilter(tag) },
+                                label = { Text(tag.name) },
+                                leadingIcon = {
+                                    Icon(
+                                        TablerIcons.Tag,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        TablerIcons.X,
+                                        contentDescription = stringResource(R.string.remove_tag),
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                },
+                            )
+                        }
+                    }
+                }
             }
         },
         floatingActionButton = {
@@ -406,11 +444,18 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize(),
         ) {
+            val layoutDirection = LocalLayoutDirection.current
             Content(
                 listState = listState,
                 viewModel = viewModel,
                 hazeState = hazeState,
-                contentPaddingValues = contentPadding,
+                contentPaddingValues =
+                    PaddingValues(
+                        start = contentPadding.calculateLeftPadding(layoutDirection),
+                        end = contentPadding.calculateRightPadding(layoutDirection),
+                        top = contentPadding.calculateTopPadding() + 8.dp,
+                        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+                    ),
                 selectedTag = selectedTag,
                 currentViewType = currentViewType,
                 searchQuery = textFieldState.text.toString(),
