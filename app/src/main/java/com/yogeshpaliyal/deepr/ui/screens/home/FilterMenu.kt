@@ -16,11 +16,11 @@ import androidx.compose.ui.res.stringResource
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import compose.icons.TablerIcons
+import compose.icons.tablericons.ArrowsSort
 import compose.icons.tablericons.Calendar
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.Eye
 import compose.icons.tablericons.EyeOff
-import compose.icons.tablericons.Filter
 import compose.icons.tablericons.SortAscending
 import compose.icons.tablericons.SortDescending
 
@@ -32,7 +32,7 @@ fun FilterMenu(
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
         IconButton(onClick = { expanded = true }) {
-            Icon(TablerIcons.Filter, contentDescription = stringResource(R.string.filter))
+            Icon(TablerIcons.ArrowsSort, contentDescription = stringResource(R.string.filter))
         }
         DropdownMenu(
             expanded = expanded,
