@@ -13,6 +13,8 @@ import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
 import com.yogeshpaliyal.deepr.data.HtmlParser
+import com.yogeshpaliyal.deepr.data.LinksDataRepository
+import com.yogeshpaliyal.deepr.data.LinksDataRepositoryImpl
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.review.ReviewManager
@@ -101,10 +103,13 @@ class DeeprApplication : Application() {
                     NetworkRepository(get())
                 }
 
+                single<LinksDataRepository> {
+                    LinksDataRepositoryImpl(get())
+                }
+
                 single<LocalServerRepository> {
                     LocalServerRepositoryImpl(
                         androidContext(),
-                        get(),
                         get(),
                         get(),
                         get(),
@@ -116,7 +121,6 @@ class DeeprApplication : Application() {
                 factory {
                     LocalServerTransferLink(
                         androidContext(),
-                        get(),
                         get(),
                         get(),
                         get(),
