@@ -310,7 +310,6 @@ class AccountViewModel(
                     favourite.toLong(),
                     tagIdsString,
                     tagIdsString,
-                    tagCount,
                     sortType,
                     sortField,
                     sortType,
