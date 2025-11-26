@@ -76,7 +76,7 @@ WHERE
       FROM LinkTags lt
       WHERE lt.linkId = Deepr.id
         AND (',' || ? || ',' LIKE '%,' || CAST(lt.tagId AS TEXT) || ',%')
-    ) = ?
+    ) > 0
   )
 GROUP BY
   Deepr.id
