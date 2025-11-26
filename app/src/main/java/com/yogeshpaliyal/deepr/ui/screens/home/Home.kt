@@ -125,10 +125,12 @@ import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ShowQrCode
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
+import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Edit
+import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
@@ -622,6 +624,10 @@ fun Content(
                     .makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT)
                     .show()
             }
+
+            is MenuItem.OpenWith -> {
+                openDeeplinkExternal(context, it.item.link)
+            }
         }
     }
 
@@ -737,6 +743,16 @@ fun Content(
                         icon = TablerIcons.Qrcode,
                         onClick = {
                             onItemClick(ShowQrCode(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.open_with),
+                        icon = TablerIcons.ExternalLink,
+                        onClick = {
+                            onItemClick(MenuItem.OpenWith(account))
                         },
                     )
                 }

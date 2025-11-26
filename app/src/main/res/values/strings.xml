@@ -61,6 +61,7 @@
     <string name="add_shortcut">Add shortcut</string>
     <string name="edit_shortcut">Edit shortcut</string>
     <string name="show_qr_code">Show QR Code</string>
+    <string name="open_with">Open With</string>
     <string name="deeplink_already_exists">Link already exists</string>
 
     <!-- Sort Menu Items -->
