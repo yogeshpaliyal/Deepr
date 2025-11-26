@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -59,9 +61,6 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -139,7 +138,6 @@ import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
-import compose.icons.tablericons.X
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -181,6 +179,12 @@ class Dashboard2(
     }
 }
 
+data class FilterTagItem(
+    val name: String,
+    val count: Long,
+    val isSelected: Boolean,
+)
+
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeMaterialsApi::class,
@@ -200,6 +204,7 @@ fun HomeScreen(
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
+    val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -212,7 +217,9 @@ fun HomeScreen(
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
     val favouriteFilter by viewModel.favouriteFilter.collectAsStateWithLifecycle()
-    val listState = if (currentViewType == ViewType.GRID) rememberLazyStaggeredGridState() else rememberLazyListState()
+    var finalTagsInfo by remember { mutableStateOf<List<FilterTagItem>?>(listOf()) }
+    val listState =
+        if (currentViewType == ViewType.GRID) rememberLazyStaggeredGridState() else rememberLazyListState()
     val isExpanded by remember(listState) {
         // Example: expanded only when at the very top of the list
         derivedStateOf {
@@ -250,6 +257,33 @@ fun HomeScreen(
                     .show()
             }
         }
+    }
+
+    LaunchedEffect(selectedTag, tags.value) {
+        // Get unique tags by merging both but first items should be selected tag and then tags
+        val allTagsList = tags.value
+        val mergedList = mutableListOf<FilterTagItem>()
+        val mapOfSelectedList = HashMap<String, Long>()
+
+        val alreadyAdded = HashSet<String>()
+
+        allTagsList.forEach { tag ->
+            mapOfSelectedList.put(tag.name, tag.linkCount)
+        }
+
+        selectedTag.forEach { tag ->
+            alreadyAdded.add(tag.name)
+            val count = mapOfSelectedList[tag.name] ?: 0L
+            mergedList.add(FilterTagItem(tag.name, count, true))
+        }
+
+        allTagsList.forEach { tag ->
+            if (alreadyAdded.contains(tag.name).not()) {
+                alreadyAdded.add(tag.name)
+                mergedList.add(FilterTagItem(tag.name, tag.linkCount, false))
+            }
+        }
+        finalTagsInfo = mergedList
     }
 
     LaunchedEffect(textFieldState.text) {
@@ -311,11 +345,11 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.sorting)) } },
+                                tooltip = { PlainTooltip { Text("View Type") } },
                                 state = rememberTooltipState(),
                             ) {
-                                FilterMenu(onSortOrderChange = {
-                                    viewModel.setSortOrder(it)
+                                ViewTypeMenu(currentViewType, {
+                                    viewModel.setViewType(it)
                                 })
                             }
 
@@ -324,11 +358,11 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
-                                tooltip = { PlainTooltip { Text("View Type") } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.sorting)) } },
                                 state = rememberTooltipState(),
                             ) {
-                                ViewTypeMenu(currentViewType, {
-                                    viewModel.setViewType(it)
+                                FilterMenu(onSortOrderChange = {
+                                    viewModel.setSortOrder(it)
                                 })
                             }
                         }
@@ -376,69 +410,37 @@ fun HomeScreen(
                     },
                 )
 
-                // Favourite filter tabs
-                SingleChoiceSegmentedButtonRow(
+                LazyRow(
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                 ) {
-                    SegmentedButton(
-                        shape =
-                            SegmentedButtonDefaults.itemShape(
-                                index = 0,
-                                count = 2,
-                            ),
-                        onClick = { viewModel.setFavouriteFilter(-1) },
-                        selected = favouriteFilter == -1,
-                        label = { Text(stringResource(R.string.all) + " (${totalLinks ?: 0})") },
-                    )
-                    SegmentedButton(
-                        shape =
-                            SegmentedButtonDefaults.itemShape(
-                                index = 1,
-                                count = 2,
-                            ),
-                        onClick = { viewModel.setFavouriteFilter(1) },
-                        selected = favouriteFilter == 1,
-                        label = { Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})") },
-                    )
-                }
+                    item {
+                        FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
+                            viewModel.setFavouriteFilter(-1)
+                            viewModel.setTagFilter(null)
+                        }, label = {
+                            Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
+                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                    }
+                    item {
+                        FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
+                            viewModel.setFavouriteFilter(1)
+                            viewModel.setTagFilter(null)
+                        }, label = {
+                            Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
+                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                    }
 
-                // Selected tags filter chips
-                AnimatedVisibility(
-                    visible = selectedTag.isNotEmpty(),
-                    enter = expandVertically(expandFrom = Alignment.Top),
-                    exit = shrinkVertically(shrinkTowards = Alignment.Top),
-                ) {
-                    FlowRow(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        selectedTag.forEach { tag ->
-                            FilterChip(
-                                selected = true,
-                                onClick = { viewModel.setTagFilter(tag) },
-                                label = { Text(tag.name) },
-                                leadingIcon = {
-                                    Icon(
-                                        TablerIcons.Tag,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        TablerIcons.X,
-                                        contentDescription = stringResource(R.string.remove_tag),
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                },
-                            )
-                        }
+                    items(finalTagsInfo ?: listOf()) {
+                        FilterChip(it.isSelected, {
+                            viewModel.setSelectedTagByName(it.name)
+                        }, label = {
+                            Text(it.name + " (${it.count})")
+                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
                     }
                 }
             }
@@ -818,6 +820,7 @@ fun Content(
                                         showMoreSelectedItem = null
                                     },
                                     label = { Text(tag.trim()) },
+                                    shape = RoundedCornerShape(percent = 50),
                                 )
                             }
                         }
@@ -1019,7 +1022,9 @@ fun DeeprList(
 
             ViewType.GRID -> {
                 LazyVerticalStaggeredGrid(
-                    state = listState as? LazyStaggeredGridState ?: rememberLazyStaggeredGridState(),
+                    state =
+                        listState as? LazyStaggeredGridState
+                            ?: rememberLazyStaggeredGridState(),
                     columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
                     modifier = modifier,
                     contentPadding = contentPaddingValues,

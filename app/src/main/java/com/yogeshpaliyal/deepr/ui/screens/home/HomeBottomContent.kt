@@ -427,6 +427,7 @@ fun HomeBottomContent(
                                         )
                                     }
                                 },
+                                shape = RoundedCornerShape(percent = 50),
                             )
                         }
                     }
@@ -454,6 +455,7 @@ fun HomeBottomContent(
                             SuggestionChip(
                                 onClick = { selectedTags.add(tag) },
                                 label = { Text(tag.name) },
+                                shape = RoundedCornerShape(percent = 50),
                             )
                         }
                     }

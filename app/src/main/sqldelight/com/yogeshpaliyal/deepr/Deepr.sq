@@ -172,7 +172,7 @@ SELECT
 FROM Tags
 LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
 GROUP BY Tags.id, Tags.name
-ORDER BY Tags.name;
+ORDER BY linkCount DESC, Tags.name;
 
 countOfLinks:
 SELECT count(*) FROM Deepr;

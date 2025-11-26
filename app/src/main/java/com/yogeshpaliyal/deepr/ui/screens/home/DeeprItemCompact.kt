@@ -103,23 +103,8 @@ fun DeeprItemCompact(
                             style = MaterialTheme.typography.bodySmall,
                             color = getDeeprItemTextColor(account.isFavourite),
                         )
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = stringResource(R.string.opened_count, account.openedCount),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = getDeeprItemTextColor(account.isFavourite),
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            account.tagsIds?.split(",")?.size?.let { tagsCount ->
-                                if (tagsCount > 0) {
-                                    Text(
-                                        text = stringResource(R.string.number_tags, tagsCount),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = getDeeprItemTextColor(account.isFavourite),
-                                    )
-                                }
-                            }
-                        }
+
+                        OpenCountAndTags(account, Modifier.fillMaxWidth())
                     }
                 }
 

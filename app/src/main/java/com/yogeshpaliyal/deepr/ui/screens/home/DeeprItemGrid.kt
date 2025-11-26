@@ -68,7 +68,7 @@ fun DeeprItemGrid(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(1f)
+                                    .aspectRatio(1.91f)
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                             placeholder = null,
                             error = null,
@@ -88,7 +88,7 @@ fun DeeprItemGrid(
                             text = account.name,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             color = getDeeprItemTextColor(account.isFavourite),
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -109,22 +109,7 @@ fun DeeprItemGrid(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.opened_count, account.openedCount),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = getDeeprItemTextColor(account.isFavourite),
-                            )
-                            account.tagsIds?.split(",")?.size?.let { tagsCount ->
-                                if (tagsCount > 0) {
-                                    Text(
-                                        text = stringResource(R.string.number_tags, tagsCount),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = getDeeprItemTextColor(account.isFavourite),
-                                    )
-                                }
-                            }
-                        }
+                        OpenCountAndTags(account, Modifier.weight(1f))
                         IconButton(onClick = {
                             onItemClick(MenuItem.MoreOptionsBottomSheet(account))
                         }) {
