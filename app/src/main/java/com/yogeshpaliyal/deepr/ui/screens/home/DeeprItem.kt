@@ -80,6 +80,10 @@ sealed class MenuItem(
         item: GetLinksAndTags,
     ) : MenuItem(item)
 
+    class OpenWith(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
     class Edit(
         item: GetLinksAndTags,
     ) : MenuItem(item)
