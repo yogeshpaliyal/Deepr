@@ -111,14 +111,12 @@ class DeeprApplication : Application() {
                         get(),
                         get(),
                         get(),
-                        get(),
                     )
                 }
 
                 factory {
                     LocalServerTransferLink(
                         androidContext(),
-                        get(),
                         get(),
                         get(),
                         get(),

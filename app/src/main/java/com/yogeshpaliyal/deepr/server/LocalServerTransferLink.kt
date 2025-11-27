@@ -11,7 +11,6 @@ import io.ktor.client.HttpClient
 
 class LocalServerTransferLink(
     context: Context,
-    deeprQueries: DeeprQueries,
     httpClient: HttpClient,
     accountViewModel: AccountViewModel,
     networkRepository: NetworkRepository,
@@ -20,7 +19,6 @@ class LocalServerTransferLink(
     dataProvider: DataProvider,
 ) : LocalServerRepositoryImpl(
         context,
-        deeprQueries,
         httpClient,
         accountViewModel,
         networkRepository,

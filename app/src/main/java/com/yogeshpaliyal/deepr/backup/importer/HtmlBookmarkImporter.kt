@@ -28,8 +28,8 @@ abstract class HtmlBookmarkImporter(
                 val bookmarks = extractBookmarks(document)
 
                 bookmarks.forEach { bookmark ->
-                    val existing = deeprQueries.getDeeprByLink(bookmark.url).executeAsOneOrNull()
-                    if (bookmark.url.isNotBlank() && existing == null) {
+                    val existing = deeprQueries.isLinkExists(bookmark.url).executeAsOneOrNull()
+                    if (bookmark.url.isNotBlank() && existing == 0L) {
                         try {
                             deeprQueries.transaction {
                                 deeprQueries.insertDeepr(
@@ -38,6 +38,7 @@ abstract class HtmlBookmarkImporter(
                                     name = bookmark.title,
                                     notes = bookmark.folder ?: "",
                                     thumbnail = "",
+                                    isFavourite = 0
                                 )
 
                                 // Add tags if present

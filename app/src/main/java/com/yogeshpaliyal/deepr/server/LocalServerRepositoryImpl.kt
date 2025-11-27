@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.NetworkRepository
@@ -59,7 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+//    private val deeprQueries: DeeprQueries,
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
@@ -151,6 +149,14 @@ open class LocalServerRepositoryImpl(
                                             sendDeeprSerialized(data = it)
                                         }
                                     }
+
+
+                                dataProvider.getAllTags(this).collectLatest {
+                                    if (it != null) {
+                                        sendDeeprSerialized(data = it)
+                                    }
+                                }
+
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "WebSocket error", e)
                             }
@@ -208,32 +214,7 @@ open class LocalServerRepositoryImpl(
                             try {
                                 // Get all tags from the database with their IDs
                                 val allTags = dataProvider.getAllTags(GlobalScope).value
-                                val response =
-                                    allTags.map { tag ->
-                                        // Count how many links use this tag
-                                        val linkCount =
-                                            deeprQueries
-                                                .getLinksAndTags(
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    -1L,
-                                                    -1L,
-                                                    tag.id.toString(),
-                                                    tag.id.toString(),
-                                                    "DESC",
-                                                    "createdAt",
-                                                    "DESC",
-                                                    "createdAt",
-                                                ).executeAsList()
-                                                .size
-                                        TagResponse(
-                                            id = tag.id,
-                                            name = tag.name,
-                                            count = linkCount,
-                                        )
-                                    }
-                                call.respond(HttpStatusCode.OK, response)
+                                call.respond(HttpStatusCode.OK, allTags?.tags ?: listOf())
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error getting tags", e)
                                 call.respond(
@@ -350,10 +331,10 @@ open class LocalServerRepositoryImpl(
     }
 
     private fun importToDatabase(links: List<LinkResponse>) {
-        deeprQueries.transaction {
+        dataProvider.runInDbTransaction {
             links.forEach { deeplink ->
-                if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
-                    deeprQueries.importDeepr(
+                if (dataProvider.isLinkExist(deeplink.link).not()) {
+                    val insertedId = dataProvider.insertLink(
                         link = deeplink.link,
                         name = deeplink.name,
                         openedCount = deeplink.openedCount,
@@ -363,15 +344,18 @@ open class LocalServerRepositoryImpl(
                         createdAt = deeplink.createdAt,
                     )
 
-                    val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+                    if (insertedId != null) {
 
-                    deeplink.tags.forEach { tagName ->
-                        deeprQueries.insertTag(name = tagName)
-                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
-                        deeprQueries.addTagToLink(
-                            linkId = insertedId,
-                            tagId = tag.id,
-                        )
+                        deeplink.tags.forEach { tagName ->
+                            dataProvider.insertTag(name = tagName)
+                            dataProvider.getTagByName(tagName)?.let {
+                                dataProvider.addTagToLink(
+                                    linkId = insertedId,
+                                    tagId = it.id,
+                                )
+                            }
+
+                        }
                     }
                 }
             }
@@ -438,7 +422,7 @@ data class TagData(
     val id: Long,
     val name: String,
 ) {
-    fun toDbTag() = GetAllTagsWithCount(id, name, linkCount = 0)
+    fun toDbTag() = DeeprTag(id, name, count = 0)
 }
 
 @Serializable
@@ -463,13 +447,6 @@ data class SuccessResponse(
 @Serializable
 data class ErrorResponse(
     val error: String,
-)
-
-@Serializable
-data class TagResponse(
-    val id: Long,
-    val name: String,
-    val count: Int,
 )
 
 @Serializable

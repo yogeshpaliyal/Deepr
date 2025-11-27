@@ -17,6 +17,30 @@ data class LinksListData(
     val links: List<DeeprLink>,
 ) : WebSocketData(dataType = "links_list")
 
+@Serializable
+data class TagsListData(
+    val tags: List<DeeprTag>,
+) : WebSocketData(dataType = "tags_list")
+
+
+@Serializable
+data class CountData(
+    val count: Long?,
+    val type: @CountType String,
+) : WebSocketData(dataType = "links_count")
+
+
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.TYPE,
+)
+annotation class CountType {
+    companion object {
+        const val TOTAL = "total"
+        const val FAVOURITE = "favourite"
+    }
+}
+
 suspend inline fun WebSocketServerSession.sendDeeprSerialized(data: WebSocketData) {
     sendSerialized(data, typeInfo<WebSocketData>())
 }
@@ -34,4 +58,11 @@ data class LinkResponse(
     val thumbnail: String,
     val isFavourite: Long,
     val tags: List<String>,
+)
+
+@Serializable
+data class DeeprTag(
+    val id: Long,
+    val name: String,
+    val count: Long,
 )

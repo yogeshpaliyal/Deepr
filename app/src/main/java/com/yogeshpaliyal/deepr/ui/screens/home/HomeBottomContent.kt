@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
+import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -64,7 +64,6 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeBottomContent(
-    deeprQueries: DeeprQueries,
     selectedLink: DeeprLink,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinInject(),
@@ -84,9 +83,10 @@ fun HomeBottomContent(
     var isFetchingMetadata by remember { mutableStateOf(false) }
     // Tags
     var newTagName by remember { mutableStateOf("") }
-    val allTags by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
-    val selectedTags = remember { mutableStateListOf<GetAllTagsWithCount>() }
-    val initialSelectedTags = remember { mutableStateListOf<GetAllTagsWithCount>() }
+    val allTagsState by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val allTags = allTagsState?.tags ?: listOf()
+    val selectedTags = remember { mutableStateListOf<DeeprTag>() }
+    val initialSelectedTags = remember { mutableStateListOf<DeeprTag>() }
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
 
@@ -119,13 +119,13 @@ fun HomeBottomContent(
         if (isCreate.not()) {
             val existingTags =
                 selectedLink.tagsIds?.split(",")?.mapIndexed { index, tagId ->
-                    GetAllTagsWithCount(
+                    DeeprTag(
                         tagId.trim().toLong(),
                         selectedLink.tagsNames
                             ?.split(",")
                             ?.getOrNull(index)
                             ?.trim() ?: "Unknown",
-                        linkCount = 0,
+                        count = 0,
                     )
                 }
             selectedTags.clear()
@@ -141,7 +141,7 @@ fun HomeBottomContent(
         // Normalize the link before saving
         val normalizedLink = normalizeLink(deeprInfo.link)
 
-        if (isCreate && deeprQueries.getDeeprByLink(normalizedLink).executeAsOneOrNull() != null) {
+        if (isCreate && viewModel.isLinkExist(normalizedLink)) {
             Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
             return@save
         }
@@ -383,7 +383,7 @@ fun HomeBottomContent(
                                     }
                                 } else {
                                     // Create a temporary tag with ID 0 (will be properly created on save)
-                                    selectedTags.add(GetAllTagsWithCount(0, newTagName, 0))
+                                    selectedTags.add(DeeprTag(0, newTagName, 0))
                                 }
 
                                 newTagName = "" // Clear input
@@ -487,11 +487,7 @@ fun HomeBottomContent(
                             modifier = Modifier,
                             onClick = {
                                 if (isValidDeeplink(deeprInfo.link)) {
-                                    if (deeprQueries
-                                            .getDeeprByLink(deeprInfo.link)
-                                            .executeAsList()
-                                            .isNotEmpty()
-                                    ) {
+                                    if (viewModel.isLinkExist(deeprInfo.link)) {
                                         Toast
                                             .makeText(
                                                 context,
@@ -521,11 +517,7 @@ fun HomeBottomContent(
                     if (isCreate) {
                         Button(onClick = {
                             if (isValidDeeplink(deeprInfo.link)) {
-                                if (deeprQueries
-                                        .getDeeprByLink(deeprInfo.link)
-                                        .executeAsList()
-                                        .isNotEmpty()
-                                ) {
+                                if (viewModel.isLinkExist(deeprInfo.link)) {
                                     Toast
                                         .makeText(
                                             context,

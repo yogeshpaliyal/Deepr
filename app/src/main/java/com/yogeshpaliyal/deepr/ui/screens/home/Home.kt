@@ -96,8 +96,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
+import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
@@ -196,7 +195,6 @@ data class FilterTagItem(
 fun HomeScreen(
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
-    deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
     mSelectedLink: DeeprLink? = null,
     sharedText: SharedLink? = null,
@@ -206,7 +204,8 @@ fun HomeScreen(
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
-    val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val tagsCollect = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val tags = tagsCollect.value?.tags ?: listOf()
 
     var selectedLink by remember { mutableStateOf<DeeprLink?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -261,16 +260,16 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(selectedTag, tags.value) {
+    LaunchedEffect(selectedTag, tags) {
         // Get unique tags by merging both but first items should be selected tag and then tags
-        val allTagsList = tags.value
+        val allTagsList = tags
         val mergedList = mutableListOf<FilterTagItem>()
         val mapOfSelectedList = HashMap<String, Long>()
 
         val alreadyAdded = HashSet<String>()
 
         allTagsList.forEach { tag ->
-            mapOfSelectedList.put(tag.name, tag.linkCount)
+            mapOfSelectedList.put(tag.name, tag.count)
         }
 
         selectedTag.forEach { tag ->
@@ -282,7 +281,7 @@ fun HomeScreen(
         allTagsList.forEach { tag ->
             if (alreadyAdded.contains(tag.name).not()) {
                 alreadyAdded.add(tag.name)
-                mergedList.add(FilterTagItem(tag.name, tag.linkCount, false))
+                mergedList.add(FilterTagItem(tag.name, tag.count, false))
             }
         }
         finalTagsInfo = mergedList
@@ -428,7 +427,7 @@ fun HomeScreen(
                                 viewModel.setTagFilter(null)
                             },
                             label = {
-                                Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
+                                Text(stringResource(R.string.all) + " (${totalLinks?.count ?: 0})")
                             },
                             modifier = Modifier.animateItem(),
                             shape = RoundedCornerShape(percent = 50),
@@ -442,7 +441,7 @@ fun HomeScreen(
                                 viewModel.setTagFilter(null)
                             },
                             label = {
-                                Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
+                                Text(stringResource(R.string.favourites) + " (${favouriteLinks?.count ?: 0})")
                             },
                             modifier = Modifier.animateItem(),
                             shape = RoundedCornerShape(percent = 50),
@@ -512,7 +511,6 @@ fun HomeScreen(
 
         selectedLink?.let {
             HomeBottomContent(
-                deeprQueries = deeprQueries,
                 selectedLink = it,
             ) { updatedValue ->
                 if (updatedValue != null) {
@@ -532,7 +530,7 @@ fun HomeScreen(
 fun Content(
     listState: ScrollableState,
     hazeState: HazeState,
-    selectedTag: List<GetAllTagsWithCount>,
+    selectedTag: List<DeeprTag>,
     contentPaddingValues: PaddingValues,
     currentViewType: @ViewType Int,
     searchQuery: String,
@@ -931,7 +929,7 @@ fun MenuListItem(
 fun DeeprList(
     listState: ScrollableState,
     accounts: List<DeeprLink>,
-    selectedTag: List<GetAllTagsWithCount>,
+    selectedTag: List<DeeprTag>,
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,

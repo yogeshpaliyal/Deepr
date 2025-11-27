@@ -44,7 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
+import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
@@ -106,7 +106,7 @@ fun DeeprItem(
     account: DeeprLink,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (tag: String) -> Unit,
-    selectedTag: List<GetAllTagsWithCount>,
+    selectedTag: List<DeeprTag>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
     analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),

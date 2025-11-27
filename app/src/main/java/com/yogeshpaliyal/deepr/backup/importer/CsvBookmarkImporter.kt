@@ -54,8 +54,8 @@ class CsvBookmarkImporter(
                             val tagsString = row.getOrNull(5) ?: ""
                             val thumbnail = row.getOrNull(6) ?: ""
                             val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
-                            val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
-                            if (link.isNotBlank() && existing == null) {
+                            val existing = deeprQueries.isLinkExists(link).executeAsOneOrNull() ?: 0L
+                            if (link.isNotBlank() && existing == 0L) {
                                 updatedCount++
                                 deeprQueries.transaction {
                                     deeprQueries.importDeepr(

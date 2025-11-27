@@ -1,7 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.database.sqlite.SQLiteConstraintException
-import android.view.Surface
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -11,7 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -58,9 +56,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -72,7 +69,6 @@ import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
 import kotlinx.coroutines.runBlocking
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 object TagSelectionScreen : TopLevelRoute {
@@ -87,12 +83,12 @@ object TagSelectionScreen : TopLevelRoute {
         val viewModel: AccountViewModel = koinActivityViewModel()
         val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
         var newTagName by remember { mutableStateOf("") }
-        val tagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+        val tagsWithCountState by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+        val tagsWithCount = tagsWithCountState?.tags ?: listOf()
         val context = LocalContext.current
         val navigator = LocalNavigator.current
-        val deeprQueries: DeeprQueries = koinInject()
-        var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
-        var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
+        var isTagEditEnable by remember { mutableStateOf<DeeprTag?>(null) }
+        var isTagDeleteEnable by remember { mutableStateOf<DeeprTag?>(null) }
         var tagEditError by remember { mutableStateOf<String?>(null) }
 
         Scaffold(
@@ -188,7 +184,7 @@ object TagSelectionScreen : TopLevelRoute {
                                                     Toast.LENGTH_SHORT,
                                                 ).show()
                                         } else {
-                                            deeprQueries.insertTag(trimmedTagName)
+                                            viewModel.insertTag(trimmedTagName)
                                             newTagName = ""
                                             Toast
                                                 .makeText(
@@ -350,7 +346,7 @@ object TagSelectionScreen : TopLevelRoute {
                                             )
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Text(
-                                                text = "${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                                                text = "${tag.count} ${if (tag.count == 1L) "link" else "links"}",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color =
                                                     if (isSelected) {
@@ -542,7 +538,7 @@ object TagSelectionScreen : TopLevelRoute {
                                     }
                                 Text(text = message)
 
-                                if (tag.linkCount > 0) {
+                                if (tag.count > 0) {
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Card(
                                         colors =
@@ -554,7 +550,7 @@ object TagSelectionScreen : TopLevelRoute {
                                             ),
                                     ) {
                                         Text(
-                                            text = "This tag is used by ${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                                            text = "This tag is used by ${tag.count} ${if (tag.count == 1L) "link" else "links"}",
                                             modifier = Modifier.padding(12.dp),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,

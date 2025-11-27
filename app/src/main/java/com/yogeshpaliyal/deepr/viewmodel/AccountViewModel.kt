@@ -4,10 +4,7 @@ import android.net.Uri
 import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToOneOrNull
-import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetAllTagsWithCount
+import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
@@ -16,6 +13,7 @@ import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.server.CountData
 import com.yogeshpaliyal.deepr.server.LinksListData
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
@@ -66,7 +64,6 @@ annotation class SortType {
 }
 
 class AccountViewModel(
-    private val deeprQueries: DeeprQueries,
     private val exportRepository: ExportRepository,
     private val importRepository: ImportRepository,
     private val syncRepository: SyncRepository,
@@ -80,23 +77,11 @@ class AccountViewModel(
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
-    val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> = dataProvider.getAllTags(viewModelScope)
+    val allTagsWithCount = dataProvider.getAllTags(viewModelScope)
 
-    val countOfLinks: StateFlow<Long?> =
-        deeprQueries
-            .countOfLinks()
-            .asFlow()
-            .mapToOneOrNull(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+    val countOfLinks: StateFlow<CountData?> = dataProvider.countOfLinks(viewModelScope)
 
-    val countOfFavouriteLinks: StateFlow<Long?> =
-        deeprQueries
-            .countOfFavouriteLinks()
-            .asFlow()
-            .mapToOneOrNull(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+    val countOfFavouriteLinks: StateFlow<CountData?> = dataProvider.countOfFavouritesLinks(viewModelScope)
 
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
@@ -114,8 +99,8 @@ class AccountViewModel(
     val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
     // State for tag filter - now supports multiple tags
-    private val _selectedTagFilter = MutableStateFlow<List<GetAllTagsWithCount>>(emptyList())
-    val selectedTagFilter: StateFlow<List<GetAllTagsWithCount>> = _selectedTagFilter
+    private val _selectedTagFilter = MutableStateFlow<List<DeeprTag>>(emptyList())
+    val selectedTagFilter: StateFlow<List<DeeprTag>> = _selectedTagFilter
 
     // State for favourite filter (-1 = All, 0 = Not Favourite, 1 = Favourite)
     private val defaultPageFavourites: Flow<Boolean> = preferenceDataStore.getDefaultPageFavourites
@@ -132,7 +117,7 @@ class AccountViewModel(
         // Track user properties for total links and tags
         viewModelScope.launch {
             countOfLinks.collect { count ->
-                count?.let {
+                count?.count?.let {
                     analyticsManager.setUserProperty(
                         com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.TOTAL_LINKS,
                         it.toString(),
@@ -145,7 +130,7 @@ class AccountViewModel(
             allTagsWithCount.collect { tags ->
                 analyticsManager.setUserProperty(
                     com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.TOTAL_TAGS,
-                    tags.size.toString(),
+                    tags?.tags?.size.toString(),
                 )
             }
         }
@@ -161,7 +146,7 @@ class AccountViewModel(
     }
 
     // Set tag filter - toggle tag in the list
-    fun setTagFilter(tag: GetAllTagsWithCount?) {
+    fun setTagFilter(tag: DeeprTag?) {
         if (tag == null) {
             _selectedTagFilter.update { emptyList() }
             analyticsManager.logEvent(
@@ -207,7 +192,7 @@ class AccountViewModel(
         tagId: Long,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.removeTagFromLink(linkId, tagId)
+            dataProvider.removeTagFromLink(linkId, tagId)
         }
     }
 
@@ -217,7 +202,7 @@ class AccountViewModel(
         tagId: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.addTagToLink(linkId, tagId)
+            dataProvider.addTagToLink(linkId, tagId)
         }
     }
 
@@ -227,24 +212,15 @@ class AccountViewModel(
         tagName: String,
     ) {
         withContext(Dispatchers.IO) {
-            // Create the tag if it doesn't exist
-            deeprQueries.insertTag(tagName)
-
-            // Get the tag ID
-            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
-
-            if (tag != null) {
-                // Add the tag to the link
-                deeprQueries.addTagToLink(linkId, tag.id)
-            }
+            dataProvider.addTagToLinkByName(linkId, tagName)
         }
     }
 
     fun setSelectedTagByName(tagName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+            val tag = dataProvider.getTagByName(tagName)
             if (tag != null) {
-                setTagFilter(GetAllTagsWithCount(tag.id, tag.name, tag.linkCount))
+                setTagFilter(tag)
             }
         }
     }
@@ -296,13 +272,12 @@ class AccountViewModel(
         link: String,
         name: String,
         executed: Boolean,
-        tagsList: List<GetAllTagsWithCount>,
+        tagsList: List<DeeprTag>,
         notes: String = "",
         thumbnail: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail)
-            deeprQueries.lastInsertRowId().executeAsOneOrNull()?.let {
+            dataProvider.insertLink(link = link, name = name,  tagsList = tagsList , notes = notes, thumbnail = thumbnail, openedCount = if (executed) 1 else 0,)?.let {
                 modifyTagsForLink(it, tagsList)
                 analyticsManager.logEvent(
                     com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.ADD_LINK,
@@ -318,38 +293,14 @@ class AccountViewModel(
 
     suspend fun modifyTagsForLink(
         linkId: Long,
-        tagsList: List<GetAllTagsWithCount>,
+        tagsList: List<DeeprTag>,
     ) {
-        withContext(Dispatchers.IO) {
-            // Then add selected tags
-            tagsList.forEach { tag ->
-                if (tag.id > 0) {
-                    // Existing tag
-                    addTagToLink(linkId, tag.id)
-                } else {
-                    // New tag
-                    addTagToLinkByName(linkId, tag.name)
-                }
-            }
-        }
+        dataProvider.modifyTagsForLink(linkId, tagsList)
     }
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val tagsToDelete = mutableListOf<Long>()
-
-            deeprQueries.getTagsForLink(id).executeAsList().forEach { tag ->
-                val linkCount = deeprQueries.hasTagLinks(tag.id).executeAsOne()
-                if (linkCount == 1L) {
-                    tagsToDelete.add(tag.id)
-                }
-            }
-
-            deeprQueries.deleteDeeprById(id)
-            deeprQueries.deleteLinkRelations(id)
-            tagsToDelete.forEach { tagId ->
-                deeprQueries.deleteTag(tagId)
-            }
+            dataProvider.deleteAccount(id)
 
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.DELETE_LINK,
@@ -360,27 +311,25 @@ class AccountViewModel(
 
     fun deleteTag(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.deleteTag(id)
-            deeprQueries.deleteTagRelations(id)
+            dataProvider.deleteTag(id)
         }
     }
 
-    suspend fun updateTag(tag: GetAllTagsWithCount) {
+    suspend fun updateTag(tag: DeeprTag) {
         withContext(Dispatchers.IO) {
-            deeprQueries.updateTag(tag.name, tag.id)
+            dataProvider.updateTag(tag)
         }
     }
 
     fun incrementOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.incrementOpenedCount(id)
-            deeprQueries.insertDeeprOpenLog(id)
+            dataProvider.incrementOpenedCount(id)
         }
     }
 
     fun resetOpenedCount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.resetOpenedCount(id)
+            dataProvider.resetOpenedCount(id)
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.RESET_COUNTER,
                 mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
@@ -390,7 +339,7 @@ class AccountViewModel(
 
     fun toggleFavourite(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.toggleFavourite(id)
+            dataProvider.toggleFavourite(id)
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.TOGGLE_FAVOURITE,
                 mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
@@ -402,13 +351,12 @@ class AccountViewModel(
         id: Long,
         newLink: String,
         newName: String,
-        tagsList: List<GetAllTagsWithCount>,
+        tagsList: List<DeeprTag>,
         notes: String = "",
         thumbnail: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, id)
-            modifyTagsForLink(id, tagsList)
+            dataProvider.updateDeeplink(id, newLink, newName, tagsList, notes, thumbnail)
             syncToMarkdown()
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.EDIT_LINK,
@@ -640,6 +588,16 @@ class AccountViewModel(
                     syncValidationChannel.send("error: ${result.message}")
                 }
             }
+        }
+    }
+
+    fun isLinkExist(link: String): Boolean {
+        return dataProvider.isLinkExist(link)
+    }
+
+    fun insertTag(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataProvider.insertTag(name)
         }
     }
 

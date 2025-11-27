@@ -33,7 +33,7 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertDeepr:
-INSERT INTO Deepr (link, name, openedCount, notes, thumbnail) VALUES (?, ?, ?, ?, ?);
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite) VALUES (?, ?, ?, ?, ?, ?);
 
 importDeepr:
 INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?);
@@ -150,8 +150,8 @@ UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ? WHERE id = ?;
 countDeepr:
 SELECT COUNT(*) FROM Deepr;
 
-getDeeprByLink:
-SELECT * FROM Deepr WHERE link = ?;
+isLinkExists:
+SELECT count(*) FROM Deepr WHERE link = ?;
 
 
 -- Tag operations
@@ -170,7 +170,7 @@ GROUP BY Tags.id, Tags.name
 ORDER BY linkCount DESC, Tags.name;
 
 
-getAllTagsWithCount:
+DeeprTag:
 SELECT 
   Tags.id,
   Tags.name,
