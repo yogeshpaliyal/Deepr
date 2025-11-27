@@ -14,14 +14,14 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.data.DeeprLink
 
 @Composable
 fun DeleteConfirmationDialog(
-    deepr: GetLinksAndTags,
+    deepr: DeeprLink,
     onDismiss: () -> Unit,
-    onConfirm: (GetLinksAndTags) -> Unit,
+    onConfirm: (DeeprLink) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(

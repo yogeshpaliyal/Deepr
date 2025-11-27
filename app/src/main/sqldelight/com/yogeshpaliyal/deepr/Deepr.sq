@@ -159,10 +159,16 @@ insertTag:
 INSERT OR IGNORE INTO Tags (name) VALUES (?);
 
 getTagByName:
-SELECT * FROM Tags WHERE name = ?;
+SELECT
+  Tags.id,
+  Tags.name,
+  COUNT(LinkTags.linkId) AS linkCount
+FROM Tags
+LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
+WHERE Tags.name = ?
+GROUP BY Tags.id, Tags.name
+ORDER BY linkCount DESC, Tags.name;
 
-getAllTags:
-SELECT * FROM Tags ORDER BY name;
 
 getAllTagsWithCount:
 SELECT 

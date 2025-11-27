@@ -1,9 +1,9 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.data.DeeprLink
 
 data class SaveDialogInfo(
-    val deepr: GetLinksAndTags,
+    val deepr: DeeprLink,
     val executeAfterSave: Boolean,
 )
 
@@ -13,8 +13,8 @@ fun createDeeprObject(
     openedCount: Long = 0,
     notes: String = "",
     thumbnail: String = "",
-): GetLinksAndTags =
-    GetLinksAndTags(
+): DeeprLink =
+    DeeprLink(
         id = 0,
         name = name,
         link = link,

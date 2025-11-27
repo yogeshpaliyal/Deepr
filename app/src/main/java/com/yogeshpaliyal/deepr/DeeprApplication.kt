@@ -12,6 +12,7 @@ import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
+import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.HtmlParser
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
@@ -110,12 +111,14 @@ class DeeprApplication : Application() {
                         get(),
                         get(),
                         get(),
+                        get(),
                     )
                 }
 
                 factory {
                     LocalServerTransferLink(
                         androidContext(),
+                        get(),
                         get(),
                         get(),
                         get(),
@@ -131,6 +134,10 @@ class DeeprApplication : Application() {
 
                 single<ReviewManager> {
                     ReviewManagerFactory.create()
+                }
+
+                single<DataProvider> {
+                    DataProvider(get())
                 }
 
                 viewModel {

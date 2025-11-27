@@ -6,15 +6,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.data.DeeprLink
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 
 @Composable
 fun ShowQRCodeMenuItem(
-    account: GetLinksAndTags,
-    onQrCodeClick: (GetLinksAndTags) -> Unit,
+    account: DeeprLink,
+    onQrCodeClick: (DeeprLink) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     androidx.compose.material3.ListItem(

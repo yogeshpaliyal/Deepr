@@ -5,19 +5,18 @@ import androidx.annotation.StringDef
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
-import com.yogeshpaliyal.deepr.GetLinksAndTags
-import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.backup.AutoBackupWorker
 import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
+import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.server.LinksListData
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.util.RequestResult
@@ -28,9 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -76,28 +73,14 @@ class AccountViewModel(
     private val networkRepository: NetworkRepository,
     private val autoBackupWorker: AutoBackupWorker,
     private val analyticsManager: AnalyticsManager,
+    private val dataProvider: DataProvider,
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
-    // State for tags
-    val allTags: StateFlow<List<Tags>> =
-        deeprQueries
-            .getAllTags()
-            .asFlow()
-            .mapToList(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
-
-    val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        deeprQueries
-            .getAllTagsWithCount()
-            .asFlow()
-            .mapToList(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+    val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> = dataProvider.getAllTags(viewModelScope)
 
     val countOfLinks: StateFlow<Long?> =
         deeprQueries
@@ -131,8 +114,8 @@ class AccountViewModel(
     val syncValidationFlow = syncValidationChannel.receiveAsFlow()
 
     // State for tag filter - now supports multiple tags
-    private val _selectedTagFilter = MutableStateFlow<List<Tags>>(emptyList())
-    val selectedTagFilter: StateFlow<List<Tags>> = _selectedTagFilter
+    private val _selectedTagFilter = MutableStateFlow<List<GetAllTagsWithCount>>(emptyList())
+    val selectedTagFilter: StateFlow<List<GetAllTagsWithCount>> = _selectedTagFilter
 
     // State for favourite filter (-1 = All, 0 = Not Favourite, 1 = Favourite)
     private val defaultPageFavourites: Flow<Boolean> = preferenceDataStore.getDefaultPageFavourites
@@ -159,7 +142,7 @@ class AccountViewModel(
         }
 
         viewModelScope.launch {
-            allTags.collect { tags ->
+            allTagsWithCount.collect { tags ->
                 analyticsManager.setUserProperty(
                     com.yogeshpaliyal.deepr.analytics.AnalyticsUserProperties.TOTAL_TAGS,
                     tags.size.toString(),
@@ -178,7 +161,7 @@ class AccountViewModel(
     }
 
     // Set tag filter - toggle tag in the list
-    fun setTagFilter(tag: Tags?) {
+    fun setTagFilter(tag: GetAllTagsWithCount?) {
         if (tag == null) {
             _selectedTagFilter.update { emptyList() }
             analyticsManager.logEvent(
@@ -261,7 +244,7 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
             if (tag != null) {
-                setTagFilter(tag)
+                setTagFilter(GetAllTagsWithCount(tag.id, tag.name, tag.linkCount))
             }
         }
     }
@@ -280,43 +263,14 @@ class AccountViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val accounts: StateFlow<List<GetLinksAndTags>?> =
-        combine(
+    val accounts: StateFlow<LinksListData?> =
+        dataProvider.getLinks(
+            viewModelScope,
             searchQuery,
             sortOrder,
             selectedTagFilter,
             favouriteFilter,
-        ) { query, sorting, tags, favourite ->
-            listOf(query, sorting, tags, favourite)
-        }.flatMapLatest { combined ->
-            val query = combined[0] as String
-            val sorting = (combined[1] as String).split("_")
-            val tags = combined[2] as List<Tags>
-            val favourite = combined[3] as Int
-            val sortField = sorting.getOrNull(0) ?: "createdAt"
-            val sortType = sorting.getOrNull(1) ?: "DESC"
-
-            // Prepare tag filter parameters
-            val tagIdsString =
-                if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
-            val tagCount = tags.size.toLong()
-
-            deeprQueries
-                .getLinksAndTags(
-                    query,
-                    query,
-                    query,
-                    favourite.toLong(),
-                    favourite.toLong(),
-                    tagIdsString,
-                    tagIdsString,
-                    sortType,
-                    sortField,
-                    sortType,
-                    sortField,
-                ).asFlow()
-                .mapToList(viewModelScope.coroutineContext)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        )
 
     fun search(query: String) {
         searchQuery.update { query }
@@ -342,7 +296,7 @@ class AccountViewModel(
         link: String,
         name: String,
         executed: Boolean,
-        tagsList: List<Tags>,
+        tagsList: List<GetAllTagsWithCount>,
         notes: String = "",
         thumbnail: String = "",
     ) {
@@ -364,7 +318,7 @@ class AccountViewModel(
 
     suspend fun modifyTagsForLink(
         linkId: Long,
-        tagsList: List<Tags>,
+        tagsList: List<GetAllTagsWithCount>,
     ) {
         withContext(Dispatchers.IO) {
             // Then add selected tags
@@ -411,7 +365,7 @@ class AccountViewModel(
         }
     }
 
-    suspend fun updateTag(tag: Tags) {
+    suspend fun updateTag(tag: GetAllTagsWithCount) {
         withContext(Dispatchers.IO) {
             deeprQueries.updateTag(tag.name, tag.id)
         }
@@ -448,7 +402,7 @@ class AccountViewModel(
         id: Long,
         newLink: String,
         newName: String,
-        tagsList: List<Tags>,
+        tagsList: List<GetAllTagsWithCount>,
         notes: String = "",
         thumbnail: String = "",
     ) {

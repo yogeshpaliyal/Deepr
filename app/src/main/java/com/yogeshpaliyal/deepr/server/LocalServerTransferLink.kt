@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr.server
 import android.content.Context
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
@@ -16,6 +17,7 @@ class LocalServerTransferLink(
     networkRepository: NetworkRepository,
     preferenceDataStore: AppPreferenceDataStore,
     analyticsManager: AnalyticsManager,
+    dataProvider: DataProvider,
 ) : LocalServerRepositoryImpl(
         context,
         deeprQueries,
@@ -24,6 +26,7 @@ class LocalServerTransferLink(
         networkRepository,
         analyticsManager,
         preferenceDataStore,
+        dataProvider,
     ) {
     override suspend fun startServer(port: Int) {
         super.startServer(port)

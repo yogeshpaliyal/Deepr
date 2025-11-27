@@ -97,14 +97,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
-import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
+import com.yogeshpaliyal.deepr.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -158,7 +158,7 @@ data object Home
     ExperimentalMaterial3ExpressiveApi::class,
 )
 class Dashboard2(
-    val mSelectedLink: GetLinksAndTags? = null,
+    val mSelectedLink: DeeprLink? = null,
 ) : TopLevelRoute {
     override val icon: ImageVector
         get() = TablerIcons.Home
@@ -198,7 +198,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
-    mSelectedLink: GetLinksAndTags? = null,
+    mSelectedLink: DeeprLink? = null,
     sharedText: SharedLink? = null,
     resetSharedText: () -> Unit,
 ) {
@@ -208,7 +208,7 @@ fun HomeScreen(
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
 
-    var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
+    var selectedLink by remember { mutableStateOf<DeeprLink?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
     val hazeState = rememberHazeState(blurEnabled = true)
     val context = LocalContext.current
@@ -421,28 +421,46 @@ fun HomeScreen(
                     contentPadding = PaddingValues(horizontal = 8.dp),
                 ) {
                     item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
-                            viewModel.setFavouriteFilter(-1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        FilterChip(
+                            selectedTag.isEmpty() && favouriteFilter == -1,
+                            {
+                                viewModel.setFavouriteFilter(-1)
+                                viewModel.setTagFilter(null)
+                            },
+                            label = {
+                                Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
+                            },
+                            modifier = Modifier.animateItem(),
+                            shape = RoundedCornerShape(percent = 50),
+                        )
                     }
                     item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
-                            viewModel.setFavouriteFilter(1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        FilterChip(
+                            selectedTag.isEmpty() && favouriteFilter == 1,
+                            {
+                                viewModel.setFavouriteFilter(1)
+                                viewModel.setTagFilter(null)
+                            },
+                            label = {
+                                Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
+                            },
+                            modifier = Modifier.animateItem(),
+                            shape = RoundedCornerShape(percent = 50),
+                        )
                     }
 
                     items(finalTagsInfo ?: listOf()) {
-                        FilterChip(it.isSelected, {
-                            viewModel.setSelectedTagByName(it.name)
-                        }, label = {
-                            Text(it.name + " (${it.count})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        FilterChip(
+                            it.isSelected,
+                            {
+                                viewModel.setSelectedTagByName(it.name)
+                            },
+                            label = {
+                                Text(it.name + " (${it.count})")
+                            },
+                            modifier = Modifier.animateItem(),
+                            shape = RoundedCornerShape(percent = 50),
+                        )
                     }
                 }
             }
@@ -514,19 +532,19 @@ fun HomeScreen(
 fun Content(
     listState: ScrollableState,
     hazeState: HazeState,
-    selectedTag: List<Tags>,
+    selectedTag: List<GetAllTagsWithCount>,
     contentPaddingValues: PaddingValues,
     currentViewType: @ViewType Int,
     searchQuery: String,
     favouriteFilter: Int,
     viewModel: AccountViewModel,
     modifier: Modifier = Modifier,
-    editDeepr: (GetLinksAndTags) -> Unit = {},
+    editDeepr: (DeeprLink) -> Unit = {},
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showMoreSelectedItem by remember { mutableStateOf<DeeprLink?>(null) }
     val analyticsManager = koinInject<AnalyticsManager>()
 
     if (accounts == null) {
@@ -539,9 +557,9 @@ fun Content(
     }
 
     val context = LocalContext.current
-    var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showShortcutDialog by remember { mutableStateOf<DeeprLink?>(null) }
+    var showQrCodeDialog by remember { mutableStateOf<DeeprLink?>(null) }
+    var showDeleteConfirmDialog by remember { mutableStateOf<DeeprLink?>(null) }
 
     showShortcutDialog?.let { deepr ->
         CreateShortcutDialog(
@@ -640,7 +658,7 @@ fun Content(
                     .hazeSource(state = hazeState)
                     .padding(horizontal = 8.dp),
             contentPaddingValues = contentPaddingValues,
-            accounts = accounts!!,
+            accounts = accounts?.links ?: emptyList(),
             selectedTag = selectedTag,
             onTagClick = {
                 viewModel.setSelectedTagByName(it)
@@ -912,8 +930,8 @@ fun MenuListItem(
 @Composable
 fun DeeprList(
     listState: ScrollableState,
-    accounts: List<GetLinksAndTags>,
-    selectedTag: List<Tags>,
+    accounts: List<DeeprLink>,
+    selectedTag: List<GetAllTagsWithCount>,
     contentPaddingValues: PaddingValues,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (String) -> Unit,

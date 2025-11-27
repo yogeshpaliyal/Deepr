@@ -18,8 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.data.DeeprLink
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Trash
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DeeprItemSwipable(
-    account: GetLinksAndTags,
+    account: DeeprLink,
     onItemClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,

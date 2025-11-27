@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
@@ -65,7 +65,7 @@ import org.koin.compose.koinInject
 @Composable
 fun HomeBottomContent(
     deeprQueries: DeeprQueries,
-    selectedLink: GetLinksAndTags,
+    selectedLink: DeeprLink,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinInject(),
     onSaveDialogInfoChange: ((SaveDialogInfo?) -> Unit) = {},
@@ -84,9 +84,9 @@ fun HomeBottomContent(
     var isFetchingMetadata by remember { mutableStateOf(false) }
     // Tags
     var newTagName by remember { mutableStateOf("") }
-    val allTags by viewModel.allTags.collectAsStateWithLifecycle()
-    val selectedTags = remember { mutableStateListOf<Tags>() }
-    val initialSelectedTags = remember { mutableStateListOf<Tags>() }
+    val allTags by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+    val selectedTags = remember { mutableStateListOf<GetAllTagsWithCount>() }
+    val initialSelectedTags = remember { mutableStateListOf<GetAllTagsWithCount>() }
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
 
@@ -119,12 +119,13 @@ fun HomeBottomContent(
         if (isCreate.not()) {
             val existingTags =
                 selectedLink.tagsIds?.split(",")?.mapIndexed { index, tagId ->
-                    Tags(
+                    GetAllTagsWithCount(
                         tagId.trim().toLong(),
                         selectedLink.tagsNames
                             ?.split(",")
                             ?.getOrNull(index)
                             ?.trim() ?: "Unknown",
+                        linkCount = 0,
                     )
                 }
             selectedTags.clear()
@@ -382,7 +383,7 @@ fun HomeBottomContent(
                                     }
                                 } else {
                                     // Create a temporary tag with ID 0 (will be properly created on save)
-                                    selectedTags.add(Tags(0, newTagName))
+                                    selectedTags.add(GetAllTagsWithCount(0, newTagName, 0))
                                 }
 
                                 newTagName = "" // Clear input

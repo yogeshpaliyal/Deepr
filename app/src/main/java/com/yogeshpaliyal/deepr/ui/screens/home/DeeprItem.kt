@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -45,9 +44,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
@@ -58,56 +57,56 @@ import java.util.Locale
 import java.util.TimeZone
 
 sealed class MenuItem(
-    val item: GetLinksAndTags,
+    val item: DeeprLink,
 ) {
     class Click(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class Copy(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class Shortcut(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class ShowQrCode(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class FavouriteClick(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class OpenWith(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class Edit(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class ResetCounter(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class Delete(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 
     class MoreOptionsBottomSheet(
-        item: GetLinksAndTags,
+        item: DeeprLink,
     ) : MenuItem(item)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeeprItem(
-    account: GetLinksAndTags,
+    account: DeeprLink,
     onItemClick: (MenuItem) -> Unit,
     onTagClick: (tag: String) -> Unit,
-    selectedTag: List<Tags>,
+    selectedTag: List<GetAllTagsWithCount>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
     analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),

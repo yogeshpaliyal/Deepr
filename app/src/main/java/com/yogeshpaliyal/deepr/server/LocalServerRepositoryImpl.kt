@@ -5,11 +5,13 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.data.DataProvider
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.deepr.viewmodel.SortType
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.timeout
@@ -20,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
 import io.ktor.http.isSuccess
 import io.ktor.http.path
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
@@ -33,11 +36,18 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import io.ktor.server.websocket.WebSockets
+import io.ktor.server.websocket.pingPeriod
+import io.ktor.server.websocket.timeout
+import io.ktor.server.websocket.webSocket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,6 +55,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
 import java.util.Locale
+import kotlin.time.Duration.Companion.seconds
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
@@ -54,6 +65,7 @@ open class LocalServerRepositoryImpl(
     private val networkRepository: NetworkRepository,
     private val analyticsManager: AnalyticsManager,
     private val preferenceDataStore: AppPreferenceDataStore,
+    private val dataProvider: DataProvider,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
@@ -107,6 +119,13 @@ open class LocalServerRepositoryImpl(
 
             server =
                 embeddedServer(CIO, host = "0.0.0.0", port = port) {
+                    install(WebSockets) {
+                        pingPeriod = 15.seconds
+                        timeout = 15.seconds
+                        maxFrameSize = Long.MAX_VALUE
+                        masking = false
+                        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+                    }
                     install(ContentNegotiation) {
                         json(
                             Json {
@@ -118,6 +137,25 @@ open class LocalServerRepositoryImpl(
                     }
 
                     routing {
+                        webSocket("/ws/updates") {
+                            try {
+                                dataProvider
+                                    .getLinks(
+                                        this,
+                                        flowOf(""),
+                                        flowOf(SortType.SORT_LINK_ASC),
+                                        flowOf(emptyList()),
+                                        flowOf(-1),
+                                    ).collectLatest {
+                                        if (it != null) {
+                                            sendDeeprSerialized(data = it)
+                                        }
+                                    }
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "WebSocket error", e)
+                            }
+                        }
+
                         get("/") {
                             try {
                                 val htmlContent =
@@ -138,50 +176,6 @@ open class LocalServerRepositoryImpl(
                                     </html>
                                     """.trimIndent(),
                                     ContentType.Text.Html,
-                                )
-                            }
-                        }
-
-                        get("/api/links") {
-                            try {
-                                val links =
-                                    deeprQueries
-                                        .getLinksAndTags(
-                                            "",
-                                            "",
-                                            "",
-                                            -1L,
-                                            -1L,
-                                            "",
-                                            "",
-                                            "DESC",
-                                            "createdAt",
-                                            "DESC",
-                                            "createdAt",
-                                        ).executeAsList()
-                                val response =
-                                    links.map { link ->
-                                        LinkResponse(
-                                            id = link.id,
-                                            link = link.link,
-                                            name = link.name,
-                                            createdAt = link.createdAt,
-                                            isFavourite = link.isFavourite,
-                                            openedCount = link.openedCount,
-                                            notes = link.notes,
-                                            thumbnail = link.thumbnail,
-                                            tags =
-                                                link.tagsNames
-                                                    ?.split(", ")
-                                                    ?.filter { it.isNotEmpty() } ?: emptyList(),
-                                        )
-                                    }
-                                call.respond(HttpStatusCode.OK, response)
-                            } catch (e: Exception) {
-                                Log.e("LocalServer", "Error getting links", e)
-                                call.respond(
-                                    HttpStatusCode.InternalServerError,
-                                    ErrorResponse("Error getting links: ${e.message}"),
                                 )
                             }
                         }
@@ -213,7 +207,7 @@ open class LocalServerRepositoryImpl(
                         get("/api/tags") {
                             try {
                                 // Get all tags from the database with their IDs
-                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val allTags = dataProvider.getAllTags(GlobalScope).value
                                 val response =
                                     allTags.map { tag ->
                                         // Count how many links use this tag
@@ -440,24 +434,11 @@ open class LocalServerRepositoryImpl(
 }
 
 @Serializable
-data class LinkResponse(
-    val id: Long,
-    val link: String,
-    val name: String,
-    val createdAt: String,
-    val openedCount: Long,
-    val notes: String,
-    val thumbnail: String,
-    val isFavourite: Long,
-    val tags: List<String>,
-)
-
-@Serializable
 data class TagData(
     val id: Long,
     val name: String,
 ) {
-    fun toDbTag() = Tags(id, name)
+    fun toDbTag() = GetAllTagsWithCount(id, name, linkCount = 0)
 }
 
 @Serializable

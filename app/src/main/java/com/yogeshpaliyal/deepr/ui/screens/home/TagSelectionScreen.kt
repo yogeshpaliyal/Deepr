@@ -61,7 +61,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -302,7 +301,7 @@ object TagSelectionScreen : TopLevelRoute {
                                         Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                viewModel.setTagFilter(Tags(tag.id, tag.name))
+                                                viewModel.setTagFilter(tag)
                                             },
                                     shape = RoundedCornerShape(12.dp),
                                     colors =
@@ -331,7 +330,7 @@ object TagSelectionScreen : TopLevelRoute {
                                         androidx.compose.material3.Checkbox(
                                             checked = isSelected,
                                             onCheckedChange = {
-                                                viewModel.setTagFilter(Tags(tag.id, tag.name))
+                                                viewModel.setTagFilter(tag)
                                             },
                                         )
 
@@ -467,7 +466,7 @@ object TagSelectionScreen : TopLevelRoute {
                                     val result =
                                         runBlocking {
                                             try {
-                                                viewModel.updateTag(Tags(tag.id, trimmedName))
+                                                viewModel.updateTag(tag)
                                                 Result.success(true)
                                             } catch (e: Exception) {
                                                 return@runBlocking Result.failure(e)

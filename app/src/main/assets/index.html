@@ -268,8 +268,83 @@
     <script>
         // Global variables to store all links and available tags
         let allLinks = [];
-        let availableTags = []; // Now contains {id, name, count} objects
-        let selectedTags = []; // Now contains {id, name} objects
+        let availableTags = [];
+        let selectedTags = [];
+        let linksSocket = null;
+        let reconnectTimer = null;
+        let hasConnectedToSocket = false;
+        const WS_RETRY_MS = 5000;
+
+        // WebSocket connection management
+        function connectLinksWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const wsUrl = `${protocol}://${window.location.host}/ws/updates`;
+
+            try {
+                linksSocket?.close();
+                linksSocket = new WebSocket(wsUrl);
+            } catch (error) {
+                console.error('Unable to create websocket', error);
+                scheduleSocketReconnect();
+                return;
+            }
+
+            linksSocket.addEventListener('open', () => {
+                hasConnectedToSocket = true;
+                if (reconnectTimer) {
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+                showToast('Live updates enabled', 'info');
+            });
+
+            linksSocket.addEventListener('message', (event) => handleSocketMessage(event.data));
+
+            linksSocket.addEventListener('close', () => {
+                if (hasConnectedToSocket) {
+                    showToast('Live updates disconnected. Retrying...', 'error');
+                }
+                scheduleSocketReconnect();
+            });
+
+            linksSocket.addEventListener('error', () => {
+                linksSocket?.close();
+            });
+        }
+
+        function handleSocketMessage(rawData) {
+            try {
+                const parsed = JSON.parse(rawData);
+                switch(parsed.dataType){
+                    case 'links_list':
+                        allLinks = parsed.links;
+                        populateTagFilter();
+                        filterAndDisplayLinks();
+                        break;
+                    default:
+                        console.warn('Unknown dataType received from websocket:', parsed.dataType);
+                }
+            } catch (error) {
+                console.error('Failed parsing websocket payload', error);
+            }
+        }
+
+        function scheduleSocketReconnect() {
+            if (reconnectTimer) {
+                return;
+            }
+            reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                connectLinksWebSocket();
+            }, WS_RETRY_MS);
+        }
+
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+        }
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -676,7 +751,13 @@
                     tagsInput.value = '';
                     selectedTags = [];
                     updateSelectedTagsDisplay();
-                    loadLinks();
+
+                    // If WebSocket is not connected, fallback to HTTP
+                    if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                        loadLinks();
+                    }
+                    // Otherwise, WebSocket will automatically send updated data
+
                     loadAvailableTags();
 
                     button.innerHTML = `
@@ -764,12 +845,22 @@
 
             // Form and refresh
             document.getElementById('addLinkForm').addEventListener('submit', addLink);
-            document.getElementById('refreshBtn').addEventListener('click', loadLinks);
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    showToast('Using real-time connection', 'info');
+                } else {
+                    connectLinksWebSocket();
+                }
+            });
 
             // Initialize
             updateSortOrderIcon();
-            loadLinks();
             loadAvailableTags();
+            connectLinksWebSocket();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            linksSocket?.close();
         });
     </script>
 </body>
