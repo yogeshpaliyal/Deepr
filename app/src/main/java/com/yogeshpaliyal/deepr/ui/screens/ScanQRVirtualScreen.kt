@@ -8,12 +8,12 @@ import androidx.compose.ui.res.stringResource
 import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
-import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import com.yogeshpaliyal.deepr.ui.screens.home.createDeeprObject
 import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
+import com.yogeshpaliyal.shared.ui.components.SettingsItem
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Qrcode
 

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deepr</string>
+    <!-- Navigation and UI Labels -->
+    <string name="settings">Configuración</string>
+    <string name="about_us">Acerca de nosotros</string>
+    <string name="back">Atrás</string>
+    <string name="save">Guardar</string>
+    <string name="saved">Guardado</string>
+    <string name="execute">Ejecutar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="search">Buscar</string>
+    <string name="create">Crear</string>
+    <string name="edit">Editar</string>
+    <string name="sorting">Ordenar</string>
+    <string name="qr_scanner">Escáner QR</string>
+    <string name="tags">Etiquetas</string>
+    <string name="all">Todos</string>
+    <string name="home">Home</string>
+
+    <string name="add_link">Agregar enlace</string>
+    <string name="fetch_name_from_link">Obtener nombre del enlace</string>
+    <string name="create_tag">Agregar etiqueta</string>
+    <string name="new_tag">Nueva etiqueta</string>
+    <string name="no_links_saved_yet">Aún no hay enlaces guardados</string>
+    <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde.</string>
+    <!-- Menu and Dialog Items -->
+    <string name="more_options">Más opciones</string>
+    <string name="copy_link">Copiar enlace</string>
+    <string name="link_copied">Enlace copiado</string>
+    <string name="delete">Eliminar</string>
+    <string name="remove_tag">Eliminar etiqueta</string>
+    <string name="failed_to_fetch_metadata">Error al obtener metadatos</string>
+    <string name="opened_count">Abierto: %d</string>
+    <string name="last_opened">Último abierto: %s</string>
+    <string name="tags_label">Etiquetas:</string>
+    <string name="suggestions_label">Sugerencias:</string>
+    <string name="filter">Filtrar</string>
+    <string name="add_shortcut">Agregar acceso directo</string>
+    <string name="edit_shortcut">Editar acceso directo</string>
+    <string name="show_qr_code">Mostrar código QR</string>
+    <string name="deeplink_already_exists">El enlace profundo ya existe</string>
+    <!-- Sort Menu Items -->
+    <string name="sort_by_date_ascending">Ordenar por Fecha Ascendente</string>
+    <string name="sort_by_date_descending">Ordenar por Fecha Descendente</string>
+    <string name="sort_by_opened_ascending">Ordenar por Abierto Ascendente</string>
+    <string name="sort_by_opened_descending">Ordenar por Abierto Descendente</string>
+    <string name="sort_by_name_ascending">Ordenar por Nombre Ascendente</string>
+    <string name="sort_by_name_descending">Ordenar por Nombre Descendente</string>
+    <string name="sort_by_link_ascending">Ordenar por Enlace Ascendente</string>
+    <string name="sort_by_link_descending">Ordenar por Enlace Descendente</string>
+    <!-- Tag Management -->
+    <string name="edit_tag">Editar Etiqueta</string>
+    <string name="delete_tag">Eliminar Etiqueta</string>
+    <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
+    <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
+    <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
+    <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
+    <string name="failed_to_delete_tag">Error al eliminar la etiqueta: %s</string>
+    <string name="tag_deleted_successfully">Etiqueta eliminada exitosamente</string>
+    <string name="edit_tag_description">Editar Etiqueta</string>
+    <string name="delete_tag_description">Eliminar Etiqueta</string>
+    <!-- Settings Screen -->
+    <string name="import_deeplinks">Importar Deeplinks</string>
+    <string name="import_deeplinks_description">Importar Deeplinks desde archivo CSV</string>
+    <string name="export_deeplinks">Exportar Deeplinks</string>
+    <string name="export_deeplinks_description">Exportar Deeplinks a archivo CSV</string>
+    <string name="shortcut_icon">Icono de acceso directo</string>
+    <string name="use_link_app_icon">Usar icono de la app que soporta enlaces</string>
+    <string name="use_deepr_app_icon">Usar icono de la app Deepr</string>
+    <string name="shortcut_icon_setting">Configuración de icono de acceso directo</string>
+    <string name="language">Idioma</string>
+    <string name="language_description">Cambiar idioma de la aplicación</string>
+    <string name="language_dialog_title">Seleccionar idioma</string>
+    <string name="system_default">Predeterminado del sistema</string>
+    <string name="english">English</string>
+    <string name="hindi">हिंदी</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="urdu">اردو</string>
+    <string name="app_version">Versión de la aplicación: %s</string>
+    <string name="made_with_love">Hecho con ❤️ en India</string>
+    <!-- About Us Screen -->
+    <string name="app_logo">Logo de la aplicación</string>
+    <string name="version_format">Versión %s</string>
+    <string name="app_description">Una aplicación simple para guardar, organizar y lanzar enlaces profundos.</string>
+    <string name="author">Autor</string>
+    <string name="author_name">Yogesh Choudhary</string>
+    <string name="twitter">Twitter</string>
+    <string name="github">GitHub</string>
+    <string name="linkedin">LinkedIn</string>
+    <string name="view_on_github">Ver en GitHub</string>
+    <!-- Save Dialog -->
+    <string name="save_deeplink">Guardar enlace profundo</string>
+    <string name="save_deeplink_message">¿Guardar el enlace profundo: %s?</string>
+    <string name="enter_link_name">Por favor, ingresa el nombre del enlace</string>
+    <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace.</string>
+    <string name="save_and_execute">Guardar y ejecutar</string>
+    <!-- Home Screen -->
+    <string name="enter_deeplink_command">Introducir enlace</string>
+    <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío.</string>
+    <!-- Error Messages -->
+    <string name="invalid_deeplink_toast">Enlace profundo inválido: %s</string>
+    <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar.</string>
+    <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo.</string>
+    <string name="export_success">Exportado exitosamente a %s</string>
+    <string name="export_failed">Error al crear archivo CSV.</string>
+    <!-- Sync Settings -->
+    <string name="select_sync_file">Seleccionar archivo de sincronización</string>
+    <string name="sync_now">Sincronizar ahora</string>
+    <string name="last_sync_time">Última sincronización:</string>
+    <string name="last_sync_time_never">Nunca sincronizado</string>
+    <string name="last_sync_time_format">%s</string>
+    <!-- Sync Messages -->
+    <string name="sync_disabled">Sincronización deshabilitada</string>
+    <string name="sync_file_not_selected">No se seleccionó archivo de sincronización</string>
+    <string name="sync_success">Sincronizado exitosamente con %s</string>
+    <string name="sync_failed">Error de sincronización: %s</string>
+    <string name="no_file_path_provided">No se proporcionó ruta de archivo</string>
+    <string name="invalid_markdown_format">Formato de tabla markdown inválido</string>
+    <string name="file_validation_error">Error de validación de archivo: %s</string>
+    <!-- Additional Sync Settings -->
+    <string name="sync_to_file">Sincronizar a archivo local (Beta)</string>
+    <string name="sync_to_file_description">Sincronizar automáticamente enlaces profundos a un archivo markdown</string>
+    <string name="select_sync_file_description">Elegir ubicación del archivo para sincronización markdown</string>
+    <string name="sync_file_validation">Validación de formato de archivo</string>
+    <string name="sync_status_valid">✓ El formato del archivo es válido</string>
+    <string name="sync_status_invalid">⚠ El formato del archivo es inválido</string>
+    <string name="sync_status_no_file">No se seleccionó archivo de sincronización</string>
+    <string name="sync_now_description">Sincronizar manualmente enlaces profundos al archivo seleccionado</string>
+</resources>

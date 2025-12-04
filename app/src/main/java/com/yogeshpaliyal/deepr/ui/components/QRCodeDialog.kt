@@ -25,7 +25,7 @@ import com.lightspark.composeqr.DotShape
 import com.lightspark.composeqr.QrCodeColors
 import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 
 @Composable
 fun QrCodeDialog(

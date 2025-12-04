@@ -50,8 +50,8 @@ import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.data.DeeprLink
-import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.shared.data.DeeprLink
+import com.yogeshpaliyal.shared.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink

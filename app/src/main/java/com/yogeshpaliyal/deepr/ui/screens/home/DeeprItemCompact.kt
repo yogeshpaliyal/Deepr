@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons

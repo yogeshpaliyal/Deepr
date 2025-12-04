@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deepr</string>
+    <string name="settings">Seadistused</string>
+    <string name="about_us">Rakenduse teave</string>
+    <string name="back">Tagasi</string>
+    <string name="save">Salvesta</string>
+    <string name="saved">Salvestatud</string>
+    <string name="execute">Käivita</string>
+    <string name="cancel">Katkesta</string>
+    <string name="search">Otsi</string>
+    <string name="create">Loo</string>
+    <string name="edit">Muuda</string>
+    <string name="sorting">Järjestamine</string>
+    <string name="qr_scanner">QR-koodi skanner</string>
+    <string name="tags">Sildid</string>
+    <string name="all">Kõik</string>
+    <string name="home">Home</string>
+
+    <string name="favourites">Lemmikud</string>
+    <string name="add_to_favourites">Lisa lemmikuks</string>
+    <string name="remove_from_favourites">Eemalda lemmikute seast</string>
+    <string name="add_link">Lisa link</string>
+    <string name="fetch_name_from_link">Tuvasta nimi lingist</string>
+    <string name="create_tag">Loo silt</string>
+</resources>

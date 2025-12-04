@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.kotlinter) apply false
     alias(libs.plugins.googleServices) apply false
     alias(libs.plugins.firebaseCrashlytics) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.android.kotlin.multiplatform.library) apply false
+    alias(libs.plugins.compose.multiplatform) apply false
 }
 
 tasks.register("copyGitHooks", Copy::class.java) {

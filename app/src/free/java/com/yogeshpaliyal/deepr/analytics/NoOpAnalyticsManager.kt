@@ -1,5 +1,7 @@
 package com.yogeshpaliyal.deepr.analytics
 
+import com.yogeshpaliyal.shared.analytics.AnalyticsManager
+
 class NoOpAnalyticsManager : AnalyticsManager {
     override fun logEvent(
         eventName: String,

@@ -16,7 +16,6 @@ import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.server.CountData
 import com.yogeshpaliyal.deepr.server.LinksListData
 import com.yogeshpaliyal.deepr.sync.SyncRepository
-import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

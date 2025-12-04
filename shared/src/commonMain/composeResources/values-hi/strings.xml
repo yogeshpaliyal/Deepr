@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deepr</string>
+    <!-- Navigation and UI Labels -->
+    <string name="settings">सेटिंग्स</string>
+    <string name="about_us">हमारे बारे में</string>
+    <string name="back">वापस</string>
+    <string name="save">सहेजें</string>
+    <string name="saved">सहेजा गया</string>
+    <string name="execute">निष्पादित करें</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="search">खोजें</string>
+    <string name="create">बनाएं</string>
+    <string name="edit">संपादित करें</string>
+    <string name="sorting">क्रमबद्ध करना</string>
+    <string name="qr_scanner">क्यूआर स्कैनर</string>
+    <string name="tags">टैग्स</string>
+    <string name="all">सभी</string>
+    <string name="home">Home</string>
+
+    <string name="add_link">लिंक जोड़ें</string>
+    <string name="fetch_name_from_link">लिंक से नाम प्राप्त करें</string>
+    <string name="create_tag">टैग बनाएं</string>
+    <string name="new_tag">नया टैग</string>
+    <string name="no_links_saved_yet">अभी तक कोई लिंक सहेजे नहीं गए</string>
+    <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें।</string>
+    <!-- Menu and Dialog Items -->
+    <string name="more_options">अधिक विकल्प</string>
+    <string name="copy_link">लिंक कॉपी करें</string>
+    <string name="link_copied">लिंक कॉपी किया गया</string>
+    <string name="delete">हटाएं</string>
+    <string name="remove_tag">टैग हटाएं</string>
+    <string name="failed_to_fetch_metadata">मेटाडेटा प्राप्त करने में विफल</string>
+    <string name="opened_count">खोला गया: %d</string>
+    <string name="last_opened">अंतिम बार खोला गया: %s</string>
+    <string name="tags_label">टैग:</string>
+    <string name="suggestions_label">सुझाव:</string>
+    <string name="filter">फ़िल्टर</string>
+    <string name="add_shortcut">शॉर्टकट जोड़ें</string>
+    <string name="edit_shortcut">शॉर्टकट संपादित करें</string>
+    <string name="show_qr_code">QR कोड दिखाएं</string>
+    <string name="deeplink_already_exists">डीपलिंक पहले से मौजूद है</string>
+    <!-- Sort Menu Items -->
+    <string name="sort_by_date_ascending">दिनांक के अनुसार आरोही क्रम में</string>
+    <string name="sort_by_date_descending">दिनांक के अनुसार अवरोही क्रम में</string>
+    <string name="sort_by_opened_ascending">खोले गए के अनुसार आरोही क्रम में</string>
+    <string name="sort_by_opened_descending">खोले गए के अनुसार अवरोही क्रम में</string>
+    <string name="sort_by_name_ascending">नाम के अनुसार आरोही क्रम में</string>
+    <string name="sort_by_name_descending">नाम के अनुसार अवरोही क्रम में</string>
+    <string name="sort_by_link_ascending">लिंक के अनुसार आरोही क्रम में</string>
+    <string name="sort_by_link_descending">लिंक के अनुसार अवरोही क्रम में</string>
+    <!-- Tag Management -->
+    <string name="edit_tag">टैग संपादित करें</string>
+    <string name="delete_tag">टैग हटाएं</string>
+    <string name="delete_tag_confirmation">क्या आप वाकई इस टैग को हटाना चाहते हैं?</string>
+    <string name="tag_name_exists">इस नाम के साथ एक टैग पहले से मौजूद है</string>
+    <string name="failed_to_edit_tag">टैग संपादित करने में विफल</string>
+    <string name="tag_edited_successfully">टैग सफलतापूर्वक संपादित</string>
+    <string name="failed_to_delete_tag">टैग हटाने में विफल: %s</string>
+    <string name="tag_deleted_successfully">टैग सफलतापूर्वक हटाया गया</string>
+    <string name="edit_tag_description">टैग संपादित करें</string>
+    <string name="delete_tag_description">टैग हटाएं</string>
+    <!-- Settings Screen -->
+    <string name="import_deeplinks">Deeplinks आयात करें</string>
+    <string name="import_deeplinks_description">CSV फ़ाइल से Deeplinks आयात करें</string>
+    <string name="export_deeplinks">Deeplinks निर्यात करें</string>
+    <string name="export_deeplinks_description">Deeplinks को CSV फ़ाइल में निर्यात करें</string>
+    <string name="shortcut_icon">शॉर्टकट आइकन</string>
+    <string name="use_link_app_icon">लिंक समर्थन करने वाले ऐप का आइकन उपयोग करें</string>
+    <string name="use_deepr_app_icon">Deepr ऐप आइकन उपयोग करें</string>
+    <string name="shortcut_icon_setting">शॉर्टकट आइकन सेटिंग</string>
+    <string name="language">भाषा</string>
+    <string name="language_description">ऐप की भाषा बदलें</string>
+    <string name="language_dialog_title">भाषा चुनें</string>
+    <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="english">English</string>
+    <string name="hindi">हिंदी</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="urdu">اردو</string>
+    <string name="app_version">ऐप संस्करण: %s</string>
+    <string name="made_with_love">भारत में ❤️ के साथ बनाया गया</string>
+    <!-- About Us Screen -->
+    <string name="app_logo">ऐप लोगो</string>
+    <string name="version_format">संस्करण %s</string>
+    <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप।</string>
+    <string name="author">लेखक</string>
+    <string name="author_name">योगेश चौधरी</string>
+    <string name="twitter">ट्विटर</string>
+    <string name="github">गिटहब</string>
+    <string name="linkedin">लिंक्डइन</string>
+    <string name="view_on_github">गिटहब पर देखें</string>
+    <!-- Save Dialog -->
+    <string name="save_deeplink">डीपलिंक सहेजें</string>
+    <string name="save_deeplink_message">डीपलिंक सहेजें: %s ?</string>
+    <string name="enter_link_name">कृपया लिंक का नाम दर्ज करें</string>
+    <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें।</string>
+    <string name="save_and_execute">सहेजें और निष्पादित करें</string>
+    <!-- Home Screen -->
+    <string name="enter_deeplink_command">लिंक दर्ज करें</string>
+    <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक।</string>
+    <!-- Error Messages -->
+    <string name="invalid_deeplink_toast">अमान्य डीपलिंक: %s</string>
+    <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला।</string>
+    <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं।</string>
+    <string name="export_success">सफलतापूर्वक %s में निर्यात किया गया</string>
+    <string name="export_failed">CSV फ़ाइल बनाने में विफल।</string>
+    <!-- Sync Settings -->
+    <string name="select_sync_file">सिंक फ़ाइल चुनें</string>
+    <string name="sync_now">अभी सिंक करें</string>
+    <string name="last_sync_time">अंतिम सिंक समय:</string>
+    <string name="last_sync_time_never">कभी सिंक नहीं हुआ</string>
+    <string name="last_sync_time_format">%s</string>
+    <!-- Sync Messages -->
+    <string name="sync_disabled">सिंक अक्षम है</string>
+    <string name="sync_file_not_selected">कोई सिंक फ़ाइल नहीं चुनी गई</string>
+    <string name="sync_success">%s के साथ सफलतापूर्वक सिंक हो गया</string>
+    <string name="sync_failed">सिंक विफल: %s</string>
+    <string name="no_file_path_provided">कोई फ़ाइल पथ प्रदान नहीं किया गया</string>
+    <string name="invalid_markdown_format">अमान्य मार्कडाउन तालिका प्रारूप</string>
+    <string name="file_validation_error">फ़ाइल सत्यापन त्रुटि: %s</string>
+    <!-- Additional Sync Settings -->
+    <string name="sync_to_file">स्थानीय फ़ाइल में सिंक करें (बीटा)</string>
+    <string name="sync_to_file_description">डीपलिंक्स को मार्कडाउन फ़ाइल में स्वचालित रूप से सिंक करें</string>
+    <string name="select_sync_file_description">मार्कडाउन सिंक के लिए फ़ाइल स्थान चुनें</string>
+    <string name="sync_file_validation">फ़ाइल प्रारूप सत्यापन</string>
+    <string name="sync_status_valid">✓ फ़ाइल प्रारूप वैध है</string>
+    <string name="sync_status_invalid">⚠ फ़ाइल प्रारूप अवैध है</string>
+    <string name="sync_status_no_file">कोई सिंक फ़ाइल नहीं चुनी गई</string>
+    <string name="sync_now_description">चयनित फ़ाइल में डीपलिंक्स को मैन्युअल रूप से सिंक करें</string>
+</resources>

@@ -1,6 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 
 data class SaveDialogInfo(
     val deepr: DeeprLink,

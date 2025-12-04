@@ -34,8 +34,16 @@ googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 playCore = "2.0.2"
 orchestrator = "1.4.2"
+kotlinStdlib = "2.2.20"
+kotlinTest = "2.2.20"
+runner = "1.7.0"
+core = "1.7.0"
+compose-multiplatform = "1.9.3"
+compose-hot-reload = "1.0.0-rc04"
 
 [libraries]
+kotlinx-rpc-krpc-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json", version.ref = "ktorClient" }
+
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -93,6 +101,10 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 orchestrator = { group = "androidx.test", name = "orchestrator", version.ref = "orchestrator" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -103,3 +115,8 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }

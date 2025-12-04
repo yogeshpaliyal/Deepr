@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 
 @Composable
 fun DeleteConfirmationDialog(

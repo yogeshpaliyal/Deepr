@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

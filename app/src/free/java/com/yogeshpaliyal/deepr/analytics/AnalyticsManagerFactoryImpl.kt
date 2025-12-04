@@ -1,7 +1,8 @@
 package com.yogeshpaliyal.deepr.analytics
 
-import android.content.Context
+import com.yogeshpaliyal.shared.analytics.AnalyticsManager
+import com.yogeshpaliyal.shared.analytics.AnalyticsManagerFactory
 
 object AnalyticsManagerFactoryImpl : AnalyticsManagerFactory {
-    override fun create(context: Context): AnalyticsManager = NoOpAnalyticsManager()
+    override fun create(): AnalyticsManager = NoOpAnalyticsManager()
 }

@@ -54,7 +54,7 @@ import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
-import com.yogeshpaliyal.deepr.ui.components.ThemeSelectionDialog
+import com.yogeshpaliyal.shared.ui.alerts.ThemeSelectionDialog
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons

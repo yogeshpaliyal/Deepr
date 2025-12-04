@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Настройки</string>
+    <string name="about_us">О нас</string>
+    <string name="back">Назад</string>
+    <string name="save">Сохранить</string>
+    <string name="saved">Сохранено</string>
+    <string name="execute">Выполнить</string>
+    <string name="cancel">Отмена</string>
+    <string name="search">Поиск</string>
+    <string name="create">Создать</string>
+    <string name="edit">Изменить</string>
+    <string name="sorting">Сортировка</string>
+    <string name="link_copied">Link copied</string>
+
+    <string name="qr_scanner">Сканер QR-кодов</string>
+    <string name="tags">Метки</string>
+    <string name="all">Все</string>
+    <string name="favourites">Избранное</string>
+    <string name="add_to_favourites">Добавить в избранное</string>
+    <string name="remove_from_favourites">Удалить из избранного</string>
+    <string name="add_link">Добавить ссылку</string>
+    <string name="fetch_name_from_link">Получить название из ссылки</string>
+    <string name="home">Home</string>
+
+</resources>

@@ -12,11 +12,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.getShortcut
 import com.yogeshpaliyal.deepr.util.isShortcutSupported
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.shared.ui.components.ClearInputIconButton
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 

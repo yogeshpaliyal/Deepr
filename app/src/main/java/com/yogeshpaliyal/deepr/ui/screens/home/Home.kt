@@ -103,10 +103,10 @@ import com.yogeshpaliyal.deepr.SharedLink
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
-import com.yogeshpaliyal.deepr.data.DeeprLink
+import com.yogeshpaliyal.shared.data.DeeprLink
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
-import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.shared.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -126,6 +126,8 @@ import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.shared.data.SharedLink
+import com.yogeshpaliyal.shared.ui.screens.LocalSharedText
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Edit
@@ -150,6 +152,8 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 data object Home
+
+
 
 @OptIn(
     ExperimentalMaterial3Api::class,

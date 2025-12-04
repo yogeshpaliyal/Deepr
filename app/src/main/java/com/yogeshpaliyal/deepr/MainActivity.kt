@@ -45,15 +45,13 @@ import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import com.yogeshpaliyal.deepr.ui.screens.home.TagSelectionScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
+import com.yogeshpaliyal.shared.data.SharedLink
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 
-data class SharedLink(
-    val url: String,
-    val title: String?,
-)
+
 
 class MainActivity : ComponentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
@@ -132,96 +130,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
-    listOf(Dashboard2(), TagSelectionScreen, Settings)
-
-val LocalSharedText =
-    compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Dashboard(
-    modifier: Modifier = Modifier,
-    sharedText: SharedLink? = null,
-    resetSharedText: () -> Unit,
-) {
-    val backStack =
-        remember {
-            TopLevelBackStack<BaseScreen>(
-                Dashboard2(),
-            )
-        }
-    val current = backStack.getLast()
-    val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
-    val hapticFeedback = LocalHapticFeedback.current
-    val layoutDirection = LocalLayoutDirection.current
-
-    CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
-        CompositionLocalProvider(LocalNavigator provides backStack) {
-            Scaffold(
-                modifier = modifier,
-                bottomBar = {
-                    AnimatedVisibility(
-                        (TOP_LEVEL_ROUTES.any { it::class == current::class }),
-                        enter = slideInVertically(initialOffsetY = { it }),
-                        exit = slideOutVertically(targetOffsetY = { it }),
-                    ) {
-                        BottomAppBar(scrollBehavior = scrollBehavior) {
-                            TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
-                                val isSelected =
-                                    topLevelRoute::class == backStack.topLevelKey::class
-                                NavigationBarItem(
-                                    selected = isSelected,
-                                    onClick = {
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        backStack.addTopLevel(topLevelRoute)
-                                    },
-                                    label = {
-                                        Text(stringResource(topLevelRoute.label))
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector = topLevelRoute.icon,
-                                            contentDescription = null,
-                                        )
-                                    },
-                                )
-                            }
-                        }
-                    }
-                },
-            ) { contentPadding ->
-                NavDisplay(
-                    backStack = backStack.backStack,
-                    entryDecorators =
-                        listOf(
-                            // Add the default decorators for managing scenes and saving state
-                            rememberSceneSetupNavEntryDecorator(),
-                            rememberSavedStateNavEntryDecorator(),
-                            // Then add the view model store decorator
-                            rememberViewModelStoreNavEntryDecorator(),
-                        ),
-                    onBack = {
-                        backStack.removeLast()
-                    },
-                    entryProvider = {
-                        NavEntry(it) { entryItem ->
-                            if (entryItem is TopLevelRoute) {
-                                entryItem.Content(
-                                    WindowInsets(
-                                        left = contentPadding.calculateLeftPadding(layoutDirection),
-                                        right = contentPadding.calculateRightPadding(layoutDirection),
-                                        top = contentPadding.calculateTopPadding(),
-                                        bottom = contentPadding.calculateBottomPadding(),
-                                    ),
-                                )
-                            } else if (entryItem is Screen) {
-                                entryItem.Content()
-                            }
-                        }
-                    },
-                )
-            }
-        }
-    }
-}

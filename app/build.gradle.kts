@@ -163,6 +163,7 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.documentfile)
+    implementation(project(":shared"))
 
     // Add Firebase dependencies to pro and freePlayStore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))

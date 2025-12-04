@@ -35,9 +35,9 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
-import com.yogeshpaliyal.deepr.ui.components.SettingsItem
-import com.yogeshpaliyal.deepr.ui.components.SettingsSection
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.shared.ui.components.SettingsItem
+import com.yogeshpaliyal.shared.ui.components.SettingsSection
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download

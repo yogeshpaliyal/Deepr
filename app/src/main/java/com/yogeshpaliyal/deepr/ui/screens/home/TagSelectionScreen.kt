@@ -60,7 +60,7 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.server.DeeprTag
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
-import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.shared.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit

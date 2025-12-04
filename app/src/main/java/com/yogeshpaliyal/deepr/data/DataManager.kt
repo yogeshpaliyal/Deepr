@@ -62,7 +62,7 @@ class DataProvider(
                 ).asFlow()
                 .map {
                     val dbList = it.executeAsList()
-                    val mappedList = dbList.map { dbObj -> DeeprLink(dbObj) }
+                    val mappedList = dbList.map { dbObj -> dbObj.toDeeprLink() }
                     LinksListData(mappedList)
                 }
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5000), null)
