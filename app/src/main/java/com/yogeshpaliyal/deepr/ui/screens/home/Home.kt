@@ -105,6 +105,7 @@ import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
+import com.yogeshpaliyal.deepr.ui.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
@@ -460,7 +461,7 @@ fun HomeScreen(
                 },
                 expanded = isExpanded,
                 onClick = {
-                    selectedLink = createDeeprObject()
+                    localNavigator.add(AddLinkScreen(createDeeprObject()))
                 },
             )
         },
@@ -487,24 +488,14 @@ fun HomeScreen(
                 searchQuery = textFieldState.text.toString(),
                 favouriteFilter = favouriteFilter,
                 editDeepr = {
-                    selectedLink = it
+                    localNavigator.add(AddLinkScreen(it))
                 },
             )
         }
 
         selectedLink?.let {
-            HomeBottomContent(
-                deeprQueries = deeprQueries,
-                selectedLink = it,
-            ) { updatedValue ->
-                if (updatedValue != null) {
-                    if (updatedValue.executeAfterSave) {
-                        openDeeplink(context, updatedValue.deepr.link)
-                    }
-                }
-                selectedLink = null
-                resetSharedText()
-            }
+            localNavigator.add(AddLinkScreen(it))
+            selectedLink = null
         }
     }
 }

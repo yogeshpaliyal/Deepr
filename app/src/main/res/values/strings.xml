@@ -23,6 +23,7 @@
     <string name="fetch_name_from_link">Fetch meta from link</string>
     <string name="create_tag">Create Tag</string>
     <string name="new_tag">New tag (Optional)</string>
+    <string name="add_tag">Add tag</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access them later.</string>
     <string name="no_favourites_found">No favourites yet</string>
