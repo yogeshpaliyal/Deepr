@@ -2,6 +2,7 @@ package com.yogeshpaliyal.deepr.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -46,15 +47,15 @@ class DeeprIntegratedTest {
             .onNodeWithContentDescription(getString(R.string.add_link))
             .performClick()
 
-        // Wait for the bottom sheet to appear
+        // Wait for the screen to appear
         composeTestRule.waitForIdle()
 
-        // Enter a deeplink
+        // Enter a deeplink using placeholder text
         composeTestRule
-            .onNodeWithText(getString(R.string.enter_deeplink_command))
+            .onNodeWithText("https://example.com or app://deeplink")
             .performTextInput("myapp://test")
 
-        // Enter a name
+        // Enter a name using label text
         composeTestRule
             .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput("Test Link")
@@ -246,12 +247,12 @@ class DeeprIntegratedTest {
 
         composeTestRule.waitForIdle()
 
-        // Enter deeplink
+        // Enter deeplink using placeholder text
         composeTestRule
-            .onNodeWithText(getString(R.string.enter_deeplink_command))
+            .onNodeWithText("https://example.com or app://deeplink")
             .performTextInput(link)
 
-        // Enter name
+        // Enter name using label text
         composeTestRule
             .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput(name)
@@ -278,23 +279,34 @@ class DeeprIntegratedTest {
 
         composeTestRule.waitForIdle()
 
-        // Enter deeplink
+        // Enter deeplink using placeholder text
         composeTestRule
-            .onNodeWithText(getString(R.string.enter_deeplink_command))
+            .onNodeWithText("https://example.com or app://deeplink")
             .performTextInput(link)
 
-        // Enter name
+        // Enter name using label text
         composeTestRule
             .onNodeWithText(getString(R.string.enter_link_name))
             .performTextInput(name)
 
-        // Add tag
+        // Add tag - click on the tag input field (using add_tag label)
         composeTestRule
-            .onNodeWithText(getString(R.string.new_tag))
+            .onNodeWithText(getString(R.string.add_tag))
+            .performScrollTo()
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        // Type the tag name
+        composeTestRule
+            .onNodeWithText(getString(R.string.add_tag))
             .performTextInput(tag)
 
+        composeTestRule.waitForIdle()
+
+        // Click on "Create Tag: 'tagName'" option in dropdown
         composeTestRule
-            .onNodeWithText(getString(R.string.create_tag))
+            .onNode(hasText(getString(R.string.create_tag), substring = true))
             .performClick()
 
         composeTestRule.waitForIdle()
