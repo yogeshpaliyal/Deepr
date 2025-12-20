@@ -20,6 +20,8 @@
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="add_link">Add Link</string>
+    <string name="add">Add</string>
+    <string name="clipboard_link_detected">Link detected in clipboard</string>
     <string name="fetch_name_from_link">Fetch meta from link</string>
     <string name="create_tag">Create Tag</string>
     <string name="new_tag">New tag (Optional)</string>
