@@ -10,6 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
+import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.ui.screens.addlink.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import kotlin.collections.remove
 
@@ -21,6 +23,15 @@ sealed interface BaseScreen : NavKey
 interface Screen : BaseScreen {
     @Composable
     fun Content()
+}
+
+data class AddLinkScreen(
+    val selectedLink: GetLinksAndTags,
+) : Screen {
+    @Composable
+    override fun Content() {
+        AddLinkScreen(selectedLink = selectedLink)
+    }
 }
 
 interface TopLevelRoute : BaseScreen {

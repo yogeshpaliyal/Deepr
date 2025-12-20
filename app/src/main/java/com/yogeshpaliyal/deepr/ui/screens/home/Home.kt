@@ -98,6 +98,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.LocalClipboardLink
 import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
@@ -105,9 +106,11 @@ import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsEvents
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
+import com.yogeshpaliyal.deepr.ui.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
@@ -215,6 +218,11 @@ fun HomeScreen(
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
+
+    // Clipboard link detection
+    val clipboardLinkState = LocalClipboardLink.current
+    val clipboardLink = clipboardLinkState?.first
+    val resetClipboardLink = clipboardLinkState?.second
     val scope = rememberCoroutineScope()
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
@@ -412,6 +420,18 @@ fun HomeScreen(
                     },
                 )
 
+                // Clipboard link banner
+                ClipboardLinkBanner(
+                    clipboardLink = clipboardLink,
+                    onAddClick = { url ->
+                        resetClipboardLink?.invoke()
+                        localNavigator.add(AddLinkScreen(createDeeprObject(link = url)))
+                    },
+                    onDismiss = {
+                        resetClipboardLink?.invoke()
+                    },
+                )
+
                 LazyRow(
                     modifier =
                         Modifier
@@ -460,7 +480,7 @@ fun HomeScreen(
                 },
                 expanded = isExpanded,
                 onClick = {
-                    selectedLink = createDeeprObject()
+                    localNavigator.add(AddLinkScreen(createDeeprObject()))
                 },
             )
         },
@@ -487,24 +507,14 @@ fun HomeScreen(
                 searchQuery = textFieldState.text.toString(),
                 favouriteFilter = favouriteFilter,
                 editDeepr = {
-                    selectedLink = it
+                    localNavigator.add(AddLinkScreen(it))
                 },
             )
         }
 
         selectedLink?.let {
-            HomeBottomContent(
-                deeprQueries = deeprQueries,
-                selectedLink = it,
-            ) { updatedValue ->
-                if (updatedValue != null) {
-                    if (updatedValue.executeAfterSave) {
-                        openDeeplink(context, updatedValue.deepr.link)
-                    }
-                }
-                selectedLink = null
-                resetSharedText()
-            }
+            localNavigator.add(AddLinkScreen(it))
+            selectedLink = null
         }
     }
 }
