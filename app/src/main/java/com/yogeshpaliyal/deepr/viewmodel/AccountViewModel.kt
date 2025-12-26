@@ -233,7 +233,9 @@ class AccountViewModel(
         linkId: Long,
         tagId: Long,
     ) {
-        linkRepository.addTagToLink(linkId, tagId)
+        withContext(Dispatchers.IO) {
+            linkRepository.addTagToLink(linkId, tagId)
+        }
     }
 
     // Add tag by name (creates tag if it doesn't exist)
@@ -410,7 +412,9 @@ class AccountViewModel(
     }
 
     suspend fun updateTag(tag: Tags) {
-        linkRepository.updateTag(tag.name, tag.id)
+        withContext(Dispatchers.IO) {
+            linkRepository.updateTag(tag.name, tag.id)
+        }
     }
 
     fun incrementOpenedCount(id: Long) {
