@@ -13,6 +13,8 @@ import com.yogeshpaliyal.deepr.backup.ExportRepositoryImpl
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepositoryImpl
 import com.yogeshpaliyal.deepr.data.HtmlParser
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.data.LinkRepositoryImpl
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.review.ReviewManager
@@ -68,6 +70,8 @@ class DeeprApplication : Application() {
                 }
 
                 single { AppPreferenceDataStore(androidContext()) }
+
+                single<LinkRepository> { LinkRepositoryImpl(get()) }
 
                 single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
 
