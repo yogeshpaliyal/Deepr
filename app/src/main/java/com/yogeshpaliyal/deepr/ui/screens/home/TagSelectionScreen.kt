@@ -109,11 +109,12 @@ object TagSelectionScreen : TopLevelRoute {
         // Filter tags based on search query
         val filteredTags =
             remember(tagsWithCount, searchQuery) {
-                if (searchQuery.isBlank()) {
+                val trimmedQuery = searchQuery.trim()
+                if (trimmedQuery.isBlank()) {
                     tagsWithCount
                 } else {
                     tagsWithCount.filter { tag ->
-                        tag.name.contains(searchQuery, ignoreCase = true)
+                        tag.name.contains(trimmedQuery, ignoreCase = true)
                     }
                 }
             }
@@ -392,7 +393,7 @@ object TagSelectionScreen : TopLevelRoute {
                             )
                             if (searchQuery.isNotBlank()) {
                                 Text(
-                                    text = "${filteredTags.size} of ${tagsWithCount.size}",
+                                    text = stringResource(R.string.filtered_tags_count, filteredTags.size, tagsWithCount.size),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 4.dp),

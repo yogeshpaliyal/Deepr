@@ -92,6 +92,7 @@
     <string name="delete_tag_description">Delete Tag</string>
     <string name="clear_all_filters">Clear All Filters</string>
     <string name="selected_tags_count">%d tags selected</string>
+    <string name="filtered_tags_count">%1$d of %2$d</string>
 
     <!-- Settings Screen -->
     <string name="backup">Backup</string>
