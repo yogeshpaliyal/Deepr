@@ -1044,6 +1044,7 @@ fun DeeprList(
                             onItemClick = onItemClick,
                             onTagClick = onTagClick,
                             isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
                         )
                     }
                 }
