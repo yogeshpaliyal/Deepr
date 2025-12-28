@@ -15,6 +15,7 @@
     <string name="sorting">Sorting</string>
     <string name="qr_scanner">QR Scanner</string>
     <string name="tags">Tags</string>
+    <string name="all_tags">All Tags</string>
     <string name="all">All</string>
     <string name="favourites">Favourites</string>
     <string name="add_to_favourites">Add to favourites</string>

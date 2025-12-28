@@ -385,7 +385,7 @@ object TagSelectionScreen : TopLevelRoute {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = "All Tags",
+                                text = stringResource(R.string.all_tags),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 4.dp),
