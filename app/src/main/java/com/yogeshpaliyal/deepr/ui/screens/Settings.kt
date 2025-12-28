@@ -62,6 +62,7 @@ import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Download
+import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
@@ -109,6 +110,7 @@ fun SettingsScreen(
     // Collect default page preference state
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
 
     Scaffold(
         contentWindowInsets = windowInsets,
@@ -273,6 +275,21 @@ fun SettingsScreen(
                         Switch(
                             checked = isThumbnailEnable,
                             onCheckedChange = { viewModel.setIsThumbnailEnable(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.ExternalLink,
+                    title = stringResource(R.string.show_open_counter),
+                    description = stringResource(R.string.show_open_counter_description),
+                    onClick = {
+                        viewModel.setShowOpenCounter(!showOpenCounter)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = showOpenCounter,
+                            onCheckedChange = { viewModel.setShowOpenCounter(it) },
                         )
                     },
                 )

@@ -583,6 +583,17 @@ class AccountViewModel(
         }
     }
 
+    // Show open counter preference methods
+    val showOpenCounter =
+        preferenceDataStore.getShowOpenCounter
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun setShowOpenCounter(show: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setShowOpenCounter(show)
+        }
+    }
+
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceDataStore.getAutoBackupEnabled
