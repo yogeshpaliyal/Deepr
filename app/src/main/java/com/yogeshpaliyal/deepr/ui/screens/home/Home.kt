@@ -535,6 +535,7 @@ fun Content(
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val analyticsManager = koinInject<AnalyticsManager>()
@@ -660,6 +661,7 @@ fun Content(
             favouriteFilter = favouriteFilter,
             viewType = currentViewType,
             onItemClick = onItemClick,
+            showOpenCounter = showOpenCounter,
         )
     }
     showMoreSelectedItem?.let { account ->
@@ -932,6 +934,7 @@ fun DeeprList(
     favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewType: @ViewType Int = ViewType.LIST,
+    showOpenCounter: Boolean = true,
 ) {
     // Determine which empty state to show
     val isSearchActive = searchQuery.isNotBlank()
@@ -1067,6 +1070,8 @@ fun DeeprList(
                             modifier = Modifier.animateItem(),
                             account = account,
                             onItemClick = onItemClick,
+                            isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
                         )
                     }
                 }
@@ -1090,6 +1095,7 @@ fun DeeprList(
                             account = account,
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
                         )
                     }
                 }

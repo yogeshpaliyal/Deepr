@@ -35,6 +35,7 @@ class AppPreferenceDataStore(
         private val SERVER_PORT = stringPreferencesKey("server_port")
         private val VIEW_TYPE = intPreferencesKey("view_type")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
+        private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -105,6 +106,11 @@ class AppPreferenceDataStore(
     val getThemeMode: Flow<String> =
         context.appDataStore.data.map { preferences ->
             preferences[THEME_MODE] ?: "light" // Default to light theme
+        }
+
+    val getShowOpenCounter: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SHOW_OPEN_COUNTER] ?: true // Default to showing counter
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -194,6 +200,12 @@ class AppPreferenceDataStore(
     suspend fun setThemeMode(mode: String) {
         context.appDataStore.edit { prefs ->
             prefs[THEME_MODE] = mode
+        }
+    }
+
+    suspend fun setShowOpenCounter(show: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[SHOW_OPEN_COUNTER] = show
         }
     }
 }

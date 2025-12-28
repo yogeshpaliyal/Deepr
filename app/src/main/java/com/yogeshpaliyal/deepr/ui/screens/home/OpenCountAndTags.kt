@@ -21,30 +21,35 @@ import compose.icons.tablericons.Tag
 fun OpenCountAndTags(
     account: GetLinksAndTags,
     modifier: Modifier = Modifier,
+    showOpenCounter: Boolean = true,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Row {
-            Icon(
-                TablerIcons.ExternalLink,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = account.openedCount.toString(),
-                style = MaterialTheme.typography.bodySmall,
-                color = getDeeprItemTextColor(account.isFavourite),
-            )
-        }
-        account.tagsIds?.split(",")?.size?.let { tagsCount ->
-            if (tagsCount > 0) {
-                Spacer(modifier = Modifier.width(8.dp))
-
+        if (showOpenCounter) {
+            Row {
+                Icon(
+                    TablerIcons.ExternalLink,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "•",
+                    text = account.openedCount.toString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = getDeeprItemTextColor(account.isFavourite),
                 )
+            }
+        }
+        account.tagsIds?.split(",")?.size?.let { tagsCount ->
+            if (tagsCount > 0) {
+                if (showOpenCounter) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = "•",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = getDeeprItemTextColor(account.isFavourite),
+                    )
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Row {
                     Icon(
