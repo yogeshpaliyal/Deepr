@@ -78,6 +78,7 @@ import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Eye
 import compose.icons.tablericons.Hash
 import compose.icons.tablericons.Plus
+import compose.icons.tablericons.Search
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
 import kotlinx.coroutines.runBlocking
@@ -96,6 +97,7 @@ object TagSelectionScreen : TopLevelRoute {
         val viewModel: AccountViewModel = koinActivityViewModel()
         val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
         var newTagName by remember { mutableStateOf("") }
+        var searchQuery by remember { mutableStateOf("") }
         val tagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
         val context = LocalContext.current
         val navigator = LocalNavigator.current
@@ -103,6 +105,19 @@ object TagSelectionScreen : TopLevelRoute {
         var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
         var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
         var tagEditError by remember { mutableStateOf<String?>(null) }
+
+        // Filter tags based on search query
+        val filteredTags =
+            remember(tagsWithCount, searchQuery) {
+                val trimmedQuery = searchQuery.trim()
+                if (trimmedQuery.isBlank()) {
+                    tagsWithCount
+                } else {
+                    tagsWithCount.filter { tag ->
+                        tag.name.contains(trimmedQuery, ignoreCase = true)
+                    }
+                }
+            }
 
         Scaffold(
             contentWindowInsets = windowInsets,
@@ -278,6 +293,35 @@ object TagSelectionScreen : TopLevelRoute {
                     }
                 }
 
+                // Search Tags Section
+                if (tagsWithCount.isNotEmpty()) {
+                    item {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { Text(stringResource(R.string.search)) },
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = TablerIcons.Search,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            trailingIcon =
+                                if (searchQuery.isNotBlank()) {
+                                    {
+                                        ClearInputIconButton(onClick = { searchQuery = "" })
+                                    }
+                                } else {
+                                    null
+                                },
+                        )
+                    }
+                }
+
                 // Selected Tags Info
                 item {
                     AnimatedVisibility(
@@ -336,19 +380,33 @@ object TagSelectionScreen : TopLevelRoute {
                 if (tagsWithCount.isNotEmpty()) {
                     item {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "All Tags",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.all_tags),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                            )
+                            if (searchQuery.isNotBlank()) {
+                                Text(
+                                    text = stringResource(R.string.filtered_tags_count, filteredTags.size, tagsWithCount.size),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                )
+                            }
+                        }
                     }
                 }
 
                 // Tags List
                 if (tagsWithCount.isEmpty()) {
                     item {
-                        // Empty State
+                        // Empty State - No tags exist
                         ElevatedCard(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp),
@@ -396,9 +454,59 @@ object TagSelectionScreen : TopLevelRoute {
                             }
                         }
                     }
+                } else if (filteredTags.isEmpty()) {
+                    item {
+                        // Empty State - No search results
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp),
+                            colors =
+                                CardDefaults.elevatedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                ),
+                        ) {
+                            Column(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(48.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(24.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Search,
+                                        contentDescription = null,
+                                        modifier =
+                                            Modifier
+                                                .padding(20.dp)
+                                                .size(48.dp),
+                                        tint = MaterialTheme.colorScheme.outline,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Text(
+                                    text = stringResource(R.string.no_search_results),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(R.string.no_search_results_description),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.outline,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
+                    }
                 } else {
                     items(
-                        tagsWithCount.sortedBy { it.name },
+                        filteredTags.sortedBy { it.name },
                         key = { it.id },
                     ) { tag ->
                         TagItem(
