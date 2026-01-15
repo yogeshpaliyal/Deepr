@@ -261,10 +261,14 @@ fun HomeScreen(
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =
                     createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
+                // Reset shared text immediately to prevent re-navigation when backing out
+                resetSharedText()
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
                     .show()
+                // Reset shared text even on error to prevent stuck state
+                resetSharedText()
             }
         }
     }
