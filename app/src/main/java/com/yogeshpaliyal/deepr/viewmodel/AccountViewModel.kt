@@ -191,6 +191,8 @@ class AccountViewModel(
                     currentList.filter { it.id != tag.id }
                 } else {
                     // Add tag if not selected
+                    // Reset favourite filter when selecting a tag
+                    _favouriteFilter.update { -1 }
                     currentList + tag
                 }
             }
