@@ -307,6 +307,13 @@ fun formatDateTime(dateTimeString: String): String {
     }
 }
 
+/**
+ * Formats a link's information into a shareable text format.
+ *
+ * @param item The link item containing name, link, and notes
+ * @return A formatted string containing the link's name (if not blank),
+ *         the link URL, and notes (if not blank), separated by double newlines
+ */
 fun formatShareText(item: GetLinksAndTags): String =
     buildString {
         if (item.name.isNotBlank()) {
