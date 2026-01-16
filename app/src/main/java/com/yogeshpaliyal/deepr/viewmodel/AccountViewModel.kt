@@ -82,7 +82,33 @@ class AccountViewModel(
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
-    // State for tags
+    // Profile state
+    val allProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
+        linkRepository
+            .getAllProfiles()
+            .asFlow()
+            .mapToList(
+                viewModelScope.coroutineContext,
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    private val selectedProfileId: Flow<Long> = preferenceDataStore.getSelectedProfileId
+    val currentProfile: StateFlow<com.yogeshpaliyal.deepr.Profile?> =
+        combine(allProfiles, selectedProfileId) { profiles, profileId ->
+            profiles.firstOrNull { it.id == profileId }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // Initialize default profile if none exists
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            val profileCount = linkRepository.countProfiles().asFlow().mapToOneOrNull(viewModelScope.coroutineContext).first()
+            if (profileCount == 0L) {
+                // Create default profile if none exists
+                linkRepository.insertProfile("Default")
+            }
+        }
+    }
+
+    // State for tags - now scoped to current profile
     val allTags: StateFlow<List<Tags>> =
         linkRepository
             .getAllTags()
@@ -91,29 +117,38 @@ class AccountViewModel(
                 viewModelScope.coroutineContext,
             ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        linkRepository
-            .getAllTagsWithCount()
-            .asFlow()
-            .mapToList(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+        selectedProfileId.flatMapLatest { profileId ->
+            linkRepository
+                .getAllTagsWithCount(profileId)
+                .asFlow()
+                .mapToList(
+                    viewModelScope.coroutineContext,
+                )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val countOfLinks: StateFlow<Long?> =
-        linkRepository
-            .countOfLinks()
-            .asFlow()
-            .mapToOneOrNull(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+        selectedProfileId.flatMapLatest { profileId ->
+            linkRepository
+                .countOfLinks(profileId)
+                .asFlow()
+                .mapToOneOrNull(
+                    viewModelScope.coroutineContext,
+                )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val countOfFavouriteLinks: StateFlow<Long?> =
-        linkRepository
-            .countOfFavouriteLinks()
-            .asFlow()
-            .mapToOneOrNull(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+        selectedProfileId.flatMapLatest { profileId ->
+            linkRepository
+                .countOfFavouriteLinks(profileId)
+                .asFlow()
+                .mapToOneOrNull(
+                    viewModelScope.coroutineContext,
+                )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
@@ -291,13 +326,15 @@ class AccountViewModel(
             sortOrder,
             selectedTagFilter,
             favouriteFilter,
-        ) { query, sorting, tags, favourite ->
-            listOf(query, sorting, tags, favourite)
+            selectedProfileId,
+        ) { query, sorting, tags, favourite, profileId ->
+            listOf(query, sorting, tags, favourite, profileId)
         }.flatMapLatest { combined ->
             val query = combined[0] as String
             val sorting = (combined[1] as String).split("_")
             val tags = combined[2] as List<Tags>
             val favourite = combined[3] as Int
+            val profileId = combined[4] as Long
             val sortField = sorting.getOrNull(0) ?: "createdAt"
             val sortType = sorting.getOrNull(1) ?: "DESC"
 
@@ -308,6 +345,7 @@ class AccountViewModel(
 
             linkRepository
                 .getLinksAndTags(
+                    profileId,
                     query,
                     query,
                     query,
@@ -352,7 +390,8 @@ class AccountViewModel(
         thumbnail: String = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            linkRepository.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail)
+            val profileId = selectedProfileId.first()
+            linkRepository.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail, profileId)
             linkRepository.lastInsertRowId()?.let {
                 modifyTagsForLink(it, tagsList)
                 analyticsManager.logEvent(
@@ -707,5 +746,62 @@ class AccountViewModel(
 
     fun requestReview(activity: android.app.Activity) {
         reviewManager.requestReview(activity)
+    }
+
+    // Profile management methods
+    fun setSelectedProfile(profileId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setSelectedProfileId(profileId)
+            // Clear tag filter when switching profiles
+            _selectedTagFilter.update { emptyList() }
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SWITCH_PROFILE,
+                mapOf("profile_id" to profileId),
+            )
+        }
+    }
+
+    fun insertProfile(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkRepository.insertProfile(name)
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CREATE_PROFILE,
+            )
+        }
+    }
+
+    suspend fun updateProfile(
+        id: Long,
+        name: String,
+    ) {
+        withContext(Dispatchers.IO) {
+            linkRepository.updateProfile(name, id)
+        }
+    }
+
+    fun deleteProfile(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Don't allow deleting if it's the only profile
+            val profileCount = linkRepository.countProfiles().asFlow().mapToOneOrNull(viewModelScope.coroutineContext).first()
+            if (profileCount != null && profileCount <= 1L) {
+                return@launch
+            }
+
+            // If deleting the currently selected profile, switch to the first available profile
+            val currentProfileId = selectedProfileId.first()
+            if (currentProfileId == id) {
+                val profiles = allProfiles.first()
+                val nextProfile = profiles.firstOrNull { it.id != id }
+                if (nextProfile != null) {
+                    setSelectedProfile(nextProfile.id)
+                }
+            }
+
+            linkRepository.deleteProfile(id)
+            analyticsManager.logEvent(
+                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.DELETE_PROFILE,
+                mapOf("profile_id" to id),
+            )
+        }
     }
 }

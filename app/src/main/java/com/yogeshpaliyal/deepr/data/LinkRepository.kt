@@ -3,13 +3,32 @@ package com.yogeshpaliyal.deepr.data
 import app.cash.sqldelight.Query
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
 
 interface LinkRepository {
+    // Profile operations
+    suspend fun insertProfile(name: String)
+
+    fun getAllProfiles(): Query<Profile>
+
+    suspend fun getProfileById(id: Long): Profile?
+
+    suspend fun getProfileByName(name: String): Profile?
+
+    suspend fun updateProfile(
+        name: String,
+        id: Long,
+    )
+
+    suspend fun deleteProfile(id: Long)
+
+    fun countProfiles(): Query<Long>
+
     // Tag operations
     fun getAllTags(): Query<Tags>
 
-    fun getAllTagsWithCount(): Query<GetAllTagsWithCount>
+    fun getAllTagsWithCount(profileId: Long): Query<GetAllTagsWithCount>
 
     suspend fun getTagByName(tagName: String): Tags?
 
@@ -43,6 +62,7 @@ interface LinkRepository {
 
     // Link operations
     fun getLinksAndTags(
+        profileId: Long,
         searchQuery1: String,
         searchQuery2: String,
         searchQuery3: String,
@@ -56,9 +76,9 @@ interface LinkRepository {
         sortField2: String,
     ): Query<GetLinksAndTags>
 
-    fun countOfLinks(): Query<Long>
+    fun countOfLinks(profileId: Long): Query<Long>
 
-    fun countOfFavouriteLinks(): Query<Long>
+    fun countOfFavouriteLinks(profileId: Long): Query<Long>
 
     suspend fun insertDeepr(
         link: String,
@@ -66,6 +86,7 @@ interface LinkRepository {
         openedCount: Long,
         notes: String,
         thumbnail: String,
+        profileId: Long,
     )
 
     suspend fun lastInsertRowId(): Long?
