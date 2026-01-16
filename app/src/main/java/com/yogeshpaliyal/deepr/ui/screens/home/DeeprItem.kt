@@ -318,7 +318,7 @@ fun formatShareText(item: GetLinksAndTags): String =
     buildString {
         if (item.name.isNotBlank()) {
             append(item.name)
-            append("\n\n")
+            append("\n")
         }
         append(item.link)
         if (item.notes.isNotBlank()) {
