@@ -34,7 +34,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledIconButton
@@ -98,6 +97,7 @@ object TagSelectionScreen : TopLevelRoute {
         val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
         var newTagName by remember { mutableStateOf("") }
         var searchQuery by remember { mutableStateOf("") }
+        var isSearchVisible by remember { mutableStateOf(false) }
         val tagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
         val context = LocalContext.current
         val navigator = LocalNavigator.current
@@ -124,25 +124,48 @@ object TagSelectionScreen : TopLevelRoute {
             topBar = {
                 TopAppBar(
                     title = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.tags),
-                            )
-                            if (tagsWithCount.isNotEmpty()) {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                    shape = RoundedCornerShape(12.dp),
-                                ) {
-                                    Text(
-                                        text = "${tagsWithCount.size}",
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                    )
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.tags),
+                                )
+                                if (tagsWithCount.isNotEmpty()) {
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        shape = RoundedCornerShape(12.dp),
+                                    ) {
+                                        Text(
+                                            text = "${tagsWithCount.size}",
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier =
+                                                Modifier.padding(
+                                                    horizontal = 10.dp,
+                                                    vertical = 4.dp,
+                                                ),
+                                        )
+                                    }
                                 }
+                            }
+                        }
+                    },
+                    actions = {
+                        if (tagsWithCount.isNotEmpty()) {
+                            FilledTonalIconButton(
+                                onClick = {
+                                    isSearchVisible = !isSearchVisible
+                                    if (!isSearchVisible) {
+                                        searchQuery = ""
+                                    }
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = TablerIcons.Search,
+                                    contentDescription = "Toggle Search",
+                                )
                             }
                         }
                     },
@@ -184,18 +207,47 @@ object TagSelectionScreen : TopLevelRoute {
                     ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                item {
+                    AnimatedVisibility(
+                        visible = isSearchVisible && tagsWithCount.isNotEmpty(),
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically(),
+                    ) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { Text(stringResource(R.string.search)) },
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = TablerIcons.Search,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            trailingIcon =
+                                if (searchQuery.isNotBlank()) {
+                                    {
+                                        ClearInputIconButton(onClick = { searchQuery = "" })
+                                    }
+                                } else {
+                                    null
+                                },
+                        )
+                    }
+                }
+
                 // Create New Tag Section
                 item {
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors =
-                            CardDefaults.elevatedCardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                            ),
+                    AnimatedVisibility(
+                        visible = !isSearchVisible || tagsWithCount.isEmpty(),
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically(),
                     ) {
                         Column(
-                            modifier = Modifier.padding(20.dp),
+                            modifier = Modifier.padding(0.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             Row(
@@ -245,7 +297,9 @@ object TagSelectionScreen : TopLevelRoute {
                                     trailingIcon =
                                         if (newTagName.isNotBlank()) {
                                             {
-                                                ClearInputIconButton(onClick = { newTagName = "" })
+                                                ClearInputIconButton(onClick = {
+                                                    newTagName = ""
+                                                })
                                             }
                                         } else {
                                             null
@@ -258,7 +312,10 @@ object TagSelectionScreen : TopLevelRoute {
                                         if (trimmedTagName.isNotBlank()) {
                                             val existingTag =
                                                 tagsWithCount.find {
-                                                    it.name.equals(trimmedTagName, ignoreCase = true)
+                                                    it.name.equals(
+                                                        trimmedTagName,
+                                                        ignoreCase = true,
+                                                    )
                                                 }
 
                                             if (existingTag != null) {
@@ -290,35 +347,6 @@ object TagSelectionScreen : TopLevelRoute {
                                 }
                             }
                         }
-                    }
-                }
-
-                // Search Tags Section
-                if (tagsWithCount.isNotEmpty()) {
-                    item {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text(stringResource(R.string.search)) },
-                            singleLine = true,
-                            shape = RoundedCornerShape(16.dp),
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = TablerIcons.Search,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            trailingIcon =
-                                if (searchQuery.isNotBlank()) {
-                                    {
-                                        ClearInputIconButton(onClick = { searchQuery = "" })
-                                    }
-                                } else {
-                                    null
-                                },
-                        )
                     }
                 }
 
@@ -393,7 +421,12 @@ object TagSelectionScreen : TopLevelRoute {
                             )
                             if (searchQuery.isNotBlank()) {
                                 Text(
-                                    text = stringResource(R.string.filtered_tags_count, filteredTags.size, tagsWithCount.size),
+                                    text =
+                                        stringResource(
+                                            R.string.filtered_tags_count,
+                                            filteredTags.size,
+                                            tagsWithCount.size,
+                                        ),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 4.dp),
@@ -406,102 +439,84 @@ object TagSelectionScreen : TopLevelRoute {
                 // Tags List
                 if (tagsWithCount.isEmpty()) {
                     item {
-                        // Empty State - No tags exist
-                        ElevatedCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(24.dp),
-                            colors =
-                                CardDefaults.elevatedCardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                ),
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(48.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
                         ) {
-                            Column(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(48.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(24.dp),
                             ) {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    shape = RoundedCornerShape(24.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Tag,
-                                        contentDescription = null,
-                                        modifier =
-                                            Modifier
-                                                .padding(20.dp)
-                                                .size(48.dp),
-                                        tint = MaterialTheme.colorScheme.outline,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Text(
-                                    text = "No tags yet",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "Create your first tag to organize your links",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    textAlign = TextAlign.Center,
+                                Icon(
+                                    imageVector = TablerIcons.Tag,
+                                    contentDescription = null,
+                                    modifier =
+                                        Modifier
+                                            .padding(20.dp)
+                                            .size(48.dp),
+                                    tint = MaterialTheme.colorScheme.outline,
                                 )
                             }
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Text(
+                                text = "No tags yet",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Create your first tag to organize your links",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.outline,
+                                textAlign = TextAlign.Center,
+                            )
                         }
                     }
                 } else if (filteredTags.isEmpty()) {
                     item {
                         // Empty State - No search results
-                        ElevatedCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(24.dp),
-                            colors =
-                                CardDefaults.elevatedCardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                ),
+
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(48.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
                         ) {
-                            Column(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(48.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(24.dp),
                             ) {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    shape = RoundedCornerShape(24.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = TablerIcons.Search,
-                                        contentDescription = null,
-                                        modifier =
-                                            Modifier
-                                                .padding(20.dp)
-                                                .size(48.dp),
-                                        tint = MaterialTheme.colorScheme.outline,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Text(
-                                    text = stringResource(R.string.no_search_results),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = stringResource(R.string.no_search_results_description),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    textAlign = TextAlign.Center,
+                                Icon(
+                                    imageVector = TablerIcons.Search,
+                                    contentDescription = null,
+                                    modifier =
+                                        Modifier
+                                            .padding(20.dp)
+                                            .size(48.dp),
+                                    tint = MaterialTheme.colorScheme.outline,
                                 )
                             }
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Text(
+                                text = stringResource(R.string.no_search_results),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.no_search_results_description),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.outline,
+                                textAlign = TextAlign.Center,
+                            )
                         }
                     }
                 } else {
@@ -611,6 +626,7 @@ object TagSelectionScreen : TopLevelRoute {
                                             is SQLiteConstraintException -> {
                                                 context.getString(R.string.tag_name_exists)
                                             }
+
                                             else -> {
                                                 context.getString(R.string.failed_to_edit_tag)
                                             }
@@ -681,7 +697,10 @@ object TagSelectionScreen : TopLevelRoute {
                                 Card(
                                     colors =
                                         CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                            containerColor =
+                                                MaterialTheme.colorScheme.errorContainer.copy(
+                                                    alpha = 0.5f,
+                                                ),
                                         ),
                                     shape = RoundedCornerShape(12.dp),
                                 ) {
