@@ -188,9 +188,14 @@ class AccountViewModel(
             _selectedTagFilter.update { currentList ->
                 if (currentList.any { it.id == tag.id }) {
                     // Remove tag if already selected
+                    // Note: We don't reset favourite filter here because:
+                    // 1. Other tags might still be selected
+                    // 2. The user should explicitly choose All/Favourites to change filter mode
                     currentList.filter { it.id != tag.id }
                 } else {
                     // Add tag if not selected
+                    // Reset favourite filter to show all links with this tag, not just favourites
+                    _favouriteFilter.update { -1 }
                     currentList + tag
                 }
             }
@@ -580,6 +585,17 @@ class AccountViewModel(
     fun setThemeMode(mode: String) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setThemeMode(mode)
+        }
+    }
+
+    // Show open counter preference methods
+    val showOpenCounter =
+        preferenceDataStore.getShowOpenCounter
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun setShowOpenCounter(show: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setShowOpenCounter(show)
         }
     }
 

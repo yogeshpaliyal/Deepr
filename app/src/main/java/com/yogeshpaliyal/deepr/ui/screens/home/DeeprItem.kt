@@ -110,6 +110,7 @@ fun DeeprItem(
     selectedTag: List<Tags>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
+    showOpenCounter: Boolean = true,
     analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
@@ -232,11 +233,13 @@ fun DeeprItem(
                             }
                         }
 
-                        Text(
-                            text = stringResource(R.string.opened_count, account.openedCount),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = getDeeprItemTextColor(account.isFavourite),
-                        )
+                        if (showOpenCounter) {
+                            Text(
+                                text = stringResource(R.string.opened_count, account.openedCount),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = getDeeprItemTextColor(account.isFavourite),
+                            )
+                        }
                     }
                 }
 

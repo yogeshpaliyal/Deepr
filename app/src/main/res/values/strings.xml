@@ -118,6 +118,8 @@
     <string name="default_page">Default Page</string>
     <string name="default_page_all">Start with All links</string>
     <string name="default_page_favourites">Start with Favourites</string>
+    <string name="show_open_counter">Show Open Counter</string>
+    <string name="show_open_counter_description">Display how many times each link has been opened</string>
     <string name="app_version">App Version: %s</string>
     <string name="made_with_love">Made with ❤️ in India</string>
 
