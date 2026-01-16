@@ -255,21 +255,19 @@ fun HomeScreen(
     }
 
     // Handle shared text from other apps
-    LaunchedEffect(sharedText) {
+    LaunchedEffect(sharedText, resetSharedText) {
         if (!sharedText?.url.isNullOrBlank()) {
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =
                     createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
-                // Reset shared text immediately to prevent re-navigation when backing out
-                resetSharedText()
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
                     .show()
-                // Reset shared text even on error to prevent stuck state
-                resetSharedText()
             }
+            // Reset shared text even on error to prevent stuck state
+            resetSharedText()
         }
     }
 
