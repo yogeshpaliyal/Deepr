@@ -84,6 +84,10 @@ sealed class MenuItem(
         item: GetLinksAndTags,
     ) : MenuItem(item)
 
+    class Share(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
     class Edit(
         item: GetLinksAndTags,
     ) : MenuItem(item)
@@ -302,3 +306,23 @@ fun formatDateTime(dateTimeString: String): String {
         return dateTimeString // fallback to raw string
     }
 }
+
+/**
+ * Formats a link's information into a shareable text format.
+ *
+ * @param item The link item containing name, link, and notes
+ * @return A formatted string containing the link's name (if not blank),
+ *         the link URL, and notes (if not blank), separated by double newlines
+ */
+fun formatShareText(item: GetLinksAndTags): String =
+    buildString {
+        if (item.name.isNotBlank()) {
+            append(item.name)
+            append("\n")
+        }
+        append(item.link)
+        if (item.notes.isNotBlank()) {
+            append("\n\n")
+            append(item.notes)
+        }
+    }
