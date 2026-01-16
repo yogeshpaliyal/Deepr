@@ -18,7 +18,10 @@ abstract class HtmlBookmarkImporter(
     protected val context: Context,
     protected val deeprQueries: DeeprQueries,
 ) : BookmarkImporter {
-    override suspend fun import(uri: Uri): RequestResult<ImportResult> {
+    override suspend fun import(
+        uri: Uri,
+        profileId: Long,
+    ): RequestResult<ImportResult> {
         var importedCount = 0
         var skippedCount = 0
 
@@ -38,6 +41,7 @@ abstract class HtmlBookmarkImporter(
                                     name = bookmark.title,
                                     notes = bookmark.folder ?: "",
                                     thumbnail = "",
+                                    profileId = profileId,
                                 )
 
                                 // Add tags if present

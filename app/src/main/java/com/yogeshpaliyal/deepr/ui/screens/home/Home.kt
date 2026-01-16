@@ -357,6 +357,17 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.profiles)) } },
+                                state = rememberTooltipState(),
+                            ) {
+                                ProfileSelectorMenu(viewModel = viewModel)
+                            }
+
+                            TooltipBox(
+                                positionProvider =
+                                    TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Below,
+                                    ),
                                 tooltip = { PlainTooltip { Text("View Type") } },
                                 state = rememberTooltipState(),
                             ) {
