@@ -309,12 +309,12 @@ fun formatDateTime(dateTimeString: String): String {
 
 fun formatShareText(item: GetLinksAndTags): String =
     buildString {
-        if (item.name.isNotEmpty()) {
+        if (item.name.isNotBlank()) {
             append(item.name)
             append("\n\n")
         }
         append(item.link)
-        if (item.notes.isNotEmpty()) {
+        if (item.notes.isNotBlank()) {
             append("\n\n")
             append(item.notes)
         }
