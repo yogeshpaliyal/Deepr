@@ -37,6 +37,8 @@
     <string name="no_favourites_with_tags">No favourites in selected tags</string>
     <string name="no_favourites_with_tags_description">Mark links with these tags as favourites or try different tags.</string>
     <string name="remove_thumbnail">Remove thumbnail</string>
+    <string name="thumbnail_url">Thumbnail URL</string>
+    <string name="edit_thumbnail_url">Edit thumbnail URL</string>
 
     <!-- Menu and Dialog Items -->
     <string name="more_options">More options</string>
