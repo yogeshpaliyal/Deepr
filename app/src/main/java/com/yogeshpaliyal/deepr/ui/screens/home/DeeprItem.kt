@@ -306,3 +306,16 @@ fun formatDateTime(dateTimeString: String): String {
         return dateTimeString // fallback to raw string
     }
 }
+
+fun formatShareText(item: GetLinksAndTags): String =
+    buildString {
+        if (item.name.isNotEmpty()) {
+            append(item.name)
+            append("\n\n")
+        }
+        append(item.link)
+        if (item.notes.isNotEmpty()) {
+            append("\n\n")
+            append(item.notes)
+        }
+    }

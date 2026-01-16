@@ -643,17 +643,7 @@ fun Content(
 
             is Share -> {
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHARE)
-                val shareText = buildString {
-                    if (it.item.name.isNotEmpty()) {
-                        append(it.item.name)
-                        append("\n\n")
-                    }
-                    append(it.item.link)
-                    if (it.item.notes.isNotEmpty()) {
-                        append("\n\n")
-                        append(it.item.notes)
-                    }
-                }
+                val shareText = formatShareText(it.item)
                 val sendIntent =
                     Intent().apply {
                         action = Intent.ACTION_SEND
