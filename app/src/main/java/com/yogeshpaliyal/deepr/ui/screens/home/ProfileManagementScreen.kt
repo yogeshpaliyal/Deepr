@@ -54,14 +54,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
@@ -72,10 +68,8 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.FolderPlus
 import compose.icons.tablericons.Folders
-import compose.icons.tablericons.Hash
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Trash
-import kotlinx.coroutines.runBlocking
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 

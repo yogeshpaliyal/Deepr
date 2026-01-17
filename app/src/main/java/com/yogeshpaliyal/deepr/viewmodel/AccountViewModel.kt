@@ -100,7 +100,10 @@ class AccountViewModel(
     // Initialize default profile if none exists
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val profileCount = linkRepository.countProfiles().asFlow().mapToOneOrNull(viewModelScope.coroutineContext).first()
+            val profileCount = linkRepository.countProfiles()
+                .asFlow()
+                .mapToOneOrNull(viewModelScope.coroutineContext)
+                .first()
             if (profileCount == 0L) {
                 // Create default profile if none exists
                 linkRepository.insertProfile("Default")
@@ -119,35 +122,38 @@ class AccountViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        selectedProfileId.flatMapLatest { profileId ->
-            linkRepository
-                .getAllTagsWithCount(profileId)
-                .asFlow()
-                .mapToList(
-                    viewModelScope.coroutineContext,
-                )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+        selectedProfileId
+            .flatMapLatest { profileId ->
+                linkRepository
+                    .getAllTagsWithCount(profileId)
+                    .asFlow()
+                    .mapToList(
+                        viewModelScope.coroutineContext,
+                    )
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfLinks: StateFlow<Long?> =
-        selectedProfileId.flatMapLatest { profileId ->
-            linkRepository
-                .countOfLinks(profileId)
-                .asFlow()
-                .mapToOneOrNull(
-                    viewModelScope.coroutineContext,
-                )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+        selectedProfileId
+            .flatMapLatest { profileId ->
+                linkRepository
+                    .countOfLinks(profileId)
+                    .asFlow()
+                    .mapToOneOrNull(
+                        viewModelScope.coroutineContext,
+                    )
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfFavouriteLinks: StateFlow<Long?> =
-        selectedProfileId.flatMapLatest { profileId ->
-            linkRepository
-                .countOfFavouriteLinks(profileId)
-                .asFlow()
-                .mapToOneOrNull(
-                    viewModelScope.coroutineContext,
-                )
+        selectedProfileId
+            .flatMapLatest { profileId ->
+                linkRepository
+                    .countOfFavouriteLinks(profileId)
+                    .asFlow()
+                    .mapToOneOrNull(
+                        viewModelScope.coroutineContext,
+                    )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     private val sortOrder: Flow<@SortType String> =
@@ -784,7 +790,10 @@ class AccountViewModel(
     fun deleteProfile(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             // Don't allow deleting if it's the only profile
-            val profileCount = linkRepository.countProfiles().asFlow().mapToOneOrNull(viewModelScope.coroutineContext).first()
+            val profileCount = linkRepository.countProfiles()
+                .asFlow()
+                .mapToOneOrNull(viewModelScope.coroutineContext)
+                .first()
             if (profileCount != null && profileCount <= 1L) {
                 return@launch
             }
