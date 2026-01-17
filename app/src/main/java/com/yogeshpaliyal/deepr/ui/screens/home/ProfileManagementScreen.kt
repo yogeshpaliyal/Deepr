@@ -70,7 +70,6 @@ import compose.icons.tablericons.FolderPlus
 import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Trash
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 object ProfileManagementScreen : TopLevelRoute {

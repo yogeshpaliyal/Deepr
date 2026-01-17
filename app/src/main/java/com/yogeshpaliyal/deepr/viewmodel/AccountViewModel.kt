@@ -100,10 +100,12 @@ class AccountViewModel(
     // Initialize default profile if none exists
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val profileCount = linkRepository.countProfiles()
-                .asFlow()
-                .mapToOneOrNull(viewModelScope.coroutineContext)
-                .first()
+            val profileCount =
+                linkRepository
+                    .countProfiles()
+                    .asFlow()
+                    .mapToOneOrNull(viewModelScope.coroutineContext)
+                    .first()
             if (profileCount == 0L) {
                 // Create default profile if none exists
                 linkRepository.insertProfile("Default")
@@ -154,7 +156,7 @@ class AccountViewModel(
                     .mapToOneOrNull(
                         viewModelScope.coroutineContext,
                     )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
@@ -790,10 +792,12 @@ class AccountViewModel(
     fun deleteProfile(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             // Don't allow deleting if it's the only profile
-            val profileCount = linkRepository.countProfiles()
-                .asFlow()
-                .mapToOneOrNull(viewModelScope.coroutineContext)
-                .first()
+            val profileCount =
+                linkRepository
+                    .countProfiles()
+                    .asFlow()
+                    .mapToOneOrNull(viewModelScope.coroutineContext)
+                    .first()
             if (profileCount != null && profileCount <= 1L) {
                 return@launch
             }
