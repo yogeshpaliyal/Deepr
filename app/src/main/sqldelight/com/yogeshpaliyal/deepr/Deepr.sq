@@ -1,3 +1,9 @@
+CREATE TABLE Profile (
+id INTEGER PRIMARY KEY NOT NULL,
+name TEXT NOT NULL UNIQUE,
+createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE Deepr (
 id INTEGER PRIMARY KEY NOT NULL,
 link TEXT NOT NULL,
@@ -6,7 +12,9 @@ createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 openedCount INTEGER NOT NULL DEFAULT 0,
 isFavourite INTEGER NOT NULL DEFAULT 0,
 notes TEXT NOT NULL DEFAULT '',
-thumbnail TEXT NOT NULL DEFAULT ''
+thumbnail TEXT NOT NULL DEFAULT '',
+profileId INTEGER NOT NULL DEFAULT 1,
+FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Tags (
@@ -33,10 +41,10 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertDeepr:
-INSERT INTO Deepr (link, name, openedCount, notes, thumbnail) VALUES (?, ?, ?, ?, ?);
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, profileId) VALUES (?, ?, ?, ?, ?, ?);
 
 importDeepr:
-INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, createdAt, profileId) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 getLinksAndTags:
 SELECT
@@ -66,7 +74,8 @@ FROM
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
-  (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
+  Deepr.profileId = ?
+  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
   AND (
     ? = -1 OR Deepr.isFavourite = ?
   )
@@ -168,17 +177,19 @@ getAllTagsWithCount:
 SELECT 
   Tags.id,
   Tags.name,
-  COUNT(LinkTags.linkId) AS linkCount
+  COUNT(DISTINCT CASE WHEN Deepr.profileId = ? THEN LinkTags.linkId END) AS linkCount
 FROM Tags
 LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
+LEFT JOIN Deepr ON LinkTags.linkId = Deepr.id
 GROUP BY Tags.id, Tags.name
+HAVING linkCount > 0
 ORDER BY linkCount DESC, Tags.name;
 
 countOfLinks:
-SELECT count(*) FROM Deepr;
+SELECT count(*) FROM Deepr WHERE profileId = ?;
 
 countOfFavouriteLinks:
-SELECT count(*) FROM Deepr WHERE isFavourite = 1;
+SELECT count(*) FROM Deepr WHERE isFavourite = 1 AND profileId = ?;
 
 
 -- Link-Tag relations
@@ -219,4 +230,26 @@ UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE
 
 setFavourite:
 UPDATE Deepr SET isFavourite = ? WHERE id = ?;
+
+-- Profile operations
+insertProfile:
+INSERT INTO Profile (name) VALUES (?);
+
+getAllProfiles:
+SELECT * FROM Profile ORDER BY createdAt ASC;
+
+getProfileById:
+SELECT * FROM Profile WHERE id = ?;
+
+getProfileByName:
+SELECT * FROM Profile WHERE name = ?;
+
+updateProfile:
+UPDATE Profile SET name = ? WHERE id = ?;
+
+deleteProfile:
+DELETE FROM Profile WHERE id = ?;
+
+countProfiles:
+SELECT COUNT(*) FROM Profile;
 

@@ -1,0 +1,12 @@
+-- Add Profile table
+CREATE TABLE Profile (
+id INTEGER PRIMARY KEY NOT NULL,
+name TEXT NOT NULL UNIQUE,
+createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default profile for existing data
+INSERT INTO Profile (id, name) VALUES (1, 'Default');
+
+-- Add profileId column to Deepr table with default value
+ALTER TABLE Deepr ADD COLUMN profileId INTEGER NOT NULL DEFAULT 1 REFERENCES Profile(id) ON DELETE CASCADE;

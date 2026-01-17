@@ -18,7 +18,10 @@ class CsvBookmarkImporter(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : BookmarkImporter {
-    override suspend fun import(uri: Uri): RequestResult<ImportResult> {
+    override suspend fun import(
+        uri: Uri,
+        profileId: Long,
+    ): RequestResult<ImportResult> {
         var updatedCount = 0
         var skippedCount = 0
 
@@ -66,6 +69,7 @@ class CsvBookmarkImporter(
                                         thumbnail = thumbnail,
                                         isFavourite = isFavourite,
                                         createdAt = createdAt,
+                                        profileId = profileId,
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 

@@ -36,6 +36,7 @@ class AppPreferenceDataStore(
         private val VIEW_TYPE = intPreferencesKey("view_type")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
         private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
+        private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -111,6 +112,11 @@ class AppPreferenceDataStore(
     val getShowOpenCounter: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[SHOW_OPEN_COUNTER] ?: true // Default to showing counter
+        }
+
+    val getSelectedProfileId: Flow<Long> =
+        context.appDataStore.data.map { preferences ->
+            preferences[SELECTED_PROFILE_ID] ?: 1L // Default to profile ID 1
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -206,6 +212,12 @@ class AppPreferenceDataStore(
     suspend fun setShowOpenCounter(show: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[SHOW_OPEN_COUNTER] = show
+        }
+    }
+
+    suspend fun setSelectedProfileId(profileId: Long) {
+        context.appDataStore.edit { prefs ->
+            prefs[SELECTED_PROFILE_ID] = profileId
         }
     }
 }
