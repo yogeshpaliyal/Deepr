@@ -305,6 +305,16 @@ fun HomeScreen(
         viewModel.search(textFieldState.text.toString())
     }
 
+    // Scroll to top when filters change
+    LaunchedEffect(favouriteFilter, selectedTag) {
+        scope.launch {
+            when (listState) {
+                is LazyStaggeredGridState -> listState.scrollToItem(0)
+                is LazyListState -> listState.scrollToItem(0)
+            }
+        }
+    }
+
     val inputField =
         @Composable {
             SearchBarDefaults.InputField(
