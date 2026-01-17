@@ -15,6 +15,7 @@
     <string name="sorting">Sorting</string>
     <string name="qr_scanner">QR Scanner</string>
     <string name="tags">Tags</string>
+    <string name="all_tags">All Tags</string>
     <string name="all">All</string>
     <string name="favourites">Favourites</string>
     <string name="add_to_favourites">Add to favourites</string>
@@ -65,6 +66,7 @@
     <string name="edit_shortcut">Edit shortcut</string>
     <string name="show_qr_code">Show QR Code</string>
     <string name="open_with">Open With</string>
+    <string name="share_link">Share link</string>
     <string name="deeplink_already_exists">Link already exists</string>
 
     <!-- Sort Menu Items -->
@@ -91,6 +93,7 @@
     <string name="delete_tag_description">Delete Tag</string>
     <string name="clear_all_filters">Clear All Filters</string>
     <string name="selected_tags_count">%d tags selected</string>
+    <string name="filtered_tags_count">%1$d of %2$d</string>
 
     <!-- Settings Screen -->
     <string name="backup">Backup</string>

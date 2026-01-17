@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr.ui.screens.home
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -123,6 +124,7 @@ import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Edit
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.FavouriteClick
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.MoreOptionsBottomSheet
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ResetCounter
+import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Share
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Shortcut
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ShowQrCode
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
@@ -141,6 +143,7 @@ import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Search
+import compose.icons.tablericons.Share
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
 import dev.chrisbanes.haze.HazeState
@@ -649,6 +652,19 @@ fun Content(
                     .show()
             }
 
+            is Share -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHARE)
+                val shareText = formatShareText(it.item)
+                val sendIntent =
+                    Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                        type = "text/plain"
+                    }
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                context.startActivity(shareIntent)
+            }
+
             is MenuItem.OpenWith -> {
                 openDeeplinkExternal(context, it.item.link)
             }
@@ -778,6 +794,16 @@ fun Content(
                         icon = TablerIcons.ExternalLink,
                         onClick = {
                             onItemClick(MenuItem.OpenWith(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.share_link),
+                        icon = TablerIcons.Share,
+                        onClick = {
+                            onItemClick(Share(account))
                         },
                     )
                 }
