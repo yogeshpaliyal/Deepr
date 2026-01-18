@@ -69,15 +69,15 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.FolderPlus
-import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.User
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 object ProfileManagementScreen : TopLevelRoute {
     override val icon: ImageVector
-        get() = TablerIcons.Folders
+        get() = TablerIcons.User
     override val label: Int
         get() = R.string.profiles
 

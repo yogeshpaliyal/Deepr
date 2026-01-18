@@ -35,8 +35,8 @@ import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Check
-import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Settings
+import compose.icons.tablericons.User
 
 @Composable
 fun ProfileSelectorMenu(
@@ -51,7 +51,7 @@ fun ProfileSelectorMenu(
     Box(modifier = modifier) {
         IconButton(onClick = { expanded = true }) {
             Icon(
-                imageVector = TablerIcons.Folders,
+                imageVector = TablerIcons.User,
                 contentDescription = stringResource(R.string.profiles),
             )
         }
