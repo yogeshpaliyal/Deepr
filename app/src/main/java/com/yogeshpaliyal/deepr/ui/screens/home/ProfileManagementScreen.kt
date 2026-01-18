@@ -191,7 +191,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                     shape = RoundedCornerShape(16.dp),
                                     leadingIcon = {
                                         Icon(
-                                            imageVector = TablerIcons.Folders,
+                                            imageVector = TablerIcons.User,
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
@@ -275,7 +275,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 ) {
                                     Icon(
-                                        imageVector = TablerIcons.Folders,
+                                        imageVector = TablerIcons.User,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.size(20.dp),
@@ -337,7 +337,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                     shape = RoundedCornerShape(24.dp),
                                 ) {
                                     Icon(
-                                        imageVector = TablerIcons.Folders,
+                                        imageVector = TablerIcons.User,
                                         contentDescription = null,
                                         modifier =
                                             Modifier
@@ -428,7 +428,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                 shape = RoundedCornerShape(12.dp),
                                 leadingIcon = {
                                     Icon(
-                                        imageVector = TablerIcons.Folders,
+                                        imageVector = TablerIcons.User,
                                         contentDescription = null,
                                     )
                                 },
