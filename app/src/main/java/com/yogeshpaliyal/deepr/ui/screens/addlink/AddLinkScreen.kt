@@ -365,6 +365,30 @@ fun AddLinkScreen(
                                 contentScale = ContentScale.Crop,
                             )
 
+                            // Thumbnail URL field
+                            OutlinedTextField(
+                                value = deeprInfo.thumbnail,
+                                onValueChange = {
+                                    deeprInfo = deeprInfo.copy(thumbnail = it)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text(stringResource(R.string.thumbnail_url)) },
+                                trailingIcon =
+                                    if (deeprInfo.thumbnail.isEmpty()) {
+                                        null
+                                    } else {
+                                        {
+                                            ClearInputIconButton(
+                                                onClick = {
+                                                    deeprInfo = deeprInfo.copy(thumbnail = "")
+                                                },
+                                            )
+                                        }
+                                    },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                            )
+
                             TextButton(
                                 onClick = { deeprInfo = deeprInfo.copy(thumbnail = "") },
                                 modifier = Modifier.align(Alignment.End),
