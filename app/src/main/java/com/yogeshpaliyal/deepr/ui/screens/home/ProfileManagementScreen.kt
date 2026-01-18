@@ -48,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.Profile
@@ -70,6 +72,7 @@ import compose.icons.tablericons.FolderPlus
 import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Trash
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 object ProfileManagementScreen : TopLevelRoute {
@@ -90,6 +93,7 @@ object ProfileManagementScreen : TopLevelRoute {
         var isProfileEditEnable by remember { mutableStateOf<Profile?>(null) }
         var isProfileDeleteEnable by remember { mutableStateOf<Profile?>(null) }
         var profileEditError by remember { mutableStateOf<String?>(null) }
+        val coroutineScope = rememberCoroutineScope()
 
         Scaffold(
             contentWindowInsets = windowInsets,
@@ -450,35 +454,28 @@ object ProfileManagementScreen : TopLevelRoute {
                                     return@Button
                                 }
 
-                                val result =
-                                    runBlocking {
-                                        try {
-                                            viewModel.updateProfile(profile.id, trimmedName)
-                                            Result.success(true)
-                                        } catch (e: Exception) {
-                                            return@runBlocking Result.failure(e)
-                                        }
+                                coroutineScope.launch {
+                                    try {
+                                        viewModel.updateProfile(profile.id, trimmedName)
+                                        isProfileEditEnable = null
+                                        profileEditError = null
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getString(R.string.profile_updated),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    } catch (e: Exception) {
+                                        profileEditError =
+                                            when (e) {
+                                                is SQLiteConstraintException -> {
+                                                    context.getString(R.string.profile_name_exists)
+                                                }
+                                                else -> {
+                                                    context.getString(R.string.failed_to_update_profile)
+                                                }
+                                            }
                                     }
-                                if (result.isFailure) {
-                                    val exception = result.exceptionOrNull()
-                                    profileEditError =
-                                        when (exception) {
-                                            is SQLiteConstraintException -> {
-                                                context.getString(R.string.profile_name_exists)
-                                            }
-                                            else -> {
-                                                context.getString(R.string.failed_to_update_profile)
-                                            }
-                                        }
-                                } else {
-                                    isProfileEditEnable = null
-                                    profileEditError = null
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            context.getString(R.string.profile_updated_successfully),
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
                                 }
                             },
                             enabled = isProfileEditEnable?.name?.isNotBlank() == true,

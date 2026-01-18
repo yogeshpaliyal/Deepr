@@ -147,6 +147,7 @@ open class LocalServerRepositoryImpl(
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
+                                            1L, // Default profile
                                             "",
                                             "",
                                             "",
@@ -220,6 +221,7 @@ open class LocalServerRepositoryImpl(
                                         val linkCount =
                                             deeprQueries
                                                 .getLinksAndTags(
+                                                    1L, // Default profile
                                                     "",
                                                     "",
                                                     "",
@@ -367,6 +369,7 @@ open class LocalServerRepositoryImpl(
                         thumbnail = deeplink.thumbnail,
                         isFavourite = deeplink.isFavourite,
                         createdAt = deeplink.createdAt,
+                        profileId = 1L, // Default profile
                     )
 
                     val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
