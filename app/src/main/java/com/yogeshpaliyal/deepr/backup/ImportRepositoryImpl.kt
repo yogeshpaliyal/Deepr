@@ -7,20 +7,19 @@ import com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.ChromeBookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.CsvBookmarkImporter
 import com.yogeshpaliyal.deepr.backup.importer.MozillaBookmarkImporter
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
 
 class ImportRepositoryImpl(
     context: Context,
     deeprQueries: DeeprQueries,
+    appPreferenceDataStore: AppPreferenceDataStore,
 ) : ImportRepository {
     private val csvImporter = CsvBookmarkImporter(context, deeprQueries)
-    private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries)
-    private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries)
+    private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries, appPreferenceDataStore)
+    private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries, appPreferenceDataStore)
 
-    override suspend fun importFromCsv(
-        uri: Uri,
-        profileId: Long,
-    ): RequestResult<ImportResult> = csvImporter.import(uri, profileId)
+    override suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult> = csvImporter.import(uri)
 
     override fun getAvailableImporters(): List<BookmarkImporter> =
         listOf(
@@ -32,6 +31,5 @@ class ImportRepositoryImpl(
     override suspend fun importBookmarks(
         uri: Uri,
         importer: BookmarkImporter,
-        profileId: Long,
-    ): RequestResult<ImportResult> = importer.import(uri, profileId)
+    ): RequestResult<ImportResult> = importer.import(uri)
 }

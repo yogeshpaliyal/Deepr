@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ImportResult
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
+import kotlinx.coroutines.flow.singleOrNull
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -17,11 +19,9 @@ import java.io.IOException
 abstract class HtmlBookmarkImporter(
     protected val context: Context,
     protected val deeprQueries: DeeprQueries,
+    protected val appPreferenceDataStore: AppPreferenceDataStore,
 ) : BookmarkImporter {
-    override suspend fun import(
-        uri: Uri,
-        profileId: Long,
-    ): RequestResult<ImportResult> {
+    override suspend fun import(uri: Uri): RequestResult<ImportResult> {
         var importedCount = 0
         var skippedCount = 0
 
@@ -34,6 +34,7 @@ abstract class HtmlBookmarkImporter(
                     val existing = deeprQueries.getDeeprByLink(bookmark.url).executeAsOneOrNull()
                     if (bookmark.url.isNotBlank() && existing == null) {
                         try {
+                            val profileId = appPreferenceDataStore.getSelectedProfileId.singleOrNull() ?: 1L
                             deeprQueries.transaction {
                                 deeprQueries.insertDeepr(
                                     link = bookmark.url,
@@ -79,7 +80,7 @@ abstract class HtmlBookmarkImporter(
      * Extract bookmarks from the HTML document.
      * Subclasses can override this to handle browser-specific formats.
      */
-    protected open fun extractBookmarks(document: Document): List<Bookmark> {
+    protected open suspend fun extractBookmarks(document: Document): List<Bookmark> {
         val bookmarks = mutableListOf<Bookmark>()
         val links = document.select("a[href]")
 
@@ -137,5 +138,6 @@ abstract class HtmlBookmarkImporter(
         val title: String,
         val folder: String? = null,
         val tags: List<String>? = null,
+        val profileId: Long? = null,
     )
 }

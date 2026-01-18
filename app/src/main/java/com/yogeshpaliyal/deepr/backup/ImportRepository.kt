@@ -5,10 +5,7 @@ import com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter
 import com.yogeshpaliyal.deepr.util.RequestResult
 
 interface ImportRepository {
-    suspend fun importFromCsv(
-        uri: Uri,
-        profileId: Long = 1L,
-    ): RequestResult<ImportResult>
+    suspend fun importFromCsv(uri: Uri): RequestResult<ImportResult>
 
     /**
      * Get all available bookmark importers.
@@ -28,6 +25,5 @@ interface ImportRepository {
     suspend fun importBookmarks(
         uri: Uri,
         importer: BookmarkImporter,
-        profileId: Long = 1L,
     ): RequestResult<ImportResult>
 }

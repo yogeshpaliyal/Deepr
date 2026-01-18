@@ -75,7 +75,7 @@ class DeeprApplication : Application() {
 
                 single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
 
-                single<ImportRepository> { ImportRepositoryImpl(androidContext(), get()) }
+                single<ImportRepository> { ImportRepositoryImpl(androidContext(), get(), get()) }
 
                 single<SyncRepository> { SyncRepositoryImpl(androidContext(), get(), get()) }
 

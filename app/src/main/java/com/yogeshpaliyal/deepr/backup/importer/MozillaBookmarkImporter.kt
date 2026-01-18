@@ -2,6 +2,8 @@ package com.yogeshpaliyal.deepr.backup.importer
 
 import android.content.Context
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import kotlinx.coroutines.flow.singleOrNull
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
@@ -11,10 +13,11 @@ import org.jsoup.nodes.Element
 class MozillaBookmarkImporter(
     context: Context,
     deeprQueries: DeeprQueries,
-) : HtmlBookmarkImporter(context, deeprQueries) {
+    appPreferenceDataStore: AppPreferenceDataStore,
+) : HtmlBookmarkImporter(context, deeprQueries, appPreferenceDataStore) {
     override fun getDisplayName(): String = "Mozilla/Firefox Bookmarks"
 
-    override fun extractBookmarks(document: Document): List<Bookmark> {
+    override suspend fun extractBookmarks(document: Document): List<Bookmark> {
         val bookmarks = mutableListOf<Bookmark>()
 
         // Firefox bookmarks use <a> tags
@@ -30,7 +33,7 @@ class MozillaBookmarkImporter(
             val lastModified = link.attr("last_modified")
             val shortcutUrl = link.attr("shortcuturl")
             val tags = link.attr("tags")
-
+            val profileId = appPreferenceDataStore.getSelectedProfileId.singleOrNull() ?: 1L
             if (url.isNotBlank() && !url.startsWith("place:")) {
                 val tagList =
                     if (tags.isNotBlank()) {
@@ -45,6 +48,7 @@ class MozillaBookmarkImporter(
                         title = title.ifBlank { url },
                         folder = folder,
                         tags = tagList,
+                        profileId = profileId,
                     ),
                 )
             }

@@ -114,7 +114,7 @@ fun AddLinkScreen(
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
-    
+
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
     val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()

@@ -2,6 +2,8 @@ package com.yogeshpaliyal.deepr.backup.importer
 
 import android.content.Context
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import kotlinx.coroutines.flow.singleOrNull
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
@@ -11,15 +13,16 @@ import org.jsoup.nodes.Element
 class ChromeBookmarkImporter(
     context: Context,
     deeprQueries: DeeprQueries,
-) : HtmlBookmarkImporter(context, deeprQueries) {
+    appPreferenceDataStore: AppPreferenceDataStore,
+) : HtmlBookmarkImporter(context, deeprQueries, appPreferenceDataStore) {
     override fun getDisplayName(): String = "Chrome Bookmarks"
 
-    override fun extractBookmarks(document: Document): List<Bookmark> {
+    override suspend fun extractBookmarks(document: Document): List<Bookmark> {
         val bookmarks = mutableListOf<Bookmark>()
 
         // Chrome bookmarks use <a> tags inside <dt> elements
         val links = document.select("dt > a[href]")
-
+        val profileId = appPreferenceDataStore.getSelectedProfileId.singleOrNull() ?: 1L
         links.forEach { link ->
             val url = link.attr("href")
             val title = link.text()
@@ -41,6 +44,7 @@ class ChromeBookmarkImporter(
                         title = title.ifBlank { url },
                         folder = folder,
                         tags = tagList,
+                        profileId = profileId,
                     ),
                 )
             }

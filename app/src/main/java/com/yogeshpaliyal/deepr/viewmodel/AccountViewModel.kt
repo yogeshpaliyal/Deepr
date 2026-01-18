@@ -540,9 +540,8 @@ class AccountViewModel(
 
     fun importCsvData(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            val profileId = selectedProfileId.first()
             importResultChannel.send("Importing, please wait...")
-            when (val result = importRepository.importFromCsv(uri, profileId)) {
+            when (val result = importRepository.importFromCsv(uri)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
@@ -568,9 +567,8 @@ class AccountViewModel(
         importer: com.yogeshpaliyal.deepr.backup.importer.BookmarkImporter,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val profileId = selectedProfileId.first()
             importResultChannel.send("Importing ${importer.getDisplayName()}, please wait...")
-            when (val result = importRepository.importBookmarks(uri, importer, profileId)) {
+            when (val result = importRepository.importBookmarks(uri, importer)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
                         "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",

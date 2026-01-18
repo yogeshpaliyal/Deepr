@@ -56,6 +56,7 @@ SELECT
   Deepr.isFavourite,
   Deepr.notes,
   Deepr.thumbnail,
+  Deepr.profileId,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames,
   GROUP_CONCAT(Tags.id, ', ') AS tagsIds

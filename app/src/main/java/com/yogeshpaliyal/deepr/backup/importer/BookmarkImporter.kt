@@ -17,10 +17,7 @@ interface BookmarkImporter {
      * @param profileId The ID of the profile to import bookmarks into
      * @return A [RequestResult] containing the [ImportResult] or an error
      */
-    suspend fun import(
-        uri: Uri,
-        profileId: Long = 1L,
-    ): RequestResult<ImportResult>
+    suspend fun import(uri: Uri): RequestResult<ImportResult>
 
     /**
      * Get the display name of this importer.
