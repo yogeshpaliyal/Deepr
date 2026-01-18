@@ -154,7 +154,7 @@ resetOpenedCount:
 UPDATE Deepr SET openedCount = 0 WHERE id = ?;
 
 updateDeeplink:
-UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ? WHERE id = ?;
+UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ?, profileId = ? WHERE id = ?;
 
 countDeepr:
 SELECT COUNT(*) FROM Deepr;

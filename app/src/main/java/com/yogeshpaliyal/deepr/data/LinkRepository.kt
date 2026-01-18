@@ -96,6 +96,7 @@ interface LinkRepository {
         newName: String,
         notes: String,
         thumbnail: String,
+        profileId: Long,
         id: Long,
     )
 

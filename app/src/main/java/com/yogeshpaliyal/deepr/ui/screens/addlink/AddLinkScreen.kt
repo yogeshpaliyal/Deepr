@@ -75,12 +75,14 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Check
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Tag
+import compose.icons.tablericons.User
 import compose.icons.tablericons.X
 import org.koin.compose.koinInject
 
@@ -112,6 +114,13 @@ fun AddLinkScreen(
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
+    
+    // Profile selection
+    val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
+    var selectedProfileId by remember(selectedLink) {
+        mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
+    }
 
     val fetchMetadata: () -> Unit = {
         isFetchingMetadata = true
@@ -185,6 +194,7 @@ fun AddLinkScreen(
                 selectedTags,
                 deeprInfo.notes,
                 deeprInfo.thumbnail,
+                selectedProfileId,
             )
         } else {
             // Edit
@@ -195,6 +205,7 @@ fun AddLinkScreen(
                 selectedTags,
                 deeprInfo.notes,
                 deeprInfo.thumbnail,
+                selectedProfileId,
             )
         }
         if (executeAfterSave) {
@@ -484,6 +495,90 @@ fun AddLinkScreen(
                                 maxLines = 4,
                                 shape = RoundedCornerShape(12.dp),
                             )
+                        }
+                    }
+                }
+
+                // Profile Selection Section
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors =
+                        CardDefaults.elevatedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = TablerIcons.User,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(
+                                text = stringResource(R.string.profile),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+
+                        // Profile Dropdown
+                        var profileExpanded by remember { mutableStateOf(false) }
+                        val selectedProfile = allProfiles.firstOrNull { it.id == selectedProfileId }
+
+                        ExposedDropdownMenuBox(
+                            expanded = profileExpanded,
+                            onExpandedChange = { profileExpanded = !profileExpanded },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            OutlinedTextField(
+                                value = selectedProfile?.name ?: "",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.select_profile)) },
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = profileExpanded) },
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                shape = RoundedCornerShape(12.dp),
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = profileExpanded,
+                                onDismissRequest = { profileExpanded = false },
+                            ) {
+                                allProfiles.forEach { profile ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
+                                                if (profile.id == selectedProfileId) {
+                                                    Icon(
+                                                        imageVector = TablerIcons.Check,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(18.dp),
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                    )
+                                                }
+                                                Text(profile.name)
+                                            }
+                                        },
+                                        onClick = {
+                                            selectedProfileId = profile.id
+                                            profileExpanded = false
+                                        },
+                                    )
+                                }
+                            }
                         }
                     }
                 }

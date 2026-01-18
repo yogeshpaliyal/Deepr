@@ -177,10 +177,11 @@ class LinkRepositoryImpl(
         newName: String,
         notes: String,
         thumbnail: String,
+        profileId: Long,
         id: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, id)
+            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, profileId, id)
         }
     }
 

@@ -247,6 +247,7 @@
     <!-- Profiles -->
     <string name="profiles">Profiles</string>
     <string name="profile">Profile</string>
+    <string name="select_profile">Select profile</string>
     <string name="create_profile">Create Profile</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="delete_profile">Delete Profile</string>
