@@ -14,6 +14,7 @@ interface BookmarkImporter {
      * Import bookmarks from the given URI.
      *
      * @param uri The URI of the file to import from
+     * @param profileId The ID of the profile to import bookmarks into
      * @return A [RequestResult] containing the [ImportResult] or an error
      */
     suspend fun import(uri: Uri): RequestResult<ImportResult>

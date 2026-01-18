@@ -4,6 +4,7 @@ import app.cash.sqldelight.Query
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,10 +12,46 @@ import kotlinx.coroutines.withContext
 class LinkRepositoryImpl(
     private val deeprQueries: DeeprQueries,
 ) : LinkRepository {
+    // Profile operations
+    override suspend fun insertProfile(name: String) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.insertProfile(name)
+        }
+    }
+
+    override fun getAllProfiles(): Query<Profile> = deeprQueries.getAllProfiles()
+
+    override suspend fun getProfileById(id: Long): Profile? =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getProfileById(id).executeAsOneOrNull()
+        }
+
+    override suspend fun getProfileByName(name: String): Profile? =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getProfileByName(name).executeAsOneOrNull()
+        }
+
+    override suspend fun updateProfile(
+        name: String,
+        id: Long,
+    ) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.updateProfile(name, id)
+        }
+    }
+
+    override suspend fun deleteProfile(id: Long) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.deleteProfile(id)
+        }
+    }
+
+    override fun countProfiles(): Query<Long> = deeprQueries.countProfiles()
+
     // Tag operations
     override fun getAllTags(): Query<Tags> = deeprQueries.getAllTags()
 
-    override fun getAllTagsWithCount(): Query<GetAllTagsWithCount> = deeprQueries.getAllTagsWithCount()
+    override fun getAllTagsWithCount(profileId: Long): Query<GetAllTagsWithCount> = deeprQueries.getAllTagsWithCount(profileId)
 
     override suspend fun getTagByName(tagName: String): Tags? =
         withContext(Dispatchers.IO) {
@@ -85,6 +122,7 @@ class LinkRepositoryImpl(
 
     // Link operations
     override fun getLinksAndTags(
+        profileId: Long,
         searchQuery1: String,
         searchQuery2: String,
         searchQuery3: String,
@@ -98,6 +136,7 @@ class LinkRepositoryImpl(
         sortField2: String,
     ): Query<GetLinksAndTags> =
         deeprQueries.getLinksAndTags(
+            profileId,
             searchQuery1,
             searchQuery2,
             searchQuery3,
@@ -111,9 +150,9 @@ class LinkRepositoryImpl(
             sortField2,
         )
 
-    override fun countOfLinks(): Query<Long> = deeprQueries.countOfLinks()
+    override fun countOfLinks(profileId: Long): Query<Long> = deeprQueries.countOfLinks(profileId)
 
-    override fun countOfFavouriteLinks(): Query<Long> = deeprQueries.countOfFavouriteLinks()
+    override fun countOfFavouriteLinks(profileId: Long): Query<Long> = deeprQueries.countOfFavouriteLinks(profileId)
 
     override suspend fun insertDeepr(
         link: String,
@@ -121,9 +160,10 @@ class LinkRepositoryImpl(
         openedCount: Long,
         notes: String,
         thumbnail: String,
+        profileId: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.insertDeepr(link, name, openedCount, notes, thumbnail)
+            deeprQueries.insertDeepr(link, name, openedCount, notes, thumbnail, profileId)
         }
     }
 
@@ -137,10 +177,11 @@ class LinkRepositoryImpl(
         newName: String,
         notes: String,
         thumbnail: String,
+        profileId: Long,
         id: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, id)
+            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, profileId, id)
         }
     }
 

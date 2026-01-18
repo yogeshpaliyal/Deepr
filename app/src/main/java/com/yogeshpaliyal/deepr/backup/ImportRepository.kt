@@ -19,6 +19,7 @@ interface ImportRepository {
      *
      * @param uri The URI of the file to import from
      * @param importer The [BookmarkImporter] to use for importing
+     * @param profileId The ID of the profile to import bookmarks into
      * @return A [RequestResult] containing the [ImportResult] or an error
      */
     suspend fun importBookmarks(

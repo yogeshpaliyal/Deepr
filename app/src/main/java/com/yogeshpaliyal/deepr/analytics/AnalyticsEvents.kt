@@ -53,6 +53,12 @@ object AnalyticsEvents {
     const val ITEM_MENU_QR_CODE = "item_menu_qr_code"
     const val ITEM_MENU_RESET_COUNTER = "item_menu_reset_counter"
     const val ITEM_MENU_FAVOURITE = "item_menu_favourite"
+
+    // Profile events
+    const val CREATE_PROFILE = "create_profile"
+    const val SWITCH_PROFILE = "switch_profile"
+    const val DELETE_PROFILE = "delete_profile"
+    const val EDIT_PROFILE = "edit_profile"
 }
 
 object AnalyticsParams {

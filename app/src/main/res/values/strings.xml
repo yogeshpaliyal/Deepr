@@ -243,4 +243,25 @@
     <string name="transfer_link_to_another_device">Transfer Link to another Device (Beta)</string>
     <string name="transfer_link_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Scan the QR code from import links option in another device</string>
     <string name="scan_qr_to_get_data">Scan to get links from another device</string>
+
+    <!-- Profiles -->
+    <string name="profiles">Profiles</string>
+    <string name="profile">Profile</string>
+    <string name="select_profile">Select profile</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="delete_profile">Delete Profile</string>
+    <string name="profile_name">Profile name</string>
+    <string name="profile_created_successfully">Profile created successfully</string>
+    <string name="profile_updated_successfully">Profile updated successfully</string>
+    <string name="profile_deleted_successfully">Profile deleted successfully</string>
+    <string name="profile_name_exists">A profile with this name already exists</string>
+    <string name="failed_to_create_profile">Failed to create profile</string>
+    <string name="failed_to_update_profile">Failed to update profile</string>
+    <string name="cannot_delete_only_profile">Cannot delete the only profile</string>
+    <string name="profile_delete_confirmation">Are you sure you want to delete this profile? All links and tags in this profile will be deleted.</string>
+    <string name="switch_profile">Switch Profile</string>
+    <string name="manage_profiles">Manage Profiles</string>
+    <string name="no_profiles_yet">No profiles yet</string>
+    <string name="create_first_profile">Create your first profile to organize your links</string>
 </resources>
