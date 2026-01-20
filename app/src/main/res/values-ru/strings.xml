@@ -209,6 +209,4 @@
     <string name="import_deeplinks_description">Импортировать ссылки из файла CSV</string>
     <string name="import_deeplinks">Импортировать ссылки</string>
     <string name="copy_link">Копировать ссылку</string>
-    <string name="show_open_counter_description"></string>
-    <string name="show_open_counter"></string>
 </resources>
