@@ -60,7 +60,7 @@ fun NoteViewDialog(
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                             context.startActivity(intent)
                         } catch (e: Exception) {
-                            Toast.makeText(context, "Cannot open link", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.cannot_open_link), Toast.LENGTH_SHORT).show()
                         }
                     },
                 )
@@ -81,10 +81,10 @@ fun NoteViewDialog(
                 onClick = {
                     val clipboard =
                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Note", deepr.notes)
+                    val clip = ClipData.newPlainText(context.getString(R.string.note), deepr.notes)
                     clipboard.setPrimaryClip(clip)
                     Toast
-                        .makeText(context, "Note copied", Toast.LENGTH_SHORT)
+                        .makeText(context, context.getString(R.string.note_copied), Toast.LENGTH_SHORT)
                         .show()
                     onDismiss()
                 },
