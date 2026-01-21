@@ -55,6 +55,7 @@
     <string name="opened_count">Opened: %d</string>
     <string name="last_opened">Last Opened: %s</string>
     <string name="notes">Notes</string>
+    <string name="note">Note</string>
     <string name="view_note">View Note</string>
     <string name="enter_notes">Enter notes (optional)</string>
     <string name="tags_label">Tags:</string>

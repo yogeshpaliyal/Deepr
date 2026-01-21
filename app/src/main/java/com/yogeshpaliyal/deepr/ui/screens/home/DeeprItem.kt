@@ -52,6 +52,7 @@ import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Note
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -101,6 +102,10 @@ sealed class MenuItem(
     ) : MenuItem(item)
 
     class MoreOptionsBottomSheet(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    class ViewNote(
         item: GetLinksAndTags,
     ) : MenuItem(item)
 }
@@ -202,6 +207,19 @@ fun DeeprItem(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Row {
+                            if (account.notes.isNotEmpty()) {
+                                IconButton(onClick = {
+                                    onItemClick(MenuItem.ViewNote(account))
+                                }) {
+                                    Icon(
+                                        TablerIcons.Note,
+                                        contentDescription = stringResource(R.string.note),
+                                        tint = getDeeprItemTextColor(account.isFavourite),
+                                        modifier = Modifier.size(28.dp),
+                                    )
+                                }
+                            }
+
                             IconButton(onClick = {
                                 onItemClick(MenuItem.FavouriteClick(account))
                             }) {

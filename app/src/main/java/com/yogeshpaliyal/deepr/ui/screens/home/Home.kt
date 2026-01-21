@@ -114,6 +114,7 @@ import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
+import com.yogeshpaliyal.deepr.ui.components.NoteViewDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.screens.LocalNetworkServer
@@ -127,6 +128,7 @@ import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ResetCounter
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Share
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Shortcut
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ShowQrCode
+import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ViewNote
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -138,7 +140,6 @@ import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
-import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Refresh
@@ -581,6 +582,7 @@ fun Content(
     var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
     var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
     var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showNoteDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
     showShortcutDialog?.let { deepr ->
         CreateShortcutDialog(
@@ -602,6 +604,16 @@ fun Content(
             onConfirm = {
                 viewModel.deleteAccount(it.id)
                 Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+            },
+        )
+    }
+
+    showNoteDialog?.let { deepr ->
+        NoteViewDialog(
+            deepr = deepr,
+            onDismiss = { showNoteDialog = null },
+            onEdit = {
+                editDeepr(it)
             },
         )
     }
@@ -679,6 +691,10 @@ fun Content(
 
             is MenuItem.OpenWith -> {
                 openDeeplinkExternal(context, it.item.link)
+            }
+
+            is ViewNote -> {
+                showNoteDialog = it.item
             }
         }
     }
@@ -772,16 +788,6 @@ fun Content(
                             onItemClick(FavouriteClick(account))
                         },
                     )
-                }
-
-                if (account.notes.isNotEmpty()) {
-                    item {
-                        MenuListItem(
-                            text = account.notes,
-                            icon = TablerIcons.Note,
-                            selectable = true,
-                        )
-                    }
                 }
 
                 item {
