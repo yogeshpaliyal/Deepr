@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +28,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
-import java.util.regex.Pattern
 
 @Composable
 fun NoteViewDialog(
@@ -102,20 +102,13 @@ private fun ClickableLinkText(
     modifier: Modifier = Modifier,
 ) {
     val linkColor = MaterialTheme.colorScheme.primary
-    val urlPattern =
-        Pattern.compile(
-            "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
-                "(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*" +
-                "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
-            Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL,
-        )
 
     val annotatedString =
         buildAnnotatedString {
             append(text)
-            val matcher = urlPattern.matcher(text)
+            val matcher = Patterns.WEB_URL.matcher(text)
             while (matcher.find()) {
-                val url = matcher.group()
+                val url = matcher.group().trim()
                 val start = matcher.start()
                 val end = matcher.end()
                 addStyle(
@@ -143,7 +136,7 @@ private fun ClickableLinkText(
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
                 .firstOrNull()?.let { annotation ->
-                    var url = annotation.item
+                    var url = annotation.item.trim()
                     if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         url = "http://$url"
                     }
