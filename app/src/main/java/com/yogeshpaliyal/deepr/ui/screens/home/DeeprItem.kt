@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -52,7 +51,6 @@ import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
-import compose.icons.tablericons.Note
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -207,19 +205,6 @@ fun DeeprItem(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Row {
-                            if (account.notes.isNotEmpty()) {
-                                IconButton(onClick = {
-                                    onItemClick(MenuItem.ViewNote(account))
-                                }) {
-                                    Icon(
-                                        TablerIcons.Note,
-                                        contentDescription = stringResource(R.string.note),
-                                        tint = getDeeprItemTextColor(account.isFavourite),
-                                        modifier = Modifier.size(28.dp),
-                                    )
-                                }
-                            }
-
                             IconButton(onClick = {
                                 onItemClick(MenuItem.FavouriteClick(account))
                             }) {

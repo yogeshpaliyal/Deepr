@@ -140,6 +140,7 @@ import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Refresh
@@ -768,6 +769,18 @@ fun Content(
                             placeholder = null,
                             error = null,
                             contentScale = ContentScale.Crop,
+                        )
+                    }
+                }
+
+                if (account.notes.isNotEmpty()) {
+                    item {
+                        MenuListItem(
+                            text = stringResource(R.string.view_note),
+                            icon = TablerIcons.Note,
+                            onClick = {
+                                onItemClick(ViewNote(account))
+                            },
                         )
                     }
                 }

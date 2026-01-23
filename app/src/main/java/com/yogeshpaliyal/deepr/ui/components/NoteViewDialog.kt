@@ -134,8 +134,10 @@ private fun ClickableLinkText(
         modifier = modifier.fillMaxWidth(),
         style = MaterialTheme.typography.bodyMedium,
         onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
+            annotatedString
+                .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                .firstOrNull()
+                ?.let { annotation ->
                     var url = annotation.item.trim()
                     if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         url = "http://$url"
