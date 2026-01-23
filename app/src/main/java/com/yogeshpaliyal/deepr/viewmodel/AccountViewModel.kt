@@ -79,6 +79,11 @@ class AccountViewModel(
     private val analyticsManager: AnalyticsManager,
 ) : ViewModel(),
     KoinComponent {
+    
+    companion object {
+        private val SEARCH_TERMS_REGEX = "\\s+".toRegex()
+    }
+    
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
@@ -353,7 +358,7 @@ class AccountViewModel(
             val tagCount = tags.size.toLong()
 
             // Split search query by spaces to support AND logic
-            val searchTerms = query.trim().split("\\s+".toRegex()).filter { it.isNotEmpty() }
+            val searchTerms = query.trim().split(SEARCH_TERMS_REGEX).filter { it.isNotEmpty() }
             
             // Use the first term for SQL filtering (to reduce initial result set)
             // or empty string if no search terms
@@ -381,10 +386,12 @@ class AccountViewModel(
                         // If 0 or 1 search term, SQL already filtered correctly
                         results
                     } else {
+                        // Convert search terms to lowercase once for performance
+                        val lowerSearchTerms = searchTerms.map { it.lowercase() }
+                        
                         // Filter results to match ALL search terms (AND logic)
                         results.filter { link ->
-                            searchTerms.all { term ->
-                                val lowerTerm = term.lowercase()
+                            lowerSearchTerms.all { lowerTerm ->
                                 (link.link?.lowercase()?.contains(lowerTerm) == true) ||
                                 (link.name?.lowercase()?.contains(lowerTerm) == true) ||
                                 (link.notes?.lowercase()?.contains(lowerTerm) == true)
