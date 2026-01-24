@@ -179,6 +179,51 @@ class DeeprIntegratedTest {
     }
 
     @Test
+    fun testMultiKeywordSearchFunctionality() {
+        // Add links with different content in name and notes
+        addLinkWithDetails("myapp://test1", "Android Development")
+        addLinkWithNotesAndDetails("myapp://test2", "Mobile App", "Android programming")
+        addLinkWithNotesAndDetails("myapp://test3", "iOS Development", "Swift programming")
+        addLinkWithDetails("myapp://test4", "Web Development")
+
+        composeTestRule.waitForIdle()
+
+        // Click on the search bar to expand it
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.search))
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        // Search with multiple keywords (space as AND operator)
+        // Should match: "Android Development" and "Mobile App" with "Android programming"
+        // Should NOT match: "iOS Development" or "Web Development"
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.search))
+            .performTextInput("Android Development")
+
+        composeTestRule.waitForIdle()
+
+        // Verify both matching links are displayed
+        composeTestRule
+            .onNodeWithText("Android Development")
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Mobile App")
+            .assertIsDisplayed()
+
+        // Verify non-matching links are not displayed
+        composeTestRule
+            .onNodeWithText("iOS Development")
+            .assertDoesNotExist()
+
+        composeTestRule
+            .onNodeWithText("Web Development")
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun testAddRemoveFavorite() {
         // Add a link
         testAddNewLink()
@@ -310,6 +355,44 @@ class DeeprIntegratedTest {
             .performClick()
 
         composeTestRule.waitForIdle()
+
+        // Save
+        composeTestRule
+            .onNodeWithText(getString(R.string.save))
+            .performScrollTo()
+            .performClick()
+
+        composeTestRule.waitForIdle()
+    }
+
+    // Helper method to add a link with notes and details
+    private fun addLinkWithNotesAndDetails(
+        link: String,
+        name: String,
+        notes: String,
+    ) {
+        // Click the FAB
+        composeTestRule
+            .onNodeWithContentDescription(getString(R.string.add_link))
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        // Enter deeplink using placeholder text
+        composeTestRule
+            .onNodeWithText("https://example.com or app://deeplink")
+            .performTextInput(link)
+
+        // Enter name using label text
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_link_name))
+            .performTextInput(name)
+
+        // Enter notes using label text
+        composeTestRule
+            .onNodeWithText(getString(R.string.enter_notes))
+            .performScrollTo()
+            .performTextInput(notes)
 
         // Save
         composeTestRule
