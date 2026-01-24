@@ -1,6 +1,8 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,9 +31,11 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +54,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.google_drive.BackupStatus
+import com.yogeshpaliyal.deepr.google_drive.DriveSyncService
+import com.yogeshpaliyal.deepr.google_drive.GoogleDriveHelper
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
@@ -61,6 +68,8 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.ChevronRight
+import compose.icons.tablericons.Cloud
+import compose.icons.tablericons.CloudUpload
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.InfoCircle
@@ -72,7 +81,12 @@ import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object Settings : TopLevelRoute {
     override val icon: ImageVector
@@ -92,9 +106,37 @@ fun SettingsScreen(
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    syncService: DriveSyncService = koinInject(),
 ) {
     val context = LocalContext.current
     val navigatorContext = LocalNavigator.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var isDriveAuthenticated by remember { mutableStateOf(false) }
+    var backupStatus by remember { mutableStateOf<BackupStatus?>(null) }
+
+    val googleSignInLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            GoogleDriveHelper.handleSignInResult(context, result.data)
+            isDriveAuthenticated = GoogleDriveHelper.isDriveAuthenticated(context)
+        }
+
+    fun updateBackupStatus() {
+        coroutineScope.launch {
+            val file = syncService.getBackupFileInfo()
+            val lastBackupDate = file?.modifiedTime?.value?.let { Instant.ofEpochMilli(it) }
+            backupStatus = BackupStatus(hasBackup = file != null, lastBackupDate = lastBackupDate)
+        }
+    }
+
+    LaunchedEffect(isDriveAuthenticated) {
+        isDriveAuthenticated = GoogleDriveHelper.isDriveAuthenticated(context)
+        if (isDriveAuthenticated) {
+            updateBackupStatus()
+        }
+    }
 
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
@@ -179,6 +221,56 @@ fun SettingsScreen(
                         navigatorContext.add(RestoreScreen)
                     },
                 )
+            }
+
+            SettingsSection("Google Drive") {
+                if (isDriveAuthenticated) {
+                    SettingsItem(
+                        TablerIcons.CloudUpload,
+                        title = "Backup",
+                        description =
+                            backupStatus?.let {
+                                if (it.hasBackup) {
+                                    "Last backup: ${it.lastBackupDate?.atZone(
+                                        ZoneId.systemDefault(),
+                                    )?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"))}"
+                                } else {
+                                    "No backup found"
+                                }
+                            },
+                        onClick = {
+                            coroutineScope.launch {
+                                syncService.backupToDrive()
+                                updateBackupStatus()
+                            }
+                        },
+                    )
+                    SettingsItem(
+                        TablerIcons.Download,
+                        title = "Restore",
+                        onClick = {
+                            coroutineScope.launch {
+                                syncService.restoreFromDrive()
+                            }
+                        },
+                    )
+                    SettingsItem(
+                        TablerIcons.Cloud,
+                        title = "Logout",
+                        onClick = {
+                            GoogleDriveHelper.signOut(context)
+                            isDriveAuthenticated = false
+                        },
+                    )
+                } else {
+                    SettingsItem(
+                        TablerIcons.Cloud,
+                        title = "Login to Google Drive",
+                        onClick = {
+                            googleSignInLauncher.launch(GoogleDriveHelper.getSignInIntent(context))
+                        },
+                    )
+                }
             }
 
             SettingsSection("Others") {

@@ -97,6 +97,10 @@ android {
             keyPassword = "android"
         }
     }
+
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+    }
 }
 
 sqldelight {
@@ -171,6 +175,10 @@ dependencies {
     "freePlaystoreImplementation"(libs.firebase.analytics)
     "freePlaystoreImplementation"(libs.firebase.crashlytics.ndk)
     "freePlaystoreImplementation"(libs.play.review)
+
+    implementation("com.google.android.gms:play-services-auth:21.5.0")
+    implementation("com.google.api-client:google-api-client-android:2.8.1")
+    implementation("com.google.apis:google-api-services-drive:v3-rev20230815-2.0.0")
 }
 
 kotlinter {
