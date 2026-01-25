@@ -165,20 +165,21 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.documentfile)
 
-    // Add Firebase dependencies to pro and freePlayStore flavors specifically
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)
     "proImplementation"(libs.play.review)
+    "proImplementation"("com.google.android.gms:play-services-auth:21.5.0")
+    "proImplementation"("com.google.api-client:google-api-client-android:2.8.1")
+    "proImplementation"("com.google.apis:google-api-services-drive:v3-rev20230815-2.0.0")
 
     "freePlaystoreImplementation"(platform(libs.firebase.bom))
     "freePlaystoreImplementation"(libs.firebase.analytics)
     "freePlaystoreImplementation"(libs.firebase.crashlytics.ndk)
     "freePlaystoreImplementation"(libs.play.review)
-
-    implementation("com.google.android.gms:play-services-auth:21.5.0")
-    implementation("com.google.api-client:google-api-client-android:2.8.1")
-    implementation("com.google.apis:google-api-services-drive:v3-rev20230815-2.0.0")
+    "freePlaystoreImplementation"("com.google.android.gms:play-services-auth:21.5.0")
+    "freePlaystoreImplementation"("com.google.api-client:google-api-client-android:2.8.1")
+    "freePlaystoreImplementation"("com.google.apis:google-api-services-drive:v3-rev20230815-2.0.0")
 }
 
 kotlinter {

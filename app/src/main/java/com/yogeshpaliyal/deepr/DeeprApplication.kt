@@ -16,7 +16,8 @@ import com.yogeshpaliyal.deepr.data.HtmlParser
 import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.LinkRepositoryImpl
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.google_drive.DriveSyncService
+import com.yogeshpaliyal.deepr.google_drive.DriveSyncManager
+import com.yogeshpaliyal.deepr.google_drive.DriveSyncManagerFactoryImpl
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.review.ReviewManager
 import com.yogeshpaliyal.deepr.review.ReviewManagerFactory
@@ -75,7 +76,7 @@ class DeeprApplication : Application() {
                 single<LinkRepository> { LinkRepositoryImpl(get()) }
 
                 single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
-                single<DriveSyncService> { DriveSyncService(androidContext(), get()) }
+                single<DriveSyncManager> { DriveSyncManagerFactoryImpl.create(androidContext(), get()) }
 
                 single<ImportRepository> { ImportRepositoryImpl(androidContext(), get(), get()) }
 

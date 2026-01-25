@@ -55,8 +55,7 @@ import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.google_drive.BackupStatus
-import com.yogeshpaliyal.deepr.google_drive.DriveSyncService
-import com.yogeshpaliyal.deepr.google_drive.GoogleDriveHelper
+import com.yogeshpaliyal.deepr.google_drive.DriveSyncManager
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
@@ -84,7 +83,6 @@ import compose.icons.tablericons.Upload
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -106,7 +104,7 @@ fun SettingsScreen(
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
-    syncService: DriveSyncService = koinInject(),
+    syncManager: DriveSyncManager = koinInject(),
 ) {
     val context = LocalContext.current
     val navigatorContext = LocalNavigator.current
@@ -119,20 +117,18 @@ fun SettingsScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult(),
         ) { result ->
-            GoogleDriveHelper.handleSignInResult(context, result.data)
-            isDriveAuthenticated = GoogleDriveHelper.isDriveAuthenticated(context)
+            syncManager.handleSignInResult(result.data)
+            isDriveAuthenticated = syncManager.isDriveAuthenticated()
         }
 
     fun updateBackupStatus() {
         coroutineScope.launch {
-            val file = syncService.getBackupFileInfo()
-            val lastBackupDate = file?.modifiedTime?.value?.let { Instant.ofEpochMilli(it) }
-            backupStatus = BackupStatus(hasBackup = file != null, lastBackupDate = lastBackupDate)
+            backupStatus = syncManager.getBackupFileInfo()
         }
     }
 
     LaunchedEffect(isDriveAuthenticated) {
-        isDriveAuthenticated = GoogleDriveHelper.isDriveAuthenticated(context)
+        isDriveAuthenticated = syncManager.isDriveAuthenticated()
         if (isDriveAuthenticated) {
             updateBackupStatus()
         }
@@ -223,53 +219,57 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection("Google Drive") {
-                if (isDriveAuthenticated) {
-                    SettingsItem(
-                        TablerIcons.CloudUpload,
-                        title = "Backup",
-                        description =
-                            backupStatus?.let {
-                                if (it.hasBackup) {
-                                    "Last backup: ${it.lastBackupDate?.atZone(
-                                        ZoneId.systemDefault(),
-                                    )?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"))}"
-                                } else {
-                                    "No backup found"
+            if (syncManager.isAvailable) {
+                SettingsSection("Google Drive") {
+                    if (isDriveAuthenticated) {
+                        SettingsItem(
+                            TablerIcons.CloudUpload,
+                            title = "Backup",
+                            description =
+                                backupStatus?.let {
+                                    if (it.hasBackup) {
+                                        "Last backup: ${it.lastBackupDate?.atZone(
+                                            ZoneId.systemDefault(),
+                                        )?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"))}"
+                                    } else {
+                                        "No backup found"
+                                    }
+                                },
+                            onClick = {
+                                coroutineScope.launch {
+                                    syncManager.backupToDrive()
+                                    updateBackupStatus()
                                 }
                             },
-                        onClick = {
-                            coroutineScope.launch {
-                                syncService.backupToDrive()
-                                updateBackupStatus()
-                            }
-                        },
-                    )
-                    SettingsItem(
-                        TablerIcons.Download,
-                        title = "Restore",
-                        onClick = {
-                            coroutineScope.launch {
-                                syncService.restoreFromDrive()
-                            }
-                        },
-                    )
-                    SettingsItem(
-                        TablerIcons.Cloud,
-                        title = "Logout",
-                        onClick = {
-                            GoogleDriveHelper.signOut(context)
-                            isDriveAuthenticated = false
-                        },
-                    )
-                } else {
-                    SettingsItem(
-                        TablerIcons.Cloud,
-                        title = "Login to Google Drive",
-                        onClick = {
-                            googleSignInLauncher.launch(GoogleDriveHelper.getSignInIntent(context))
-                        },
-                    )
+                        )
+                        SettingsItem(
+                            TablerIcons.Download,
+                            title = "Restore",
+                            onClick = {
+                                coroutineScope.launch {
+                                    syncManager.restoreFromDrive()
+                                }
+                            },
+                        )
+                        SettingsItem(
+                            TablerIcons.Cloud,
+                            title = "Logout",
+                            onClick = {
+                                syncManager.signOut()
+                                isDriveAuthenticated = false
+                            },
+                        )
+                    } else {
+                        SettingsItem(
+                            TablerIcons.Cloud,
+                            title = "Login to Google Drive",
+                            onClick = {
+                                syncManager.getSignInIntent()?.let { intent ->
+                                    googleSignInLauncher.launch(intent)
+                                }
+                            },
+                        )
+                    }
                 }
             }
 
