@@ -1,4 +1,4 @@
-package com.yogeshpaliyal.deepr.google_drive
+package com.yogeshpaliyal.deepr.gdrive
 
 import android.content.Context
 import android.content.Intent
@@ -18,6 +18,7 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.util.formatDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -26,9 +27,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import java.io.File
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import com.google.api.services.drive.model.File as DriveFile
 
 private const val APP_NAME = "Deepr"
@@ -159,7 +157,7 @@ class DriveSyncManagerImpl(
 
                 val driveService = getGoogleDrive() ?: return@withContext null
                 val driveFile = getDriveBackupFileInfo(driveService)
-                val lastBackupDate = driveFile?.modifiedTime?.value?.let { Instant.ofEpochMilli(it) }
+                val lastBackupDate = driveFile?.modifiedTime?.value
                 BackupStatus(hasBackup = driveFile != null, lastBackupDate = lastBackupDate)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to get backup file info", e)
@@ -251,11 +249,7 @@ class DriveSyncManagerImpl(
             BackupData(
                 version = BACKUP_VERSION,
                 appVersionCode = BuildConfig.VERSION_CODE,
-                backupDate =
-                    DateTimeFormatter
-                        .ofPattern("yyyy-MM-dd HH:mm:ss")
-                        .withZone(ZoneId.systemDefault())
-                        .format(Instant.now()),
+                backupDate = formatDateTime(System.currentTimeMillis()),
                 profiles = profiles,
                 links = links,
             )

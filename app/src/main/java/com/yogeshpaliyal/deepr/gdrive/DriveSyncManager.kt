@@ -1,7 +1,6 @@
-package com.yogeshpaliyal.deepr.google_drive
+package com.yogeshpaliyal.deepr.gdrive
 
 import android.content.Intent
-import java.time.Instant
 
 /**
  * Interface for Google Drive sync functionality.
@@ -51,5 +50,5 @@ interface DriveSyncManager {
 
 data class BackupStatus(
     val hasBackup: Boolean = false,
-    val lastBackupDate: Instant? = null,
+    val lastBackupDate: Long? = null,
 )

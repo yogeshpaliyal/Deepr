@@ -1,4 +1,4 @@
-package com.yogeshpaliyal.deepr.google_drive
+package com.yogeshpaliyal.deepr.gdrive
 
 import android.content.Intent
 
