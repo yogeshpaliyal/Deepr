@@ -1,22 +1,33 @@
 package com.yogeshpaliyal.deepr.data
 
+import android.content.Context
 import app.cash.sqldelight.Query
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.backup.GoogleDriveAutoBackupWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class LinkRepositoryImpl(
+    private val context: Context,
     private val deeprQueries: DeeprQueries,
 ) : LinkRepository {
+    /**
+     * Schedules auto backup after data modification.
+     */
+    private fun scheduleAutoBackup() {
+        GoogleDriveAutoBackupWorker.scheduleBackup(context)
+    }
+
     // Profile operations
     override suspend fun insertProfile(name: String) {
         withContext(Dispatchers.IO) {
             deeprQueries.insertProfile(name)
         }
+        scheduleAutoBackup()
     }
 
     override fun getAllProfiles(): Query<Profile> = deeprQueries.getAllProfiles()
@@ -38,12 +49,14 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.updateProfile(name, id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun deleteProfile(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.deleteProfile(id)
         }
+        scheduleAutoBackup()
     }
 
     override fun countProfiles(): Query<Long> = deeprQueries.countProfiles()
@@ -62,6 +75,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.insertTag(tagName)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun updateTag(
@@ -71,18 +85,21 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.updateTag(name, id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun deleteTag(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.deleteTag(id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun deleteTagRelations(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.deleteTagRelations(id)
         }
+        scheduleAutoBackup()
     }
 
     // Link-Tag operations
@@ -93,6 +110,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.addTagToLink(linkId, tagId)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun removeTagFromLink(
@@ -102,6 +120,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.removeTagFromLink(linkId, tagId)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun getTagsForLink(linkId: Long): List<Tags> =
@@ -118,6 +137,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.deleteLinkRelations(linkId)
         }
+        scheduleAutoBackup()
     }
 
     // Link operations
@@ -165,6 +185,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.insertDeepr(link, name, openedCount, notes, thumbnail, profileId)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun lastInsertRowId(): Long? =
@@ -183,12 +204,14 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, profileId, id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun deleteDeeprById(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.deleteDeeprById(id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun incrementOpenedCount(id: Long) {
@@ -207,6 +230,7 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.toggleFavourite(id)
         }
+        scheduleAutoBackup()
     }
 
     override suspend fun insertDeeprOpenLog(id: Long) {

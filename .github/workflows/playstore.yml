@@ -24,7 +24,7 @@ jobs:
           echo "${{ github.ref_name || github.event.inputs.version }}"
 
       - name: Build Release AAB
-        run: ./gradlew bundleFreePlaystoreRelease
+        run: ./gradlew bundleFreeRelease
 
       - name: 🏗 Enable Firebase
         id: enable-firebase
@@ -35,7 +35,7 @@ jobs:
         id: signAAB
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/bundle/freePlaystoreRelease
+          releaseDirectory: app/build/outputs/bundle/freeRelease
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
           alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -51,7 +51,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: com.yogeshpaliyal.deepr
-          releaseFiles: app/build/outputs/bundle/freePlaystoreRelease/*.aab
+          releaseFiles: app/build/outputs/bundle/freeRelease/*.aab
           track: production
           userFraction: 0.01
           status: inProgress

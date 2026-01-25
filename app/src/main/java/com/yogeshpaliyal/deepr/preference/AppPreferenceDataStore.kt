@@ -37,6 +37,8 @@ class AppPreferenceDataStore(
         private val THEME_MODE = stringPreferencesKey("theme_mode")
         private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
         private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
+        private val GOOGLE_DRIVE_AUTO_BACKUP_ENABLED =
+            booleanPreferencesKey("google_drive_auto_backup_enabled")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -117,6 +119,11 @@ class AppPreferenceDataStore(
     val getSelectedProfileId: Flow<Long> =
         context.appDataStore.data.map { preferences ->
             preferences[SELECTED_PROFILE_ID] ?: 1L // Default to profile ID 1
+        }
+
+    val getGoogleDriveAutoBackupEnabled: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[GOOGLE_DRIVE_AUTO_BACKUP_ENABLED] ?: false // Default to disabled
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -218,6 +225,12 @@ class AppPreferenceDataStore(
     suspend fun setSelectedProfileId(profileId: Long) {
         context.appDataStore.edit { prefs ->
             prefs[SELECTED_PROFILE_ID] = profileId
+        }
+    }
+
+    suspend fun setGoogleDriveAutoBackupEnabled(enabled: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[GOOGLE_DRIVE_AUTO_BACKUP_ENABLED] = enabled
         }
     }
 }

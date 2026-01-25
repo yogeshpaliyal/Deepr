@@ -9,6 +9,9 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import com.yogeshpaliyal.deepr.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 fun openDeeplink(
     context: Context,
@@ -150,4 +153,13 @@ fun isValidDeeplink(link: String): Boolean {
     } catch (_: Exception) {
         false
     }
+}
+
+fun formatDateTime(milliseconds: Long?): String {
+    milliseconds ?: return ""
+    // Define the desired format
+    val sdf: SimpleDateFormat = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+    // Convert the milliseconds to a Date object and then format it
+    val dateString: String? = sdf.format(Date(milliseconds))
+    return dateString ?: ""
 }
