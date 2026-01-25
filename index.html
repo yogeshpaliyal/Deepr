@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <!-- Google tag (gtag.js) -->
         <script
             async
             src="https://www.googletagmanager.com/gtag/js?id=G-ZZS2SM0W5N"
@@ -19,7 +18,6 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Deepr 🔗 - Deeplink Management for Android</title>
-        <!-- Tailwind CSS CDN -->
         <link
             href="https://unpkg.com/tailwindcss@1.9.6/dist/tailwind.min.css"
             rel="stylesheet"
@@ -55,6 +53,10 @@
                 background: #f7f8fa;
                 color: #222;
             }
+            .privacy-card {
+                background: rgba(31, 41, 55, 0.5);
+                backdrop-filter: blur(10px);
+            }
         </style>
     </head>
     <body class="bg-gray-900 text-white font-sans antialiased">
@@ -72,7 +74,6 @@
                 }
             }
         </style>
-        <!-- Header Section -->
         <header
             class="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-80 backdrop-blur-md"
         >
@@ -96,11 +97,9 @@
             </nav>
         </header>
 
-        <!-- Hero Section -->
         <section
             class="relative flex flex-col items-center justify-center text-center overflow-hidden pt-24 md:pt-32 pb-8"
         >
-            <!-- Animated gradient background -->
             <div class="absolute inset-0 z-0 pointer-events-none">
                 <div
                     class="w-full h-full absolute bg-hero-pattern opacity-10"
@@ -222,7 +221,6 @@
             </div>
         </section>
 
-        <!-- Features Section -->
         <section id="features" class="container mx-auto px-6 py-20">
             <h2
                 class="text-4xl font-extrabold text-center mb-16 text-indigo-400 drop-shadow-lg"
@@ -305,7 +303,6 @@
             </div>
         </section>
 
-        <!-- Architecture Section -->
         <section id="architecture" class="container mx-auto px-6 py-16">
             <h2
                 class="text-3xl font-extrabold text-center mb-8 text-indigo-400 drop-shadow-lg"
@@ -394,7 +391,39 @@
             </div>
         </section>
 
-        <!-- Author Section -->
+        <section id="privacy" class="container mx-auto px-6 py-20">
+            <div class="max-w-4xl mx-auto privacy-card p-8 md:p-12 rounded-3xl border border-indigo-500 shadow-2xl">
+                <h2 class="text-3xl font-extrabold mb-8 text-indigo-400">🛡️ Privacy Policy</h2>
+                <div class="space-y-6 text-gray-300 leading-relaxed">
+                    <p>
+                        Deepr is built with a <strong>privacy-first</strong> philosophy. As an open-source tool designed for developers, we believe your data should belong to you and stay under your control.
+                    </p>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">1. Data Collection</h3>
+                        <p>Deepr <strong>does not collect</strong>, store, or transmit any personal information to external servers. All deeplinks, categories, and usage statistics are stored locally on your device's private storage using SQLDelight.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">2. Analytics & Tracking</h3>
+                        <p>The application contains <strong>no trackers</strong>, no advertising SDKs, and no third-party analytics. We do not monitor how you use the app or what links you store.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">3. Permissions</h3>
+                        <p>Deepr requests minimal permissions required to function (such as creating Home Screen shortcuts). It does not request access to your contacts, location, or files unless explicitly triggered by a user action for a specific feature.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">4. Open Source Transparency</h3>
+                        <p>Because Deepr is open-source, you can verify our privacy claims by reviewing the source code on our GitHub repository at any time.</p>
+                    </div>
+
+                    <p class="text-sm italic pt-4 border-t border-gray-700">Last Updated: January 2026</p>
+                </div>
+            </div>
+        </section>
+
         <section id="author" class="container mx-auto px-6 py-16">
             <h2 class="text-3xl font-extrabold text-center mb-8">✍️ Author</h2>
             <div
@@ -493,12 +522,15 @@
             </div>
         </section>
 
-        <!-- Footer Section -->
         <footer class="bg-gray-900 py-12 text-center text-gray-400">
+            <div class="mb-4 space-x-4">
+                <a href="#features" class="hover:text-white transition">Features</a>
+                <a href="#privacy" class="hover:text-white transition">Privacy Policy</a>
+                <a href="https://github.com/yogeshpaliyal/Deepr" class="hover:text-white transition">GitHub</a>
+            </div>
             <p><span id="copyright-year"></span> Deepr. All rights reserved.</p>
         </footer>
 
-        <!-- JavaScript for hero animation and footer year -->
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const heroContent = document.getElementById("hero-content");
