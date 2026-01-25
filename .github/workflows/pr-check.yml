@@ -45,15 +45,15 @@ jobs:
         run: |
           bash ./scripts/enableDisableFirebase.sh false
 
-      - name: 🏗 Build Free APK
-        run: bash ./gradlew assembleFreeDebug
+      - name: 🏗 Build Github APK
+        run: bash ./gradlew assembleGithubDebug
 
       - name: 🏗 Enable Firebase
         run: |
           bash ./scripts/enableDisableFirebase.sh true
 
       - name: 🏗 Build Free Play store APK
-        run: bash ./gradlew assembleFreePlaystoreDebug
+        run: bash ./gradlew assembleFreeDebug
 
       - name: 🏗 Build Pro APK
         run: bash ./gradlew assembleProDebug
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: app/build/outputs/apk/free/debug/*.apk
+          path: app/build/outputs/apk/github/debug/*.apk
           retention-days: 3
 
       - name: 💬 Comment on PR with APK Link
