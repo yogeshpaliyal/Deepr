@@ -29,13 +29,13 @@ jobs:
 
       - name: Build Release AAB
         id: buildRelease
-        run: ./gradlew bundleFreePlaystoreRelease
+        run: ./gradlew bundleFreeRelease
 
       - name: Sign AAB
         id: sign
         uses: r0adkll/sign-android-release@fix/bundle-signing
         with:
-          releaseDirectory: app/build/outputs/bundle/freePlaystoreRelease
+          releaseDirectory: app/build/outputs/bundle/freeRelease
           signingKeyBase64: ${{ secrets.PLAY_STORE_UPLOAD_SIGNING_KEY }}
           alias: ${{ secrets.PLAY_STORE_UPLOAD_ALIAS  }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -45,5 +45,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: app/build/outputs/bundle/freePlaystoreRelease/*.aab
+          path: app/build/outputs/bundle/freeRelease/*.aab
           retention-days: 3

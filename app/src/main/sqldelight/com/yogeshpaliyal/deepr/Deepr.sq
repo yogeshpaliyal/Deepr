@@ -110,6 +110,36 @@ ORDER BY
         END
     END DESC;
 
+getLinksForBackup:
+SELECT
+  D.id,
+  D.link,
+  D.name,
+  D.createdAt,
+  D.openedCount,
+  D.isFavourite,
+  D.notes,
+  D.thumbnail,
+  D.profileId,
+  P.name AS profileName,
+  DOL_Max.lastOpenedAt,
+  GROUP_CONCAT(T.name, ', ') AS tags
+FROM Deepr AS D
+JOIN Profile AS P ON D.profileId = P.id
+LEFT JOIN (
+      SELECT
+        deeplinkId,
+        MAX(openedAt) AS lastOpenedAt
+      FROM
+        DeeprOpenLog
+      GROUP BY
+        deeplinkId
+    ) AS DOL_Max ON D.id = DOL_Max.deeplinkId
+LEFT JOIN LinkTags AS LT ON D.id = LT.linkId
+LEFT JOIN Tags AS T ON LT.tagId = T.id
+GROUP BY
+  D.id;
+
 
 listDeeprAsc:
 SELECT * FROM Deepr ORDER BY createdAt ASC;
@@ -250,6 +280,12 @@ UPDATE Profile SET name = ? WHERE id = ?;
 
 deleteProfile:
 DELETE FROM Profile WHERE id = ?;
+
+deleteAllProfiles:
+DELETE FROM Profile;
+
+deleteAllTags:
+DELETE FROM Tags;
 
 countProfiles:
 SELECT COUNT(*) FROM Profile;

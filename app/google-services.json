@@ -12,7 +12,12 @@
           "package_name": "com.yogeshpaliyal.deepr"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBpl14YPxi408uILdQb4IBb48B6Hv_vgEc"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +41,20 @@
           "package_name": "com.yogeshpaliyal.deepr.debug"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1051853339817-i3j5cgc649818bhf8rlfr5cp8pucnm22.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yogeshpaliyal.deepr.debug",
+            "certificate_hash": "6cb826b4c83a766a4eb41705ae77e9879574fed0"
+          }
+        },
+        {
+          "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBpl14YPxi408uILdQb4IBb48B6Hv_vgEc"
@@ -39,7 +62,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -50,7 +78,20 @@
           "package_name": "com.yogeshpaliyal.deepr.pro"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1051853339817-2gqko82u352jeg5ag59tupt12kcq1c9b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yogeshpaliyal.deepr.pro",
+            "certificate_hash": "7badca69ac1e28692856a67df92a81001c198be3"
+          }
+        },
+        {
+          "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBpl14YPxi408uILdQb4IBb48B6Hv_vgEc"
@@ -58,7 +99,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -69,7 +115,20 @@
           "package_name": "com.yogeshpaliyal.deepr.pro.debug"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1051853339817-i0995omlhd8f4ul5fi7e5678e12b7fh4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yogeshpaliyal.deepr.pro.debug",
+            "certificate_hash": "6cb826b4c83a766a4eb41705ae77e9879574fed0"
+          }
+        },
+        {
+          "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBpl14YPxi408uILdQb4IBb48B6Hv_vgEc"
@@ -77,7 +136,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051853339817-tn6k0ggsrric0ilbjs8s49udmh3oaa6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

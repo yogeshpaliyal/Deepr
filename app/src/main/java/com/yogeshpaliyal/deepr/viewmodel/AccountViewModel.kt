@@ -649,6 +649,17 @@ class AccountViewModel(
         }
     }
 
+    // Google Drive auto backup preference methods
+    val googleDriveAutoBackupEnabled =
+        preferenceDataStore.getGoogleDriveAutoBackupEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun setGoogleDriveAutoBackupEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setGoogleDriveAutoBackupEnabled(enabled)
+        }
+    }
+
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceDataStore.getAutoBackupEnabled

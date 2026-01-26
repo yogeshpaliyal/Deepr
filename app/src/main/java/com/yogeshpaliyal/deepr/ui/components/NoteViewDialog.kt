@@ -1,0 +1,83 @@
+package com.yogeshpaliyal.deepr.ui.components
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.R
+
+@Composable
+fun NoteViewDialog(
+    deepr: GetLinksAndTags,
+    onDismiss: () -> Unit,
+    onEdit: (GetLinksAndTags) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.note))
+        },
+        text = {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 400.dp)
+                        .verticalScroll(scrollState),
+            ) {
+                SelectionContainer {
+                    Text(
+                        text = deepr.notes,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDismiss()
+                    onEdit(deepr)
+                },
+            ) {
+                Text(stringResource(R.string.edit))
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = {
+                    val clipboard =
+                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText(context.getString(R.string.note), deepr.notes)
+                    clipboard.setPrimaryClip(clip)
+                    Toast
+                        .makeText(context, context.getString(R.string.note_copied), Toast.LENGTH_SHORT)
+                        .show()
+                    onDismiss()
+                },
+            ) {
+                Text(stringResource(R.string.copy))
+            }
+        },
+    )
+}
