@@ -17,7 +17,7 @@
     <string name="tags">Tags</string>
     <string name="all">Alle</string>
     <string name="add_link">Link hinzufügen</string>
-    <string name="fetch_name_from_link">Name vom Link abrufen</string>
+    <string name="fetch_name_from_link">Meta-Daten aus Link abrufen</string>
     <string name="create_tag">Tag erstellen</string>
     <string name="new_tag">Neuer Tag</string>
     <string name="no_links_saved_yet">Noch keine Links gespeichert</string>
@@ -107,7 +107,7 @@
     <!-- Sync Settings -->
     <string name="select_sync_file">Synchronisationsdatei auswählen</string>
     <string name="sync_now">Jetzt synchronisieren</string>
-    <string name="last_sync_time">Letzte Synchronisation:</string>
+    <string name="last_sync_time">Letzte Synchronisation</string>
     <string name="last_sync_time_never">Noch nie synchronisiert</string>
     <string name="last_sync_time_format">%s</string>
     <!-- Sync Messages -->
@@ -127,4 +127,6 @@
     <string name="sync_status_invalid">⚠ Dateiformat ist ungültig</string>
     <string name="sync_status_no_file">Keine Sync-Datei ausgewählt</string>
     <string name="sync_now_description">Deeplinks manuell mit ausgewählter Datei synchronisieren</string>
+    <string name="favourites">Favoriten</string>
+    <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
 </resources>

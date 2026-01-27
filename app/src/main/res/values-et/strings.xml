@@ -235,4 +235,7 @@
     <string name="manage_profiles">Halda profiile</string>
     <string name="no_profiles_yet">Profiile veel pole</string>
     <string name="create_first_profile">Linkide haldamiseks lisa oma esimene profiil</string>
+    <string name="note">Märge</string>
+    <string name="note_copied">Märge on kopeeritud</string>
+    <string name="cannot_open_link">Lingi avamine ei õnnestu</string>
 </resources>
