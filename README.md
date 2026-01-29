@@ -25,6 +25,7 @@
 - QR Code support: Generate and scan
 - Organize links by tags
 - Save link by sharing from other app (eg: chrome, etc.)
+- **Silent save option:** Save links from share sheet without opening the app
 - Save links to markdown file in local storage. (can be used for obsidian)
 - **Local network server:** Access and manage links from other devices on the same network
 
