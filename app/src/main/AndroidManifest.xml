@@ -52,6 +52,7 @@
             android:name=".SilentSaveActivity"
             android:exported="true"
             android:label="@string/save_silently"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
