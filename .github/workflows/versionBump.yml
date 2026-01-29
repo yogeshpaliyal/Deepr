@@ -51,7 +51,7 @@ jobs:
         run: echo "${{ steps.bump-app-version.outputs.newVersion }}"
 
       - name: Build Release APK
-        run: ./gradlew assembleFreeRelease
+        run: ./gradlew assembleGithubRelease
 
       - name: Sign Release APK
         id: signApk
@@ -81,7 +81,7 @@ jobs:
 
       - name: Rename artifact names
         run: |
-          mv ${{steps.signApk.outputs.signedReleaseFile}} app/build/outputs/apk/free/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk
+          mv ${{steps.signApk.outputs.signedReleaseFile}} app/build/outputs/apk/github/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk
 
       - name: Create Release
         uses: ncipollo/release-action@v1.16.0
@@ -89,6 +89,6 @@ jobs:
           tag: "${{ steps.bump-app-version.outputs.newVersion }}"
           generateReleaseNotes: true
           commit: "master"
-          artifacts: "app/build/outputs/apk/free/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk"
+          artifacts: "app/build/outputs/apk/github/release/deepr-release-${{steps.bump-app-version.outputs.newVersion}}.apk"
           discussionCategory: "Release feedbacks"
           makeLatest: true
