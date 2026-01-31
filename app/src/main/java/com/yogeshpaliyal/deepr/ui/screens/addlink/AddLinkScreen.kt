@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -121,6 +122,8 @@ fun AddLinkScreen(
     var selectedProfileId by remember(selectedLink) {
         mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
     }
+    var showCreateProfileDialog by remember { mutableStateOf(false) }
+    var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
     val fetchMetadata: () -> Unit = {
         isFetchingMetadata = true
@@ -578,6 +581,34 @@ fun AddLinkScreen(
                                         },
                                     )
                                 }
+                                
+                                if (allProfiles.isNotEmpty()) {
+                                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                }
+                                
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            Icon(
+                                                imageVector = TablerIcons.Plus,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(18.dp),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.create_profile),
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        profileExpanded = false
+                                        showCreateProfileDialog = true
+                                    },
+                                )
                             }
                         }
                     }
@@ -851,5 +882,100 @@ fun AddLinkScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+    
+    // Auto-select newly created profile
+    LaunchedEffect(allProfiles, pendingProfileNameToSelect) {
+        if (pendingProfileNameToSelect != null) {
+            val newProfile = allProfiles.find { 
+                it.name.equals(pendingProfileNameToSelect, ignoreCase = true) 
+            }
+            if (newProfile != null) {
+                selectedProfileId = newProfile.id
+                pendingProfileNameToSelect = null
+            }
+        }
+    }
+    
+    // Create Profile Dialog
+    if (showCreateProfileDialog) {
+        var newProfileName by remember { mutableStateOf("") }
+        var profileCreationError by remember { mutableStateOf<String?>(null) }
+        
+        AlertDialog(
+            onDismissRequest = { 
+                showCreateProfileDialog = false
+                profileCreationError = null
+            },
+            title = { 
+                Text(stringResource(R.string.create_profile)) 
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = newProfileName,
+                        onValueChange = { 
+                            newProfileName = it
+                            profileCreationError = null
+                        },
+                        label = { Text(stringResource(R.string.profile_name)) },
+                        singleLine = true,
+                        isError = profileCreationError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    if (profileCreationError != null) {
+                        Text(
+                            text = profileCreationError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val trimmedProfileName = newProfileName.trim()
+                        if (trimmedProfileName.isBlank()) {
+                            profileCreationError = context.getString(R.string.profile_name_exists)
+                            return@TextButton
+                        }
+                        
+                        val existingProfile = allProfiles.find { 
+                            it.name.equals(trimmedProfileName, ignoreCase = true) 
+                        }
+                        
+                        if (existingProfile != null) {
+                            profileCreationError = context.getString(R.string.profile_name_exists)
+                        } else {
+                            viewModel.insertProfile(trimmedProfileName)
+                            pendingProfileNameToSelect = trimmedProfileName
+                            showCreateProfileDialog = false
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.profile_created_successfully),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    },
+                    enabled = newProfileName.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.create_profile))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showCreateProfileDialog = false
+                        profileCreationError = null
+                    },
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
     }
 }
