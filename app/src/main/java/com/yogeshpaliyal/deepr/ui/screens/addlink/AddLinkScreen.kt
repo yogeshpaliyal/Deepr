@@ -883,12 +883,12 @@ fun AddLinkScreen(
             }
         }
     }
-    
+
     // Auto-select newly created profile
     LaunchedEffect(allProfiles, pendingProfileNameToSelect) {
         if (pendingProfileNameToSelect != null) {
-            val newProfile = allProfiles.find { 
-                it.name.equals(pendingProfileNameToSelect, ignoreCase = true) 
+            val newProfile = allProfiles.find {
+                it.name.equals(pendingProfileNameToSelect, ignoreCase = true)
             }
             if (newProfile != null) {
                 selectedProfileId = newProfile.id
@@ -896,21 +896,21 @@ fun AddLinkScreen(
             }
         }
     }
-    
+
     // Create Profile Dialog
     if (showCreateProfileDialog) {
         // State variables are intentionally declared inside the dialog condition block
         // to reset when the dialog is dismissed and reopened, providing a clean state for each use
         var newProfileName by remember { mutableStateOf("") }
         var profileCreationError by remember { mutableStateOf<String?>(null) }
-        
+
         AlertDialog(
-            onDismissRequest = { 
+            onDismissRequest = {
                 showCreateProfileDialog = false
                 profileCreationError = null
             },
-            title = { 
-                Text(stringResource(R.string.create_profile)) 
+            title = {
+                Text(stringResource(R.string.create_profile))
             },
             text = {
                 Column(
@@ -918,7 +918,7 @@ fun AddLinkScreen(
                 ) {
                     OutlinedTextField(
                         value = newProfileName,
-                        onValueChange = { 
+                        onValueChange = {
                             newProfileName = it
                             profileCreationError = null
                         },
@@ -945,11 +945,11 @@ fun AddLinkScreen(
                             profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
                             return@TextButton
                         }
-                        
-                        val existingProfile = allProfiles.find { 
-                            it.name.equals(trimmedProfileName, ignoreCase = true) 
+
+                        val existingProfile = allProfiles.find {
+                            it.name.equals(trimmedProfileName, ignoreCase = true)
                         }
-                        
+
                         if (existingProfile != null) {
                             profileCreationError = context.getString(R.string.profile_name_exists)
                         } else {
@@ -970,7 +970,7 @@ fun AddLinkScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { 
+                    onClick = {
                         showCreateProfileDialog = false
                         profileCreationError = null
                     },
