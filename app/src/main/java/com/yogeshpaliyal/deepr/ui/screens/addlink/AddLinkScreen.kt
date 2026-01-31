@@ -926,9 +926,9 @@ fun AddLinkScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                     )
-                    if (profileCreationError != null) {
+                    profileCreationError?.let { errorMessage ->
                         Text(
-                            text = profileCreationError!!,
+                            text = errorMessage,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                         )
@@ -940,7 +940,7 @@ fun AddLinkScreen(
                     onClick = {
                         val trimmedProfileName = newProfileName.trim()
                         if (trimmedProfileName.isBlank()) {
-                            profileCreationError = context.getString(R.string.profile_name_exists)
+                            profileCreationError = "Profile name cannot be blank"
                             return@TextButton
                         }
                         
