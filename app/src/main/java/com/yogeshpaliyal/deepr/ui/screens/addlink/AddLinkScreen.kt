@@ -899,6 +899,8 @@ fun AddLinkScreen(
     
     // Create Profile Dialog
     if (showCreateProfileDialog) {
+        // State variables are intentionally declared inside the dialog condition block
+        // to reset when the dialog is dismissed and reopened, providing a clean state for each use
         var newProfileName by remember { mutableStateOf("") }
         var profileCreationError by remember { mutableStateOf<String?>(null) }
         
@@ -940,7 +942,7 @@ fun AddLinkScreen(
                     onClick = {
                         val trimmedProfileName = newProfileName.trim()
                         if (trimmedProfileName.isBlank()) {
-                            profileCreationError = "Profile name cannot be blank"
+                            profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
                             return@TextButton
                         }
                         
