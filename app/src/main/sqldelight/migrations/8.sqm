@@ -1,0 +1,2 @@
+-- Add themeMode column to Profile table for per-profile themes
+ALTER TABLE Profile ADD COLUMN themeMode TEXT NOT NULL DEFAULT 'system';

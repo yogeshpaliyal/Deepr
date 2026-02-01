@@ -18,6 +18,7 @@ interface LinkRepository {
 
     suspend fun updateProfile(
         name: String,
+        themeMode: String,
         id: Long,
     )
 

@@ -97,6 +97,12 @@ class AccountViewModel(
             profiles.firstOrNull { it.id == profileId }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    // Get current profile's theme mode
+    val currentProfileTheme: StateFlow<String> =
+        currentProfile.map { profile ->
+            profile?.themeMode ?: "system"
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
     // Initialize default profile if none exists
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -795,9 +801,10 @@ class AccountViewModel(
     suspend fun updateProfile(
         id: Long,
         name: String,
+        themeMode: String,
     ) {
         withContext(Dispatchers.IO) {
-            linkRepository.updateProfile(name, id)
+            linkRepository.updateProfile(name, themeMode, id)
         }
     }
 

@@ -52,10 +52,12 @@ import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
+import org.koin.androidx.compose.koinViewModel
 
 data class SharedLink(
     val url: String,
@@ -98,12 +100,10 @@ class MainActivity : ComponentActivity() {
         getLinkFromIntent(intent)
 
         setContent {
-            val preferenceDataStore = remember { AppPreferenceDataStore(this) }
-            val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
-                initialValue = "system",
-            )
+            val viewModel: AccountViewModel = koinViewModel()
+            val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
 
-            DeeprTheme(themeMode = themeMode) {
+            DeeprTheme(themeMode = profileTheme) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {
