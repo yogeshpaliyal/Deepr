@@ -581,11 +581,11 @@ fun AddLinkScreen(
                                         },
                                     )
                                 }
-                                
+
                                 if (allProfiles.isNotEmpty()) {
                                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                                 }
-                                
+
                                 DropdownMenuItem(
                                     text = {
                                         Row(
@@ -887,9 +887,10 @@ fun AddLinkScreen(
     // Auto-select newly created profile
     LaunchedEffect(allProfiles, pendingProfileNameToSelect) {
         if (pendingProfileNameToSelect != null) {
-            val newProfile = allProfiles.find {
-                it.name.equals(pendingProfileNameToSelect, ignoreCase = true)
-            }
+            val newProfile =
+                allProfiles.find {
+                    it.name.equals(pendingProfileNameToSelect, ignoreCase = true)
+                }
             if (newProfile != null) {
                 selectedProfileId = newProfile.id
                 pendingProfileNameToSelect = null
@@ -946,9 +947,10 @@ fun AddLinkScreen(
                             return@TextButton
                         }
 
-                        val existingProfile = allProfiles.find {
-                            it.name.equals(trimmedProfileName, ignoreCase = true)
-                        }
+                        val existingProfile =
+                            allProfiles.find {
+                                it.name.equals(trimmedProfileName, ignoreCase = true)
+                            }
 
                         if (existingProfile != null) {
                             profileCreationError = context.getString(R.string.profile_name_exists)
@@ -956,11 +958,12 @@ fun AddLinkScreen(
                             viewModel.insertProfile(trimmedProfileName)
                             pendingProfileNameToSelect = trimmedProfileName
                             showCreateProfileDialog = false
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.profile_created_successfully),
-                                Toast.LENGTH_SHORT,
-                            ).show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.profile_created_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                     },
                     enabled = newProfileName.isNotBlank(),
