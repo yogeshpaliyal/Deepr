@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,9 +11,10 @@ import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 /**
@@ -28,16 +30,23 @@ class SilentSaveActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Store application context and scope for use after activity finishes
+        val appContext = applicationContext
+
         // Handle the shared link
-        handleSharedLink(intent)
+        handleSharedLink(intent, appContext)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleSharedLink(intent)
+        val appContext = applicationContext
+        handleSharedLink(intent, appContext)
     }
 
-    private fun handleSharedLink(intent: Intent) {
+    private fun handleSharedLink(
+        intent: Intent,
+        appContext: Context,
+    ) {
         when {
             intent.action == Intent.ACTION_SEND && intent.type == "text/plain" -> {
                 val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
@@ -46,29 +55,32 @@ class SilentSaveActivity : ComponentActivity() {
                 if (sharedText != null) {
                     val normalizedLink = normalizeLink(sharedText)
                     if (isValidDeeplink(normalizedLink)) {
-                        saveLinkSilently(normalizedLink, title ?: "")
+                        saveLinkSilently(normalizedLink, title ?: "", appContext)
                     } else {
-                        showToastAndFinish(getString(R.string.invalid_link_silent_save))
+                        showToast(appContext, appContext.getString(R.string.invalid_link_silent_save))
                     }
-                } else {
-                    finish()
                 }
-            }
-            else -> {
-                finish()
             }
         }
     }
 
-    private fun saveLinkSilently(link: String, title: String) {
+    private fun saveLinkSilently(
+        link: String,
+        title: String,
+        appContext: Context,
+    ) {
+        // Launch in application scope so it continues after activity finishes
         lifecycleScope.launch {
             try {
                 val profileId = preferenceDataStore.getSelectedProfileId.first()
 
                 // Check if link already exists
-                val existingLink = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+                val existingLink =
+                    withContext(Dispatchers.IO) {
+                        deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+                    }
                 if (existingLink != null) {
-                    showToastAndFinish(getString(R.string.link_already_exists))
+                    showToast(appContext, appContext.getString(R.string.link_already_exists))
                     return@launch
                 }
 
@@ -78,30 +90,30 @@ class SilentSaveActivity : ComponentActivity() {
                     openedCount = 0,
                     notes = "",
                     thumbnail = "",
-                    profileId = profileId
+                    profileId = profileId,
                 )
 
-                showToastAndFinish(getString(R.string.link_saved_silently))
+                showToast(appContext, appContext.getString(R.string.link_saved_silently))
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to save link silently: $link", e)
-                showToastAndFinish(getString(R.string.failed_to_save_link))
+                showToast(appContext, appContext.getString(R.string.failed_to_save_link))
             }
         }
     }
 
-    private suspend fun showToastAndFinish(message: String) {
-        Toast.makeText(
-            this@SilentSaveActivity,
-            message,
-            Toast.LENGTH_SHORT
-        ).show()
-        // Delay to allow toast to be visible before finishing
-        delay(TOAST_DELAY_MS)
+    private fun showToast(
+        context: Context,
+        message: String,
+    ) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context.applicationContext, message, Toast.LENGTH_SHORT).show()
+            }
+        }
         finish()
     }
 
     companion object {
         private const val TAG = "SilentSaveActivity"
-        private const val TOAST_DELAY_MS = 500L
     }
 }
