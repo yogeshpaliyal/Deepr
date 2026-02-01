@@ -52,10 +52,12 @@ import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
+import org.koin.androidx.compose.koinViewModel
 
 data class SharedLink(
     val url: String,
@@ -98,12 +100,32 @@ class MainActivity : ComponentActivity() {
         getLinkFromIntent(intent)
 
         setContent {
-            val preferenceDataStore = remember { AppPreferenceDataStore(this) }
-            val themeMode by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
-                initialValue = "system",
-            )
+            val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
+            val viewModel: AccountViewModel = koinViewModel()
 
-            DeeprTheme(themeMode = themeMode) {
+            // Pro users use per-profile theme, non-pro users use global theme
+            val themeMode =
+                if (isProUser) {
+                    val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
+                    profileTheme
+                } else {
+                    val preferenceDataStore = remember { AppPreferenceDataStore(this) }
+                    val globalTheme by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
+                        initialValue = "system",
+                    )
+                    globalTheme
+                }
+
+            // Pro users use per-profile color theme
+            val colorTheme =
+                if (isProUser) {
+                    val profileColorTheme by viewModel.currentProfileColorTheme.collectAsStateWithLifecycle()
+                    profileColorTheme
+                } else {
+                    "dynamic"
+                }
+
+            DeeprTheme(themeMode = themeMode, colorTheme = colorTheme) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {

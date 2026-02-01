@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -96,6 +97,20 @@ class AccountViewModel(
         combine(allProfiles, selectedProfileId) { profiles, profileId ->
             profiles.firstOrNull { it.id == profileId }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // Get current profile's theme mode
+    val currentProfileTheme: StateFlow<String> =
+        currentProfile
+            .map { profile ->
+                profile?.themeMode ?: "system"
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
+    // Get current profile's color theme
+    val currentProfileColorTheme: StateFlow<String> =
+        currentProfile
+            .map { profile ->
+                profile?.colorTheme ?: "dynamic"
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "dynamic")
 
     // Initialize default profile if none exists
     init {
@@ -795,9 +810,11 @@ class AccountViewModel(
     suspend fun updateProfile(
         id: Long,
         name: String,
+        themeMode: String,
+        colorTheme: String,
     ) {
         withContext(Dispatchers.IO) {
-            linkRepository.updateProfile(name, id)
+            linkRepository.updateProfile(name, themeMode, colorTheme, id)
         }
     }
 

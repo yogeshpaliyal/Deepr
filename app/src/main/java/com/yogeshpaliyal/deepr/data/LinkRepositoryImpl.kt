@@ -44,10 +44,12 @@ class LinkRepositoryImpl(
 
     override suspend fun updateProfile(
         name: String,
+        themeMode: String,
+        colorTheme: String,
         id: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.updateProfile(name, id)
+            deeprQueries.updateProfile(name, themeMode, colorTheme, id)
         }
         scheduleAutoBackup()
     }
