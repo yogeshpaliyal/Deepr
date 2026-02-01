@@ -144,6 +144,30 @@ class HtmlWriterTest {
         assertTrue("Should mark favourite with icon", result.contains("ICON=\"★\""))
     }
 
+    @Test
+    fun htmlWriter_escapesTagNamesInFolders() {
+        // Given
+        val htmlWriter = HtmlWriter()
+        val testData = listOf(
+            createTestLink(
+                link = "https://example.com",
+                name = "Test Link",
+                tagsNames = "work<script>alert('xss')</script>,normal&tag"
+            )
+        )
+        val outputStream = ByteArrayOutputStream()
+
+        // When
+        htmlWriter.writeToHtml(outputStream, testData)
+        val result = outputStream.toString("UTF-8")
+
+        // Then
+        assertTrue("Should escape < in tag folder name", result.contains("&lt;"))
+        assertTrue("Should escape > in tag folder name", result.contains("&gt;"))
+        assertTrue("Should escape & in tag folder name", result.contains("&amp;"))
+        assertTrue("Should not contain unescaped script tag", !result.contains("<script>"))
+    }
+
     private fun createTestLink(
         link: String,
         name: String = link,

@@ -51,7 +51,7 @@ class HtmlWriter {
 
             // Write tagged links in folders
             tagGroups.entries.sortedBy { it.key }.forEach { (tag, links) ->
-                writer.write("    <DT><H3>$tag</H3>\n")
+                writer.write("    <DT><H3>${escapeHtml(tag)}</H3>\n")
                 writer.write("    <DL><p>\n")
                 links.forEach { item ->
                     writeBookmark(writer, item, indent = "        ")
