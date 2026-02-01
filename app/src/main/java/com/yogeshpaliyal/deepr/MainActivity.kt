@@ -100,22 +100,32 @@ class MainActivity : ComponentActivity() {
         getLinkFromIntent(intent)
 
         setContent {
-            val isProUser = BuildConfig.APPLICATION_ID.endsWith(".pro")
+            val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
             val viewModel: AccountViewModel = koinViewModel()
-            
-            // Pro users use per-profile theme, non-pro users use global theme
-            val themeMode = if (isProUser) {
-                val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
-                profileTheme
-            } else {
-                val preferenceDataStore = remember { AppPreferenceDataStore(this) }
-                val globalTheme by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
-                    initialValue = "system",
-                )
-                globalTheme
-            }
 
-            DeeprTheme(themeMode = themeMode) {
+            // Pro users use per-profile theme, non-pro users use global theme
+            val themeMode =
+                if (isProUser) {
+                    val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
+                    profileTheme
+                } else {
+                    val preferenceDataStore = remember { AppPreferenceDataStore(this) }
+                    val globalTheme by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
+                        initialValue = "system",
+                    )
+                    globalTheme
+                }
+
+            // Pro users use per-profile color theme
+            val colorTheme =
+                if (isProUser) {
+                    val profileColorTheme by viewModel.currentProfileColorTheme.collectAsStateWithLifecycle()
+                    profileColorTheme
+                } else {
+                    "dynamic"
+                }
+
+            DeeprTheme(themeMode = themeMode, colorTheme = colorTheme) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {

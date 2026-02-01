@@ -66,13 +66,12 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.deepr.ui.screens.ProfileTheme
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.FolderPlus
-import compose.icons.tablericons.MoonStars
 import compose.icons.tablericons.Plus
-import compose.icons.tablericons.Sun
 import compose.icons.tablericons.Trash
 import compose.icons.tablericons.User
 import kotlinx.coroutines.launch
@@ -409,7 +408,7 @@ object ProfileManagementScreen : TopLevelRoute {
                         )
                     },
                     text = {
-                        val isProUser = BuildConfig.APPLICATION_ID.endsWith(".pro")
+                        val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(
                                 value = profile.name,
@@ -447,60 +446,14 @@ object ProfileManagementScreen : TopLevelRoute {
                                         null
                                     },
                             )
-                            
+
                             // Theme selection for pro users
-                            if (isProUser) {
-                                Column {
-                                    Text(
-                                        text = "Theme",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(bottom = 8.dp),
-                                    )
-                                    val themeOptions = listOf(
-                                        "system" to "System default",
-                                        "light" to "Light",
-                                        "dark" to "Dark",
-                                    )
-                                    themeOptions.forEach { (mode, label) ->
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    isProfileEditEnable = profile.copy(themeMode = mode)
-                                                }
-                                                .padding(vertical = 4.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
-                                            RadioButton(
-                                                selected = profile.themeMode == mode,
-                                                onClick = {
-                                                    isProfileEditEnable = profile.copy(themeMode = mode)
-                                                },
-                                            )
-                                            Row(
-                                                modifier = Modifier.padding(start = 8.dp),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                            ) {
-                                                Icon(
-                                                    imageVector = when (mode) {
-                                                        "light" -> TablerIcons.Sun
-                                                        "dark" -> TablerIcons.MoonStars
-                                                        else -> TablerIcons.User
-                                                    },
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(18.dp),
-                                                )
-                                                Text(
-                                                    text = label,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            ProfileTheme(
+                                profile = profile,
+                                onProfileUpdate = {
+                                    isProfileEditEnable = it
+                                },
+                            )
                         }
                     },
                     confirmButton = {
@@ -514,7 +467,12 @@ object ProfileManagementScreen : TopLevelRoute {
 
                                 coroutineScope.launch {
                                     try {
-                                        viewModel.updateProfile(profile.id, trimmedName, isProfileEditEnable?.themeMode ?: "system")
+                                        viewModel.updateProfile(
+                                            profile.id,
+                                            trimmedName,
+                                            isProfileEditEnable?.themeMode ?: "system",
+                                            isProfileEditEnable?.colorTheme ?: "dynamic",
+                                        )
                                         isProfileEditEnable = null
                                         profileEditError = null
                                         Toast

@@ -100,9 +100,17 @@ class AccountViewModel(
 
     // Get current profile's theme mode
     val currentProfileTheme: StateFlow<String> =
-        currentProfile.map { profile ->
-            profile?.themeMode ?: "system"
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+        currentProfile
+            .map { profile ->
+                profile?.themeMode ?: "system"
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
+    // Get current profile's color theme
+    val currentProfileColorTheme: StateFlow<String> =
+        currentProfile
+            .map { profile ->
+                profile?.colorTheme ?: "dynamic"
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "dynamic")
 
     // Initialize default profile if none exists
     init {
@@ -803,9 +811,10 @@ class AccountViewModel(
         id: Long,
         name: String,
         themeMode: String,
+        colorTheme: String,
     ) {
         withContext(Dispatchers.IO) {
-            linkRepository.updateProfile(name, themeMode, id)
+            linkRepository.updateProfile(name, themeMode, colorTheme, id)
         }
     }
 

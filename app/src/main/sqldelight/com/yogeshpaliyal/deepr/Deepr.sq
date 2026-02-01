@@ -2,7 +2,8 @@ CREATE TABLE Profile (
 id INTEGER PRIMARY KEY NOT NULL,
 name TEXT NOT NULL UNIQUE,
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-themeMode TEXT NOT NULL DEFAULT 'system'
+themeMode TEXT NOT NULL DEFAULT 'system',
+colorTheme TEXT NOT NULL DEFAULT 'dynamic'
 );
 
 CREATE TABLE Deepr (
@@ -277,7 +278,7 @@ getProfileByName:
 SELECT * FROM Profile WHERE name = ?;
 
 updateProfile:
-UPDATE Profile SET name = ?, themeMode = ? WHERE id = ?;
+UPDATE Profile SET name = ?, themeMode = ?, colorTheme = ? WHERE id = ?;
 
 deleteProfile:
 DELETE FROM Profile WHERE id = ?;

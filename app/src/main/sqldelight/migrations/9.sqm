@@ -1,0 +1,2 @@
+-- Add colorTheme column to Profile table for color theme customization
+ALTER TABLE Profile ADD COLUMN colorTheme TEXT NOT NULL DEFAULT 'dynamic';
