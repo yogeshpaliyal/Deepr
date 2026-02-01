@@ -100,10 +100,22 @@ class MainActivity : ComponentActivity() {
         getLinkFromIntent(intent)
 
         setContent {
+            val isProUser = BuildConfig.APPLICATION_ID.endsWith(".pro")
             val viewModel: AccountViewModel = koinViewModel()
-            val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
+            
+            // Pro users use per-profile theme, non-pro users use global theme
+            val themeMode = if (isProUser) {
+                val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
+                profileTheme
+            } else {
+                val preferenceDataStore = remember { AppPreferenceDataStore(this) }
+                val globalTheme by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
+                    initialValue = "system",
+                )
+                globalTheme
+            }
 
-            DeeprTheme(themeMode = profileTheme) {
+            DeeprTheme(themeMode = themeMode) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {
