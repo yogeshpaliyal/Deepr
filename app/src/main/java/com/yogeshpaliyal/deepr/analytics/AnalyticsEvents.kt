@@ -35,6 +35,7 @@ object AnalyticsEvents {
 
     // Import/Export events
     const val EXPORT_CSV = "export_csv"
+    const val EXPORT_HTML = "export_html"
     const val IMPORT_CSV = "import_csv"
 
     // Shortcut events
