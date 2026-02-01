@@ -267,4 +267,11 @@
     <string name="manage_profiles">Manage Profiles</string>
     <string name="no_profiles_yet">No profiles yet</string>
     <string name="create_first_profile">Create your first profile to organize your links</string>
+
+    <!-- Silent Save Feature -->
+    <string name="save_silently">Save silently</string>
+    <string name="link_saved_silently">Link saved successfully</string>
+    <string name="invalid_link_silent_save">Invalid link</string>
+    <string name="failed_to_save_link">Failed to save link</string>
+    <string name="link_already_exists">Link already exists</string>
 </resources>
