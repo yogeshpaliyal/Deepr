@@ -538,6 +538,23 @@ class AccountViewModel(
         }
     }
 
+    fun exportHtmlData(uri: Uri? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = exportRepository.exportToHtml(uri)) {
+                is RequestResult.Success -> {
+                    exportResultChannel.send("Export completed: ${result.data}")
+                    analyticsManager.logEvent(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.EXPORT_HTML,
+                    )
+                }
+
+                is RequestResult.Error -> {
+                    exportResultChannel.send("Export failed: ${result.message}")
+                }
+            }
+        }
+    }
+
     fun importCsvData(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             importResultChannel.send("Importing, please wait...")
