@@ -24,6 +24,7 @@
 - Import/Export links
 - QR Code support: Generate and scan
 - Organize links by tags
+- Manage multiple profiles
 - Save link by sharing from other app (eg: chrome, etc.)
 - **Silent save option:** Save links from share sheet without opening the app
 - Save links to markdown file in local storage. (can be used for obsidian)
