@@ -24,6 +24,8 @@ class HtmlWriter {
             writer.write("<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n")
             writer.write("<TITLE>Bookmarks</TITLE>\n")
             writer.write("<H1>Bookmarks</H1>\n")
+            // Note: <DL><p> is the standard Netscape bookmark format (not a typo)
+            // The <p> is part of the original format spec from Netscape Navigator
             writer.write("<DL><p>\n")
 
             // Group links by tags to create folders
@@ -56,9 +58,11 @@ class HtmlWriter {
                 links.forEach { item ->
                     writeBookmark(writer, item, indent = "        ")
                 }
+                // Note: </DL><p> is the standard Netscape bookmark format
                 writer.write("    </DL><p>\n")
             }
 
+            // Note: </DL><p> is the standard Netscape bookmark format
             writer.write("</DL><p>\n")
         }
     }
