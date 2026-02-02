@@ -238,4 +238,10 @@
     <string name="note">Märge</string>
     <string name="note_copied">Märge on kopeeritud</string>
     <string name="cannot_open_link">Lingi avamine ei õnnestu</string>
+    <string name="profile_name_cannot_be_blank">Profiili nimi ei tohi jääda tühjaks</string>
+    <string name="save_silently">Salvesta vaikselt</string>
+    <string name="link_saved_silently">Lingi salvestamine õnnestus</string>
+    <string name="invalid_link_silent_save">Vigane link</string>
+    <string name="failed_to_save_link">Lingi salvestamine ei õnnestunud</string>
+    <string name="link_already_exists">Selline link on juba olemas</string>
 </resources>
