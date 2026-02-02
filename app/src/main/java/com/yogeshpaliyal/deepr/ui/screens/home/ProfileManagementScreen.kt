@@ -60,11 +60,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.deepr.ui.screens.ProfileTheme
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
@@ -406,7 +408,8 @@ object ProfileManagementScreen : TopLevelRoute {
                         )
                     },
                     text = {
-                        Column {
+                        val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(
                                 value = profile.name,
                                 onValueChange = {
@@ -443,6 +446,14 @@ object ProfileManagementScreen : TopLevelRoute {
                                         null
                                     },
                             )
+
+                            // Theme selection for pro users
+                            ProfileTheme(
+                                profile = profile,
+                                onProfileUpdate = {
+                                    isProfileEditEnable = it
+                                },
+                            )
                         }
                     },
                     confirmButton = {
@@ -456,7 +467,12 @@ object ProfileManagementScreen : TopLevelRoute {
 
                                 coroutineScope.launch {
                                     try {
-                                        viewModel.updateProfile(profile.id, trimmedName)
+                                        viewModel.updateProfile(
+                                            profile.id,
+                                            trimmedName,
+                                            isProfileEditEnable?.themeMode ?: "system",
+                                            isProfileEditEnable?.colorTheme ?: "dynamic",
+                                        )
                                         isProfileEditEnable = null
                                         profileEditError = null
                                         Toast

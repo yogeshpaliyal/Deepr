@@ -107,6 +107,10 @@ fun ProUpgradeDialog(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     ProFeatureItem(
+                        title = "Theme Customization",
+                        description = "Personalize with multiple color themes",
+                    )
+                    ProFeatureItem(
                         title = "Google Drive Backup",
                         description = "Securely backup your links to Google Drive",
                     )

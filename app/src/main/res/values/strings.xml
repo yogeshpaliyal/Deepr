@@ -259,6 +259,7 @@
     <string name="profile_updated_successfully">Profile updated successfully</string>
     <string name="profile_deleted_successfully">Profile deleted successfully</string>
     <string name="profile_name_exists">A profile with this name already exists</string>
+    <string name="profile_name_cannot_be_blank">Profile name cannot be blank</string>
     <string name="failed_to_create_profile">Failed to create profile</string>
     <string name="failed_to_update_profile">Failed to update profile</string>
     <string name="cannot_delete_only_profile">Cannot delete the only profile</string>
@@ -267,4 +268,11 @@
     <string name="manage_profiles">Manage Profiles</string>
     <string name="no_profiles_yet">No profiles yet</string>
     <string name="create_first_profile">Create your first profile to organize your links</string>
+
+    <!-- Silent Save Feature -->
+    <string name="save_silently">Save silently</string>
+    <string name="link_saved_silently">Link saved successfully</string>
+    <string name="invalid_link_silent_save">Invalid link</string>
+    <string name="failed_to_save_link">Failed to save link</string>
+    <string name="link_already_exists">Link already exists</string>
 </resources>
