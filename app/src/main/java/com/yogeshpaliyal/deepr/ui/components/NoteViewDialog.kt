@@ -51,12 +51,11 @@ fun NoteViewDialog(
             while (matcher.find()) {
                 val start = matcher.start()
                 val end = matcher.end()
-                val url = text.substring(start, end)
 
                 // Add URL annotation
                 addStringAnnotation(
                     tag = "URL",
-                    annotation = url,
+                    annotation = text.substring(start, end),
                     start = start,
                     end = end,
                 )
