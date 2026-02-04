@@ -1030,7 +1030,7 @@ fun AddLinkScreen(
                     )
                     if (tagCreationError != null) {
                         Text(
-                            text = tagCreationError!!,
+                            text = tagCreationError.orEmpty(),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                         )
@@ -1082,7 +1082,7 @@ fun AddLinkScreen(
                             }
                         }
                     },
-                    enabled = newTagName.isNotBlank(),
+                    enabled = newTagName.trim().isNotBlank(),
                 ) {
                     Text(stringResource(R.string.create_tag))
                 }
