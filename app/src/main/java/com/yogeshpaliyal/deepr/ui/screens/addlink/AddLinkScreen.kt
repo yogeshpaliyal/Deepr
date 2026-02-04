@@ -52,6 +52,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +69,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
@@ -85,6 +87,7 @@ import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +97,7 @@ fun AddLinkScreen(
     modifier: Modifier = Modifier,
     deeprQueries: DeeprQueries = koinInject(),
     viewModel: AccountViewModel = koinInject(),
+    linkRepository: LinkRepository = koinInject(),
 ) {
     val context = LocalContext.current
     val navigator = LocalNavigator.current
@@ -109,7 +113,6 @@ fun AddLinkScreen(
     var isNameError by remember { mutableStateOf(false) }
     var isFetchingMetadata by remember { mutableStateOf(false) }
     // Tags
-    var newTagName by remember { mutableStateOf("") }
     val allTags by viewModel.allTags.collectAsStateWithLifecycle()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
@@ -124,6 +127,8 @@ fun AddLinkScreen(
     }
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
+    var showCreateTagDialog by remember { mutableStateOf(false) }
+    var pendingTagNameToSelect by remember { mutableStateOf<String?>(null) }
 
     val fetchMetadata: () -> Unit = {
         isFetchingMetadata = true
@@ -642,40 +647,25 @@ fun AddLinkScreen(
                             )
                         }
 
-                        // Tag Input with Autocomplete
-                        var expanded by remember { mutableStateOf(false) }
-                        val exactMatchExists =
-                            allTags.any {
-                                it.name.equals(newTagName, ignoreCase = true)
-                            }
-                        val filteredTags =
-                            allTags.filter {
-                                it.name.contains(newTagName, ignoreCase = true) &&
-                                    !selectedTags.contains(it)
-                            }
-                        val alreadySelected =
-                            selectedTags.any {
-                                it.name.equals(newTagName, ignoreCase = true)
-                            }
-                        val showCreateOption = newTagName.isNotBlank() && !exactMatchExists && !alreadySelected
+                        // Tag Dropdown
+                        var tagExpanded by remember { mutableStateOf(false) }
+                        val availableTags = allTags.filter { !selectedTags.contains(it) }
 
                         ExposedDropdownMenuBox(
-                            expanded = expanded && (showCreateOption || filteredTags.isNotEmpty()),
-                            onExpandedChange = { expanded = !expanded },
+                            expanded = tagExpanded,
+                            onExpandedChange = { tagExpanded = !tagExpanded },
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             OutlinedTextField(
-                                value = newTagName,
-                                onValueChange = {
-                                    newTagName = it
-                                    expanded = true
-                                },
+                                value = "",
+                                onValueChange = {},
+                                readOnly = true,
                                 label = { Text(stringResource(R.string.add_tag)) },
+                                placeholder = { Text(stringResource(R.string.add_tag)) },
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true),
-                                singleLine = true,
+                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                                 leadingIcon = {
                                     Icon(
                                         imageVector = TablerIcons.Plus,
@@ -683,51 +673,59 @@ fun AddLinkScreen(
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tagExpanded) },
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 shape = RoundedCornerShape(12.dp),
                             )
 
                             ExposedDropdownMenu(
-                                expanded = expanded && (showCreateOption || filteredTags.isNotEmpty()),
-                                onDismissRequest = { expanded = false },
+                                expanded = tagExpanded,
+                                onDismissRequest = { tagExpanded = false },
                             ) {
-                                if (showCreateOption) {
+                                availableTags.forEach { tag ->
                                     DropdownMenuItem(
                                         text = {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             ) {
-                                                Icon(
-                                                    imageVector = TablerIcons.Plus,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(18.dp),
-                                                )
-                                                Text(
-                                                    stringResource(R.string.create_tag) + ": \"$newTagName\"",
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
+                                                Text(tag.name)
                                             }
                                         },
                                         onClick = {
-                                            selectedTags.add(Tags(0, newTagName))
-                                            newTagName = ""
-                                            expanded = false
-                                        },
-                                    )
-                                }
-                                filteredTags.forEach { tag ->
-                                    DropdownMenuItem(
-                                        text = { Text(tag.name) },
-                                        onClick = {
                                             selectedTags.add(tag)
-                                            newTagName = ""
-                                            expanded = false
+                                            tagExpanded = false
                                         },
                                     )
                                 }
+
+                                if (availableTags.isNotEmpty()) {
+                                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                }
+
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            Icon(
+                                                imageVector = TablerIcons.Plus,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(18.dp),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.create_tag),
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        tagExpanded = false
+                                        showCreateTagDialog = true
+                                    },
+                                )
                             }
                         }
 
@@ -976,6 +974,124 @@ fun AddLinkScreen(
                     onClick = {
                         showCreateProfileDialog = false
                         profileCreationError = null
+                    },
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
+    }
+
+    // Auto-select newly created tag
+    LaunchedEffect(allTags, pendingTagNameToSelect) {
+        if (pendingTagNameToSelect != null) {
+            val newTag =
+                allTags.find {
+                    it.name.equals(pendingTagNameToSelect, ignoreCase = true)
+                }
+            if (newTag != null && !selectedTags.contains(newTag)) {
+                selectedTags.add(newTag)
+                pendingTagNameToSelect = null
+            }
+        }
+    }
+
+    // Create Tag Dialog
+    if (showCreateTagDialog) {
+        // State variables are intentionally declared inside the dialog condition block
+        // to reset when the dialog is dismissed and reopened, providing a clean state for each use
+        var newTagName by remember { mutableStateOf("") }
+        var tagCreationError by remember { mutableStateOf<String?>(null) }
+        val coroutineScope = rememberCoroutineScope()
+
+        AlertDialog(
+            onDismissRequest = {
+                showCreateTagDialog = false
+                tagCreationError = null
+            },
+            title = {
+                Text(stringResource(R.string.create_tag))
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = newTagName,
+                        onValueChange = {
+                            newTagName = it
+                            tagCreationError = null
+                        },
+                        label = { Text(stringResource(R.string.add_tag)) },
+                        singleLine = true,
+                        isError = tagCreationError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    if (tagCreationError != null) {
+                        Text(
+                            text = tagCreationError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val trimmedTagName = newTagName.trim()
+                        if (trimmedTagName.isBlank()) {
+                            tagCreationError = context.getString(R.string.tag_name_cannot_be_blank)
+                            return@TextButton
+                        }
+
+                        val existingTag =
+                            allTags.find {
+                                it.name.equals(trimmedTagName, ignoreCase = true)
+                            }
+
+                        if (existingTag != null) {
+                            if (!selectedTags.contains(existingTag)) {
+                                selectedTags.add(existingTag)
+                                showCreateTagDialog = false
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.tag_added_successfully),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            } else {
+                                tagCreationError = context.getString(R.string.tag_already_selected)
+                            }
+                        } else {
+                            coroutineScope.launch {
+                                try {
+                                    linkRepository.insertTag(trimmedTagName)
+                                    pendingTagNameToSelect = trimmedTagName
+                                    showCreateTagDialog = false
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            context.getString(R.string.tag_created_successfully),
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                } catch (e: SQLiteConstraintException) {
+                                    tagCreationError = context.getString(R.string.tag_name_exists)
+                                }
+                            }
+                        }
+                    },
+                    enabled = newTagName.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.create_tag))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showCreateTagDialog = false
+                        tagCreationError = null
                     },
                 ) {
                     Text(stringResource(android.R.string.cancel))
