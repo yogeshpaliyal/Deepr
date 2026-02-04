@@ -661,7 +661,6 @@ fun AddLinkScreen(
                                 onValueChange = {},
                                 readOnly = true,
                                 label = { Text(stringResource(R.string.add_tag)) },
-                                placeholder = { Text(stringResource(R.string.add_tag)) },
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
