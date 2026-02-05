@@ -44,6 +44,7 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
+import com.yogeshpaliyal.deepr.ui.components.ProfileSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.components.SettingsSection
@@ -59,6 +60,7 @@ import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
+import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
@@ -103,6 +105,11 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+
+    // Collect profiles and silent save profile preference
+    val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val silentSaveProfileId by viewModel.silentSaveProfileId.collectAsStateWithLifecycle()
+    var showSilentSaveProfileDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = windowInsets,
@@ -287,6 +294,17 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                SettingsItem(
+                    TablerIcons.Folders,
+                    title = stringResource(R.string.silent_save_profile),
+                    description =
+                        allProfiles.find { it.id == silentSaveProfileId }?.name
+                            ?: stringResource(R.string.silent_save_profile_description),
+                    onClick = {
+                        showSilentSaveProfileDialog = true
+                    },
+                )
             }
 
             SettingsSection("About") {
@@ -411,6 +429,20 @@ fun SettingsScreen(
                     showThemeDialog = false
                 },
                 onDismiss = { showThemeDialog = false },
+            )
+        }
+
+        // Silent Save Profile Selection Dialog
+        if (showSilentSaveProfileDialog) {
+            ProfileSelectionDialog(
+                profiles = allProfiles,
+                currentProfileId = silentSaveProfileId,
+                onProfileSelect = { selectedProfileId ->
+                    viewModel.setSilentSaveProfile(selectedProfileId)
+                    showSilentSaveProfileDialog = false
+                },
+                onDismiss = { showSilentSaveProfileDialog = false },
+                title = stringResource(R.string.silent_save_profile),
             )
         }
     }

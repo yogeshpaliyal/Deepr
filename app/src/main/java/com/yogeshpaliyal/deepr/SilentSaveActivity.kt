@@ -72,7 +72,7 @@ class SilentSaveActivity : ComponentActivity() {
         // Launch in application scope so it continues after activity finishes
         lifecycleScope.launch {
             try {
-                val profileId = preferenceDataStore.getSelectedProfileId.first()
+                val profileId = preferenceDataStore.getSilentSaveProfileId.first()
 
                 // Check if link already exists
                 val existingLink =
