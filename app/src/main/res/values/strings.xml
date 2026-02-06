@@ -275,4 +275,8 @@
     <string name="invalid_link_silent_save">Invalid link</string>
     <string name="failed_to_save_link">Failed to save link</string>
     <string name="link_already_exists">Link already exists</string>
+
+    <!-- Clipboard Link Detection Setting -->
+    <string name="clipboard_link_detection">Clipboard link detection</string>
+    <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
 </resources>
