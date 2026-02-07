@@ -59,16 +59,16 @@ class CsvBookmarkImporter(
                             val tagsString = row.getOrNull(5) ?: ""
                             val thumbnail = row.getOrNull(6) ?: ""
                             val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
-                            val profileName = row.getOrNull(8)
+                            val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
                                 deeprQueries.transaction {
                                     val profileID =
                                         profileName?.let {
-                                            val profile = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
+                                            val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                             if (profile == null) {
-                                                deeprQueries.insertProfile(profileName)
+                                                deeprQueries.insertProfile(it)
                                                 deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                             } else {
                                                 profile.id
