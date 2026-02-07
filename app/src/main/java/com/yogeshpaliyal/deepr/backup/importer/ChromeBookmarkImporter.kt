@@ -3,7 +3,7 @@ package com.yogeshpaliyal.deepr.backup.importer
 import android.content.Context
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.first
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
@@ -22,7 +22,7 @@ class ChromeBookmarkImporter(
 
         // Chrome bookmarks use <a> tags inside <dt> elements
         val links = document.select("dt > a[href]")
-        val profileId = appPreferenceDataStore.getSelectedProfileId.singleOrNull() ?: 1L
+        val profileId = appPreferenceDataStore.getSelectedProfileId.first()
         links.forEach { link ->
             val url = link.attr("href")
             val title = link.text()
