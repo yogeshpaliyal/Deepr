@@ -15,7 +15,7 @@ class ImportRepositoryImpl(
     deeprQueries: DeeprQueries,
     appPreferenceDataStore: AppPreferenceDataStore,
 ) : ImportRepository {
-    private val csvImporter = CsvBookmarkImporter(context, deeprQueries)
+    private val csvImporter = CsvBookmarkImporter(context, deeprQueries, appPreferenceDataStore)
     private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries, appPreferenceDataStore)
     private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries, appPreferenceDataStore)
 
