@@ -136,6 +136,7 @@ import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.CheckSquare
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Home
@@ -212,6 +213,8 @@ fun HomeScreen(
 ) {
     val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
+    val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
+    val selectedLinkIds by viewModel.selectedLinkIds.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
@@ -248,14 +251,20 @@ fun HomeScreen(
         }
     }
 
-    BackHandler(enabled = selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
+    BackHandler(enabled = isSelectionMode || selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
         hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-        if (searchBarState.currentValue == SearchBarValue.Expanded) {
-            scope.launch {
-                searchBarState.animateToCollapsed()
+        when {
+            isSelectionMode -> {
+                viewModel.clearSelection()
             }
-        } else if (selectedTag.isNotEmpty()) {
-            viewModel.setTagFilter(null)
+            searchBarState.currentValue == SearchBarValue.Expanded -> {
+                scope.launch {
+                    searchBarState.animateToCollapsed()
+                }
+            }
+            selectedTag.isNotEmpty() -> {
+                viewModel.setTagFilter(null)
+            }
         }
     }
 
@@ -405,6 +414,33 @@ fun HomeScreen(
                                     viewModel.setSortOrder(it)
                                 })
                             }
+
+                            TooltipBox(
+                                positionProvider =
+                                    TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Below,
+                                    ),
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.select_multiple)) } },
+                                state = rememberTooltipState(),
+                            ) {
+                                IconButton(onClick = {
+                                    if (isSelectionMode) {
+                                        viewModel.clearSelection()
+                                    } else {
+                                        viewModel.enterSelectionMode()
+                                    }
+                                }) {
+                                    Icon(
+                                        TablerIcons.CheckSquare,
+                                        contentDescription = stringResource(R.string.select_multiple),
+                                        tint = if (isSelectionMode) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        },
+                                    )
+                                }
+                            }
                         }
                     } else {
                         if (textFieldState.text.isNotEmpty()) {
@@ -498,21 +534,49 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
-                    Icon(
-                        TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.add_link),
-                    )
-                },
-                text = {
-                    Text(stringResource(R.string.add_link))
-                },
-                expanded = isExpanded,
-                onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject()))
-                },
-            )
+            if (!isSelectionMode) {
+                ExtendedFloatingActionButton(
+                    icon = {
+                        Icon(
+                            TablerIcons.Plus,
+                            contentDescription = stringResource(R.string.add_link),
+                        )
+                    },
+                    text = {
+                        Text(stringResource(R.string.add_link))
+                    },
+                    expanded = isExpanded,
+                    onClick = {
+                        localNavigator.add(AddLinkScreen(createDeeprObject()))
+                    },
+                )
+            }
+        },
+        bottomBar = {
+            if (isSelectionMode && selectedLinkIds.isNotEmpty()) {
+                BulkActionBar(
+                    selectedCount = selectedLinkIds.size,
+                    onSelectAll = { viewModel.selectAllLinks() },
+                    onCancel = { viewModel.clearSelection() },
+                    onDelete = {
+                        viewModel.bulkDeleteLinks(selectedLinkIds)
+                        Toast.makeText(context, "Deleted ${selectedLinkIds.size} links", Toast.LENGTH_SHORT).show()
+                    },
+                    onMoveToProfile = {
+                        // TODO: Show profile selection dialog
+                        Toast.makeText(context, "Move to profile (TODO)", Toast.LENGTH_SHORT).show()
+                    },
+                    onAttachTags = {
+                        // TODO: Show tag selection dialog
+                        Toast.makeText(context, "Attach tags (TODO)", Toast.LENGTH_SHORT).show()
+                    },
+                    onToggleFavourite = { setFavourite ->
+                        viewModel.bulkToggleFavourite(selectedLinkIds, setFavourite)
+                        val message = if (setFavourite) "Favorited" else "Unfavorited"
+                        Toast.makeText(context, "$message ${selectedLinkIds.size} links", Toast.LENGTH_SHORT).show()
+                    },
+                )
+            }
         },
     ) { contentPadding ->
         Box(
@@ -566,6 +630,8 @@ fun Content(
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
+    val selectedLinkIds by viewModel.selectedLinkIds.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val analyticsManager = koinInject<AnalyticsManager>()
@@ -697,6 +763,10 @@ fun Content(
             is ViewNote -> {
                 showNoteDialog = it.item
             }
+
+            is MenuItem.ToggleSelection -> {
+                viewModel.toggleLinkSelection(it.item.id)
+            }
         }
     }
 
@@ -720,6 +790,8 @@ fun Content(
             viewType = currentViewType,
             onItemClick = onItemClick,
             showOpenCounter = showOpenCounter,
+            isSelectionMode = isSelectionMode,
+            selectedLinkIds = selectedLinkIds,
         )
     }
     showMoreSelectedItem?.let { account ->
@@ -1005,6 +1077,8 @@ fun DeeprList(
     modifier: Modifier = Modifier,
     viewType: @ViewType Int = ViewType.LIST,
     showOpenCounter: Boolean = true,
+    isSelectionMode: Boolean = false,
+    selectedLinkIds: Set<Long> = emptySet(),
 ) {
     // Determine which empty state to show
     val isSearchActive = searchQuery.isNotBlank()
@@ -1115,6 +1189,8 @@ fun DeeprList(
                             onTagClick = onTagClick,
                             isThumbnailEnable = isThumbnailEnable,
                             showOpenCounter = showOpenCounter,
+                            isSelectionMode = isSelectionMode,
+                            isSelected = selectedLinkIds.contains(account.id),
                         )
                     }
                 }
@@ -1143,6 +1219,8 @@ fun DeeprList(
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
                             showOpenCounter = showOpenCounter,
+                            isSelectionMode = isSelectionMode,
+                            isSelected = selectedLinkIds.contains(account.id),
                         )
                     }
                 }
@@ -1167,8 +1245,163 @@ fun DeeprList(
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
                             showOpenCounter = showOpenCounter,
+                            isSelectionMode = isSelectionMode,
+                            isSelected = selectedLinkIds.contains(account.id),
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BulkActionBar(
+    selectedCount: Int,
+    onSelectAll: () -> Unit,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+    onMoveToProfile: () -> Unit,
+    onAttachTags: () -> Unit,
+    onToggleFavourite: (Boolean) -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = 3.dp,
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.selected_count, selectedCount),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+
+            Row {
+                TooltipBox(
+                    positionProvider =
+                        TooltipDefaults.rememberTooltipPositionProvider(
+                            TooltipAnchorPosition.Above,
+                        ),
+                    tooltip = { PlainTooltip { Text(stringResource(R.string.select_all)) } },
+                    state = rememberTooltipState(),
+                ) {
+                    IconButton(onClick = onSelectAll) {
+                        Icon(
+                            TablerIcons.CheckSquare,
+                            contentDescription = stringResource(R.string.select_all),
+                        )
+                    }
+                }
+
+                TooltipBox(
+                    positionProvider =
+                        TooltipDefaults.rememberTooltipPositionProvider(
+                            TooltipAnchorPosition.Above,
+                        ),
+                    tooltip = { PlainTooltip { Text(stringResource(R.string.attach_tags)) } },
+                    state = rememberTooltipState(),
+                ) {
+                    IconButton(onClick = onAttachTags) {
+                        Icon(
+                            TablerIcons.Tag,
+                            contentDescription = stringResource(R.string.attach_tags),
+                        )
+                    }
+                }
+
+                var showMoreMenu by remember { mutableStateOf(false) }
+
+                Box {
+                    TooltipBox(
+                        positionProvider =
+                            TooltipDefaults.rememberTooltipPositionProvider(
+                                TooltipAnchorPosition.Above,
+                            ),
+                        tooltip = { PlainTooltip { Text(stringResource(R.string.more_options)) } },
+                        state = rememberTooltipState(),
+                    ) {
+                        IconButton(onClick = { showMoreMenu = true }) {
+                            Icon(
+                                TablerIcons.DotsVertical,
+                                contentDescription = stringResource(R.string.more_options),
+                            )
+                        }
+                    }
+
+                    androidx.compose.material3.DropdownMenu(
+                        expanded = showMoreMenu,
+                        onDismissRequest = { showMoreMenu = false },
+                    ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.move_to_profile)) },
+                            onClick = {
+                                showMoreMenu = false
+                                onMoveToProfile()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Home,
+                                    contentDescription = null,
+                                )
+                            },
+                        )
+
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.bulk_favourite)) },
+                            onClick = {
+                                showMoreMenu = false
+                                onToggleFavourite(true)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Star,
+                                    contentDescription = null,
+                                )
+                            },
+                        )
+
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.bulk_unfavourite)) },
+                            onClick = {
+                                showMoreMenu = false
+                                onToggleFavourite(false)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.StarBorder,
+                                    contentDescription = null,
+                                )
+                            },
+                        )
+
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.bulk_delete)) },
+                            onClick = {
+                                showMoreMenu = false
+                                onDelete()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    TablerIcons.Trash,
+                                    contentDescription = null,
+                                )
+                            },
+                        )
+                    }
+                }
+
+                TextButton(onClick = onCancel) {
+                    Text(stringResource(R.string.cancel_selection))
                 }
             }
         }
