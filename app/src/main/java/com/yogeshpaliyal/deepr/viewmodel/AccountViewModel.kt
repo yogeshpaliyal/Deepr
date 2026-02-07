@@ -675,6 +675,17 @@ class AccountViewModel(
         }
     }
 
+    // Clipboard link detection preference methods
+    val clipboardLinkDetectionEnabled =
+        preferenceDataStore.getClipboardLinkDetectionEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun setClipboardLinkDetectionEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setClipboardLinkDetectionEnabled(enabled)
+        }
+    }
+
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceDataStore.getAutoBackupEnabled

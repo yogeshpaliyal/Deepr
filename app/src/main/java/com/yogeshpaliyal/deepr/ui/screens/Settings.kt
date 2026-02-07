@@ -53,6 +53,7 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.InfoCircle
@@ -103,6 +104,7 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     Scaffold(
         contentWindowInsets = windowInsets,
@@ -284,6 +286,21 @@ fun SettingsScreen(
                         Switch(
                             checked = showOpenCounter,
                             onCheckedChange = { viewModel.setShowOpenCounter(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Clipboard,
+                    title = stringResource(R.string.clipboard_link_detection),
+                    description = stringResource(R.string.clipboard_link_detection_description),
+                    onClick = {
+                        viewModel.setClipboardLinkDetectionEnabled(!clipboardLinkDetectionEnabled)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = clipboardLinkDetectionEnabled,
+                            onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
                         )
                     },
                 )
