@@ -6,7 +6,7 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ImportResult
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
-import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.firstOrNull
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -34,7 +34,7 @@ abstract class HtmlBookmarkImporter(
                     val existing = deeprQueries.getDeeprByLink(bookmark.url).executeAsOneOrNull()
                     if (bookmark.url.isNotBlank() && existing == null) {
                         try {
-                            val profileId = appPreferenceDataStore.getSelectedProfileId.singleOrNull() ?: 1L
+                            val profileId = appPreferenceDataStore.getSelectedProfileId.firstOrNull() ?: 1L
                             deeprQueries.transaction {
                                 deeprQueries.insertDeepr(
                                     link = bookmark.url,

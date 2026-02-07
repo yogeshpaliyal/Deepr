@@ -30,7 +30,7 @@ class ExportRepositoryImpl(
         if (count == 0L) {
             return RequestResult.Error(context.getString(R.string.no_data_to_export))
         }
-        val dataToExportInCsvFormat = deeprQueries.listDeeprWithTagsAsc().executeAsList()
+        val dataToExportInCsvFormat = deeprQueries.getLinksForBackup().executeAsList()
         if (dataToExportInCsvFormat.isEmpty()) {
             return RequestResult.Error(context.getString(R.string.no_data_available_export))
         }

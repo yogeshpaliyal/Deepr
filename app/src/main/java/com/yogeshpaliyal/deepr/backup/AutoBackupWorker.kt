@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.ListDeeprWithTagsAsc
+import com.yogeshpaliyal.deepr.GetLinksForBackup
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -37,7 +37,7 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
-                val dataToExport = deeprQueries.listDeeprWithTagsAsc().executeAsList()
+                val dataToExport = deeprQueries.getLinksForBackup().executeAsList()
                 if (dataToExport.isEmpty()) {
                     return@withContext
                 }
@@ -60,7 +60,7 @@ class AutoBackupWorker(
     private fun saveToSelectedLocation(
         location: String,
         fileName: String = "deepr_backup.csv",
-        data: List<ListDeeprWithTagsAsc>,
+        data: List<GetLinksForBackup>,
     ): Boolean =
         try {
             // For content:// URIs from document picker, create a new document in that folder
