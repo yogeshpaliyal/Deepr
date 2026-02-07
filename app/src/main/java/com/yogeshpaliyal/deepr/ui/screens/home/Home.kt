@@ -559,8 +559,13 @@ fun HomeScreen(
                     onSelectAll = { viewModel.selectAllLinks() },
                     onCancel = { viewModel.clearSelection() },
                     onDelete = {
+                        val count = selectedLinkIds.size
                         viewModel.bulkDeleteLinks(selectedLinkIds)
-                        Toast.makeText(context, "Deleted ${selectedLinkIds.size} links", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.resources.getQuantityString(R.plurals.links_deleted, count, count),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     },
                     onMoveToProfile = {
                         // TODO: Show profile selection dialog
@@ -570,10 +575,15 @@ fun HomeScreen(
                         // TODO: Show tag selection dialog
                         Toast.makeText(context, "Attach tags (TODO)", Toast.LENGTH_SHORT).show()
                     },
-                    onToggleFavourite = { setFavourite ->
-                        viewModel.bulkToggleFavourite(selectedLinkIds, setFavourite)
-                        val message = if (setFavourite) "Favorited" else "Unfavorited"
-                        Toast.makeText(context, "$message ${selectedLinkIds.size} links", Toast.LENGTH_SHORT).show()
+                    onToggleFavourite = { setFavorite ->
+                        val count = selectedLinkIds.size
+                        viewModel.bulkToggleFavourite(selectedLinkIds, setFavorite)
+                        val pluralRes = if (setFavorite) R.plurals.links_favorited else R.plurals.links_unfavorited
+                        Toast.makeText(
+                            context,
+                            context.resources.getQuantityString(pluralRes, count, count),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     },
                 )
             }
@@ -1264,7 +1274,7 @@ private fun BulkActionBar(
     onDelete: () -> Unit,
     onMoveToProfile: () -> Unit,
     onAttachTags: () -> Unit,
-    onToggleFavourite: (Boolean) -> Unit,
+    onToggleFavorite: (Boolean) -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -1360,7 +1370,7 @@ private fun BulkActionBar(
                             text = { Text(stringResource(R.string.bulk_favourite)) },
                             onClick = {
                                 showMoreMenu = false
-                                onToggleFavourite(true)
+                                onToggleFavorite(true)
                             },
                             leadingIcon = {
                                 Icon(
@@ -1374,7 +1384,7 @@ private fun BulkActionBar(
                             text = { Text(stringResource(R.string.bulk_unfavourite)) },
                             onClick = {
                                 showMoreMenu = false
-                                onToggleFavourite(false)
+                                onToggleFavorite(false)
                             },
                             leadingIcon = {
                                 Icon(

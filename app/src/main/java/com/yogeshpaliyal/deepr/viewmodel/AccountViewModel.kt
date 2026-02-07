@@ -569,10 +569,10 @@ class AccountViewModel(
         }
     }
 
-    fun bulkToggleFavourite(linkIds: Set<Long>, setFavourite: Boolean) {
+    fun bulkToggleFavourite(linkIds: Set<Long>, setFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             linkIds.forEach { id ->
-                linkRepository.updateFavourite(id, if (setFavourite) 1 else 0)
+                linkRepository.updateFavourite(id, if (setFavorite) 1 else 0)
             }
             clearSelection()
             syncToMarkdown()

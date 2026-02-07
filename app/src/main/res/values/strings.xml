@@ -290,4 +290,19 @@
     <string name="bulk_favourite">Favorite selected</string>
     <string name="bulk_unfavourite">Unfavorite selected</string>
     <string name="cancel_selection">Cancel</string>
+    
+    <plurals name="links_deleted">
+        <item quantity="one">Deleted %d link</item>
+        <item quantity="other">Deleted %d links</item>
+    </plurals>
+    
+    <plurals name="links_favorited">
+        <item quantity="one">Favorited %d link</item>
+        <item quantity="other">Favorited %d links</item>
+    </plurals>
+    
+    <plurals name="links_unfavorited">
+        <item quantity="one">Unfavorited %d link</item>
+        <item quantity="other">Unfavorited %d links</item>
+    </plurals>
 </resources>
