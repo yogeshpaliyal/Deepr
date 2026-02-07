@@ -30,6 +30,7 @@ fun DeeprItemSwipable(
     account: GetLinksAndTags,
     onItemClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier,
+    isSelectionMode: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val dismissState =
@@ -40,33 +41,37 @@ fun DeeprItemSwipable(
 
     val scope = rememberCoroutineScope()
 
-    SwipeToDismissBox(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(8.dp)),
-        state = dismissState,
-        onDismiss = {
-            scope.launch {
-                dismissState.reset()
-            }
-            when (it) {
-                SwipeToDismissBoxValue.EndToStart -> {
-                    onItemClick(MenuItem.Delete(account))
-                    false
+    // Disable swipe when in selection mode
+    if (isSelectionMode) {
+        content()
+    } else {
+        SwipeToDismissBox(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp)),
+            state = dismissState,
+            onDismiss = {
+                scope.launch {
+                    dismissState.reset()
                 }
+                when (it) {
+                    SwipeToDismissBoxValue.EndToStart -> {
+                        onItemClick(MenuItem.Delete(account))
+                        false
+                    }
 
-                SwipeToDismissBoxValue.StartToEnd -> {
-                    onItemClick(MenuItem.Edit(account))
-                    false
-                }
+                    SwipeToDismissBoxValue.StartToEnd -> {
+                        onItemClick(MenuItem.Edit(account))
+                        false
+                    }
 
-                else -> {
-                    false
+                    else -> {
+                        false
+                    }
                 }
-            }
-        },
-        backgroundContent = {
+            },
+            backgroundContent = {
             when (dismissState.dismissDirection) {
                 SwipeToDismissBoxValue.StartToEnd -> {
                     Box(
@@ -115,7 +120,8 @@ fun DeeprItemSwipable(
                 }
             }
         },
-    ) {
-        content()
+        ) {
+            content()
+        }
     }
 }

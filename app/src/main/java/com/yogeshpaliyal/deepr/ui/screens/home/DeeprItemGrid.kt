@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,20 +42,34 @@ fun DeeprItemGrid(
     modifier: Modifier = Modifier,
     isThumbnailEnable: Boolean = true,
     showOpenCounter: Boolean = true,
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
 ) {
-    DeeprItemSwipable(account, onItemClick, modifier) {
+    DeeprItemSwipable(account, onItemClick, modifier, isSelectionMode) {
         Card(
             colors =
                 CardDefaults.cardColors(
-                    containerColor = getDeeprItemBackgroundColor(account.isFavourite),
+                    containerColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        getDeeprItemBackgroundColor(account.isFavourite)
+                    },
                 ),
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { onItemClick(MenuItem.Click(account)) },
+                        onClick = {
+                            if (isSelectionMode) {
+                                onItemClick(MenuItem.ToggleSelection(account))
+                            } else {
+                                onItemClick(MenuItem.Click(account))
+                            }
+                        },
                         onLongClick = {
-                            onItemClick(MenuItem.Copy(account))
+                            if (!isSelectionMode) {
+                                onItemClick(MenuItem.Copy(account))
+                            }
                         },
                     ),
         ) {
@@ -111,14 +126,23 @@ fun DeeprItemGrid(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         OpenCountAndTags(account, Modifier.weight(1f), showOpenCounter)
-                        IconButton(onClick = {
-                            onItemClick(MenuItem.MoreOptionsBottomSheet(account))
-                        }) {
-                            Icon(
-                                imageVector = TablerIcons.DotsVertical,
-                                contentDescription = stringResource(R.string.more_options),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        if (isSelectionMode) {
+                            Checkbox(
+                                checked = isSelected,
+                                onCheckedChange = {
+                                    onItemClick(MenuItem.ToggleSelection(account))
+                                },
                             )
+                        } else {
+                            IconButton(onClick = {
+                                onItemClick(MenuItem.MoreOptionsBottomSheet(account))
+                            }) {
+                                Icon(
+                                    imageVector = TablerIcons.DotsVertical,
+                                    contentDescription = stringResource(R.string.more_options),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                     }
                 }

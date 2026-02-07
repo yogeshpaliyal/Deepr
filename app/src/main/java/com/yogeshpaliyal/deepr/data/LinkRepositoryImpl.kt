@@ -235,6 +235,20 @@ class LinkRepositoryImpl(
         scheduleAutoBackup()
     }
 
+    override suspend fun updateFavourite(id: Long, isFavourite: Long) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.setFavourite(isFavourite, id)
+        }
+        scheduleAutoBackup()
+    }
+
+    override suspend fun updateLinkProfile(id: Long, profileId: Long) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.updateLinkProfile(profileId, id)
+        }
+        scheduleAutoBackup()
+    }
+
     override suspend fun insertDeeprOpenLog(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.insertDeeprOpenLog(id)
