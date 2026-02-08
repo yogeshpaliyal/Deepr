@@ -244,4 +244,6 @@
     <string name="invalid_link_silent_save">Vigane link</string>
     <string name="failed_to_save_link">Lingi salvestamine ei õnnestunud</string>
     <string name="link_already_exists">Selline link on juba olemas</string>
+    <string name="clipboard_link_detection">Lingi tuvastus lõikelaualt</string>
+    <string name="clipboard_link_detection_description">Tuvasta lõikelaual asuvad lingid automaatselt ja kuva teade nende lisamiseks</string>
 </resources>
