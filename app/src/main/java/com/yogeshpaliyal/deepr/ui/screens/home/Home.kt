@@ -136,7 +136,8 @@ import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.CheckSquare
+import compose.icons.tablericons.Checkbox
+import compose.icons.tablericons.DotsVertical
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Home
@@ -431,7 +432,7 @@ fun HomeScreen(
                                     }
                                 }) {
                                     Icon(
-                                        TablerIcons.CheckSquare,
+                                        TablerIcons.Checkbox,
                                         contentDescription = stringResource(R.string.select_multiple),
                                         tint = if (isSelectionMode) {
                                             MaterialTheme.colorScheme.primary
@@ -575,7 +576,7 @@ fun HomeScreen(
                         // TODO: Show tag selection dialog
                         Toast.makeText(context, "Attach tags (TODO)", Toast.LENGTH_SHORT).show()
                     },
-                    onToggleFavourite = { setFavorite ->
+                    onToggleFavorite = { setFavorite ->
                         val count = selectedLinkIds.size
                         viewModel.bulkToggleFavourite(selectedLinkIds, setFavorite)
                         val pluralRes = if (setFavorite) R.plurals.links_favorited else R.plurals.links_unfavorited
@@ -1265,7 +1266,7 @@ fun DeeprList(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun BulkActionBar(
     selectedCount: Int,
@@ -1307,7 +1308,7 @@ private fun BulkActionBar(
                 ) {
                     IconButton(onClick = onSelectAll) {
                         Icon(
-                            TablerIcons.CheckSquare,
+                            TablerIcons.Checkbox,
                             contentDescription = stringResource(R.string.select_all),
                         )
                     }
