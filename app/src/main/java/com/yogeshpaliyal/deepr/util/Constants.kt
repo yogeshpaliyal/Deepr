@@ -10,5 +10,6 @@ object Constants {
         const val TAGS = "Tags"
         const val THUMBNAIL = "Thumbnail"
         const val IS_FAVOURITE = "isFavourite"
+        const val PROFILE_NAME = "profileName"
     }
 }

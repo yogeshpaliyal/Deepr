@@ -275,6 +275,8 @@
     <string name="invalid_link_silent_save">Invalid link</string>
     <string name="failed_to_save_link">Failed to save link</string>
     <string name="link_already_exists">Link already exists</string>
+    <string name="silent_save_profile">Silent Save Profile</string>
+    <string name="silent_save_profile_description">Links saved via \'Save Silently\' will go to this profile</string>
 
     <!-- Clipboard Link Detection Setting -->
     <string name="clipboard_link_detection">Clipboard link detection</string>
