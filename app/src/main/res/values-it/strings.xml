@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Deepr</string>
+
+    <!-- Navigation and UI Labels -->
     <string name="settings">Impostazioni</string>
-    <string name="about_us">Chi siamo</string>
+    <string name="about_us">Chi Siamo</string>
     <string name="back">Indietro</string>
     <string name="save">Salva</string>
     <string name="saved">Salvato</string>
@@ -12,9 +14,9 @@
     <string name="create">Crea</string>
     <string name="edit">Modifica</string>
     <string name="sorting">Ordinamento</string>
-    <string name="qr_scanner">Scanner QR code</string>
+    <string name="qr_scanner">Scanner QR Code</string>
     <string name="tags">Etichette</string>
-    <string name="all_tags">Tutte le etichette</string>
+    <string name="all_tags">Tutte le Etichette</string>
     <string name="all">Tutti</string>
     <string name="favourites">Preferiti</string>
     <string name="add_to_favourites">Aggiungi ai preferiti</string>
@@ -23,7 +25,7 @@
     <string name="add">Aggiungi</string>
     <string name="clipboard_link_detected">Link rilevato negli appunti</string>
     <string name="fetch_name_from_link">Recupera metadati dal link</string>
-    <string name="create_tag">Crea etichetta</string>
+    <string name="create_tag">Crea Tag</string>
     <string name="new_tag">Nuova etichetta (Facoltativo)</string>
     <string name="add_tag">Aggiungi etichetta</string>
     <string name="no_links_saved_yet">Nessun link ancora salvato</string>
@@ -32,73 +34,252 @@
     <string name="no_favourites_description">Contrassegna i link come preferiti per visualizzarli qui.</string>
     <string name="no_search_results">Nessun risultato trovato</string>
     <string name="no_search_results_description">Prova a cercare con parole chiave diverse.</string>
-    <string name="no_links_with_tags">Nessun link con i tag selezionati</string>
+    <string name="no_links_with_tags">Nessun link con le etichette selezionate</string>
     <string name="no_links_with_tags_description">Prova a selezionare etichette diverse o a cancellare i filtri.</string>
     <string name="no_favourites_with_tags">Nessun preferito nelle etichette selezionate</string>
     <string name="no_favourites_with_tags_description">Contrassegna i link con queste etichette come preferiti oppure prova etichette diverse.</string>
     <string name="remove_thumbnail">Rimuovi miniatura</string>
-    <string name="thumbnail_url">URL miniatura</string>
+    <string name="thumbnail_url">URL Miniatura</string>
     <string name="edit_thumbnail_url">Modifica URL miniatura</string>
+
+    <!-- Menu and Dialog Items -->
     <string name="more_options">Più opzioni</string>
     <string name="copy_link">Copia link</string>
     <string name="link_copied">Link copiato</string>
     <string name="delete">Elimina</string>
-    <string name="delete_confirmation_title">Eliminare il link?</string>
+    <string name="delete_confirmation_title">Eliminare il Link?</string>
     <string name="delete_confirmation_message">Sei sicuro di voler eliminare questo link?</string>
     <string name="delete_link_confirmation_with_name">Sei sicuro di voler eliminare \'%s\'?</string>
     <string name="remove_tag">Rimuovi etichetta</string>
     <string name="reset_opened_count">Reimposta il conteggio delle aperture</string>
     <string name="failed_to_fetch_metadata">Impossibile recuperare i metadati</string>
     <string name="opened_count">Aperto: %d</string>
-    <string name="last_opened">Ultima apertura: %s</string>
-    <string name="notes">Appunti</string>
-    <string name="note">Appunto</string>
-    <string name="note_copied">Appunto copiato</string>
+    <string name="last_opened">Ultima Apertura: %s</string>
+    <string name="notes">Note</string>
+    <string name="note">Nota</string>
+    <string name="note_copied">Nota copiata</string>
     <string name="cannot_open_link">Impossibile aprire il link</string>
-    <string name="view_note">Vedi appunto</string>
+    <string name="view_note">Vedi Nota</string>
     <string name="enter_notes">Inserisci note (facoltativo)</string>
     <string name="tags_label">Etichette:</string>
     <string name="suggestions_label">Suggerimenti:</string>
     <string name="filter">Filtro</string>
-    <string name="home">Casa</string>
+    <string name="home">Home</string>
     <string name="load_more_tags">+%d in più</string>
     <string name="number_tags">Etichette: %d</string>
     <string name="show_less_tags">Mostra meno</string>
     <string name="add_shortcut">Aggiungi scorciatoia</string>
     <string name="edit_shortcut">Modifica scorciatoia</string>
-    <string name="show_qr_code">Mostra codice QR</string>
-    <string name="open_with">Apri con</string>
+    <string name="show_qr_code">Mostra Codice QR</string>
+    <string name="open_with">Apri Con</string>
     <string name="share_link">Condividi link</string>
     <string name="deeplink_already_exists">Link già esistente</string>
-    <string name="sort_by_date_ascending">Ordina per data crescente</string>
-    <string name="sort_by_date_descending">Ordina per data decrescente</string>
-    <string name="sort_by_opened_ascending">Ordina per Aperto Crescente</string>
-    <string name="sort_by_opened_descending">Ordina per Aperto Decrescente</string>
+
+    <!-- Sort Menu Items -->
+    <string name="sort_by_date_ascending">Ordina per Data Crescente</string>
+    <string name="sort_by_date_descending">Ordina per Data Decrescente</string>
+    <string name="sort_by_opened_ascending">Ordina per Aperture Crescente</string>
+    <string name="sort_by_opened_descending">Ordina per Aperture Decrescente</string>
     <string name="sort_by_name_ascending">Ordina per Nome Crescente</string>
     <string name="sort_by_name_descending">Ordina per Nome Decrescente</string>
-    <string name="sort_by_link_ascending">Ordina per link crescente</string>
-    <string name="sort_by_link_descending">Ordina per link decrescente</string>
-    <string name="edit_tag">Gestione etichette</string>
-    <string name="delete_tag">Elimina etichetta</string>
-    <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questa etichetta?</string>
-    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare l\'etichetta \'%s\'?</string>
-    <string name="tag_name_exists">Un\'etichetta con questo nome esiste già</string>
-    <string name="failed_to_edit_tag">Impossibile modificare l\'etichetta</string>
-    <string name="tag_edited_successfully">Etichetta modificata com successo</string>
-    <string name="failed_to_delete_tag">Impossibile eliminare l\'etichetta: %s</string>
-    <string name="tag_deleted_successfully">Etichetta eliminata con successo</string>
-    <string name="edit_tag_description">Modifica etichetta</string>
-    <string name="delete_tag_description">Elimina etichetta</string>
-    <string name="clear_all_filters">Pulisci tutti i filtri</string>
-    <string name="selected_tags_count">%d etichette selezionate</string>
+    <string name="sort_by_link_ascending">Ordina per Link Crescente</string>
+    <string name="sort_by_link_descending">Ordina per Link Decrescente</string>
+
+    <!-- Tag Management -->
+    <string name="edit_tag">Modifica Tag</string>
+    <string name="delete_tag">Elimina Tag</string>
+    <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questo tag?</string>
+    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag \'%s\'?</string>
+    <string name="tag_name_exists">Un tag con questo nome esiste già</string>
+    <string name="failed_to_edit_tag">Impossibile modificare il tag</string>
+    <string name="tag_edited_successfully">Tag modificato con successo</string>
+    <string name="failed_to_delete_tag">Impossibile eliminare il tag: %s</string>
+    <string name="tag_deleted_successfully">Tag eliminato con successo</string>
+    <string name="edit_tag_description">Modifica Tag</string>
+    <string name="delete_tag_description">Elimina Tag</string>
+    <string name="clear_all_filters">Pulisci Tutti i Filtri</string>
+    <string name="selected_tags_count">%d tag selezionati</string>
     <string name="filtered_tags_count">%1$d di %2$d</string>
+
+    <!-- Settings Screen -->
     <string name="backup">Backup</string>
     <string name="restore">Ripristina</string>
     <string name="import_deeplinks">Importa link</string>
     <string name="import_deeplinks_description">Importa link da file CSV</string>
     <string name="export_deeplinks">Esporta link</string>
-    <string name="export_deeplinks_description">Esporta link al file CSV</string>
-    <string name="shortcut_icon">Icona di scorciatoia</string>
-    <string name="use_link_app_icon">Utilizzare l\'icona dell\'app di supporto del link</string>
+    <string name="export_deeplinks_description">Esporta link in un file CSV</string>
+    <string name="shortcut_icon">Icona Scorciatoia</string>
+    <string name="use_link_app_icon">Usa l\'icona dell\'app di supporto del link</string>
     <string name="use_deepr_app_icon">Usa l\'icona dell\'app Deepr</string>
+    <string name="shortcut_icon_setting">Impostazione Icona Scorciatoia</string>
+    <string name="language">Lingua</string>
+    <string name="language_description">Cambia la lingua dell\'app</string>
+    <string name="language_dialog_title">Seleziona Lingua</string>
+    <string name="system_default">Predefinito di Sistema</string>
+    <string name="english">Inglese</string>
+    <string name="hindi">Hindi</string>
+    <string name="spanish">Spagnolo</string>
+    <string name="french">Francese</string>
+    <string name="german">Tedesco</string>
+    <string name="urdu">Urdu</string>
+    <string name="default_page">Pagina Predefinita</string>
+    <string name="default_page_all">Inizia con Tutti i link</string>
+    <string name="default_page_favourites">Inizia con i Preferiti</string>
+    <string name="show_open_counter">Mostra Contatore Aperture</string>
+    <string name="show_open_counter_description">Visualizza quante volte ogni link è stato aperto</string>
+    <string name="app_version">Versione App: %s</string>
+    <string name="made_with_love">Fatto con ❤️ in India</string>
+
+    <!-- About Us Screen -->
+    <string name="app_logo">Logo dell\'App</string>
+    <string name="version_format">Versione %s</string>
+    <string name="app_description">Una semplice app per salvare, organizzare e lanciare link.</string>
+    <string name="author">Autore</string>
+    <string name="author_name">Yogesh Choudhary</string>
+    <string name="contributors">Collaboratori</string>
+    <string name="contributors_thank_you">Grazie a tutti i fantastici collaboratori che hanno aiutato a migliorare Deepr! 🙏</string>
+    <string name="view_contributors">Visualizza Collaboratori</string>
+    <string name="twitter">Twitter</string>
+    <string name="github">GitHub</string>
+    <string name="linkedin">LinkedIn</string>
+    <string name="view_on_github">Visualizza su GitHub</string>
+
+    <!-- Save Dialog -->
+    <string name="save_deeplink">Salva Link</string>
+    <string name="save_deeplink_message">Salvare il link: %s ?</string>
+    <string name="enter_link_name">Inserisci il nome per il link (Facoltativo)</string>
+    <string name="enter_link_name_error">Inserisci un nome per il link.</string>
+    <string name="save_and_execute">Salva ed Esegui</string>
+
+    <!-- Home Screen -->
+    <string name="enter_deeplink_command">Inserisci link</string>
+    <string name="invalid_empty_deeplink">Link non valido o vuoto.</string>
+
+    <!-- Error Messages -->
+    <string name="invalid_deeplink_toast">Link non valido: %s</string>
+    <string name="no_data_to_export">Nessun dato trovato nel database da esportare.</string>
+    <string name="no_data_available_export">Nessun dato disponibile per l\'esportazione dopo la mappatura.</string>
+    <string name="export_success">Esportato con successo in %s</string>
+    <string name="export_failed">Impossibile creare il file CSV.</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_to_file">Sincronizza su File Locale (Beta)</string>
+    <string name="sync_to_file_description">Sincronizza automaticamente i link in un file markdown</string>
+    <string name="select_sync_file">Seleziona File di Sincronizzazione</string>
+    <string name="select_sync_file_description">Scegli la posizione del file per la sincronizzazione markdown</string>
+    <string name="sync_file_validation">Validazione del Formato del File</string>
+    <string name="sync_status_valid">✓ Il formato del file è valido</string>
+    <string name="sync_status_invalid">⚠ Il formato del file non è valido</string>
+    <string name="sync_status_no_file">Nessun file di sincronizzazione selezionato</string>
+    <string name="sync_now">Sincronizza Ora</string>
+    <string name="sync_now_description">Sincronizza manualmente i link al file selezionato</string>
+    <string name="last_sync_time">Ultima Sincronizzazione</string>
+    <string name="last_sync_time_never">Mai sincronizzato</string>
+    <string name="last_sync_time_format">%s</string>
+
+    <!-- Sync Messages -->
+    <string name="sync_disabled">Sincronizzazione disabilitata</string>
+    <string name="sync_file_not_selected">Nessun file di sincronizzazione selezionato</string>
+    <string name="sync_success">Sincronizzato con successo in %s</string>
+    <string name="sync_failed">Sincronizzazione fallita: %s</string>
+    <string name="no_file_path_provided">Nessun percorso file fornito</string>
+    <string name="invalid_markdown_format">Formato tabella markdown non valido</string>
+    <string name="file_validation_error">Errore di validazione del file: %s</string>
+
+    <!-- Auto Backup Settings -->
+    <string name="auto_backup">Backup Automatico</string>
+    <string name="auto_backup_description">Backup automatico dei link in un file CSV</string>
+    <string name="select_backup_location">Seleziona Posizione di Backup</string>
+    <string name="select_backup_location_description">Scegli la cartella per i backup automatici</string>
+    <string name="backup_interval">Intervallo di Backup</string>
+    <string name="backup_interval_description">Ogni quanto eseguire il backup automaticamente</string>
+    <string name="interval_1_hour">Ogni ora</string>
+    <string name="interval_6_hours">Ogni 6 ore</string>
+    <string name="interval_12_hours">Ogni 12 ore</string>
+    <string name="interval_24_hours">Ogni 24 ore (Giornaliero)</string>
+    <string name="interval_7_days">Ogni 7 giorni (Settimanale)</string>
+    <string name="last_backup_time">Ultimo Backup</string>
+    <string name="last_backup_time_never">Mai eseguito il backup</string>
+    <string name="last_backup_time_format">%s</string>
+    <string name="backup_location_not_selected">Nessuna posizione di backup selezionata</string>
+    <string name="select_interval">Seleziona Intervallo</string>
+    <string name="backup_interval_dialog_title">Seleziona l\'Intervallo di Backup</string>
+
+    <!-- Local Network Server -->
+    <string name="local_network_server">Server di Rete Locale</string>
+    <string name="local_server_running">Server Locale in Esecuzione</string>
+    <string name="server_status">Stato del Server</string>
+    <string name="server_running">Il server è in esecuzione ed è accessibile sulla rete locale</string>
+    <string name="server_running_tap_to_configure">Server in esecuzione - Tocca per configurare</string>
+    <string name="server_stopped">Il server non è in esecuzione</string>
+    <string name="server_address">Indirizzo del Server</string>
+    <string name="ip_address">Indirizzo IP</string>
+    <string name="server_url">URL del Server</string>
+    <string name="copy">Copia</string>
+    <string name="copied_to_clipboard">Copiato negli appunti</string>
+    <string name="scan_qr_code">Scansiona Codice QR</string>
+    <string name="scan_qr_code_description">Scansiona questo codice QR da un altro dispositivo per accedere al server</string>
+    <string name="how_to_use">Come Usare</string>
+    <string name="local_server_instructions">1. Attiva l\'interruttore sopra per avviare il server\n2. Assicurati che entrambi i dispositivi siano sulla stessa rete Wi-Fi\n3. Usa l\'URL o scansiona il codice QR da un altro dispositivo\n4. Accedi all\'interfaccia web o usa gli endpoint API per gestire i tuoi link</string>
+    <string name="api_endpoints">Endpoint API</string>
+    <string name="api_endpoints_description">Endpoint REST API disponibili per l\'accesso programmatico</string>
+    <string name="api_get_links">Ottieni tutti i link salvati</string>
+    <string name="api_add_link">Aggiungi un nuovo link (JSON: {"link": "url", "name": "nome"})</string>
+    <string name="api_get_tags">Ottieni tutte le etichette disponibili</string>
+    <string name="api_get_link_info">Ottieni i metadati per un URL</string>
+    <string name="api_get_server_info">Ottieni informazioni sul server e documentazione API</string>
+    <string name="local_server_notification_channel_name">Server Locale</string>
+    <string name="local_server_notification_channel_description">Notifiche per lo stato del server locale</string>
+    <string name="local_server_notification_text">URL del Server: %s</string>
+    <string name="local_server_starting">Avvio del server…</string>
+    <string name="stop">Ferma</string>
+    <string name="server_port">Porta del Server</string>
+    <string name="custom_port">Porta Personalizzata</string>
+    <string name="port_number">Numero di Porta</string>
+    <string name="default_port">Predefinita: 8080</string>
+    <string name="port_range_hint">Inserisci porta (1024–65535)</string>
+    <string name="invalid_port">Numero di porta non valido. Deve essere compreso tra 1024 e 65535.</string>
+    <string name="port_changed_restart">Porta cambiata. Riavvio del server...</string>
+    <string name="change_port">Cambia Porta</string>
+
+    <!-- Transfer Link Server -->
+    <string name="transfer_link_server">Server Trasferimento Link</string>
+    <string name="transfer_link_to_another_device">Trasferisci Link a un altro Dispositivo (Beta)</string>
+    <string name="transfer_link_server_instructions">1. Attiva l\'interruttore sopra per avviare il server\n2. Assicurati che entrambi i dispositivi siano sulla stessa rete Wi-Fi\n3. Scansiona il codice QR dall\'opzione di importazione link in un altro dispositivo</string>
+    <string name="scan_qr_to_get_data">Scansiona per ottenere i link da un altro dispositivo</string>
+
+    <!-- Profiles -->
+    <string name="profiles">Profili</string>
+    <string name="profile">Profilo</string>
+    <string name="select_profile">Seleziona profilo</string>
+    <string name="create_profile">Crea Profilo</string>
+    <string name="edit_profile">Modifica Profilo</string>
+    <string name="delete_profile">Elimina Profilo</string>
+    <string name="profile_name">Nome del profilo</string>
+    <string name="profile_created_successfully">Profilo creato con successo</string>
+    <string name="profile_updated_successfully">Profilo aggiornato con successo</string>
+    <string name="profile_deleted_successfully">Profilo eliminato con successo</string>
+    <string name="profile_name_exists">Esiste già un profilo con questo nome</string>
+    <string name="profile_name_cannot_be_blank">Il nome del profilo non può essere vuoto</string>
+    <string name="failed_to_create_profile">Impossibile creare il profilo</string>
+    <string name="failed_to_update_profile">Impossibile aggiornare il profilo</string>
+    <string name="cannot_delete_only_profile">Impossibile eliminare l\'unico profilo esistente</string>
+    <string name="profile_delete_confirmation">Sei sicuro di voler eliminare questo profilo? Tutti i link e le etichette in questo profilo verranno eliminati.</string>
+    <string name="switch_profile">Cambia Profilo</string>
+    <string name="manage_profiles">Gestisci Profili</string>
+    <string name="no_profiles_yet">Nessun profilo ancora</string>
+    <string name="create_first_profile">Crea il tuo primo profilo per organizzare i tuoi link</string>
+
+    <!-- Silent Save Feature -->
+    <string name="save_silently">Salva silenziosamente</string>
+    <string name="link_saved_silently">Link salvato con successo</string>
+    <string name="invalid_link_silent_save">Link non valido</string>
+    <string name="failed_to_save_link">Impossibile salvare il link</string>
+    <string name="link_already_exists">Il link esiste già</string>
+    <string name="silent_save_profile">Profilo per Salvataggio Silenzioso</string>
+    <string name="silent_save_profile_description">I link salvati tramite \'Salva silenziosamente\' andranno in questo profilo</string>
+
+    <!-- Clipboard Link Detection Setting -->
+    <string name="clipboard_link_detection">Rilevamento link negli appunti</string>
+    <string name="clipboard_link_detection_description">Rileva automaticamente i link negli appunti e mostra un banner per aggiungerli</string>
 </resources>
