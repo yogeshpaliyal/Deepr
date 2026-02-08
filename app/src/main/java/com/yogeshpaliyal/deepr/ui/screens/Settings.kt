@@ -56,11 +56,11 @@ import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
+import compose.icons.tablericons.Folders
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
-import compose.icons.tablericons.Folders
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
