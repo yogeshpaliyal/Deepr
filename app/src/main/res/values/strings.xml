@@ -277,4 +277,8 @@
     <string name="link_already_exists">Link already exists</string>
     <string name="silent_save_profile">Silent Save Profile</string>
     <string name="silent_save_profile_description">Links saved via \'Save Silently\' will go to this profile</string>
+
+    <!-- Clipboard Link Detection Setting -->
+    <string name="clipboard_link_detection">Clipboard link detection</string>
+    <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
 </resources>

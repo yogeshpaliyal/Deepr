@@ -40,6 +40,8 @@ class AppPreferenceDataStore(
         private val SILENT_SAVE_PROFILE_ID = longPreferencesKey("silent_save_profile_id")
         private val GOOGLE_DRIVE_AUTO_BACKUP_ENABLED =
             booleanPreferencesKey("google_drive_auto_backup_enabled")
+        private val CLIPBOARD_LINK_DETECTION_ENABLED =
+            booleanPreferencesKey("clipboard_link_detection_enabled")
     }
 
     val getSortingOrder: Flow<@SortType String> =
@@ -130,6 +132,11 @@ class AppPreferenceDataStore(
     val getGoogleDriveAutoBackupEnabled: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[GOOGLE_DRIVE_AUTO_BACKUP_ENABLED] ?: false // Default to disabled
+        }
+
+    val getClipboardLinkDetectionEnabled: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[CLIPBOARD_LINK_DETECTION_ENABLED] ?: true // Default to enabled
         }
 
     suspend fun setSortingOrder(order: @SortType String) {
@@ -243,6 +250,12 @@ class AppPreferenceDataStore(
     suspend fun setGoogleDriveAutoBackupEnabled(enabled: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[GOOGLE_DRIVE_AUTO_BACKUP_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setClipboardLinkDetectionEnabled(enabled: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[CLIPBOARD_LINK_DETECTION_ENABLED] = enabled
         }
     }
 }

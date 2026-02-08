@@ -7,8 +7,10 @@ import com.opencsv.CSVReaderBuilder
 import com.opencsv.exceptions.CsvException
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ImportResult
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 
 /**
@@ -17,13 +19,16 @@ import java.io.IOException
 class CsvBookmarkImporter(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
+    private val appPreferenceDataStore: AppPreferenceDataStore,
 ) : BookmarkImporter {
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
         var updatedCount = 0
         var skippedCount = 0
 
         try {
+            val defaultProfileId = appPreferenceDataStore.getSelectedProfileId.first()
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
+
                 inputStream.reader().use { reader ->
                     val customParser =
                         CSVParserBuilder()
@@ -54,21 +59,21 @@ class CsvBookmarkImporter(
                             val tagsString = row.getOrNull(5) ?: ""
                             val thumbnail = row.getOrNull(6) ?: ""
                             val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
-                            val profileName = row.getOrNull(8)
+                            val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
                             val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
                             if (link.isNotBlank() && existing == null) {
                                 updatedCount++
                                 deeprQueries.transaction {
                                     val profileID =
                                         profileName?.let {
-                                            val profile = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
+                                            val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                             if (profile == null) {
-                                                deeprQueries.insertProfile(profileName)
+                                                deeprQueries.insertProfile(it)
                                                 deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                             } else {
                                                 profile.id
                                             }
-                                        }
+                                        } ?: defaultProfileId
                                     deeprQueries.importDeepr(
                                         link = link,
                                         openedCount = openedCount,
@@ -77,7 +82,7 @@ class CsvBookmarkImporter(
                                         thumbnail = thumbnail,
                                         isFavourite = isFavourite,
                                         createdAt = createdAt,
-                                        profileId = profileID ?: 1L,
+                                        profileId = profileID,
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 

@@ -32,10 +32,11 @@
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | Play Store | F-droid |
-|-----------------------------------|----------------|------------|---------|
-| Firebase Analytics                | ❌              | ✅          | ❌       |
-| Google Drive Backup (Coming Soon) | ❌              | ✅          | ❌       |
+| Feature                           | Github Release | Play Store | F-droid | Pro Version on Play Store |
+|-----------------------------------|----------------|------------|---------|-----------|
+| Firebase Analytics                | ❌              | ✅          | ❌       | ✅  |
+| Google Drive Backup | ❌              | ❌         | ❌       | ✅  |
+| Profile speicific themes | ❌              | ❌          | ❌       | ✅  |
 
 
 

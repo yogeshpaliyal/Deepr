@@ -192,21 +192,29 @@ fun Dashboard(
     val hapticFeedback = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
+    val viewModel: AccountViewModel = koinViewModel()
+
+    // Collect clipboard link detection preference
+    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Clipboard link detection
     var clipboardLink by remember { mutableStateOf<ClipboardLink?>(null) }
 
-    LaunchedEffect(Unit) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = clipboard.primaryClip
-        if (clipData != null && clipData.itemCount > 0) {
-            val text = clipData.getItemAt(0).text?.toString()
-            if (!text.isNullOrBlank()) {
-                val normalizedLink = normalizeLink(text)
-                if (isValidDeeplink(normalizedLink)) {
-                    clipboardLink = ClipboardLink(normalizedLink)
+    LaunchedEffect(clipboardLinkDetectionEnabled) {
+        if (clipboardLinkDetectionEnabled) {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = clipboard.primaryClip
+            if (clipData != null && clipData.itemCount > 0) {
+                val text = clipData.getItemAt(0).text?.toString()
+                if (!text.isNullOrBlank()) {
+                    val normalizedLink = normalizeLink(text)
+                    if (isValidDeeplink(normalizedLink)) {
+                        clipboardLink = ClipboardLink(normalizedLink)
+                    }
                 }
             }
+        } else {
+            clipboardLink = null
         }
     }
 
