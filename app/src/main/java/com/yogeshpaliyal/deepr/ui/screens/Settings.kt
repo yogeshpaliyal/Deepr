@@ -193,8 +193,6 @@ fun SettingsScreen(
                     },
                 )
 
-                ScanQRCode()
-
                 SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
