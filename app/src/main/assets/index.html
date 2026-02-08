@@ -68,7 +68,28 @@
                 <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
                     Deepr
                 </h1>
-                <p class="text-gray-600 text-lg">Your Personal Link Manager</p>
+                <p class="text-gray-600 text-lg mb-4">Your Personal Link Manager</p>
+
+                <!-- Profile Selector -->
+                <div class="flex items-center justify-center gap-3">
+                    <label for="profileSelect" class="text-sm font-medium text-gray-700">Profile:</label>
+                    <select
+                        id="profileSelect"
+                        class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
+                    >
+                        <option value="1">Default</option>
+                    </select>
+                    <button
+                        id="addProfileBtn"
+                        class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1"
+                        title="Add New Profile"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        New Profile
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -265,11 +286,51 @@
         </div>
     </div>
 
+    <!-- Add Profile Modal -->
+    <div id="addProfileModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeAddProfileModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Create New Profile</h3>
+            <form id="addProfileForm">
+                <div class="mb-4">
+                    <label for="newProfileName" class="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Name
+                    </label>
+                    <input
+                        type="text"
+                        id="newProfileName"
+                        placeholder="Enter profile name..."
+                        required
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button
+                        type="button"
+                        onclick="closeAddProfileModal()"
+                        class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        id="createProfileBtn"
+                        class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
+                    >
+                        Create Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Global variables to store all links and available tags
         let allLinks = [];
         let availableTags = []; // Now contains {id, name, count} objects
         let selectedTags = []; // Now contains {id, name} objects
+        let profiles = []; // Contains {id, name, createdAt} objects
+        let selectedProfileId = 1; // Default profile
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -317,6 +378,103 @@
             } catch (error) {
                 console.error('Error loading tags:', error);
                 availableTags = [];
+            }
+        }
+
+        // Load profiles from API
+        async function loadProfiles() {
+            try {
+                const response = await fetch('/api/profiles');
+                profiles = await response.json();
+                populateProfileSelect();
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+                profiles = [];
+            }
+        }
+
+        // Populate profile dropdown
+        function populateProfileSelect() {
+            const profileSelect = document.getElementById('profileSelect');
+            profileSelect.innerHTML = profiles.map(profile => `
+                <option value="${profile.id}" ${profile.id === selectedProfileId ? 'selected' : ''}>
+                    ${escapeHtml(profile.name)}
+                </option>
+            `).join('');
+        }
+
+        // Handle profile selection change
+        function onProfileChange() {
+            const profileSelect = document.getElementById('profileSelect');
+            selectedProfileId = parseInt(profileSelect.value, 10);
+            loadLinks();
+            showToast(`Switched to profile: ${profiles.find(p => p.id === selectedProfileId)?.name || 'Unknown'}`, 'info');
+        }
+
+        // Open add profile modal
+        function openAddProfileModal() {
+            document.getElementById('addProfileModal').classList.remove('hidden');
+            document.getElementById('newProfileName').focus();
+        }
+
+        // Close add profile modal
+        function closeAddProfileModal() {
+            document.getElementById('addProfileModal').classList.add('hidden');
+            document.getElementById('newProfileName').value = '';
+        }
+
+        // Create new profile
+        async function createProfile(event) {
+            event.preventDefault();
+
+            const nameInput = document.getElementById('newProfileName');
+            const button = document.getElementById('createProfileBtn');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                showToast('Please enter a profile name', 'error');
+                return;
+            }
+
+            const originalText = button.textContent;
+            button.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating...
+            `;
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/api/profiles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.ok) {
+                    showToast(`Profile "${name}" created successfully!`, 'success');
+                    closeAddProfileModal();
+                    await loadProfiles();
+                    // Select the newly created profile
+                    const newProfile = profiles.find(p => p.name === name);
+                    if (newProfile) {
+                        selectedProfileId = newProfile.id;
+                        populateProfileSelect();
+                        loadLinks();
+                    }
+                } else {
+                    throw new Error('Failed to create profile');
+                }
+            } catch (error) {
+                console.error('Error creating profile:', error);
+                showToast('Failed to create profile. Please try again.', 'error');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
             }
         }
 
@@ -612,7 +770,7 @@
 
         async function loadLinks() {
             try {
-                const response = await fetch('/api/links');
+                const response = await fetch(`/api/links?profileId=${selectedProfileId}`);
                 const links = await response.json();
 
                 allLinks = links;
@@ -665,7 +823,8 @@
                         link: urlInput.value,
                         name: nameInput.value,
                         notes: notesInput.value,
-                        tags: selectedTags // Send tags in {id, name} format
+                        tags: selectedTags, // Send tags in {id, name} format
+                        profileId: selectedProfileId
                     })
                 });
 
@@ -738,6 +897,11 @@
             document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
             document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
 
+            // Profile controls
+            document.getElementById('profileSelect').addEventListener('change', onProfileChange);
+            document.getElementById('addProfileBtn').addEventListener('click', openAddProfileModal);
+            document.getElementById('addProfileForm').addEventListener('submit', createProfile);
+
             // Tag input functionality
             const tagInput = document.getElementById('linkTags');
             const debouncedShowSuggestions = debounce((input) => showSuggestions(input), 200);
@@ -768,7 +932,9 @@
 
             // Initialize
             updateSortOrderIcon();
-            loadLinks();
+            loadProfiles().then(() => {
+                loadLinks();
+            });
             loadAvailableTags();
         });
     </script>

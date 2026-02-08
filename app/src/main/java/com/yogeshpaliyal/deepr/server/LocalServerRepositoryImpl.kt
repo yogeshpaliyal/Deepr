@@ -142,12 +142,52 @@ open class LocalServerRepositoryImpl(
                             }
                         }
 
+                        get("/api/profiles") {
+                            try {
+                                val profiles = deeprQueries.getAllProfiles().executeAsList()
+                                val response =
+                                    profiles.map { profile ->
+                                        ProfileResponse(
+                                            id = profile.id,
+                                            name = profile.name,
+                                            createdAt = profile.createdAt,
+                                        )
+                                    }
+                                call.respond(HttpStatusCode.OK, response)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error getting profiles", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error getting profiles: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/profiles") {
+                            try {
+                                val request = call.receive<AddProfileRequest>()
+                                deeprQueries.insertProfile(request.name)
+                                call.respond(
+                                    HttpStatusCode.Created,
+                                    SuccessResponse("Profile created successfully"),
+                                )
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error creating profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error creating profile: ${e.message}"),
+                                )
+                            }
+                        }
+
                         get("/api/links") {
                             try {
+                                val profileId =
+                                    call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
-                                            1L, // Default profile
+                                            profileId,
                                             "",
                                             "",
                                             "",
@@ -192,11 +232,13 @@ open class LocalServerRepositoryImpl(
                                 val request = call.receive<AddLinkRequest>()
                                 // Insert the link without tags first
                                 accountViewModel.insertAccount(
-                                    request.link,
-                                    request.name,
-                                    false,
-                                    request.tags.map { it.toDbTag() },
-                                    request.notes,
+                                    link = request.link,
+                                    name = request.name,
+                                    executed = false,
+                                    tagsList = request.tags.map { it.toDbTag() },
+                                    notes = request.notes,
+                                    thumbnail = "",
+                                    profileId = request.profileId,
                                 )
                                 call.respond(
                                     HttpStatusCode.Created,
@@ -469,6 +511,19 @@ data class AddLinkRequest(
     val name: String,
     val notes: String = "",
     val tags: List<TagData> = emptyList(),
+    val profileId: Long = 1L,
+)
+
+@Serializable
+data class ProfileResponse(
+    val id: Long,
+    val name: String,
+    val createdAt: String,
+)
+
+@Serializable
+data class AddProfileRequest(
+    val name: String,
 )
 
 @Serializable
