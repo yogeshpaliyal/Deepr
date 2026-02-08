@@ -215,7 +215,7 @@ FROM Tags
 LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
 LEFT JOIN Deepr ON LinkTags.linkId = Deepr.id
 GROUP BY Tags.id, Tags.name
-HAVING linkCount > 0
+
 ORDER BY linkCount DESC, Tags.name;
 
 countOfLinks:
