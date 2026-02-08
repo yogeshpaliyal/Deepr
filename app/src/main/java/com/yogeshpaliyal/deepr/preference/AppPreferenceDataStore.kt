@@ -12,6 +12,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 private val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = "app_data_store")
@@ -126,7 +127,7 @@ class AppPreferenceDataStore(
 
     val getSilentSaveProfileId: Flow<Long> =
         context.appDataStore.data.map { preferences ->
-            preferences[SILENT_SAVE_PROFILE_ID] ?: 1L // Default to profile ID 1
+            preferences[SILENT_SAVE_PROFILE_ID] ?: getSelectedProfileId.firstOrNull() ?: 1L // Default to profile ID 1
         }
 
     val getGoogleDriveAutoBackupEnabled: Flow<Boolean> =
