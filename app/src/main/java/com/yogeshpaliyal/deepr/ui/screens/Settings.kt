@@ -235,12 +235,12 @@ fun SettingsScreen(
 
                 SettingsItem(
                     TablerIcons.Moon,
-                    title = "Theme",
+                    title = stringResource(R.string.theme),
                     description =
                         when (themeMode) {
-                            "light" -> "Light"
-                            "dark" -> "Dark"
-                            else -> "System default"
+                            "light" -> stringResource(R.string.theme_light)
+                            "dark" -> stringResource(R.string.theme_dark)
+                            else -> stringResource(R.string.system_default)
                         },
                     onClick = {
                         showThemeDialog = true
