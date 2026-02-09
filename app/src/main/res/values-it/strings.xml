@@ -101,4 +101,10 @@
     <string name="shortcut_icon">Icona di scorciatoia</string>
     <string name="use_link_app_icon">Utilizzare l\'icona dell\'app di supporto del link</string>
     <string name="use_deepr_app_icon">Usa l\'icona dell\'app Deepr</string>
+    <string name="theme">Tema</string>
+    <string name="system_default">Predefinito di Sistema</string>
+    <string name="theme_dialog_title">Seleziona Tema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="close">Chiudi</string>
 </resources>
