@@ -281,4 +281,30 @@
     <!-- Clipboard Link Detection Setting -->
     <string name="clipboard_link_detection">Clipboard link detection</string>
     <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
+
+    <!-- Multi-Selection Feature -->
+    <string name="select_multiple">Select multiple</string>
+    <string name="selected_count">%d selected</string>
+    <string name="select_all">Select all</string>
+    <string name="move_to_profile">Move to profile</string>
+    <string name="attach_tags">Attach tags</string>
+    <string name="bulk_delete">Delete selected</string>
+    <string name="bulk_favourite">Favorite selected</string>
+    <string name="bulk_unfavourite">Unfavorite selected</string>
+    <string name="cancel_selection">Cancel</string>
+    
+    <plurals name="links_deleted">
+        <item quantity="one">Deleted %d link</item>
+        <item quantity="other">Deleted %d links</item>
+    </plurals>
+    
+    <plurals name="links_favorited">
+        <item quantity="one">Favorited %d link</item>
+        <item quantity="other">Favorited %d links</item>
+    </plurals>
+    
+    <plurals name="links_unfavorited">
+        <item quantity="one">Unfavorited %d link</item>
+        <item quantity="other">Unfavorited %d links</item>
+    </plurals>
 </resources>

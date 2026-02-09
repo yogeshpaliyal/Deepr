@@ -197,6 +197,13 @@ class AccountViewModel(
     private val _favouriteFilter = MutableStateFlow(-1)
     val favouriteFilter: StateFlow<Int> = _favouriteFilter
 
+    // State for multi-selection
+    private val _selectedLinkIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedLinkIds: StateFlow<Set<Long>> = _selectedLinkIds
+
+    val isSelectionMode: StateFlow<Boolean> = _selectedLinkIds.map { it.isNotEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             defaultPageFavourites.collect { isFavouritesDefault ->
@@ -279,6 +286,32 @@ class AccountViewModel(
             com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.FILTER_FAVOURITES,
             mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.IS_FAVOURITE to (filter == 1)),
         )
+    }
+
+    // Multi-selection management functions
+    fun toggleLinkSelection(linkId: Long) {
+        _selectedLinkIds.update { currentSet ->
+            if (currentSet.contains(linkId)) {
+                currentSet - linkId
+            } else {
+                currentSet + linkId
+            }
+        }
+    }
+
+    fun selectAllLinks() {
+        val allLinkIds = accounts.value?.map { it.id }?.toSet() ?: emptySet()
+        _selectedLinkIds.update { allLinkIds }
+    }
+
+    fun clearSelection() {
+        _selectedLinkIds.update { emptySet() }
+    }
+
+    fun enterSelectionMode(linkId: Long? = null) {
+        if (linkId != null) {
+            _selectedLinkIds.update { setOf(linkId) }
+        }
     }
 
     // Remove tag from link
@@ -476,6 +509,73 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.deleteTag(id)
             linkRepository.deleteTagRelations(id)
+        }
+    }
+
+    // Bulk action methods
+    fun bulkDeleteLinks(linkIds: Set<Long>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkIds.forEach { id ->
+                val tagsToDelete = mutableListOf<Long>()
+
+                linkRepository.getTagsForLink(id).forEach { tag ->
+                    val linkCount = linkRepository.hasTagLinks(tag.id)
+                    if (linkCount == 1L) {
+                        tagsToDelete.add(tag.id)
+                    }
+                }
+
+                linkRepository.deleteDeeprById(id)
+                linkRepository.deleteLinkRelations(id)
+                tagsToDelete.forEach { tagId ->
+                    linkRepository.deleteTag(tagId)
+                }
+
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.DELETE_LINK,
+                    mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to id),
+                )
+            }
+            clearSelection()
+            syncToMarkdown()
+        }
+    }
+
+    fun bulkMoveLinksToProfile(linkIds: Set<Long>, targetProfileId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkIds.forEach { id ->
+                linkRepository.updateLinkProfile(id, targetProfileId)
+            }
+            clearSelection()
+            syncToMarkdown()
+        }
+    }
+
+    fun bulkAttachTags(linkIds: Set<Long>, tags: List<Tags>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkIds.forEach { linkId ->
+                tags.forEach { tag ->
+                    if (tag.id > 0) {
+                        // Existing tag
+                        addTagToLink(linkId, tag.id)
+                    } else {
+                        // New tag
+                        addTagToLinkByName(linkId, tag.name)
+                    }
+                }
+            }
+            clearSelection()
+            syncToMarkdown()
+        }
+    }
+
+    fun bulkToggleFavourite(linkIds: Set<Long>, setFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkIds.forEach { id ->
+                linkRepository.updateFavourite(id, if (setFavorite) 1 else 0)
+            }
+            clearSelection()
+            syncToMarkdown()
         }
     }
 

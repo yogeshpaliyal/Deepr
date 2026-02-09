@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -106,6 +107,10 @@ sealed class MenuItem(
     class ViewNote(
         item: GetLinksAndTags,
     ) : MenuItem(item)
+
+    class ToggleSelection(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -118,6 +123,8 @@ fun DeeprItem(
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
     showOpenCounter: Boolean = true,
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
     analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
@@ -127,28 +134,40 @@ fun DeeprItem(
 
     val linkCopied = stringResource(R.string.link_copied)
 
-    DeeprItemSwipable(account, onItemClick, modifier) {
+    DeeprItemSwipable(account, onItemClick, modifier, isSelectionMode) {
         Card(
             colors =
                 CardDefaults.cardColors(
-                    containerColor = getDeeprItemBackgroundColor(account.isFavourite),
+                    containerColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        getDeeprItemBackgroundColor(account.isFavourite)
+                    },
                 ),
             modifier =
                 Modifier
                     .testTag("DeeprItem")
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { onItemClick(MenuItem.Click(account)) },
+                        onClick = {
+                            if (isSelectionMode) {
+                                onItemClick(MenuItem.ToggleSelection(account))
+                            } else {
+                                onItemClick(MenuItem.Click(account))
+                            }
+                        },
                         onLongClick = {
-                            analyticsManager.logEvent(
-                                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.COPY_LINK,
-                                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to account.id),
-                            )
-                            val clipboard =
-                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText(linkCopied, account.link)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, linkCopied, Toast.LENGTH_SHORT).show()
+                            if (!isSelectionMode) {
+                                analyticsManager.logEvent(
+                                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.COPY_LINK,
+                                    mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to account.id),
+                                )
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText(linkCopied, account.link)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(context, linkCopied, Toast.LENGTH_SHORT).show()
+                            }
                         },
                     ),
         ) {
@@ -205,38 +224,47 @@ fun DeeprItem(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Row {
-                            IconButton(onClick = {
-                                onItemClick(MenuItem.FavouriteClick(account))
-                            }) {
-                                Icon(
-                                    imageVector =
-                                        if (account.isFavourite == 1L) {
-                                            Icons.Rounded.Star
-                                        } else {
-                                            Icons.Rounded.StarBorder
-                                        },
-                                    contentDescription =
-                                        if (account.isFavourite == 1L) {
-                                            stringResource(R.string.remove_from_favourites)
-                                        } else {
-                                            stringResource(R.string.add_to_favourites)
-                                        },
-                                    tint = getDeeprItemTextColor(account.isFavourite),
-                                    modifier = Modifier.size(28.dp),
+                            if (isSelectionMode) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = {
+                                        onItemClick(MenuItem.ToggleSelection(account))
+                                    },
                                 )
-                            }
+                            } else {
+                                IconButton(onClick = {
+                                    onItemClick(MenuItem.FavouriteClick(account))
+                                }) {
+                                    Icon(
+                                        imageVector =
+                                            if (account.isFavourite == 1L) {
+                                                Icons.Rounded.Star
+                                            } else {
+                                                Icons.Rounded.StarBorder
+                                            },
+                                        contentDescription =
+                                            if (account.isFavourite == 1L) {
+                                                stringResource(R.string.remove_from_favourites)
+                                            } else {
+                                                stringResource(R.string.add_to_favourites)
+                                            },
+                                        tint = getDeeprItemTextColor(account.isFavourite),
+                                        modifier = Modifier.size(28.dp),
+                                    )
+                                }
 
-                            IconButton(onClick = {
-                                onItemClick(
-                                    MenuItem.MoreOptionsBottomSheet(
-                                        account,
-                                    ),
-                                )
-                            }) {
-                                Icon(
-                                    TablerIcons.DotsVertical,
-                                    contentDescription = stringResource(R.string.more_options),
-                                )
+                                IconButton(onClick = {
+                                    onItemClick(
+                                        MenuItem.MoreOptionsBottomSheet(
+                                            account,
+                                        ),
+                                    )
+                                }) {
+                                    Icon(
+                                        TablerIcons.DotsVertical,
+                                        contentDescription = stringResource(R.string.more_options),
+                                    )
+                                }
                             }
                         }
 

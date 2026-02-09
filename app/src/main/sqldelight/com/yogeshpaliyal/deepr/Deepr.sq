@@ -264,6 +264,9 @@ UPDATE Deepr SET isFavourite = CASE WHEN isFavourite = 0 THEN 1 ELSE 0 END WHERE
 setFavourite:
 UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 
+updateLinkProfile:
+UPDATE Deepr SET profileId = ? WHERE id = ?;
+
 -- Profile operations
 insertProfile:
 INSERT OR IGNORE INTO Profile (name) VALUES (?);

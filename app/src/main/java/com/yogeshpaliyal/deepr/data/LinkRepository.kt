@@ -110,5 +110,9 @@ interface LinkRepository {
 
     suspend fun toggleFavourite(id: Long)
 
+    suspend fun updateFavourite(id: Long, isFavourite: Long)
+
+    suspend fun updateLinkProfile(id: Long, profileId: Long)
+
     suspend fun insertDeeprOpenLog(id: Long)
 }
