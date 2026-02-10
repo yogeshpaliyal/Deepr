@@ -28,9 +28,9 @@
     <string name="new_tag">New tag (Optional)</string>
     <string name="add_tag">Add tag</string>
     <string name="no_links_saved_yet">No links saved yet</string>
-    <string name="save_your_link_below">Save your link below to quickly access them later.</string>
+    <string name="save_your_link_below">Save your link below to quickly access them later</string>
     <string name="no_favourites_found">No favourites yet</string>
-    <string name="no_favourites_description">Mark links as favourites to see them here.</string>
+    <string name="no_favourites_description">Mark links as favourites to see them here</string>
     <string name="no_search_results">No results found</string>
     <string name="no_search_results_description">Try searching with different keywords.</string>
     <string name="no_links_with_tags">No links with selected tags</string>
@@ -56,6 +56,8 @@
     <string name="last_opened">Last Opened: %s</string>
     <string name="notes">Notes</string>
     <string name="note">Note</string>
+    <string name="link">link</string>
+    <string name="links">links</string>
     <string name="note_copied">Note copied</string>
     <string name="cannot_open_link">Cannot open link</string>
     <string name="view_note">View Note</string>
@@ -88,8 +90,9 @@
     <string name="edit_tag">Edit Tag</string>
     <string name="delete_tag">Delete Tag</string>
     <string name="delete_tag_confirmation">Are you sure you want to delete this tag?</string>
-    <string name="delete_tag_confirmation_with_name">Are you sure you want to delete \'%s\' tag?</string>
+    <string name="delete_tag_confirmation_with_name">Are you sure you want to delete %s tag?</string>
     <string name="tag_name_exists">Tag with this name already exists</string>
+    <string name="tag_used_by_links">This tag is used by %1$d %2$s</string>
     <string name="failed_to_edit_tag">Failed to edit tag</string>
     <string name="tag_edited_successfully">Tag edited successfully</string>
     <string name="failed_to_delete_tag">Failed to delete tag: %s</string>
@@ -114,13 +117,14 @@
     <string name="language">Language</string>
     <string name="language_description">Change app language</string>
     <string name="language_dialog_title">Select Language</string>
+    <string name="theme">Theme</string>
     <string name="system_default">System Default</string>
     <string name="english">English</string>
     <string name="hindi">हिंदी</string>
     <string name="spanish">Español</string>
     <string name="french">Français</string>
     <string name="german">Deutsch</string>
-    <string name="urdu">اردو</string>
+    <string name="urdu">Urdu</string>
     <string name="default_page">Default Page</string>
     <string name="default_page_all">Start with All links</string>
     <string name="default_page_favourites">Start with Favourites</string>
@@ -249,6 +253,7 @@
 
     <!-- Profiles -->
     <string name="profiles">Profiles</string>
+    <string name="reorder">Reorder</string>
     <string name="profile">Profile</string>
     <string name="select_profile">Select profile</string>
     <string name="create_profile">Create Profile</string>
@@ -264,6 +269,8 @@
     <string name="failed_to_update_profile">Failed to update profile</string>
     <string name="cannot_delete_only_profile">Cannot delete the only profile</string>
     <string name="profile_delete_confirmation">Are you sure you want to delete this profile? All links and tags in this profile will be deleted.</string>
+    <string name="profile_delete_confirmation_with_name">Are you sure you want to delete %s profile? All links and tags in this profile will be deleted</string>
+    <string name="delete_profile_confirmation">Are you sure you want to delete this profile? All links and tags in this profile will be deleted.</string>
     <string name="switch_profile">Switch Profile</string>
     <string name="manage_profiles">Manage Profiles</string>
     <string name="no_profiles_yet">No profiles yet</string>
@@ -281,4 +288,69 @@
     <!-- Clipboard Link Detection Setting -->
     <string name="clipboard_link_detection">Clipboard link detection</string>
     <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
+
+    <!-- Theme Selection -->
+    <string name="theme_dialog_title">Select Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="close">Close</string>
+
+    <!-- Local Server Web Interface -->
+    <string name="web_title">Deepr - Link Manager</string>
+    <string name="web_subtitle">Your Personal Link Manager</string>
+    <string name="web_profile_label">Profile:</string>
+    <string name="web_new_profile">New Profile</string>
+    <string name="web_add_new_link">Add New Link</string>
+    <string name="web_link_url">Link URL</string>
+    <string name="web_link_name">Link Name</string>
+    <string name="web_optional">Optional</string>
+    <string name="web_notes_optional">Notes (Optional)</string>
+    <string name="web_tags_optional">Tags (Optional)</string>
+    <string name="web_add_link_button">Add Link</string>
+    <string name="web_your_links">Your Links</string>
+    <string name="web_refresh">Refresh</string>
+    <string name="web_search_placeholder">Search links by name or URL...</string>
+    <string name="web_all_tags">All Tags</string>
+    <string name="web_sort_date">Date Added</string>
+    <string name="web_sort_name">Name</string>
+    <string name="web_sort_opens">Opens</string>
+    <string name="web_opens">opens</string>
+    <string name="web_clear">Clear</string>
+    <string name="web_loading_links">Loading links...</string>
+    <string name="web_loading_description">Please wait while we fetch your saved links.</string>
+    <string name="web_no_links">No links yet!</string>
+    <string name="web_no_links_description">Add your first link using the form above to get started.</string>
+    <string name="web_no_matching">No matching links found!</string>
+    <string name="web_no_matching_description">Try adjusting your search terms or filters.</string>
+    <string name="web_create_profile_title">Create New Profile</string>
+    <string name="web_profile_name_label">Profile Name</string>
+    <string name="web_cancel">Cancel</string>
+    <string name="web_create_profile_button">Create Profile</string>
+    <string name="web_status_creating">Creating...</string>
+    <string name="web_status_added">Added!</string>
+    <string name="web_success_link_added">Link added successfully!</string>
+    <string name="web_error_add_link">Failed to add link. Please try again.</string>
+    <string name="web_error_loading">Error loading links</string>
+    <string name="web_error_refresh">Please try refreshing the page.</string>
+    <string name="web_error_fetch">Failed to load links. Please try again.</string>
+    <string name="web_msg_switched">Switched to profile: </string>
+    <string name="web_msg_filtered">Filtered by tag: </string>
+    <string name="web_msg_filters_cleared">Filters cleared</string>
+    <string name="web_open_link">Open Link</string>
+
+    <!-- Other missing strings -->
+    <string name="enter_profile_name">Enter profile name</string>
+    <string name="all_profiles">All Profiles</string>
+    <string name="profile_name_cannot_be_empty">Profile name cannot be empty</string>
+    <string name="failed_to_fetch_data">Failed to fetch data from %1$s, status code: %2$d</string>
+    <string name="error_fetching_data">Error fetching data from %1$s: %2$s</string>
+    <string name="current_profile">Current Profile</string>
+    <string name="server_info">Server Info</string>
+    <string name="invalid_shared_link">Invalid deeplink from shared content</string>
+    <string name="view_type">View Type</string>
+    <string name="deleted">Deleted</string>
+    <string name="opened_count_reset">Opened count reset</string>
+    <string name="unknown">Unknown</string>
+    <string name="preview">Preview</string>
+    <string name="link_placeholder">https://example.com or app://deeplink</string>
 </resources>

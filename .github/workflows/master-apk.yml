@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      - issue-360-partial
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,6 +28,13 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew assembleFreeDebug
+
+      - name: 🚀 Upload APK to Artifacts 📱
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/free/debug/*.apk
+          retention-days: 7
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:

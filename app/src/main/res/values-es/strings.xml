@@ -21,7 +21,7 @@
     <string name="create_tag">Agregar etiqueta</string>
     <string name="new_tag">Nueva etiqueta</string>
     <string name="no_links_saved_yet">Aún no hay enlaces guardados</string>
-    <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde.</string>
+    <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde</string>
     <!-- Menu and Dialog Items -->
     <string name="more_options">Más opciones</string>
     <string name="copy_link">Copiar enlace</string>

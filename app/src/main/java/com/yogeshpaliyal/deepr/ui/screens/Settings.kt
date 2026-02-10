@@ -54,7 +54,6 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
@@ -106,7 +105,6 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
-    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Collect profiles and silent save profile preference
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
@@ -193,8 +191,6 @@ fun SettingsScreen(
                     },
                 )
 
-                ScanQRCode()
-
                 SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
@@ -235,12 +231,12 @@ fun SettingsScreen(
 
                 SettingsItem(
                     TablerIcons.Moon,
-                    title = "Theme",
+                    title = stringResource(R.string.theme),
                     description =
                         when (themeMode) {
-                            "light" -> "Light"
-                            "dark" -> "Dark"
-                            else -> "System default"
+                            "light" -> stringResource(R.string.theme_light)
+                            "dark" -> stringResource(R.string.theme_dark)
+                            else -> stringResource(R.string.system_default)
                         },
                     onClick = {
                         showThemeDialog = true
@@ -305,21 +301,6 @@ fun SettingsScreen(
                             ?: stringResource(R.string.silent_save_profile_description),
                     onClick = {
                         showSilentSaveProfileDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Clipboard,
-                    title = stringResource(R.string.clipboard_link_detection),
-                    description = stringResource(R.string.clipboard_link_detection_description),
-                    onClick = {
-                        viewModel.setClipboardLinkDetectionEnabled(!clipboardLinkDetectionEnabled)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = clipboardLinkDetectionEnabled,
-                            onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
-                        )
                     },
                 )
             }

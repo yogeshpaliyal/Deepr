@@ -24,7 +24,7 @@
 - Import/Export links
 - QR Code support: Generate and scan
 - Organize links by tags
-- Manage multiple profiles
+- Manage multiple profiles. When the user is inside a profile list of links, clicking the Profile icon at the bottom bar or using the device back button will send them back to the profiles selection grid.
 - Save link by sharing from other app (eg: chrome, etc.)
 - **Silent save option:** Save links from share sheet without opening the app
 - Save links to markdown file in local storage. (can be used for obsidian)
@@ -32,11 +32,11 @@
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | Play Store | F-droid | Pro Version on Play Store |
-|-----------------------------------|----------------|------------|---------|-----------|
-| Firebase Analytics                | ❌              | ✅          | ❌       | ✅  |
-| Google Drive Backup | ❌              | ❌         | ❌       | ✅  |
-| Profile speicific themes | ❌              | ❌          | ❌       | ✅  |
+| Feature                           | Github Release | F-droid | Play Store | Pro Version on Play Store |
+|-----------------------------------|----------------|---------|------------|-----------|
+| Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
+| Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
+| Profile speicific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 
@@ -58,11 +58,10 @@ You can download from any of the sources mentioned below.
 All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
-- F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+- F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
-- Play Store (All features
-  unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
+- Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 
 

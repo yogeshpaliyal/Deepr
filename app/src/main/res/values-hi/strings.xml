@@ -21,7 +21,7 @@
     <string name="create_tag">टैग बनाएं</string>
     <string name="new_tag">नया टैग</string>
     <string name="no_links_saved_yet">अभी तक कोई लिंक सहेजे नहीं गए</string>
-    <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें।</string>
+    <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें</string>
     <!-- Menu and Dialog Items -->
     <string name="more_options">अधिक विकल्प</string>
     <string name="copy_link">लिंक कॉपी करें</string>
@@ -82,7 +82,7 @@
     <!-- About Us Screen -->
     <string name="app_logo">ऐप लोगो</string>
     <string name="version_format">संस्करण %s</string>
-    <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप।</string>
+    <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप</string>
     <string name="author">लेखक</string>
     <string name="author_name">योगेश चौधरी</string>
     <string name="twitter">ट्विटर</string>
@@ -93,17 +93,17 @@
     <string name="save_deeplink">डीपलिंक सहेजें</string>
     <string name="save_deeplink_message">डीपलिंक सहेजें: %s ?</string>
     <string name="enter_link_name">कृपया लिंक का नाम दर्ज करें</string>
-    <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें।</string>
+    <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें</string>
     <string name="save_and_execute">सहेजें और निष्पादित करें</string>
     <!-- Home Screen -->
     <string name="enter_deeplink_command">लिंक दर्ज करें</string>
-    <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक।</string>
+    <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक</string>
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">अमान्य डीपलिंक: %s</string>
-    <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला।</string>
-    <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं।</string>
+    <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला</string>
+    <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं</string>
     <string name="export_success">सफलतापूर्वक %s में निर्यात किया गया</string>
-    <string name="export_failed">CSV फ़ाइल बनाने में विफल।</string>
+    <string name="export_failed">CSV फ़ाइल बनाने में विफल</string>
     <!-- Sync Settings -->
     <string name="select_sync_file">सिंक फ़ाइल चुनें</string>
     <string name="sync_now">अभी सिंक करें</string>
@@ -136,7 +136,7 @@
     <string name="clipboard_link_detected">क्लिपबोर्ड में लिंक मिला</string>
     <string name="all_tags">सारे टैग्स</string>
     <string name="no_search_results">कोई नतीजा नहीं मिला</string>
-    <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें।</string>
+    <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें</string>
     <string name="delete_confirmation_title">क्या लिंक हटाना है?</string>
     <string name="note">टिप्पणी</string>
     <string name="note_copied">नोट कॉपी हो गया</string>
@@ -163,7 +163,7 @@
     <string name="failed_to_create_profile">प्रोफ़ाइल बनाने में विफल</string>
     <string name="profile_updated_successfully">प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई</string>
     <string name="cannot_delete_only_profile">एकमात्र प्रोफ़ाइल को हटाया नहीं जा सकता</string>
-    <string name="profile_delete_confirmation">क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? इस प्रोफ़ाइल के सभी लिंक और टैग हटा दिए जाएंगे।</string>
+    <string name="profile_delete_confirmation">क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? इस प्रोफ़ाइल के सभी लिंक और टैग हटा दिए जाएंगे</string>
     <string name="switch_profile">अगली प्रोफ़ाइल में स्विच करें</string>
     <string name="manage_profiles">प्रोफाइल प्रबंधित करें</string>
     <string name="no_profiles_yet">अभी तक कोई प्रोफ़ाइल नहीं बनाई गई है</string>
@@ -186,18 +186,18 @@
     <string name="default_port">डिफ़ॉल्ट: 8080</string>
     <string name="api_get_links">सभी सहेजे गए लिंक प्राप्त करें</string>
     <string name="port_range_hint">पोर्ट दर्ज करें (1024–65535)</string>
-    <string name="invalid_port">अमान्य पोर्ट नंबर। यह 1024 और 65535 के बीच होना चाहिए।</string>
+    <string name="invalid_port">अमान्य पोर्ट नंबर। यह 1024 और 65535 के बीच होना चाहिए</string>
     <string name="port_changed_restart">पोर्ट बदल दिया गया है। सर्वर फिर से शुरू हो रहा है…</string>
     <string name="change_port">पोर्ट बदलें</string>
     <string name="transfer_link_server">लिंक ट्रांसफ़र सर्वर</string>
     <string name="transfer_link_to_another_device">लिंक को दूसरे डिवाइस पर ट्रांसफ़र करें (बीटा)</string>
     <string name="transfer_link_server_instructions">1. सर्वर शुरू करने के लिए ऊपर दिए गए स्विच को चालू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस में “Import Links” विकल्प से QR कोड स्कैन करें</string>
     <string name="scan_qr_to_get_data">दूसरे डिवाइस से लिंक पाने के लिए स्कैन करें</string>
-    <string name="no_favourites_description">यहाँ देखने के लिए लिंक को पसंदीदा के रूप में चिह्नित करें।</string>
+    <string name="no_favourites_description">यहाँ देखने के लिए लिंक को पसंदीदा के रूप में चिह्नित करें</string>
     <string name="no_links_with_tags">चुने गए टैग के साथ कोई लिंक नहीं है</string>
-    <string name="no_links_with_tags_description">अलग टैग चुनने की कोशिश करें या फ़िल्टर हटाएँ।</string>
+    <string name="no_links_with_tags_description">अलग टैग चुनने की कोशिश करें या फ़िल्टर हटाएँ</string>
     <string name="no_favourites_with_tags">चुने गए टैग में कोई पसंदीदा नहीं है</string>
-    <string name="no_favourites_with_tags_description">इन टैग्स वाले लिंक को पसंदीदा के रूप में चिन्हित करें या अलग टैग्स आज़माएँ।</string>
+    <string name="no_favourites_with_tags_description">इन टैग्स वाले लिंक को पसंदीदा के रूप में चिन्हित करें या अलग टैग्स आज़माएँ</string>
     <string name="remove_thumbnail">थंबनेल हटाएँ</string>
     <string name="thumbnail_url">थंबनेल URL (लिंक)</string>
     <string name="edit_thumbnail_url">थंबनेल URL संपादित करें</string>
