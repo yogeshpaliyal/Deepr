@@ -5,6 +5,7 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.NetworkRepository
@@ -120,11 +121,62 @@ open class LocalServerRepositoryImpl(
                     routing {
                         get("/") {
                             try {
-                                val htmlContent =
+                                var htmlContent =
                                     context.assets
                                         .open("index.html")
                                         .bufferedReader()
                                         .use { it.readText() }
+
+                                // Replace placeholders with translations
+                                val placeholders =
+                                    mapOf(
+                                        "{{WEB_TITLE}}" to R.string.web_title,
+                                        "{{WEB_SUBTITLE}}" to R.string.web_subtitle,
+                                        "{{WEB_PROFILE_LABEL}}" to R.string.web_profile_label,
+                                        "{{WEB_NEW_PROFILE}}" to R.string.web_new_profile,
+                                        "{{WEB_ADD_NEW_LINK}}" to R.string.web_add_new_link,
+                                        "{{WEB_LINK_URL}}" to R.string.web_link_url,
+                                        "{{WEB_LINK_NAME}}" to R.string.web_link_name,
+                                        "{{WEB_OPTIONAL}}" to R.string.web_optional,
+                                        "{{WEB_NOTES_OPTIONAL}}" to R.string.web_notes_optional,
+                                        "{{WEB_TAGS_OPTIONAL}}" to R.string.web_tags_optional,
+                                        "{{WEB_ADD_LINK_BUTTON}}" to R.string.web_add_link_button,
+                                        "{{WEB_YOUR_LINKS}}" to R.string.web_your_links,
+                                        "{{WEB_REFRESH}}" to R.string.web_refresh,
+                                        "{{WEB_SEARCH_PLACEHOLDER}}" to R.string.web_search_placeholder,
+                                        "{{WEB_ALL_TAGS}}" to R.string.web_all_tags,
+                                        "{{WEB_SORT_DATE}}" to R.string.web_sort_date,
+                                        "{{WEB_SORT_NAME}}" to R.string.web_sort_name,
+                                        "{{WEB_SORT_OPENS}}" to R.string.web_sort_opens,
+                                        "{{WEB_CLEAR}}" to R.string.web_clear,
+                                        "{{WEB_LOADING_LINKS}}" to R.string.web_loading_links,
+                                        "{{WEB_LOADING_DESCRIPTION}}" to R.string.web_loading_description,
+                                        "{{WEB_CREATE_PROFILE_TITLE}}" to R.string.web_create_profile_title,
+                                        "{{WEB_PROFILE_NAME_LABEL}}" to R.string.web_profile_name_label,
+                                        "{{WEB_CANCEL}}" to R.string.web_cancel,
+                                        "{{WEB_CREATE_PROFILE_BUTTON}}" to R.string.web_create_profile_button,
+                                        "{{WEB_STATUS_CREATING}}" to R.string.web_status_creating,
+                                        "{{WEB_STATUS_ADDED}}" to R.string.web_status_added,
+                                        "{{WEB_SUCCESS_LINK_ADDED}}" to R.string.web_success_link_added,
+                                        "{{WEB_ERROR_ADD_LINK}}" to R.string.web_error_add_link,
+                                        "{{WEB_ERROR_LOADING}}" to R.string.web_error_loading,
+                                        "{{WEB_ERROR_REFRESH}}" to R.string.web_error_refresh,
+                                        "{{WEB_ERROR_FETCH}}" to R.string.web_error_fetch,
+                                        "{{WEB_MSG_SWITCHED}}" to R.string.web_msg_switched,
+                                        "{{WEB_MSG_FILTERED}}" to R.string.web_msg_filtered,
+                                        "{{WEB_MSG_FILTERS_CLEARED}}" to R.string.web_msg_filters_cleared,
+                                        "{{WEB_NO_LINKS}}" to R.string.web_no_links,
+                                        "{{WEB_NO_LINKS_DESCRIPTION}}" to R.string.web_no_links_description,
+                                        "{{WEB_NO_MATCHING}}" to R.string.web_no_matching,
+                                        "{{WEB_NO_MATCHING_DESCRIPTION}}" to R.string.web_no_matching_description,
+                                        "{{WEB_OPEN_LINK}}" to R.string.web_open_link,
+                                        "{{WEB_OPENS}}" to R.string.web_opens,
+                                    )
+
+                                placeholders.forEach { (placeholder, resId) ->
+                                    htmlContent = htmlContent.replace(placeholder, context.getString(resId))
+                                }
+
                                 call.respondText(htmlContent, ContentType.Text.Html)
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error reading HTML asset", e)
@@ -166,7 +218,7 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                deeprQueries.insertProfile(request.name)
+                                deeprQueries.insertProfile(request.name, 0L)
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),
@@ -188,6 +240,7 @@ open class LocalServerRepositoryImpl(
                                     deeprQueries
                                         .getLinksAndTags(
                                             profileId,
+                                            "",
                                             "",
                                             "",
                                             "",
@@ -267,6 +320,7 @@ open class LocalServerRepositoryImpl(
                                                     "",
                                                     "",
                                                     "",
+                                                    "",
                                                     -1L,
                                                     -1L,
                                                     tag.id.toString(),
@@ -325,6 +379,24 @@ open class LocalServerRepositoryImpl(
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
                                     ErrorResponse("Error getting link info: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links/increment-count") {
+                            try {
+                                val id = call.request.queryParameters["id"]?.toLongOrNull()
+                                if (id != null) {
+                                    accountViewModel.incrementOpenedCount(id)
+                                    call.respond(HttpStatusCode.OK, SuccessResponse("Count incremented"))
+                                } else {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error incrementing count", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error incrementing count: ${e.message}"),
                                 )
                             }
                         }

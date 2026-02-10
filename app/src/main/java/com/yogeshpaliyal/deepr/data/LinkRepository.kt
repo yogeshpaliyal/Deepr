@@ -8,7 +8,7 @@ import com.yogeshpaliyal.deepr.Tags
 
 interface LinkRepository {
     // Profile operations
-    suspend fun insertProfile(name: String)
+    suspend fun insertProfile(name: String, priority: Long = 0)
 
     fun getAllProfiles(): Query<Profile>
 
@@ -22,6 +22,10 @@ interface LinkRepository {
         colorTheme: String,
         id: Long,
     )
+
+    suspend fun updateProfilePriority(id: Long, priority: Long)
+
+    suspend fun getMaxPriority(): Long
 
     suspend fun deleteProfile(id: Long)
 
@@ -68,6 +72,7 @@ interface LinkRepository {
         searchQuery1: String,
         searchQuery2: String,
         searchQuery3: String,
+        searchQuery4: String,
         favouriteFilter1: Long,
         favouriteFilter2: Long,
         tagIdsString1: String,

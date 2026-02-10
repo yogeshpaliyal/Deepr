@@ -3,7 +3,8 @@ id INTEGER PRIMARY KEY NOT NULL,
 name TEXT NOT NULL UNIQUE,
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 themeMode TEXT NOT NULL DEFAULT 'system',
-colorTheme TEXT NOT NULL DEFAULT 'dynamic'
+colorTheme TEXT NOT NULL DEFAULT 'dynamic',
+priority INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Deepr (
@@ -78,7 +79,7 @@ FROM
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
   Deepr.profileId = ?
-  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
+  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%' OR Tags.name LIKE '%' || ? || '%')
   AND (
     ? = -1 OR Deepr.isFavourite = ?
   )
@@ -215,7 +216,7 @@ FROM Tags
 LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
 LEFT JOIN Deepr ON LinkTags.linkId = Deepr.id
 GROUP BY Tags.id, Tags.name
-HAVING linkCount > 0
+
 ORDER BY linkCount DESC, Tags.name;
 
 countOfLinks:
@@ -266,10 +267,10 @@ UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 
 -- Profile operations
 insertProfile:
-INSERT OR IGNORE INTO Profile (name) VALUES (?);
+INSERT OR IGNORE INTO Profile (name, priority) VALUES (?, ?);
 
 getAllProfiles:
-SELECT * FROM Profile ORDER BY createdAt ASC;
+SELECT * FROM Profile ORDER BY priority ASC, createdAt ASC;
 
 getProfileById:
 SELECT * FROM Profile WHERE id = ?;
@@ -279,6 +280,12 @@ SELECT * FROM Profile WHERE name = ?;
 
 updateProfile:
 UPDATE Profile SET name = ?, themeMode = ?, colorTheme = ? WHERE id = ?;
+
+updateProfilePriority:
+UPDATE Profile SET priority = ? WHERE id = ?;
+
+maxPriority:
+SELECT MAX(priority) FROM Profile;
 
 deleteProfile:
 DELETE FROM Profile WHERE id = ?;
