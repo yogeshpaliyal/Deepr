@@ -127,4 +127,19 @@
     <string name="sync_status_invalid">⚠ El formato del archivo es inválido</string>
     <string name="sync_status_no_file">No se seleccionó archivo de sincronización</string>
     <string name="sync_now_description">Sincronizar manualmente enlaces profundos al archivo seleccionado</string>
+    <string name="all_tags">Todas las etiquetas</string>
+    <string name="favourites">Favoritos</string>
+    <string name="add_to_favourites">Añadir a favoritos</string>
+    <string name="remove_from_favourites">Eliminar de favoritos</string>
+    <string name="add">Añadir</string>
+    <string name="clipboard_link_detected">Enlace detectado en el portapapeles</string>
+    <string name="add_tag">Añadir etiqueta</string>
+    <string name="no_favourites_found">Sin favoritos todavía</string>
+    <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí.</string>
+    <string name="no_search_results">Sin resutados</string>
+    <string name="no_search_results_description">Pruebe a buscar diferentes palabras clave.</string>
+    <string name="no_links_with_tags">No hay enlaces con las etiquetas seleccionadas</string>
+    <string name="no_links_with_tags_description">Prueba a seleccionar diferentes etiquetas o reestablecer los filtros.</string>
+    <string name="no_favourites_with_tags">Sin favoritos en las etiquetas seleccionadas</string>
+    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos o pruebe diferentes etiquetas.</string>
 </resources>
