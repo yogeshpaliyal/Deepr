@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens.addlink
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -64,12 +65,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.journeyapps.barcodescanner.ScanOptions
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
+import com.yogeshpaliyal.deepr.util.QRScanner
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
@@ -82,6 +85,7 @@ import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Plus
+import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
@@ -108,6 +112,18 @@ fun AddLinkScreen(
     var isError by remember { mutableStateOf(false) }
     var isNameError by remember { mutableStateOf(false) }
     var isFetchingMetadata by remember { mutableStateOf(false) }
+
+    val qrScanner =
+        rememberLauncherForActivityResult(
+            QRScanner(),
+        ) { result ->
+            if (result.contents != null) {
+                val normalizedLink = normalizeLink(result.contents)
+                deeprInfo = deeprInfo.copy(link = normalizedLink)
+                isError = false
+            }
+        }
+
     // Tags
     var newTagName by remember { mutableStateOf("") }
     val allTags by viewModel.allTags.collectAsStateWithLifecycle()
@@ -291,11 +307,9 @@ fun AddLinkScreen(
                                     Text(text = stringResource(R.string.invalid_empty_deeplink))
                                 }
                             },
-                            trailingIcon =
-                                if (deeprInfo.link.isEmpty()) {
-                                    null
-                                } else {
-                                    {
+                            trailingIcon = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (deeprInfo.link.isNotEmpty()) {
                                         ClearInputIconButton(
                                             onClick = {
                                                 deeprInfo = deeprInfo.copy(link = "")
@@ -303,7 +317,17 @@ fun AddLinkScreen(
                                             },
                                         )
                                     }
-                                },
+                                    IconButton(onClick = {
+                                        qrScanner.launch(ScanOptions())
+                                    }) {
+                                        Icon(
+                                            imageVector = TablerIcons.Qrcode,
+                                            contentDescription = stringResource(R.string.qr_scanner),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                }
+                            },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                         )
