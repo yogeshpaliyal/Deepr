@@ -13,7 +13,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.R
 
 @Composable
 fun ThemeSelectionDialog(
@@ -23,16 +25,16 @@ fun ThemeSelectionDialog(
 ) {
     val themeOptions =
         listOf(
-            "system" to "System default",
-            "light" to "Light",
-            "dark" to "Dark",
+            "system" to stringResource(R.string.system_default),
+            "light" to stringResource(R.string.theme_light),
+            "dark" to stringResource(R.string.theme_dark),
         )
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Select Theme",
+                text = stringResource(R.string.theme_dialog_title),
                 style = MaterialTheme.typography.headlineSmall,
             )
         },
@@ -62,7 +64,7 @@ fun ThemeSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.close))
             }
         },
     )
