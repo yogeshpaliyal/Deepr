@@ -20,7 +20,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   validate-pr:
@@ -65,29 +64,4 @@ jobs:
           path: app/build/outputs/apk/github/debug/*.apk
           retention-days: 3
 
-      - name: 💬 Comment on PR with APK Link
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        with:
-          script: |
-            const runId = context.runId;
-            const repo = context.repo;
-            const prNumber = context.issue.number;
 
-            const comment = `## 📱 APK Build Complete!
-
-            Your debug APK has been built successfully and is ready for testing.
-
-            ### 📥 Download APK
-            [Download app-debug.apk](https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId})
-
-            **Note:** Click the link above, scroll down to the "Artifacts" section, and download the \`app-debug\` artifact.
-
-            **Retention:** This artifact will be available for 3 days.`;
-
-            github.rest.issues.createComment({
-              owner: repo.owner,
-              repo: repo.repo,
-              issue_number: prNumber,
-              body: comment
-            });
