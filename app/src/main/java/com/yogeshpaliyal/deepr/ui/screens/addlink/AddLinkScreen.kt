@@ -134,9 +134,8 @@ fun AddLinkScreen(
 
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
-    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     var selectedProfileId by remember(selectedLink) {
-        mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
+        mutableStateOf(selectedLink.profileId)
     }
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
