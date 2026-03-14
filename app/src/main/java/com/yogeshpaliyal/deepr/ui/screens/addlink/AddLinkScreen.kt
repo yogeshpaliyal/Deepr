@@ -686,6 +686,7 @@ fun AddLinkScreen(
                             }
 
                             var openWithExpanded by remember { mutableStateOf(false) }
+                            val appNotInstalledText = stringResource(R.string.app_not_installed)
                             val selectedAppLabel = remember(deeprInfo.openWithPackage, resolvedApps) {
                                 if (deeprInfo.openWithPackage.isEmpty()) {
                                     ""
@@ -694,7 +695,7 @@ fun AddLinkScreen(
                                         .firstOrNull { it.activityInfo.packageName == deeprInfo.openWithPackage }
                                         ?.loadLabel(context.packageManager)
                                         ?.toString()
-                                        ?: deeprInfo.openWithPackage
+                                        ?: appNotInstalledText
                                 }
                             }
 
