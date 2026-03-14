@@ -430,6 +430,7 @@ open class LocalServerRepositoryImpl(
                         isFavourite = deeplink.isFavourite,
                         createdAt = deeplink.createdAt,
                         profileId = 1L, // Default profile
+                        openWithPackage = "",
                     )
 
                     val insertedId = deeprQueries.lastInsertRowId().executeAsOne()

@@ -16,11 +16,15 @@ import java.util.Locale
 fun openDeeplink(
     context: Context,
     link: String,
+    packageName: String = "",
 ): Boolean {
     if (!isValidDeeplink(link)) return false
     val normalizedLink = normalizeLink(link)
     return try {
         val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
+        if (packageName.isNotEmpty()) {
+            intent.setPackage(packageName)
+        }
         context.startActivity(intent)
         true
     } catch (e: Exception) {

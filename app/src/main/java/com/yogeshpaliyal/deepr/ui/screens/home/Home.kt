@@ -625,7 +625,7 @@ fun Content(
         when (it) {
             is Click -> {
                 viewModel.incrementOpenedCount(it.item.id)
-                openDeeplink(context, it.item.link)
+                openDeeplink(context, it.item.link, it.item.openWithPackage)
                 analyticsManager.logEvent(
                     AnalyticsEvents.OPEN_LINK,
                     mapOf(AnalyticsParams.LINK_ID to it.item.id),

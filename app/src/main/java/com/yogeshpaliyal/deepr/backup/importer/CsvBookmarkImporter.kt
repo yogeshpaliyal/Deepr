@@ -83,6 +83,7 @@ class CsvBookmarkImporter(
                                         isFavourite = isFavourite,
                                         createdAt = createdAt,
                                         profileId = profileID,
+                                        openWithPackage = "",
                                     )
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 
