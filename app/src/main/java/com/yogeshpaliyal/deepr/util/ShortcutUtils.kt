@@ -17,15 +17,18 @@ fun createShortcut(
     useLinkBasedIcon: Boolean,
 ) {
     if (isShortcutSupported(context)) {
+        val intent = Intent(Intent.ACTION_VIEW, deepr.link.toUri())
+        if (deepr.openWithPackage.isNotEmpty()) {
+            intent.setPackage(deepr.openWithPackage)
+        }
         val shortcutInfo =
             ShortcutInfoCompat
                 .Builder(context, "deepr_${deepr.id}")
                 .setShortLabel(shortcutName)
                 .setLongLabel(shortcutName)
                 .setIcon(getShortcutAppIcon(context, deepr.link, useLinkBasedIcon))
-                .setIntent(
-                    Intent(Intent.ACTION_VIEW, deepr.link.toUri()),
-                ).build()
+                .setIntent(intent)
+                .build()
         if (alreadyExists) {
             // If the shortcut already exists, we update it
             ShortcutManagerCompat.updateShortcuts(context, listOf(shortcutInfo))

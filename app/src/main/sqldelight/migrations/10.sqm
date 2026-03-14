@@ -1,0 +1,2 @@
+-- Add openWithPackage column to Deepr table to store preferred app package name for opening links
+ALTER TABLE Deepr ADD COLUMN openWithPackage TEXT NOT NULL DEFAULT '';

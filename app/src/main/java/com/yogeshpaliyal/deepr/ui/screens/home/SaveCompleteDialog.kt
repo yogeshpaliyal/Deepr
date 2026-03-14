@@ -14,6 +14,7 @@ fun createDeeprObject(
     notes: String = "",
     thumbnail: String = "",
     profileId: Long = 1L,
+    openWithPackage: String = "",
 ): GetLinksAndTags =
     GetLinksAndTags(
         id = 0,
@@ -28,4 +29,5 @@ fun createDeeprObject(
         notes = notes,
         thumbnail = thumbnail,
         profileId = profileId,
+        openWithPackage = openWithPackage,
     )

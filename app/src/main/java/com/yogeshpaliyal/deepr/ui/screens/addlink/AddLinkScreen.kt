@@ -1,5 +1,8 @@
 package com.yogeshpaliyal.deepr.ui.screens.addlink
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -63,6 +66,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.journeyapps.barcodescanner.ScanOptions
@@ -81,6 +85,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Check
 import compose.icons.tablericons.Download
+import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
@@ -213,6 +218,7 @@ fun AddLinkScreen(
                 deeprInfo.notes,
                 deeprInfo.thumbnail,
                 selectedProfileId,
+                deeprInfo.openWithPackage,
             )
         } else {
             // Edit
@@ -224,10 +230,11 @@ fun AddLinkScreen(
                 deeprInfo.notes,
                 deeprInfo.thumbnail,
                 selectedProfileId,
+                deeprInfo.openWithPackage,
             )
         }
         if (executeAfterSave) {
-            openDeeplink(context, normalizedLink)
+            openDeeplink(context, normalizedLink, deeprInfo.openWithPackage)
         }
         navigator.removeLast()
     }
@@ -637,6 +644,144 @@ fun AddLinkScreen(
                     }
                 }
 
+                // Open With App Section
+                val resolvedApps = remember(deeprInfo.link) {
+                    if (isValidDeeplink(deeprInfo.link)) {
+                        val normalizedLink = normalizeLink(deeprInfo.link)
+                        val intent = Intent(Intent.ACTION_VIEW, normalizedLink.toUri())
+                        context.packageManager
+                            .queryIntentActivities(intent, PackageManager.MATCH_ALL)
+                            .distinctBy { it.activityInfo.packageName }
+                    } else {
+                        emptyList()
+                    }
+                }
+
+                if (resolvedApps.isNotEmpty()) {
+                    ElevatedCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.elevatedCardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = TablerIcons.ExternalLink,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text = stringResource(R.string.open_with_app),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+
+                            var openWithExpanded by remember { mutableStateOf(false) }
+                            val appNotInstalledText = stringResource(R.string.app_not_installed)
+                            val selectedAppLabel = remember(deeprInfo.openWithPackage, resolvedApps) {
+                                if (deeprInfo.openWithPackage.isEmpty()) {
+                                    ""
+                                } else {
+                                    resolvedApps
+                                        .firstOrNull { it.activityInfo.packageName == deeprInfo.openWithPackage }
+                                        ?.loadLabel(context.packageManager)
+                                        ?.toString()
+                                        ?: appNotInstalledText
+                                }
+                            }
+
+                            ExposedDropdownMenuBox(
+                                expanded = openWithExpanded,
+                                onExpandedChange = { openWithExpanded = !openWithExpanded },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedAppLabel,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.select_app)) },
+                                    placeholder = { Text(stringResource(R.string.system_default)) },
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = openWithExpanded) },
+                                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                    shape = RoundedCornerShape(12.dp),
+                                )
+
+                                ExposedDropdownMenu(
+                                    expanded = openWithExpanded,
+                                    onDismissRequest = { openWithExpanded = false },
+                                ) {
+                                    // System default (no specific app)
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
+                                                if (deeprInfo.openWithPackage.isEmpty()) {
+                                                    Icon(
+                                                        imageVector = TablerIcons.Check,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(18.dp),
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                    )
+                                                }
+                                                Text(stringResource(R.string.system_default))
+                                            }
+                                        },
+                                        onClick = {
+                                            deeprInfo = deeprInfo.copy(openWithPackage = "")
+                                            openWithExpanded = false
+                                        },
+                                    )
+
+                                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                                    resolvedApps.forEach { resolveInfo ->
+                                        val packageName = resolveInfo.activityInfo.packageName
+                                        val appLabel = resolveInfo.loadLabel(context.packageManager).toString()
+
+                                        DropdownMenuItem(
+                                            text = {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                ) {
+                                                    if (packageName == deeprInfo.openWithPackage) {
+                                                        Icon(
+                                                            imageVector = TablerIcons.Check,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(18.dp),
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                        )
+                                                    }
+                                                    Text(appLabel)
+                                                }
+                                            },
+                                            onClick = {
+                                                deeprInfo = deeprInfo.copy(openWithPackage = packageName)
+                                                openWithExpanded = false
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Tags Section
                 ElevatedCard(
                     modifier = Modifier.fillMaxWidth(),
@@ -889,7 +1034,7 @@ fun AddLinkScreen(
                             FilledTonalButton(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
-                                    isError = !openDeeplink(context, deeprInfo.link)
+                                    isError = !openDeeplink(context, deeprInfo.link, deeprInfo.openWithPackage)
                                 },
                                 shape = RoundedCornerShape(12.dp),
                             ) {

@@ -89,6 +89,7 @@ interface LinkRepository {
         notes: String,
         thumbnail: String,
         profileId: Long,
+        openWithPackage: String = "",
     )
 
     suspend fun lastInsertRowId(): Long?
@@ -99,6 +100,7 @@ interface LinkRepository {
         notes: String,
         thumbnail: String,
         profileId: Long,
+        openWithPackage: String,
         id: Long,
     )
 

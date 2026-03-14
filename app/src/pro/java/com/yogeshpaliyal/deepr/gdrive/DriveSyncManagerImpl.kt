@@ -123,6 +123,7 @@ class DriveSyncManagerImpl(
                                 notes = linkBackup.notes,
                                 thumbnail = linkBackup.thumbnail,
                                 profileId = profileId,
+                                openWithPackage = "",
                             )
                             val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 
