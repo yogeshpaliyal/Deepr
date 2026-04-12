@@ -22,9 +22,9 @@
     <string name="create_tag">Stwórz tag</string>
     <string name="new_tag">Nowy tag (Opcjonalnie)</string>
     <string name="no_links_saved_yet">Nie zapisano żadnych linków</string>
-    <string name="save_your_link_below">Zapisz link poniżej, aby mieć do niego szybki dostęp.</string>
+    <string name="save_your_link_below">Zapisz link poniżej, aby mieć do niego szybki dostęp</string>
     <string name="no_favourites_found">Brak ulubionych</string>
-    <string name="no_favourites_description">Oznacz linki jako ulubione, aby zobaczyć je tutaj.</string>
+    <string name="no_favourites_description">Oznacz linki jako ulubione, aby zobaczyć je tutaj</string>
     <string name="no_search_results">Brak wyników</string>
     <string name="no_search_results_description">Spróbuj wyszukać, przy użyciu innych słów kluczowych.</string>
     <string name="no_links_with_tags">Brak linków z wybranymi tagami</string>

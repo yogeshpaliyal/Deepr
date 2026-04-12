@@ -21,7 +21,7 @@
     <string name="create_tag">Créer une étiquette</string>
     <string name="new_tag">Nouvelle étiquette</string>
     <string name="no_links_saved_yet">Aucun lien sauvegardé pour le moment</string>
-    <string name="save_your_link_below">Enregistrez votre lien ci-dessous pour y accéder rapidement plus tard.</string>
+    <string name="save_your_link_below">Enregistrez votre lien ci-dessous pour y accéder rapidement plus tard</string>
     <!-- Menu and Dialog Items -->
     <string name="more_options">Plus d\'options</string>
     <string name="copy_link">Copier le lien</string>
