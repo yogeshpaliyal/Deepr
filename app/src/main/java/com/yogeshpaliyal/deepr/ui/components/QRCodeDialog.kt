@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,8 +40,8 @@ fun QrCodeDialog(
                     modifier = Modifier.size(300.dp),
                     colors =
                         QrCodeColors(
-                            background = AlertDialogDefaults.containerColor,
-                            foreground = MaterialTheme.colorScheme.onSurface,
+                            background = Color.White,
+                            foreground = Color.Black,
                         ),
                     dotShape = DotShape.Circle,
                 ) {
