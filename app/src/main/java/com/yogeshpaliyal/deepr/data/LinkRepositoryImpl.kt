@@ -23,9 +23,9 @@ class LinkRepositoryImpl(
     }
 
     // Profile operations
-    override suspend fun insertProfile(name: String) {
+    override suspend fun insertProfile(name: String, priority: Long) {
         withContext(Dispatchers.IO) {
-            deeprQueries.insertProfile(name)
+            deeprQueries.insertProfile(name, priority)
         }
         scheduleAutoBackup()
     }
@@ -53,6 +53,18 @@ class LinkRepositoryImpl(
         }
         scheduleAutoBackup()
     }
+
+    override suspend fun updateProfilePriority(id: Long, priority: Long) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.updateProfilePriority(priority, id)
+        }
+        scheduleAutoBackup()
+    }
+
+    override suspend fun getMaxPriority(): Long =
+        withContext(Dispatchers.IO) {
+            deeprQueries.maxPriority().executeAsOneOrNull()?.MAX ?: 0L
+        }
 
     override suspend fun deleteProfile(id: Long) {
         withContext(Dispatchers.IO) {
