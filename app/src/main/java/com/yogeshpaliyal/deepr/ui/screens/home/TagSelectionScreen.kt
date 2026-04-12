@@ -679,30 +679,42 @@ object TagSelectionScreen : TopLevelRoute {
                         Text(
                             text = stringResource(R.string.delete_tag),
                             style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            val message =
-                                buildAnnotatedString {
-                                    append("Are you sure you want to delete ")
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val fullMessage = stringResource(R.string.delete_tag_confirmation_with_name, tag.name)
+                            val parts = fullMessage.split(tag.name)
+                            val annotatedString = buildAnnotatedString {
+                                if (parts.size >= 2) {
+                                    append(parts[0])
                                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                        append("'${tag.name}'")
+                                        append(tag.name)
                                     }
-                                    append(" tag?")
+                                    append(parts[1])
+                                } else {
+                                    append(fullMessage)
                                 }
-                            Text(text = message)
+                            }
+                            Text(
+                                text = annotatedString,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
 
                             if (tag.linkCount > 0) {
                                 Card(
                                     colors =
                                         CardDefaults.cardColors(
-                                            containerColor =
-                                                MaterialTheme.colorScheme.errorContainer.copy(
-                                                    alpha = 0.5f,
-                                                ),
+                                            containerColor = MaterialTheme.colorScheme.errorContainer,
                                         ),
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(12.dp),
@@ -715,8 +727,9 @@ object TagSelectionScreen : TopLevelRoute {
                                             tint = MaterialTheme.colorScheme.onErrorContainer,
                                             modifier = Modifier.size(16.dp),
                                         )
+                                        val linkText = if (tag.linkCount == 1L) stringResource(R.string.link) else stringResource(R.string.links)
                                         Text(
-                                            text = "This tag is used by ${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                                            text = stringResource(R.string.tag_used_by_links, tag.linkCount, linkText),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,
                                         )

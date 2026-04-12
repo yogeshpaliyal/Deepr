@@ -83,6 +83,13 @@ class AccountViewModel(
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
+    private val _showProfilesGrid = MutableStateFlow(false)
+    val showProfilesGrid: StateFlow<Boolean> = _showProfilesGrid
+
+    fun setShowProfilesGrid(show: Boolean) {
+        _showProfilesGrid.value = show
+    }
+
     // Profile state
     val allProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
         linkRepository
@@ -123,7 +130,19 @@ class AccountViewModel(
                     .first()
             if (profileCount == 0L) {
                 // Create default profile if none exists
-                linkRepository.insertProfile("Default")
+                linkRepository.insertProfile("Default", 0)
+            } else {
+                // Normalize priorities for existing profiles if needed
+                normalizePriorities()
+            }
+        }
+    }
+
+    private suspend fun normalizePriorities() {
+        val profiles = linkRepository.getAllProfiles().executeAsList()
+        profiles.forEachIndexed { index, profile ->
+            if (profile.priority != index.toLong()) {
+                linkRepository.updateProfilePriority(profile.id, index.toLong())
             }
         }
     }
@@ -139,15 +158,22 @@ class AccountViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        selectedProfileId
-            .flatMapLatest { profileId ->
-                linkRepository
-                    .getAllTagsWithCount(profileId)
-                    .asFlow()
-                    .mapToList(
-                        viewModelScope.coroutineContext,
-                    )
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+        combine(selectedProfileId, searchQuery) { profileId, query ->
+            Pair(profileId, query)
+        }.flatMapLatest { (profileId, query) ->
+            linkRepository
+                .getAllTagsWithCount(profileId)
+                .asFlow()
+                .mapToList(
+                    viewModelScope.coroutineContext,
+                ).map { tags ->
+                    if (query.isBlank()) {
+                        tags
+                    } else {
+                        tags.filter { it.name.contains(query, ignoreCase = true) }
+                    }
+                }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfLinks: StateFlow<Long?> =
@@ -369,6 +395,7 @@ class AccountViewModel(
             linkRepository
                 .getLinksAndTags(
                     profileId,
+                    query,
                     query,
                     query,
                     query,
@@ -821,10 +848,47 @@ class AccountViewModel(
 
     fun insertProfile(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            linkRepository.insertProfile(name)
+            val maxPriority = linkRepository.getMaxPriority()
+            linkRepository.insertProfile(name, maxPriority + 1)
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CREATE_PROFILE,
             )
+        }
+    }
+
+    fun moveProfileUp(profileId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // First, ensure all profiles have unique, sequential priorities
+            normalizePriorities()
+            
+            val profiles = linkRepository.getAllProfiles().executeAsList()
+            val index = profiles.indexOfFirst { it.id == profileId }
+            if (index > 0) {
+                val currentProfile = profiles[index]
+                val previousProfile = profiles[index - 1]
+
+                val tempPriority = currentProfile.priority
+                linkRepository.updateProfilePriority(currentProfile.id, previousProfile.priority)
+                linkRepository.updateProfilePriority(previousProfile.id, tempPriority)
+            }
+        }
+    }
+
+    fun moveProfileDown(profileId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // First, ensure all profiles have unique, sequential priorities
+            normalizePriorities()
+            
+            val profiles = linkRepository.getAllProfiles().executeAsList()
+            val index = profiles.indexOfFirst { it.id == profileId }
+            if (index != -1 && index < profiles.size - 1) {
+                val currentProfile = profiles[index]
+                val nextProfile = profiles[index + 1]
+
+                val tempPriority = currentProfile.priority
+                linkRepository.updateProfilePriority(currentProfile.id, nextProfile.priority)
+                linkRepository.updateProfilePriority(nextProfile.id, tempPriority)
+            }
         }
     }
 
