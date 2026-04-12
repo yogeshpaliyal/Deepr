@@ -194,15 +194,13 @@ fun Dashboard(
     val context = LocalContext.current
     val viewModel: AccountViewModel = koinViewModel()
 
-    // Collect clipboard link detection preference
-    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
-
     // Clipboard link detection
     var clipboardLink by remember { mutableStateOf<ClipboardLink?>(null) }
 
-    LaunchedEffect(clipboardLinkDetectionEnabled) {
-        if (clipboardLinkDetectionEnabled) {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+        val listener = ClipboardManager.OnPrimaryClipChangedListener {
             val clipData = clipboard.primaryClip
             if (clipData != null && clipData.itemCount > 0) {
                 val text = clipData.getItemAt(0).text?.toString()
@@ -213,8 +211,24 @@ fun Dashboard(
                     }
                 }
             }
-        } else {
-            clipboardLink = null
+        }
+
+        // Initial check
+        val clipData = clipboard.primaryClip
+        if (clipData != null && clipData.itemCount > 0) {
+            val text = clipData.getItemAt(0).text?.toString()
+            if (!text.isNullOrBlank()) {
+                val normalizedLink = normalizeLink(text)
+                if (isValidDeeplink(normalizedLink)) {
+                    clipboardLink = ClipboardLink(normalizedLink)
+                }
+            }
+        }
+
+        clipboard.addPrimaryClipChangedListener(listener)
+
+        onDispose {
+            clipboard.removePrimaryClipChangedListener(listener)
         }
     }
 
@@ -239,6 +253,9 @@ fun Dashboard(
                                         selected = isSelected,
                                         onClick = {
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                            if (topLevelRoute is Dashboard2) {
+                                                viewModel.setShowProfilesGrid(true)
+                                            }
                                             backStack.addTopLevel(topLevelRoute)
                                         },
                                         label = {
