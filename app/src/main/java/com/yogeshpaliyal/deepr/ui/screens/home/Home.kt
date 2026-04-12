@@ -8,12 +8,17 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +36,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -45,11 +53,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.AppBarWithSearch
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -71,6 +81,11 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.ripple
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -85,14 +100,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -111,7 +131,6 @@ import com.yogeshpaliyal.deepr.ui.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
-import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.NoteViewDialog
@@ -136,9 +155,12 @@ import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.ArrowsSort
+import compose.icons.tablericons.ChevronDown
+import compose.icons.tablericons.ChevronUp
+import compose.icons.tablericons.Check
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
-import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
@@ -148,6 +170,8 @@ import compose.icons.tablericons.Search
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.User
+import compose.icons.tablericons.ArrowsSort
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -157,6 +181,8 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 
 data object Home
 
@@ -169,9 +195,9 @@ class Dashboard2(
     val mSelectedLink: GetLinksAndTags? = null,
 ) : TopLevelRoute {
     override val icon: ImageVector
-        get() = TablerIcons.Home
+        get() = TablerIcons.User
     override val label: Int
-        get() = R.string.home
+        get() = R.string.profiles
 
     @Composable
     override fun Content(windowInsets: WindowInsets) {
@@ -199,6 +225,7 @@ data class FilterTagItem(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeMaterialsApi::class,
     ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
 )
 @Composable
 fun HomeScreen(
@@ -212,10 +239,12 @@ fun HomeScreen(
 ) {
     val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
-    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+
+    val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
+    val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -249,12 +278,22 @@ fun HomeScreen(
         }
     }
 
-    BackHandler(enabled = selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
+    var showCreateProfileDialog by remember { mutableStateOf(false) }
+    var profileToManage by remember { mutableStateOf<com.yogeshpaliyal.deepr.Profile?>(null) }
+    var isReordering by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = isReordering || profileToManage != null || !showProfilesGrid || selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
         hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-        if (searchBarState.currentValue == SearchBarValue.Expanded) {
+        if (isReordering) {
+            isReordering = false
+        } else if (profileToManage != null) {
+            profileToManage = null
+        } else if (searchBarState.currentValue == SearchBarValue.Expanded) {
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
+        } else if (!showProfilesGrid) {
+            viewModel.setShowProfilesGrid(true)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
         }
@@ -266,10 +305,10 @@ fun HomeScreen(
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =
-                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "", profileId = currentProfile?.id ?: 1L)
+                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
             } else {
                 Toast
-                    .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
+                    .makeText(context, context.getString(R.string.invalid_shared_link), Toast.LENGTH_SHORT)
                     .show()
             }
             // Reset shared text even on error to prevent stuck state
@@ -375,18 +414,7 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.profiles)) } },
-                                state = rememberTooltipState(),
-                            ) {
-                                ProfileSelectorMenu(viewModel = viewModel)
-                            }
-
-                            TooltipBox(
-                                positionProvider =
-                                    TooltipDefaults.rememberTooltipPositionProvider(
-                                        TooltipAnchorPosition.Below,
-                                    ),
-                                tooltip = { PlainTooltip { Text("View Type") } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.view_type)) } },
                                 state = rememberTooltipState(),
                             ) {
                                 ViewTypeMenu(currentViewType, {
@@ -420,100 +448,181 @@ fun HomeScreen(
             )
         }
 
+    val interactionSource = remember { MutableInteractionSource() }
+
     Scaffold(
         contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Column(
-                modifier =
-                    Modifier
-                        .hazeEffect(
-                            state = hazeState,
-                            style = HazeMaterials.ultraThin(),
-                        ).fillMaxWidth(),
-            ) {
-                AppBarWithSearch(
-                    scrollBehavior = scrollBehavior,
-                    state = searchBarState,
-                    inputField = inputField,
-                    colors =
-                        SearchBarDefaults.appBarWithSearchColors(
-                            appBarContainerColor = Color.Transparent,
-                        ),
-                )
-                ServerStatusBar(
-                    onServerStatusClick = {
-                        // Navigate to LocalNetworkServer screen when status bar is clicked
-                        analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
-                        if (localNavigator.getLast() !is LocalNetworkServer) {
-                            localNavigator.add(LocalNetworkServer)
+            if (showProfilesGrid) {
+                TopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.profiles),
+                            )
+                            if (allProfiles.isNotEmpty()) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(12.dp),
+                                ) {
+                                    Text(
+                                        text = "${allProfiles.size}",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier =
+                                            Modifier.padding(
+                                                horizontal = 10.dp,
+                                                vertical = 4.dp,
+                                            ),
+                                    )
+                                }
+                            }
                         }
                     },
-                )
-
-                // Clipboard link banner
-                ClipboardLinkBanner(
-                    clipboardLink = clipboardLink,
-                    onAddClick = { url ->
-                        resetClipboardLink?.invoke()
-                        localNavigator.add(AddLinkScreen(createDeeprObject(link = url, profileId = currentProfile?.id ?: 1L)))
+                    actions = {
+                        if (allProfiles.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    isReordering = !isReordering
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = if (isReordering) TablerIcons.Check else TablerIcons.ArrowsSort,
+                                    contentDescription = if (isReordering) "Finish Reordering" else stringResource(R.string.reorder),
+                                    tint = if (isReordering) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        }
                     },
-                    onDismiss = {
-                        resetClipboardLink?.invoke()
-                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
-
-                LazyRow(
+            } else {
+                Column(
                     modifier =
                         Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                            .hazeEffect(
+                                state = hazeState,
+                                style = HazeMaterials.ultraThin(),
+                            ).fillMaxWidth(),
                 ) {
-                    item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
-                            viewModel.setFavouriteFilter(-1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
-                    }
-                    item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
-                            viewModel.setFavouriteFilter(1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
-                    }
+                    AppBarWithSearch(
+                        scrollBehavior = scrollBehavior,
+                        state = searchBarState,
+                        inputField = inputField,
+                        colors =
+                            SearchBarDefaults.appBarWithSearchColors(
+                                appBarContainerColor = Color.Transparent,
+                            ),
+                    )
+                    ServerStatusBar(
+                        onServerStatusClick = {
+                            // Navigate to LocalNetworkServer screen when status bar is clicked
+                            analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
+                            if (localNavigator.getLast() !is LocalNetworkServer) {
+                                localNavigator.add(LocalNetworkServer)
+                            }
+                        },
+                    )
 
-                    items(finalTagsInfo ?: listOf()) {
-                        FilterChip(it.isSelected, {
-                            viewModel.setSelectedTagByName(it.name)
-                        }, label = {
-                            Text(it.name + " (${it.count})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                    LazyRow(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp),
+                    ) {
+                        if (textFieldState.text.isEmpty()) {
+                            item {
+                                FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
+                                    viewModel.setFavouriteFilter(-1)
+                                    viewModel.setTagFilter(null)
+                                }, label = {
+                                    Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
+                                }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                            }
+                            item {
+                                FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
+                                    viewModel.setFavouriteFilter(1)
+                                    viewModel.setTagFilter(null)
+                                }, label = {
+                                    Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
+                                }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                            }
+                        }
+
+                        items(finalTagsInfo ?: listOf()) {
+                            FilterChip(it.isSelected, {
+                                viewModel.setSelectedTagByName(it.name)
+                            }, label = {
+                                Text(it.name + " (${it.count})")
+                            }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        }
                     }
                 }
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
+            if (!showProfilesGrid) {
+                FloatingActionButton(
+                    onClick = {},
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(56.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            localNavigator.add(AddLinkScreen(createDeeprObject()))
+                                        },
+                                        onLongPress = {
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            var linkToPass = clipboardLink?.url ?: ""
+                                            
+                                            // Fallback: try to read directly from clipboard manager if state is empty
+                                            if (linkToPass.isBlank()) {
+                                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                val clipData = clipboard.primaryClip
+                                                if (clipData != null && clipData.itemCount > 0) {
+                                                    val text = clipData.getItemAt(0).text?.toString()
+                                                    if (!text.isNullOrBlank()) {
+                                                        val normalized = normalizeLink(text)
+                                                        if (isValidDeeplink(normalized)) {
+                                                            linkToPass = normalized
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            localNavigator.add(AddLinkScreen(createDeeprObject(link = linkToPass)))
+                                        },
+                                    )
+                                },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            TablerIcons.Plus,
+                            contentDescription = stringResource(R.string.add_link),
+                        )
+                    }
+                }
+            } else {
+                FloatingActionButton(
+                    onClick = {
+                        showCreateProfileDialog = true
+                    },
+                ) {
                     Icon(
                         TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.add_link),
+                        contentDescription = stringResource(R.string.create_profile),
                     )
-                },
-                text = {
-                    Text(stringResource(R.string.add_link))
-                },
-                expanded = isExpanded,
-                onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
-                },
-            )
+                }
+            }
         },
     ) { contentPadding ->
         Box(
@@ -522,656 +631,159 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             val layoutDirection = LocalLayoutDirection.current
-            Content(
-                listState = listState,
-                viewModel = viewModel,
-                hazeState = hazeState,
-                contentPaddingValues =
-                    PaddingValues(
-                        start = contentPadding.calculateLeftPadding(layoutDirection),
-                        end = contentPadding.calculateRightPadding(layoutDirection),
-                        top = contentPadding.calculateTopPadding() + 8.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 8.dp,
-                    ),
-                selectedTag = selectedTag,
-                currentViewType = currentViewType,
-                searchQuery = textFieldState.text.toString(),
-                favouriteFilter = favouriteFilter,
-                editDeepr = {
-                    localNavigator.add(AddLinkScreen(it))
-                },
-            )
+            if (showProfilesGrid) {
+                ProfilesGrid(
+                    profiles = allProfiles,
+                    isReordering = isReordering,
+                    currentProfileId =
+                        viewModel.currentProfile
+                            .collectAsStateWithLifecycle()
+                            .value
+                            ?.id ?: -1L,
+                    contentPaddingValues =
+                        PaddingValues(
+                            start = contentPadding.calculateLeftPadding(layoutDirection) + 16.dp,
+                            end = contentPadding.calculateRightPadding(layoutDirection) + 16.dp,
+                            top = contentPadding.calculateTopPadding() + 16.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                        ),
+                    onProfileClick = {
+                        if (!isReordering) {
+                            viewModel.setSelectedProfile(it.id)
+                            viewModel.setShowProfilesGrid(false)
+                        }
+                    },
+                    onProfileLongClick = {
+                        if (!isReordering) {
+                            profileToManage = it
+                        }
+                    },
+                    onMoveUp = {
+                        viewModel.moveProfileUp(it.id)
+                    },
+                    onMoveDown = {
+                        viewModel.moveProfileDown(it.id)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Content(
+                    listState = listState,
+                    viewModel = viewModel,
+                    hazeState = hazeState,
+                    contentPaddingValues =
+                        PaddingValues(
+                            start = contentPadding.calculateLeftPadding(layoutDirection),
+                            end = contentPadding.calculateRightPadding(layoutDirection),
+                            top = contentPadding.calculateTopPadding() + 8.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 8.dp,
+                        ),
+                    selectedTag = selectedTag,
+                    currentViewType = currentViewType,
+                    searchQuery = textFieldState.text.toString(),
+                    favouriteFilter = favouriteFilter,
+                    editDeepr = {
+                        localNavigator.add(AddLinkScreen(it))
+                    },
+                )
+            }
         }
 
         selectedLink?.let {
             localNavigator.add(AddLinkScreen(it))
             selectedLink = null
         }
-    }
-}
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun Content(
-    listState: ScrollableState,
-    hazeState: HazeState,
-    selectedTag: List<Tags>,
-    contentPaddingValues: PaddingValues,
-    currentViewType: @ViewType Int,
-    searchQuery: String,
-    favouriteFilter: Int,
-    viewModel: AccountViewModel,
-    modifier: Modifier = Modifier,
-    editDeepr: (GetLinksAndTags) -> Unit = {},
-) {
-    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
-    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
-    val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    val analyticsManager = koinInject<AnalyticsManager>()
-
-    if (accounts == null) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) { ContainedLoadingIndicator() }
-        return
-    }
-
-    val context = LocalContext.current
-    var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showNoteDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-
-    showShortcutDialog?.let { deepr ->
-        CreateShortcutDialog(
-            deepr = deepr,
-            onDismiss = { showShortcutDialog = null },
-        )
-    }
-
-    showQrCodeDialog?.let {
-        QrCodeDialog(it) {
-            showQrCodeDialog = null
+        profileToManage?.let { profile ->
+            RenameDeleteProfileDialog(
+                profile = profile,
+                onDismiss = { profileToManage = null },
+                viewModel = viewModel,
+                allProfiles = allProfiles,
+            )
         }
     }
 
-    showDeleteConfirmDialog?.let { deepr ->
-        DeleteConfirmationDialog(
-            deepr = deepr,
-            onDismiss = { showDeleteConfirmDialog = null },
-            onConfirm = {
-                viewModel.deleteAccount(it.id)
-                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+    if (showCreateProfileDialog) {
+        var newProfileName by remember { mutableStateOf("") }
+        var profileCreationError by remember { mutableStateOf<String?>(null) }
+
+        AlertDialog(
+            onDismissRequest = {
+                showCreateProfileDialog = false
+                profileCreationError = null
             },
-        )
-    }
-
-    showNoteDialog?.let { deepr ->
-        NoteViewDialog(
-            deepr = deepr,
-            onDismiss = { showNoteDialog = null },
-            onEdit = {
-                editDeepr(it)
+            title = {
+                Text(stringResource(R.string.create_profile))
             },
-        )
-    }
-
-    val onItemClick: (MenuItem) -> Unit = {
-        showMoreSelectedItem = null
-        when (it) {
-            is Click -> {
-                viewModel.incrementOpenedCount(it.item.id)
-                openDeeplink(context, it.item.link)
-                analyticsManager.logEvent(
-                    AnalyticsEvents.OPEN_LINK,
-                    mapOf(AnalyticsParams.LINK_ID to it.item.id),
-                )
-            }
-
-            is Delete -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_DELETE)
-                showDeleteConfirmDialog = it.item
-            }
-
-            is Edit -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_EDIT)
-                editDeepr(it.item)
-            }
-
-            is FavouriteClick -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_FAVOURITE)
-                viewModel.toggleFavourite(it.item.id)
-            }
-
-            is ResetCounter -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
-                viewModel.resetOpenedCount(it.item.id)
-                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
-            }
-
-            is Shortcut -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHORTCUT)
-                showShortcutDialog = it.item
-            }
-
-            is ShowQrCode -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_QR_CODE)
-                showQrCodeDialog = it.item
-            }
-
-            is MoreOptionsBottomSheet -> {
-                showMoreSelectedItem = it.item
-            }
-
-            is Copy -> {
-                val clipboard =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip =
-                    ClipData.newPlainText(context.getString(R.string.link_copied), it.item.link)
-                clipboard.setPrimaryClip(clip)
-                Toast
-                    .makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT)
-                    .show()
-            }
-
-            is Share -> {
-                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHARE)
-                val shareText = formatShareText(it.item)
-                val sendIntent =
-                    Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, shareText)
-                        type = "text/plain"
-                    }
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
-            }
-
-            is MenuItem.OpenWith -> {
-                openDeeplinkExternal(context, it.item.link)
-            }
-
-            is ViewNote -> {
-                showNoteDialog = it.item
-            }
-        }
-    }
-
-    Column(modifier.fillMaxSize()) {
-        DeeprList(
-            listState = listState,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .hazeSource(state = hazeState)
-                    .padding(horizontal = 8.dp),
-            contentPaddingValues = contentPaddingValues,
-            accounts = accounts!!,
-            selectedTag = selectedTag,
-            onTagClick = {
-                viewModel.setSelectedTagByName(it)
-            },
-            isThumbnailEnable = isThumbnailEnable,
-            searchQuery = searchQuery,
-            favouriteFilter = favouriteFilter,
-            viewType = currentViewType,
-            onItemClick = onItemClick,
-            showOpenCounter = showOpenCounter,
-        )
-    }
-    showMoreSelectedItem?.let { account ->
-        ModalBottomSheet(sheetState = showMoreBottomSheet, onDismissRequest = {
-            showMoreSelectedItem = null
-        }) {
-            val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-            var tagsExpanded by remember { mutableStateOf(false) }
-            val selectedTags =
-                remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
-
-            LazyColumn {
-                item {
-                    ListItem(
-                        headlineContent = {
-                            Column {
-                                Text(
-                                    text = account.name,
-                                )
-                                Text(
-                                    text = account.link,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = newProfileName,
+                        onValueChange = {
+                            newProfileName = it
+                            profileCreationError = null
                         },
-                        modifier =
-                            Modifier
-                                .padding(4.dp)
-                                .fillMaxWidth()
-                                .clickable {
-                                    onItemClick(Click(account))
-                                },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        label = { Text(stringResource(R.string.profile_name)) },
+                        singleLine = true,
+                        isError = profileCreationError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                     )
-                }
-
-                if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
-                    item {
-                        AsyncImage(
-                            model = account.thumbnail,
-                            contentDescription = account.name,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1.91f)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                            placeholder = null,
-                            error = null,
-                            contentScale = ContentScale.Crop,
+                    profileCreationError?.let { errorMessage ->
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
-
-                if (account.notes.isNotEmpty()) {
-                    item {
-                        MenuListItem(
-                            text = stringResource(R.string.view_note),
-                            icon = TablerIcons.Note,
-                            onClick = {
-                                onItemClick(ViewNote(account))
-                            },
-                        )
-                    }
-                }
-
-                item {
-                    MenuListItem(
-                        text =
-                            if (account.isFavourite == 1L) {
-                                stringResource(R.string.remove_from_favourites)
-                            } else {
-                                stringResource(
-                                    R.string.add_to_favourites,
-                                )
-                            },
-                        icon = if (account.isFavourite == 1L) Icons.Rounded.Star else Icons.Rounded.StarBorder,
-                        selectable = true,
-                        onClick = {
-                            onItemClick(FavouriteClick(account))
-                        },
-                    )
-                }
-
-                item {
-                    ShortcutMenuItem(account, {
-                        onItemClick(Shortcut(it))
-                    })
-                }
-
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.show_qr_code),
-                        icon = TablerIcons.Qrcode,
-                        onClick = {
-                            onItemClick(ShowQrCode(account))
-                        },
-                    )
-                }
-
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.open_with),
-                        icon = TablerIcons.ExternalLink,
-                        onClick = {
-                            onItemClick(MenuItem.OpenWith(account))
-                        },
-                    )
-                }
-
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.share_link),
-                        icon = TablerIcons.Share,
-                        onClick = {
-                            onItemClick(Share(account))
-                        },
-                    )
-                }
-
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.reset_opened_count),
-                        icon = TablerIcons.Refresh,
-                        onClick = {
-                            onItemClick(ResetCounter(account))
-                        },
-                    )
-                }
-
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.edit),
-                        icon = TablerIcons.Edit,
-                        onClick = {
-                            onItemClick(Edit(account))
-                        },
-                    )
-                }
-                item {
-                    MenuListItem(
-                        text = stringResource(R.string.delete),
-                        icon = TablerIcons.Trash,
-                        onClick = {
-                            onItemClick(Delete(account))
-                        },
-                        colors =
-                            ListItemDefaults.colors(
-                                headlineColor = MaterialTheme.colorScheme.error,
-                                leadingIconColor = MaterialTheme.colorScheme.error,
-                                containerColor = Color.Transparent,
-                            ),
-                    )
-                }
-
-                // Display last opened time
-                if (account.lastOpenedAt != null) {
-                    item {
-                        MenuListItem(
-                            text =
-                                stringResource(
-                                    R.string.last_opened,
-                                    formatDateTime(account.lastOpenedAt),
-                                ),
-                            textStyle = MaterialTheme.typography.bodySmall,
-                            onClick = {
-                                onItemClick(Edit(account))
-                            },
-                            icon = null,
-                            colors =
-                                ListItemDefaults.colors(
-                                    containerColor = Color.Transparent,
-                                ),
-                        )
-                    }
-                }
-
-                item {
-                    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                        // Determine max tags to show based on expanded state
-                        val maxTagsToShow = if (tagsExpanded) selectedTags?.size ?: 0 else 9
-                        val visibleTags = selectedTags?.take(maxTagsToShow) ?: emptyList()
-                        val hiddenTagsCount = (selectedTags?.size ?: 0) - visibleTags.size
-
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            visibleTags.forEach { tag ->
-                                val isSelected = selectedTag.any { it.name == tag.trim() }
-                                FilterChip(
-                                    modifier = Modifier.padding(0.dp),
-                                    elevation = null,
-                                    selected = isSelected,
-                                    onClick = {
-                                        viewModel.setSelectedTagByName(tag)
-                                        showMoreSelectedItem = null
-                                    },
-                                    label = { Text(tag.trim()) },
-                                    shape = RoundedCornerShape(percent = 50),
-                                )
-                            }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val trimmedProfileName = newProfileName.trim()
+                        if (trimmedProfileName.isBlank()) {
+                            profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
+                            return@TextButton
                         }
 
-                        // Show "Load More" or "Show Less" button if there are more than 9 tags
-                        if ((selectedTags?.size ?: 0) > 9) {
-                            TextButton(
-                                onClick = { tagsExpanded = !tagsExpanded },
-                                modifier = Modifier.padding(start = 4.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                            ) {
-                                Text(
-                                    text =
-                                        if (tagsExpanded) {
-                                            stringResource(R.string.show_less_tags)
-                                        } else {
-                                            stringResource(R.string.load_more_tags, hiddenTagsCount)
-                                        },
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                )
+                        val existingProfile =
+                            allProfiles.find {
+                                it.name.equals(trimmedProfileName, ignoreCase = true)
                             }
+
+                        if (existingProfile != null) {
+                            profileCreationError = context.getString(R.string.profile_name_exists)
+                        } else {
+                            viewModel.insertProfile(trimmedProfileName)
+                            showCreateProfileDialog = false
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.profile_created_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
-                    }
+                    },
+                    enabled = newProfileName.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.create_profile))
                 }
-            }
-        }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showCreateProfileDialog = false
+                        profileCreationError = null
+                    },
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
     }
 }
 
-@Composable
-fun MenuListItem(
-    text: String,
-    icon: ImageVector?,
-    modifier: Modifier = Modifier,
-    textStyle: TextStyle = LocalTextStyle.current,
-    colors: ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    onClick: (() -> Unit)? = null,
-    selectable: Boolean = false,
-) {
-    ListItem(
-        headlineContent = {
-            if (selectable) {
-                SelectionContainer {
-                    Text(
-                        text = text,
-                        style = textStyle,
-                    )
-                }
-            } else {
-                Text(
-                    text = text,
-                    style = textStyle,
-                )
-            }
-        },
-        modifier =
-            modifier
-                .padding(vertical = 4.dp)
-                .fillMaxWidth()
-                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
-        leadingContent = {
-            if (icon != null) {
-                Icon(
-                    icon,
-                    contentDescription = text,
-                )
-            }
-        },
-        colors = colors,
-    )
-}
-
-@Composable
-fun DeeprList(
-    listState: ScrollableState,
-    accounts: List<GetLinksAndTags>,
-    selectedTag: List<Tags>,
-    contentPaddingValues: PaddingValues,
-    onItemClick: (MenuItem) -> Unit,
-    onTagClick: (String) -> Unit,
-    isThumbnailEnable: Boolean,
-    searchQuery: String,
-    favouriteFilter: Int,
-    modifier: Modifier = Modifier,
-    viewType: @ViewType Int = ViewType.LIST,
-    showOpenCounter: Boolean = true,
-) {
-    // Determine which empty state to show
-    val isSearchActive = searchQuery.isNotBlank()
-    val isFavouriteFilterActive = favouriteFilter == 1
-    val isTagFilterActive = selectedTag.isNotEmpty()
-
-    AnimatedVisibility(
-        visible = accounts.isEmpty(),
-        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
-        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
-    ) {
-        // When empty, use a Column with weights to ensure vertical centering
-        Column(
-            modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.weight(1f)) // Push content down
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(16.dp),
-            ) {
-                // Choose appropriate icon and messages based on state
-                val (icon, titleRes, descriptionRes) =
-                    when {
-                        isSearchActive ->
-                            Triple(
-                                TablerIcons.Search,
-                                R.string.no_search_results,
-                                R.string.no_search_results_description,
-                            )
-
-                        isTagFilterActive ->
-                            Triple(
-                                TablerIcons.Tag,
-                                R.string.no_links_with_tags,
-                                R.string.no_links_with_tags_description,
-                            )
-
-                        isFavouriteFilterActive ->
-                            Triple(
-                                TablerIcons.Link,
-                                R.string.no_favourites_found,
-                                R.string.no_favourites_description,
-                            )
-
-                        else ->
-                            Triple(
-                                TablerIcons.Link,
-                                R.string.no_links_saved_yet,
-                                R.string.save_your_link_below,
-                            )
-                    }
-
-                Icon(
-                    icon,
-                    contentDescription = stringResource(titleRes),
-                    modifier =
-                        Modifier
-                            .size(80.dp)
-                            .padding(bottom = 16.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = stringResource(titleRes),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(descriptionRes),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 32.dp),
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f)) // Push content up
-        }
-    }
-
-    AnimatedVisibility(
-        visible = accounts.isNotEmpty(),
-        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
-        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
-    ) {
-        when (viewType) {
-            ViewType.LIST -> {
-                LazyColumn(
-                    state = listState as? LazyListState ?: rememberLazyListState(),
-                    modifier = modifier,
-                    contentPadding = contentPaddingValues,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    items(
-                        count = accounts.size,
-                        key = { index -> accounts[index].id },
-                    ) { index ->
-                        val account = accounts[index]
-
-                        DeeprItem(
-                            modifier = Modifier.animateItem(),
-                            account = account,
-                            selectedTag = selectedTag,
-                            onItemClick = onItemClick,
-                            onTagClick = onTagClick,
-                            isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
-                        )
-                    }
-                }
-            }
-
-            ViewType.GRID -> {
-                LazyVerticalStaggeredGrid(
-                    state =
-                        listState as? LazyStaggeredGridState
-                            ?: rememberLazyStaggeredGridState(),
-                    columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
-                    modifier = modifier,
-                    contentPadding = contentPaddingValues,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalItemSpacing = 8.dp,
-                ) {
-                    items(
-                        count = accounts.size,
-                        key = { index -> accounts[index].id },
-                    ) { index ->
-                        val account = accounts[index]
-
-                        DeeprItemGrid(
-                            modifier = Modifier.animateItem(),
-                            account = account,
-                            onItemClick = onItemClick,
-                            isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
-                        )
-                    }
-                }
-            }
-
-            ViewType.COMPACT -> {
-                LazyColumn(
-                    state = listState as? LazyListState ?: rememberLazyListState(),
-                    modifier = modifier,
-                    contentPadding = contentPaddingValues,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    items(
-                        count = accounts.size,
-                        key = { index -> accounts[index].id },
-                    ) { index ->
-                        val account = accounts[index]
-
-                        DeeprItemCompact(
-                            modifier = Modifier.animateItem(),
-                            account = account,
-                            onItemClick = onItemClick,
-                            isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
