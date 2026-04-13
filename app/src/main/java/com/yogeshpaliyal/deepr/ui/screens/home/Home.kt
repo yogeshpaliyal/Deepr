@@ -119,7 +119,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
-import com.yogeshpaliyal.deepr.LocalClipboardLink
 import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
@@ -245,6 +244,7 @@ fun HomeScreen(
 
     val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -254,10 +254,6 @@ fun HomeScreen(
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
 
-    // Clipboard link detection
-    val clipboardLinkState = LocalClipboardLink.current
-    val clipboardLink = clipboardLinkState?.first
-    val resetClipboardLink = clipboardLinkState?.second
     val scope = rememberCoroutineScope()
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
@@ -578,28 +574,27 @@ fun HomeScreen(
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onTap = {
-                                            localNavigator.add(AddLinkScreen(createDeeprObject()))
+                                            localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
                                         },
                                         onLongPress = {
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            var linkToPass = clipboardLink?.url ?: ""
-                                            
-                                            // Fallback: try to read directly from clipboard manager if state is empty
-                                            if (linkToPass.isBlank()) {
-                                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                val clipData = clipboard.primaryClip
-                                                if (clipData != null && clipData.itemCount > 0) {
-                                                    val text = clipData.getItemAt(0).text?.toString()
-                                                    if (!text.isNullOrBlank()) {
-                                                        val normalized = normalizeLink(text)
-                                                        if (isValidDeeplink(normalized)) {
-                                                            linkToPass = normalized
-                                                        }
+                                            var linkToPass = ""
+
+                                            // Read directly from clipboard manager
+                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            val clipData = clipboard.primaryClip
+                                            if (clipData != null && clipData.itemCount > 0) {
+                                                val item = clipData.getItemAt(0)
+                                                val text = item.text?.toString()
+                                                if (text != null) {
+                                                    val normalized = normalizeLink(text)
+                                                    if (isValidDeeplink(normalized)) {
+                                                        linkToPass = normalized
                                                     }
                                                 }
                                             }
-                                            
-                                            localNavigator.add(AddLinkScreen(createDeeprObject(link = linkToPass)))
+
+                                            localNavigator.add(AddLinkScreen(createDeeprObject(link = linkToPass, profileId = currentProfile?.id ?: 1L)))
                                         },
                                     )
                                 },
@@ -787,3 +782,629 @@ fun HomeScreen(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun Content(
+    listState: ScrollableState,
+    hazeState: HazeState,
+    selectedTag: List<Tags>,
+    contentPaddingValues: PaddingValues,
+    currentViewType: @ViewType Int,
+    searchQuery: String,
+    favouriteFilter: Int,
+    viewModel: AccountViewModel,
+    modifier: Modifier = Modifier,
+    editDeepr: (GetLinksAndTags) -> Unit = {},
+) {
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    val analyticsManager = koinInject<AnalyticsManager>()
+
+    if (accounts == null) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) { ContainedLoadingIndicator() }
+        return
+    }
+
+    val context = LocalContext.current
+    var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var showNoteDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+
+    showShortcutDialog?.let { deepr ->
+        CreateShortcutDialog(
+            deepr = deepr,
+            onDismiss = { showShortcutDialog = null },
+        )
+    }
+
+    showQrCodeDialog?.let {
+        QrCodeDialog(it) {
+            showQrCodeDialog = null
+        }
+    }
+
+    showDeleteConfirmDialog?.let { deepr ->
+        DeleteConfirmationDialog(
+            deepr = deepr,
+            onDismiss = { showDeleteConfirmDialog = null },
+            onConfirm = {
+                viewModel.deleteAccount(it.id)
+                Toast.makeText(context, context.getString(R.string.deleted), Toast.LENGTH_SHORT).show()
+            },
+        )
+    }
+
+    showNoteDialog?.let { deepr ->
+        NoteViewDialog(
+            deepr = deepr,
+            onDismiss = { showNoteDialog = null },
+            onEdit = {
+                editDeepr(it)
+            },
+        )
+    }
+
+    val onItemClick: (MenuItem) -> Unit = {
+        showMoreSelectedItem = null
+        when (it) {
+            is Click -> {
+                viewModel.incrementOpenedCount(it.item.id)
+                openDeeplink(context, it.item.link)
+                analyticsManager.logEvent(
+                    AnalyticsEvents.OPEN_LINK,
+                    mapOf(AnalyticsParams.LINK_ID to it.item.id),
+                )
+            }
+
+            is Delete -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_DELETE)
+                showDeleteConfirmDialog = it.item
+            }
+
+            is Edit -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_EDIT)
+                editDeepr(it.item)
+            }
+
+            is FavouriteClick -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_FAVOURITE)
+                viewModel.toggleFavourite(it.item.id)
+            }
+
+            is ResetCounter -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
+                viewModel.resetOpenedCount(it.item.id)
+                Toast.makeText(context, context.getString(R.string.opened_count_reset), Toast.LENGTH_SHORT).show()
+            }
+
+            is Shortcut -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHORTCUT)
+                showShortcutDialog = it.item
+            }
+
+            is ShowQrCode -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_QR_CODE)
+                showQrCodeDialog = it.item
+            }
+
+            is MoreOptionsBottomSheet -> {
+                showMoreSelectedItem = it.item
+            }
+
+            is Copy -> {
+                val clipboard =
+                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip =
+                    ClipData.newPlainText(context.getString(R.string.link_copied), it.item.link)
+                clipboard.setPrimaryClip(clip)
+                Toast
+                    .makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            is Share -> {
+                analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_SHARE)
+                val shareText = formatShareText(it.item)
+                val sendIntent =
+                    Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                        type = "text/plain"
+                    }
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                context.startActivity(shareIntent)
+            }
+
+            is MenuItem.OpenWith -> {
+                openDeeplinkExternal(context, it.item.link)
+            }
+
+            is ViewNote -> {
+                showNoteDialog = it.item
+            }
+        }
+    }
+
+    Column(modifier.fillMaxSize()) {
+        DeeprList(
+            listState = listState,
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .hazeSource(state = hazeState)
+                    .padding(horizontal = 8.dp),
+            contentPaddingValues = contentPaddingValues,
+            accounts = accounts!!,
+            selectedTag = selectedTag,
+            onTagClick = {
+                viewModel.setSelectedTagByName(it)
+            },
+            isThumbnailEnable = isThumbnailEnable,
+            searchQuery = searchQuery,
+            favouriteFilter = favouriteFilter,
+            viewType = currentViewType,
+            onItemClick = onItemClick,
+            showOpenCounter = showOpenCounter,
+        )
+    }
+    showMoreSelectedItem?.let { account ->
+        ModalBottomSheet(sheetState = showMoreBottomSheet, onDismissRequest = {
+            showMoreSelectedItem = null
+        }) {
+            val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+            var tagsExpanded by remember { mutableStateOf(false) }
+            val selectedTags =
+                remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
+
+            LazyColumn {
+                item {
+                    ListItem(
+                        headlineContent = {
+                            Column {
+                                Text(
+                                    text = account.name,
+                                )
+                                Text(
+                                    text = account.link,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    onItemClick(Click(account))
+                                },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+
+                if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
+                    item {
+                        AsyncImage(
+                            model = account.thumbnail,
+                            contentDescription = account.name,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1.91f)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                            placeholder = null,
+                            error = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+                }
+
+                if (account.notes.isNotEmpty()) {
+                    item {
+                        MenuListItem(
+                            text = stringResource(R.string.view_note),
+                            icon = TablerIcons.Note,
+                            onClick = {
+                                onItemClick(ViewNote(account))
+                            },
+                        )
+                    }
+                }
+
+                item {
+                    MenuListItem(
+                        text =
+                            if (account.isFavourite == 1L) {
+                                stringResource(R.string.remove_from_favourites)
+                            } else {
+                                stringResource(
+                                    R.string.add_to_favourites,
+                                )
+                            },
+                        icon = if (account.isFavourite == 1L) Icons.Rounded.Star else Icons.Rounded.StarBorder,
+                        selectable = true,
+                        onClick = {
+                            onItemClick(FavouriteClick(account))
+                        },
+                    )
+                }
+
+                item {
+                    ShortcutMenuItem(account, {
+                        onItemClick(Shortcut(it))
+                    })
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.show_qr_code),
+                        icon = TablerIcons.Qrcode,
+                        onClick = {
+                            onItemClick(ShowQrCode(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.open_with),
+                        icon = TablerIcons.ExternalLink,
+                        onClick = {
+                            onItemClick(MenuItem.OpenWith(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.share_link),
+                        icon = TablerIcons.Share,
+                        onClick = {
+                            onItemClick(Share(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.reset_opened_count),
+                        icon = TablerIcons.Refresh,
+                        onClick = {
+                            onItemClick(ResetCounter(account))
+                        },
+                    )
+                }
+
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.edit),
+                        icon = TablerIcons.Edit,
+                        onClick = {
+                            onItemClick(Edit(account))
+                        },
+                    )
+                }
+                item {
+                    MenuListItem(
+                        text = stringResource(R.string.delete),
+                        icon = TablerIcons.Trash,
+                        onClick = {
+                            onItemClick(Delete(account))
+                        },
+                        colors =
+                            ListItemDefaults.colors(
+                                headlineColor = MaterialTheme.colorScheme.error,
+                                leadingIconColor = MaterialTheme.colorScheme.error,
+                                containerColor = Color.Transparent,
+                            ),
+                    )
+                }
+
+                // Display last opened time
+                if (account.lastOpenedAt != null) {
+                    item {
+                        MenuListItem(
+                            text =
+                                stringResource(
+                                    R.string.last_opened,
+                                    formatDateTime(account.lastOpenedAt),
+                                ),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            onClick = {
+                                onItemClick(Edit(account))
+                            },
+                            icon = null,
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
+                        )
+                    }
+                }
+
+                item {
+                    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+                        // Determine max tags to show based on expanded state
+                        val maxTagsToShow = if (tagsExpanded) selectedTags?.size ?: 0 else 9
+                        val visibleTags = selectedTags?.take(maxTagsToShow) ?: emptyList()
+                        val hiddenTagsCount = (selectedTags?.size ?: 0) - visibleTags.size
+
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            visibleTags.forEach { tag ->
+                                val isSelected = selectedTag.any { it.name == tag.trim() }
+                                FilterChip(
+                                    modifier = Modifier.padding(0.dp),
+                                    elevation = null,
+                                    selected = isSelected,
+                                    onClick = {
+                                        viewModel.setSelectedTagByName(tag)
+                                        showMoreSelectedItem = null
+                                    },
+                                    label = { Text(tag.trim()) },
+                                    shape = RoundedCornerShape(percent = 50),
+                                )
+                            }
+                        }
+
+                        // Show "Load More" or "Show Less" button if there are more than 9 tags
+                        if ((selectedTags?.size ?: 0) > 9) {
+                            TextButton(
+                                onClick = { tagsExpanded = !tagsExpanded },
+                                modifier = Modifier.padding(start = 4.dp),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                            ) {
+                                Text(
+                                    text =
+                                        if (tagsExpanded) {
+                                            stringResource(R.string.show_less_tags)
+                                        } else {
+                                            stringResource(R.string.load_more_tags, hiddenTagsCount)
+                                        },
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MenuListItem(
+    text: String,
+    icon: ImageVector?,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    colors: ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    onClick: (() -> Unit)? = null,
+    selectable: Boolean = false,
+) {
+    ListItem(
+        headlineContent = {
+            if (selectable) {
+                SelectionContainer {
+                    Text(
+                        text = text,
+                        style = textStyle,
+                    )
+                }
+            } else {
+                Text(
+                    text = text,
+                    style = textStyle,
+                )
+            }
+        },
+        modifier =
+            modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
+                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        leadingContent = {
+            if (icon != null) {
+                Icon(
+                    icon,
+                    contentDescription = text,
+                )
+            }
+        },
+        colors = colors,
+    )
+}
+
+@Composable
+fun DeeprList(
+    listState: ScrollableState,
+    accounts: List<GetLinksAndTags>,
+    selectedTag: List<Tags>,
+    contentPaddingValues: PaddingValues,
+    onItemClick: (MenuItem) -> Unit,
+    onTagClick: (String) -> Unit,
+    isThumbnailEnable: Boolean,
+    searchQuery: String,
+    favouriteFilter: Int,
+    modifier: Modifier = Modifier,
+    viewType: @ViewType Int = ViewType.LIST,
+    showOpenCounter: Boolean = true,
+) {
+    // Determine which empty state to show
+    val isSearchActive = searchQuery.isNotBlank()
+    val isFavouriteFilterActive = favouriteFilter == 1
+    val isTagFilterActive = selectedTag.isNotEmpty()
+
+    AnimatedVisibility(
+        visible = accounts.isEmpty(),
+        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
+    ) {
+        // When empty, use a Column with weights to ensure vertical centering
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.weight(1f)) // Push content down
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp),
+            ) {
+                // Choose appropriate icon and messages based on state
+                val (icon, titleRes, descriptionRes) =
+                    when {
+                        isSearchActive ->
+                            Triple(
+                                TablerIcons.Search,
+                                R.string.no_search_results,
+                                R.string.no_search_results_description,
+                            )
+
+                        isTagFilterActive ->
+                            Triple(
+                                TablerIcons.Tag,
+                                R.string.no_links_with_tags,
+                                R.string.no_links_with_tags_description,
+                            )
+
+                        isFavouriteFilterActive ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_favourites_found,
+                                R.string.no_favourites_description,
+                            )
+
+                        else ->
+                            Triple(
+                                TablerIcons.Link,
+                                R.string.no_links_saved_yet,
+                                R.string.save_your_link_below,
+                            )
+                    }
+
+                Icon(
+                    icon,
+                    contentDescription = stringResource(titleRes),
+                    modifier =
+                        Modifier
+                            .size(80.dp)
+                            .padding(bottom = 16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = stringResource(titleRes),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(descriptionRes),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f)) // Push content up
+        }
+    }
+
+    AnimatedVisibility(
+        visible = accounts.isNotEmpty(),
+        enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+        exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically),
+    ) {
+        when (viewType) {
+            ViewType.LIST -> {
+                LazyColumn(
+                    state = listState as? LazyListState ?: rememberLazyListState(),
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
+
+                        DeeprItem(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            selectedTag = selectedTag,
+                            onItemClick = onItemClick,
+                            onTagClick = onTagClick,
+                            isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
+                        )
+                    }
+                }
+            }
+
+            ViewType.GRID -> {
+                LazyVerticalStaggeredGrid(
+                    state =
+                        listState as? LazyStaggeredGridState
+                            ?: rememberLazyStaggeredGridState(),
+                    columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalItemSpacing = 8.dp,
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
+
+                        DeeprItemGrid(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            onItemClick = onItemClick,
+                            isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
+                        )
+                    }
+                }
+            }
+
+            ViewType.COMPACT -> {
+                LazyColumn(
+                    state = listState as? LazyListState ?: rememberLazyListState(),
+                    modifier = modifier,
+                    contentPadding = contentPaddingValues,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = accounts.size,
+                        key = { index -> accounts[index].id },
+                    ) { index ->
+                        val account = accounts[index]
+
+                        DeeprItemCompact(
+                            modifier = Modifier.animateItem(),
+                            account = account,
+                            onItemClick = onItemClick,
+                            isThumbnailEnable = isThumbnailEnable,
+                            showOpenCounter = showOpenCounter,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
