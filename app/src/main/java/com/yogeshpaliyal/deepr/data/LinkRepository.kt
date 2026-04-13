@@ -12,9 +12,9 @@ interface LinkRepository {
 
     fun getAllProfiles(): Query<Profile>
 
-    fun getProfileById(id: Long): Query<Profile>
+    suspend fun getProfileById(id: Long): Profile?
 
-    fun getProfileByName(name: String): Query<Profile>
+    suspend fun getProfileByName(name: String): Profile?
 
     suspend fun updateProfile(
         name: String,
