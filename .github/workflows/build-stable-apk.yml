@@ -1,0 +1,45 @@
+name: Build Stable APK
+on:
+  push:
+    branches:
+      - master
+      - 10-feature-localized-web-interface-and-fixes
+      - build/stable-apk
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Force Debug Signing on Release
+        run: |
+          # Extract signingConfigs block
+          sed -n '/signingConfigs {/,/    }/p' app/build.gradle.kts > signing_block.txt
+          # Remove original signingConfigs block
+          sed -i '/signingConfigs {/,/    }/d' app/build.gradle.kts
+          # Insert signingConfigs block before buildTypes
+          sed -i '/buildTypes {/e cat signing_block.txt' app/build.gradle.kts
+          # Link release build to debug signing
+          sed -i '/release {/a \            signingConfig = signingConfigs.getByName("debug")' app/build.gradle.kts
+
+      - name: Build Github Release APK
+        run: ./gradlew assembleGithubRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepr-stable-github-release
+          path: app/build/outputs/apk/github/release/*.apk
