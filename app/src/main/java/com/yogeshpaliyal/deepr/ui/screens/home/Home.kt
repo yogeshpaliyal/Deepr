@@ -16,7 +16,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -565,9 +564,6 @@ fun HomeScreen(
         },
         floatingActionButton = {
             if (!showProfilesGrid) {
-                val context = LocalContext.current
-                val hapticFeedback = LocalHapticFeedback.current
-
                 FloatingActionButton(
                     onClick = {},
                 ) {
