@@ -9,6 +9,7 @@ class CsvWriter {
     fun writeToCsv(
         outputStream: OutputStream,
         data: List<GetLinksForBackup>,
+        settings: Map<String, String> = emptyMap(),
     ) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
@@ -40,6 +41,22 @@ class CsvWriter {
                             item.thumbnail,
                             item.isFavourite.toString(),
                             item.profileName,
+                        ),
+                    )
+                }
+                // Write settings rows (blank link for backward compatibility)
+                settings.forEach { (key, value) ->
+                    csvWriter.writeNext(
+                        arrayOf(
+                            "",
+                            Constants.Settings.MARKER,
+                            key,
+                            value,
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
                         ),
                     )
                 }

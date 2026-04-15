@@ -8,8 +8,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -20,9 +23,23 @@ import java.util.Locale
 class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
+    private val preferenceDataStore: AppPreferenceDataStore,
 ) : ExportRepository {
     private val csvWriter by lazy {
         CsvWriter()
+    }
+
+    private suspend fun collectSettings(): Map<String, String> {
+        val settings = mutableMapOf<String, String>()
+        settings[Constants.Settings.SORTING_ORDER] = preferenceDataStore.getSortingOrder.first()
+        settings[Constants.Settings.VIEW_TYPE] = preferenceDataStore.viewType.first().toString()
+        settings[Constants.Settings.USE_LINK_BASED_ICONS] = preferenceDataStore.getUseLinkBasedIcons.first().toString()
+        settings[Constants.Settings.DEFAULT_PAGE_FAVOURITES] = preferenceDataStore.getDefaultPageFavourites.first().toString()
+        settings[Constants.Settings.IS_THUMBNAIL_ENABLE] = preferenceDataStore.isThumbnailEnable.first().toString()
+        settings[Constants.Settings.THEME_MODE] = preferenceDataStore.getThemeMode.first()
+        settings[Constants.Settings.SHOW_OPEN_COUNTER] = preferenceDataStore.getShowOpenCounter.first().toString()
+        settings[Constants.Settings.CLIPBOARD_LINK_DETECTION_ENABLED] = preferenceDataStore.getClipboardLinkDetectionEnabled.first().toString()
+        return settings
     }
 
     override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
@@ -37,13 +54,14 @@ class ExportRepositoryImpl(
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val fileName = "deepr_export_$timeStamp.csv"
+        val settings = collectSettings()
 
         return withContext(Dispatchers.IO) {
             // If URI is provided, export to that location
             if (uri != null) {
                 return@withContext try {
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -74,7 +92,7 @@ class ExportRepositoryImpl(
 
                 if (defaultUri != null) {
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -96,7 +114,7 @@ class ExportRepositoryImpl(
                 val file = File(downloadsDir, fileName)
 
                 FileOutputStream(file).use { outputStream ->
-                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                 }
                 RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
             }
