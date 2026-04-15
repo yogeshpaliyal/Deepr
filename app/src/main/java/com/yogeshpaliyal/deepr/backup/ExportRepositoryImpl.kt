@@ -9,10 +9,8 @@ import android.provider.MediaStore
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -29,19 +27,6 @@ class ExportRepositoryImpl(
         CsvWriter()
     }
 
-    private suspend fun collectSettings(): Map<String, String> {
-        val settings = mutableMapOf<String, String>()
-        settings[Constants.Settings.SORTING_ORDER] = preferenceDataStore.getSortingOrder.first()
-        settings[Constants.Settings.VIEW_TYPE] = preferenceDataStore.viewType.first().toString()
-        settings[Constants.Settings.USE_LINK_BASED_ICONS] = preferenceDataStore.getUseLinkBasedIcons.first().toString()
-        settings[Constants.Settings.DEFAULT_PAGE_FAVOURITES] = preferenceDataStore.getDefaultPageFavourites.first().toString()
-        settings[Constants.Settings.IS_THUMBNAIL_ENABLE] = preferenceDataStore.isThumbnailEnable.first().toString()
-        settings[Constants.Settings.THEME_MODE] = preferenceDataStore.getThemeMode.first()
-        settings[Constants.Settings.SHOW_OPEN_COUNTER] = preferenceDataStore.getShowOpenCounter.first().toString()
-        settings[Constants.Settings.CLIPBOARD_LINK_DETECTION_ENABLED] = preferenceDataStore.getClipboardLinkDetectionEnabled.first().toString()
-        return settings
-    }
-
     override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
         val count = deeprQueries.countDeepr().executeAsOne()
         if (count == 0L) {
@@ -54,7 +39,7 @@ class ExportRepositoryImpl(
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val fileName = "deepr_export_$timeStamp.csv"
-        val settings = collectSettings()
+        val settings = preferenceDataStore.collectExportableSettings()
 
         return withContext(Dispatchers.IO) {
             // If URI is provided, export to that location

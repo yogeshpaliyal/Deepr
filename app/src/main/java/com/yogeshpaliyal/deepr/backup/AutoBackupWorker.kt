@@ -6,7 +6,6 @@ import androidx.documentfile.provider.DocumentFile
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksForBackup
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import com.yogeshpaliyal.deepr.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -18,19 +17,6 @@ class AutoBackupWorker(
 ) {
     private val csvWriter by lazy {
         CsvWriter()
-    }
-
-    private suspend fun collectSettings(): Map<String, String> {
-        val settings = mutableMapOf<String, String>()
-        settings[Constants.Settings.SORTING_ORDER] = preferenceDataStore.getSortingOrder.first()
-        settings[Constants.Settings.VIEW_TYPE] = preferenceDataStore.viewType.first().toString()
-        settings[Constants.Settings.USE_LINK_BASED_ICONS] = preferenceDataStore.getUseLinkBasedIcons.first().toString()
-        settings[Constants.Settings.DEFAULT_PAGE_FAVOURITES] = preferenceDataStore.getDefaultPageFavourites.first().toString()
-        settings[Constants.Settings.IS_THUMBNAIL_ENABLE] = preferenceDataStore.isThumbnailEnable.first().toString()
-        settings[Constants.Settings.THEME_MODE] = preferenceDataStore.getThemeMode.first()
-        settings[Constants.Settings.SHOW_OPEN_COUNTER] = preferenceDataStore.getShowOpenCounter.first().toString()
-        settings[Constants.Settings.CLIPBOARD_LINK_DETECTION_ENABLED] = preferenceDataStore.getClipboardLinkDetectionEnabled.first().toString()
-        return settings
     }
 
     suspend fun doWork() {
@@ -60,7 +46,7 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
-                val settings = collectSettings()
+                val settings = preferenceDataStore.collectExportableSettings()
                 val success = saveToSelectedLocation(location = location, data = dataToExport, settings = settings)
 
                 if (success) {
