@@ -281,4 +281,9 @@
     <!-- Clipboard Link Detection Setting -->
     <string name="clipboard_link_detection">Clipboard link detection</string>
     <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
+    <string name="theme">Theme</string>
+    <string name="theme_dialog_title">Select Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="close">Close</string>
 </resources>
