@@ -21,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -195,7 +194,10 @@ fun Dashboard(
     val viewModel: AccountViewModel = koinViewModel()
 
     // Clipboard link detection
-    var clipboardLink by remember { mutableStateOf<ClipboardLink?>(null) }
+    var clipboardLink by
+        remember {
+            mutableStateOf<ClipboardLink?>(null)
+        }
 
     androidx.compose.runtime.DisposableEffect(Unit) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

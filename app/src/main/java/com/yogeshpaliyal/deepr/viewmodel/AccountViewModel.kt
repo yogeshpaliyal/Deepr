@@ -860,7 +860,7 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             // First, ensure all profiles have unique, sequential priorities
             normalizePriorities()
-            
+
             val profiles = linkRepository.getAllProfiles().executeAsList()
             val index = profiles.indexOfFirst { it.id == profileId }
             if (index > 0) {
@@ -878,7 +878,7 @@ class AccountViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             // First, ensure all profiles have unique, sequential priorities
             normalizePriorities()
-            
+
             val profiles = linkRepository.getAllProfiles().executeAsList()
             val index = profiles.indexOfFirst { it.id == profileId }
             if (index != -1 && index < profiles.size - 1) {
