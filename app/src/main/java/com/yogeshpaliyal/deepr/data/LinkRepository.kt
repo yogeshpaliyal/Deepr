@@ -8,7 +8,16 @@ import com.yogeshpaliyal.deepr.Tags
 
 interface LinkRepository {
     // Profile operations
-    suspend fun insertProfile(name: String)
+
+    /**
+     * Inserts a new profile.
+     * @param name The name of the profile.
+     * @param priority The priority. If null, calculates the next available priority.
+     */
+    suspend fun insertProfile(
+        name: String,
+        priority: Long? = null,
+    )
 
     fun getAllProfiles(): Query<Profile>
 
@@ -21,6 +30,16 @@ interface LinkRepository {
         themeMode: String,
         colorTheme: String,
         id: Long,
+    )
+
+    /**
+     * Updates the priority of a given profile.
+     * @param id The profile ID
+     * @param priority The new priority to set
+     */
+    suspend fun updateProfilePriority(
+        id: Long,
+        priority: Long,
     )
 
     suspend fun deleteProfile(id: Long)
