@@ -228,14 +228,14 @@ fun RenameDeleteProfileDialog(
                     text = stringResource(R.string.delete_profile),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
-            text = { 
+            text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     val fullMessage = stringResource(R.string.profile_delete_confirmation_with_name, profile.name)
                     val parts = fullMessage.split(profile.name)
@@ -253,11 +253,10 @@ fun RenameDeleteProfileDialog(
                     Text(
                         text = annotatedString,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
-            },
-            confirmButton = {
+            },            confirmButton = {
                 Button(
                     onClick = {
                         viewModel.deleteProfile(profile.id)
