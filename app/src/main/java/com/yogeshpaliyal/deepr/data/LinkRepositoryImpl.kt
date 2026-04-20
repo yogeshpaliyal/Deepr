@@ -74,6 +74,17 @@ class LinkRepositoryImpl(
         scheduleAutoBackup()
     }
 
+    override suspend fun updateProfilesPriority(profilePriorities: List<Pair<Long, Long>>) {
+        withContext(Dispatchers.IO) {
+            deeprQueries.transaction {
+                profilePriorities.forEach { (id, priority) ->
+                    deeprQueries.updateProfilePriority(priority, id)
+                }
+            }
+        }
+        scheduleAutoBackup()
+    }
+
     suspend fun getMaxPriority(): Long =
         withContext(Dispatchers.IO) {
             deeprQueries.maxPriority().executeAsOneOrNull()?.MAX ?: 0L

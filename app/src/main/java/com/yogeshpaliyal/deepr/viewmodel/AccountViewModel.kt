@@ -140,10 +140,16 @@ class AccountViewModel(
 
     private suspend fun normalizePriorities() {
         val profiles = linkRepository.getAllProfiles().executeAsList()
-        profiles.forEachIndexed { index, profile ->
-            if (profile.priority != index.toLong()) {
-                linkRepository.updateProfilePriority(profile.id, index.toLong())
+        val updates =
+            profiles.mapIndexedNotNull { index, profile ->
+                if (profile.priority != index.toLong()) {
+                    profile.id to index.toLong()
+                } else {
+                    null
+                }
             }
+        if (updates.isNotEmpty()) {
+            linkRepository.updateProfilesPriority(updates)
         }
     }
 
@@ -158,21 +164,13 @@ class AccountViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        combine(selectedProfileId, searchQuery) { profileId, query ->
-            Pair(profileId, query)
-        }.flatMapLatest { (profileId, query) ->
+        selectedProfileId.flatMapLatest { profileId ->
             linkRepository
                 .getAllTagsWithCount(profileId)
                 .asFlow()
                 .mapToList(
                     viewModelScope.coroutineContext,
-                ).map { tags ->
-                    if (query.isBlank()) {
-                        tags
-                    } else {
-                        tags.filter { it.name.contains(query, ignoreCase = true) }
-                    }
-                }
+                )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -395,7 +393,6 @@ class AccountViewModel(
             linkRepository
                 .getLinksAndTags(
                     profileId,
-                    query,
                     query,
                     query,
                     query,
@@ -848,8 +845,7 @@ class AccountViewModel(
 
     fun insertProfile(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val maxPriority = linkRepository.getMaxPriority()
-            linkRepository.insertProfile(name, maxPriority + 1)
+            linkRepository.insertProfile(name)
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CREATE_PROFILE,
             )
@@ -867,9 +863,12 @@ class AccountViewModel(
                 val currentProfile = profiles[index]
                 val previousProfile = profiles[index - 1]
 
-                val tempPriority = currentProfile.priority
-                linkRepository.updateProfilePriority(currentProfile.id, previousProfile.priority)
-                linkRepository.updateProfilePriority(previousProfile.id, tempPriority)
+                linkRepository.updateProfilesPriority(
+                    listOf(
+                        currentProfile.id to previousProfile.priority,
+                        previousProfile.id to currentProfile.priority,
+                    ),
+                )
             }
         }
     }
@@ -885,13 +884,15 @@ class AccountViewModel(
                 val currentProfile = profiles[index]
                 val nextProfile = profiles[index + 1]
 
-                val tempPriority = currentProfile.priority
-                linkRepository.updateProfilePriority(currentProfile.id, nextProfile.priority)
-                linkRepository.updateProfilePriority(nextProfile.id, tempPriority)
+                linkRepository.updateProfilesPriority(
+                    listOf(
+                        currentProfile.id to nextProfile.priority,
+                        nextProfile.id to currentProfile.priority,
+                    ),
+                )
             }
         }
     }
-
     suspend fun updateProfile(
         id: Long,
         name: String,

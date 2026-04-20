@@ -199,38 +199,39 @@ fun Dashboard(
             mutableStateOf<ClipboardLink?>(null)
         }
 
-    androidx.compose.runtime.DisposableEffect(Unit) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipboardDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
-        val listener = ClipboardManager.OnPrimaryClipChangedListener {
-            val clipData = clipboard.primaryClip
-            if (clipData != null && clipData.itemCount > 0) {
-                val text = clipData.getItemAt(0).text?.toString()
-                if (!text.isNullOrBlank()) {
-                    val normalizedLink = normalizeLink(text)
-                    if (isValidDeeplink(normalizedLink)) {
-                        clipboardLink = ClipboardLink(normalizedLink)
+    androidx.compose.runtime.DisposableEffect(context, clipboardDetectionEnabled) {
+        if (!clipboardDetectionEnabled) {
+            clipboardLink = null
+            onDispose { }
+        } else {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            fun updateClipboardLinkFromPrimaryClip() {
+                val clipData = clipboard.primaryClip
+                val text = clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString()
+                val normalizedLink = text?.takeIf { it.isNotBlank() }?.let(::normalizeLink)
+                clipboardLink =
+                    if (normalizedLink != null && isValidDeeplink(normalizedLink)) {
+                        ClipboardLink(normalizedLink)
+                    } else {
+                        null
                     }
-                }
             }
-        }
 
-        // Initial check
-        val clipData = clipboard.primaryClip
-        if (clipData != null && clipData.itemCount > 0) {
-            val text = clipData.getItemAt(0).text?.toString()
-            if (!text.isNullOrBlank()) {
-                val normalizedLink = normalizeLink(text)
-                if (isValidDeeplink(normalizedLink)) {
-                    clipboardLink = ClipboardLink(normalizedLink)
-                }
+            val listener = ClipboardManager.OnPrimaryClipChangedListener {
+                updateClipboardLinkFromPrimaryClip()
             }
-        }
 
-        clipboard.addPrimaryClipChangedListener(listener)
+            // Initial check
+            updateClipboardLinkFromPrimaryClip()
 
-        onDispose {
-            clipboard.removePrimaryClipChangedListener(listener)
+            clipboard.addPrimaryClipChangedListener(listener)
+
+            onDispose {
+                clipboard.removePrimaryClipChangedListener(listener)
+            }
         }
     }
 

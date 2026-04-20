@@ -690,18 +690,19 @@ object TagSelectionScreen : TopLevelRoute {
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             val fullMessage = stringResource(R.string.delete_tag_confirmation_with_name, tag.name)
-                            val parts = fullMessage.split(tag.name)
-                            val annotatedString = buildAnnotatedString {
-                                if (parts.size >= 2) {
-                                    append(parts[0])
-                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                        append(tag.name)
+                            val tagIndex = fullMessage.indexOf(tag.name)
+                            val annotatedString =
+                                buildAnnotatedString {
+                                    if (tagIndex >= 0) {
+                                        append(fullMessage.substring(0, tagIndex))
+                                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                            append(tag.name)
+                                        }
+                                        append(fullMessage.substring(tagIndex + tag.name.length))
+                                    } else {
+                                        append(fullMessage)
                                     }
-                                    append(parts[1])
-                                } else {
-                                    append(fullMessage)
                                 }
-                            }
                             Text(
                                 text = annotatedString,
                                 textAlign = TextAlign.Center,
@@ -727,14 +728,13 @@ object TagSelectionScreen : TopLevelRoute {
                                             tint = MaterialTheme.colorScheme.onErrorContainer,
                                             modifier = Modifier.size(16.dp),
                                         )
-                                        val linkText =
-                                            if (tag.linkCount == 1L) {
-                                                stringResource(R.string.link)
-                                            } else {
-                                                stringResource(R.string.links)
-                                            }
                                         Text(
-                                            text = stringResource(R.string.tag_used_by_links, tag.linkCount, linkText),
+                                            text =
+                                                stringResource(
+                                                    R.plurals.tag_used_by_links,
+                                                    tag.linkCount.toInt(),
+                                                    tag.linkCount,
+                                                ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,
                                         )

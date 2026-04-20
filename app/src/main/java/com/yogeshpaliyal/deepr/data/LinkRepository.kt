@@ -42,6 +42,8 @@ interface LinkRepository {
         priority: Long,
     )
 
+    suspend fun updateProfilesPriority(profilePriorities: List<Pair<Long, Long>>)
+
     suspend fun deleteProfile(id: Long)
 
     fun countProfiles(): Query<Long>
