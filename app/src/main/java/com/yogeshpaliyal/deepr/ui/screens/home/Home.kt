@@ -223,10 +223,6 @@ fun HomeScreen(
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
 
-    // Clipboard link detection
-    val clipboardLinkState = LocalClipboardLink.current
-    val clipboardLink = clipboardLinkState?.first
-    val resetClipboardLink = clipboardLinkState?.second
     val scope = rememberCoroutineScope()
     val totalLinks by viewModel.countOfLinks.collectAsStateWithLifecycle()
     val favouriteLinks by viewModel.countOfFavouriteLinks.collectAsStateWithLifecycle()
