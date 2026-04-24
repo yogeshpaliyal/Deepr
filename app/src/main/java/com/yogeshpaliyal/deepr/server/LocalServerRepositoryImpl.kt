@@ -191,6 +191,7 @@ open class LocalServerRepositoryImpl(
                                             "",
                                             "",
                                             "",
+                                            "",
                                             -1L,
                                             -1L,
                                             "",
@@ -264,6 +265,7 @@ open class LocalServerRepositoryImpl(
                                             deeprQueries
                                                 .getLinksAndTags(
                                                     1L, // Default profile
+                                                    "",
                                                     "",
                                                     "",
                                                     "",
