@@ -99,7 +99,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
-import com.yogeshpaliyal.deepr.LocalClipboardLink
 import com.yogeshpaliyal.deepr.LocalSharedText
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.SharedLink
@@ -111,7 +110,6 @@ import com.yogeshpaliyal.deepr.ui.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
-import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
 import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.NoteViewDialog
@@ -448,18 +446,6 @@ fun HomeScreen(
                         if (localNavigator.getLast() !is LocalNetworkServer) {
                             localNavigator.add(LocalNetworkServer)
                         }
-                    },
-                )
-
-                // Clipboard link banner
-                ClipboardLinkBanner(
-                    clipboardLink = clipboardLink,
-                    onAddClick = { url ->
-                        resetClipboardLink?.invoke()
-                        localNavigator.add(AddLinkScreen(createDeeprObject(link = url, profileId = currentProfile?.id ?: 1L)))
-                    },
-                    onDismiss = {
-                        resetClipboardLink?.invoke()
                     },
                 )
 
