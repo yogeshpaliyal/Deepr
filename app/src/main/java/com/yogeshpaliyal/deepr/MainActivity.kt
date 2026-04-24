@@ -170,9 +170,6 @@ private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
 val LocalSharedText =
     compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
 
-val LocalClipboardLink =
-    compositionLocalOf<Pair<ClipboardLink?, () -> Unit>?> { null }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(
@@ -192,56 +189,9 @@ fun Dashboard(
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
     val viewModel: AccountViewModel = koinViewModel()
-    val clipboardDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
-
-    // Clipboard link detection
-    var clipboardLink by
-        remember {
-            mutableStateOf<ClipboardLink?>(null)
-        }
-
-    val clipboardDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
-
-    androidx.compose.runtime.DisposableEffect(context, clipboardDetectionEnabled) {
-        if (!clipboardDetectionEnabled) {
-            clipboardLink = null
-            onDispose { }
-        } else {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-            fun updateClipboardLinkFromPrimaryClip() {
-                val clipData = clipboard.primaryClip
-                val text = clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString()
-                val normalizedLink = text?.takeIf { it.isNotBlank() }?.let(::normalizeLink)
-                clipboardLink =
-                    if (normalizedLink != null && isValidDeeplink(normalizedLink)) {
-                        ClipboardLink(normalizedLink)
-                    } else {
-                        null
-                    }
-            }
-
-            val listener = ClipboardManager.OnPrimaryClipChangedListener {
-                updateClipboardLinkFromPrimaryClip()
-            }
-
-            // Initial check
-            updateClipboardLinkFromPrimaryClip()
-
-            clipboard.addPrimaryClipChangedListener(listener)
-
-            onDispose {
-                clipboard.removePrimaryClipChangedListener(listener)
-            }
-        }
-    }
-
-    val resetClipboardLink: () -> Unit = { clipboardLink = null }
-
     CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
-        CompositionLocalProvider(LocalClipboardLink provides Pair(clipboardLink, resetClipboardLink)) {
-            CompositionLocalProvider(LocalNavigator provides backStack) {
-                Scaffold(
+        CompositionLocalProvider(LocalNavigator provides backStack) {
+            Scaffold(
                     modifier = modifier,
                     bottomBar = {
                         AnimatedVisibility(
