@@ -192,6 +192,7 @@ fun Dashboard(
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
     val viewModel: AccountViewModel = koinViewModel()
+    val clipboardDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Clipboard link detection
     var clipboardLink by

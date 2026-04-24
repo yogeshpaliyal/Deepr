@@ -89,6 +89,7 @@ interface LinkRepository {
         searchQuery1: String,
         searchQuery2: String,
         searchQuery3: String,
+        searchQuery4: String,
         favouriteFilter1: Long,
         favouriteFilter2: Long,
         tagIdsString1: String,

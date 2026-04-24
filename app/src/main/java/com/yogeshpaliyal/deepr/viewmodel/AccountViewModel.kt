@@ -396,6 +396,7 @@ class AccountViewModel(
                     query,
                     query,
                     query,
+                    query,
                     favourite.toLong(),
                     favourite.toLong(),
                     tagIdsString,
