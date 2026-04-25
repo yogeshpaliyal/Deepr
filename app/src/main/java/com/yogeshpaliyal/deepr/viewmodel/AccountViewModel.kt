@@ -171,7 +171,7 @@ class AccountViewModel(
         selectedProfileId.flatMapLatest { profileId ->
             linkRepository
                 .getAllTagsWithCount(profileId)
-                    .asFlow()
+                .asFlow()
                 .mapToList(
                     viewModelScope.coroutineContext,
                 )
