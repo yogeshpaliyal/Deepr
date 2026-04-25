@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -88,7 +89,7 @@ class AccountViewModel(
     private val searchQuery = MutableStateFlow("")
 
     private val _showProfilesGrid = MutableStateFlow(false)
-    val showProfilesGrid: StateFlow<Boolean> = _showProfilesGrid
+    val showProfilesGrid: StateFlow<Boolean> = _showProfilesGrid.asStateFlow()
 
     fun setShowProfilesGrid(show: Boolean) {
         _showProfilesGrid.value = show
@@ -137,7 +138,9 @@ class AccountViewModel(
                 linkRepository.insertProfile("Default", 0)
             } else {
                 // Normalize priorities for existing profiles if needed
-                normalizePriorities()
+                reorderMutex.withLock {
+                    normalizePriorities()
+                }
             }
         }
     }

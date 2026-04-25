@@ -691,8 +691,23 @@ object TagSelectionScreen : TopLevelRoute {
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             val template = stringResource(R.string.delete_tag_confirmation_with_name)
-                            val tagPlaceholder = "%s"
-                            val tagIndex = template.indexOf(tagPlaceholder)
+                            val tagPlaceholderPositional = "%1\$s"
+                            val tagPlaceholderSimple = "%s"
+
+                            val tagIndex =
+                                if (template.contains(tagPlaceholderPositional)) {
+                                    template.indexOf(tagPlaceholderPositional)
+                                } else {
+                                    template.indexOf(tagPlaceholderSimple)
+                                }
+
+                            val placeholderLength =
+                                if (template.contains(tagPlaceholderPositional)) {
+                                    tagPlaceholderPositional.length
+                                } else {
+                                    tagPlaceholderSimple.length
+                                }
+
                             val annotatedString =
                                 buildAnnotatedString {
                                     if (tagIndex >= 0) {
@@ -700,7 +715,7 @@ object TagSelectionScreen : TopLevelRoute {
                                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                                             append(tag.name)
                                         }
-                                        append(template.substring(tagIndex + tagPlaceholder.length))
+                                        append(template.substring(tagIndex + placeholderLength))
                                     } else {
                                         append(stringResource(R.string.delete_tag_confirmation_with_name, tag.name))
                                     }

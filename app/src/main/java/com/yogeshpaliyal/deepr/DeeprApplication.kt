@@ -37,6 +37,7 @@ import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 class DeeprApplication : Application() {
@@ -104,17 +105,7 @@ class DeeprApplication : Application() {
                     }
                 }
 
-                viewModel {
-                    AccountViewModel(
-                        linkRepository = get(),
-                        exportRepository = get(),
-                        importRepository = get(),
-                        syncRepository = get(),
-                        networkRepository = get(),
-                        autoBackupWorker = get(),
-                        analyticsManager = get(),
-                    )
-                }
+                viewModelOf(::AccountViewModel)
 
                 single {
                     HtmlParser()
