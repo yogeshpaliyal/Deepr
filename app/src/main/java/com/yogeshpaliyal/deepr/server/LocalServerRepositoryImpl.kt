@@ -627,3 +627,4 @@ data class QRTransferInfo(
     val port: Int,
     val appVersion: String,
 )
+
