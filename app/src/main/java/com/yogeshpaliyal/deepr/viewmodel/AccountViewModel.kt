@@ -16,8 +16,8 @@ import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.LinkRepository
-import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.ProfilePriorityUpdate
+import com.yogeshpaliyal.deepr.network.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType

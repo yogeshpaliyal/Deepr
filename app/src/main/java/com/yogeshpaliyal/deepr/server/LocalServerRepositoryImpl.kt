@@ -218,7 +218,7 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                deeprQueries.insertProfile(request.name, 0L)
+                                deeprQueries.insertProfile(request.name)
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),

@@ -105,7 +105,17 @@ class DeeprApplication : Application() {
                     }
                 }
 
-                viewModelOf(::AccountViewModel)
+                viewModel {
+                    AccountViewModel(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                    )
+                }
 
                 single {
                     HtmlParser()
