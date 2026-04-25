@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 3-feature-profiles-state-and-nav
-      - 10-feature-localized-web-interface-and-fixes
   workflow_dispatch:
 
 jobs:
