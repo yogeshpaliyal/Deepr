@@ -6,6 +6,8 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
 
+data class ProfilePriorityUpdate(val profileId: Long, val priority: Long)
+
 interface LinkRepository {
     // Profile operations
 
@@ -42,7 +44,7 @@ interface LinkRepository {
         priority: Long,
     )
 
-    suspend fun updateProfilesPriority(profilePriorities: List<Pair<Long, Long>>)
+    suspend fun updateProfilesPriority(profilePriorities: List<ProfilePriorityUpdate>)
 
     suspend fun deleteProfile(id: Long)
 

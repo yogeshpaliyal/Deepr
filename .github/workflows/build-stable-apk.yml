@@ -2,9 +2,8 @@ name: Build Stable APK
 on:
   push:
     branches:
-      - master
+      - 3-feature-profiles-state-and-nav
       - 10-feature-localized-web-interface-and-fixes
-      - build/stable-apk
   workflow_dispatch:
 
 jobs:
@@ -14,10 +13,10 @@ jobs:
       contents: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4.7.0
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -28,22 +27,51 @@ jobs:
 
       - name: Force Debug Signing on Release
         run: |
+          # Validate expected structure exists
+          if ! grep -q 'signingConfigs {' app/build.gradle.kts; then
+            echo "ERROR: signingConfigs block not found"
+            exit 1
+          fi
+          if ! grep -q 'release {' app/build.gradle.kts; then
+            echo "ERROR: release build type not found"
+            exit 1
+          fi
+
           # Extract signingConfigs block
           sed -n '/signingConfigs {/,/    }/p' app/build.gradle.kts > signing_block.txt
+          
+          if [ ! -s signing_block.txt ]; then
+            echo "ERROR: Failed to extract signingConfigs block"
+            exit 1
+          fi
+
           # Remove original signingConfigs block
           sed -i '/signingConfigs {/,/    }/d' app/build.gradle.kts
+          
           # Insert signingConfigs block before buildTypes
+          sed -i '/buildTypes {/i \\' app/build.gradle.kts
           sed -i '/buildTypes {/e cat signing_block.txt' app/build.gradle.kts
+          
           # Link release build to debug signing
           sed -i '/release {/a \            signingConfig = signingConfigs.getByName("debug")' app/build.gradle.kts
+
+          # Verify the change was applied
+          if ! grep -q 'signingConfig = signingConfigs.getByName("debug")' app/build.gradle.kts; then
+            echo "ERROR: Failed to inject debug signing config"
+            exit 1
+          fi
 
       - name: Build Github Release APK
         run: ./gradlew assembleGithubRelease
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Create Release
+        uses: softprops/action-gh-release@v2.2.1
         with:
-          repo_token: "${{ github.token }}"
-          automatic_release_tag: "latest-master"
+          tag_name: "latest-stable"
+          name: "Latest Stable Build"
+          body: "Automatic build of the stable APK from ${{ github.ref_name }} branch."
+          draft: false
           prerelease: true
-          title: "Latest Master Build"
           files: app/build/outputs/apk/github/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

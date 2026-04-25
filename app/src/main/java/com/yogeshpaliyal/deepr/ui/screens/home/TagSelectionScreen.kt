@@ -56,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -730,7 +731,7 @@ object TagSelectionScreen : TopLevelRoute {
                                         )
                                         Text(
                                             text =
-                                                stringResource(
+                                                pluralStringResource(
                                                     R.plurals.tag_used_by_links,
                                                     tag.linkCount.toInt(),
                                                     tag.linkCount,

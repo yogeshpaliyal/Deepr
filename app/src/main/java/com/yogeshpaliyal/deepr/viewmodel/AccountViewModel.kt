@@ -16,7 +16,8 @@ import com.yogeshpaliyal.deepr.backup.ExportRepository
 import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.LinkRepository
-import com.yogeshpaliyal.deepr.data.NetworkRepository
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.data.ProfilePriorityUpdate
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
@@ -36,6 +37,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -80,6 +83,7 @@ class AccountViewModel(
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
+    private val reorderMutex = Mutex()
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
 
@@ -143,7 +147,7 @@ class AccountViewModel(
         val updates =
             profiles.mapIndexedNotNull { index, profile ->
                 if (profile.priority != index.toLong()) {
-                    profile.id to index.toLong()
+                    ProfilePriorityUpdate(profileId = profile.id, priority = index.toLong())
                 } else {
                     null
                 }
@@ -855,42 +859,46 @@ class AccountViewModel(
 
     fun moveProfileUp(profileId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            // First, ensure all profiles have unique, sequential priorities
-            normalizePriorities()
+            reorderMutex.withLock {
+                // First, ensure all profiles have unique, sequential priorities
+                normalizePriorities()
 
-            val profiles = linkRepository.getAllProfiles().executeAsList()
-            val index = profiles.indexOfFirst { it.id == profileId }
-            if (index > 0) {
-                val currentProfile = profiles[index]
-                val previousProfile = profiles[index - 1]
+                val profiles = linkRepository.getAllProfiles().executeAsList()
+                val index = profiles.indexOfFirst { it.id == profileId }
+                if (index > 0) {
+                    val currentProfile = profiles[index]
+                    val previousProfile = profiles[index - 1]
 
-                linkRepository.updateProfilesPriority(
-                    listOf(
-                        currentProfile.id to previousProfile.priority,
-                        previousProfile.id to currentProfile.priority,
-                    ),
-                )
+                    linkRepository.updateProfilesPriority(
+                        listOf(
+                            ProfilePriorityUpdate(profileId = currentProfile.id, priority = previousProfile.priority),
+                            ProfilePriorityUpdate(profileId = previousProfile.id, priority = currentProfile.priority),
+                        ),
+                    )
+                }
             }
         }
     }
 
     fun moveProfileDown(profileId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            // First, ensure all profiles have unique, sequential priorities
-            normalizePriorities()
+            reorderMutex.withLock {
+                // First, ensure all profiles have unique, sequential priorities
+                normalizePriorities()
 
-            val profiles = linkRepository.getAllProfiles().executeAsList()
-            val index = profiles.indexOfFirst { it.id == profileId }
-            if (index != -1 && index < profiles.size - 1) {
-                val currentProfile = profiles[index]
-                val nextProfile = profiles[index + 1]
+                val profiles = linkRepository.getAllProfiles().executeAsList()
+                val index = profiles.indexOfFirst { it.id == profileId }
+                if (index != -1 && index < profiles.size - 1) {
+                    val currentProfile = profiles[index]
+                    val nextProfile = profiles[index + 1]
 
-                linkRepository.updateProfilesPriority(
-                    listOf(
-                        currentProfile.id to nextProfile.priority,
-                        nextProfile.id to currentProfile.priority,
-                    ),
-                )
+                    linkRepository.updateProfilesPriority(
+                        listOf(
+                            ProfilePriorityUpdate(profileId = currentProfile.id, priority = nextProfile.priority),
+                            ProfilePriorityUpdate(profileId = nextProfile.id, priority = currentProfile.priority),
+                        ),
+                    )
+                }
             }
         }
     }
