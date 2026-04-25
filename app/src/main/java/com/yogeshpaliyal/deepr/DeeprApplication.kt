@@ -107,13 +107,13 @@ class DeeprApplication : Application() {
 
                 viewModel {
                     AccountViewModel(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
+                        linkRepository = get(),
+                        exportRepository = get(),
+                        importRepository = get(),
+                        syncRepository = get(),
+                        networkRepository = get(),
+                        autoBackupWorker = get(),
+                        analyticsManager = get(),
                     )
                 }
 
