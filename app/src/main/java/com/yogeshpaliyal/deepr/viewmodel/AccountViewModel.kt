@@ -173,8 +173,7 @@ class AccountViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        selectedProfileId
-            .flatMapLatest { profileId ->
+        selectedProfileId            .flatMapLatest { profileId ->
                 linkRepository
                     .getAllTagsWithCount(profileId)
                     .asFlow()
