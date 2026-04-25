@@ -101,31 +101,27 @@ class AccountViewModel(
             .asFlow()
             .mapToList(
                 viewModelScope.coroutineContext,
-            )
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     private val selectedProfileId: Flow<Long> = preferenceDataStore.getSelectedProfileId
     val currentProfile: StateFlow<com.yogeshpaliyal.deepr.Profile?> =
         combine(allProfiles, selectedProfileId) { profiles, profileId ->
             profiles.firstOrNull { it.id == profileId }
-        }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // Get current profile's theme mode
     val currentProfileTheme: StateFlow<String> =
         currentProfile
             .map { profile ->
                 profile?.themeMode ?: "system"
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
 
     // Get current profile's color theme
     val currentProfileColorTheme: StateFlow<String> =
         currentProfile
             .map { profile ->
                 profile?.colorTheme ?: "dynamic"
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "dynamic")
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "dynamic")
 
     // Initialize default profile if none exists
     init {
@@ -168,20 +164,19 @@ class AccountViewModel(
             .asFlow()
             .mapToList(
                 viewModelScope.coroutineContext,
-            )
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        selectedProfileId            .flatMapLatest { profileId ->
+        selectedProfileId
+            .flatMapLatest { profileId ->
                 linkRepository
                     .getAllTagsWithCount(profileId)
                     .asFlow()
                     .mapToList(
                         viewModelScope.coroutineContext,
                     )
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfLinks: StateFlow<Long?> =
@@ -193,8 +188,7 @@ class AccountViewModel(
                     .mapToOneOrNull(
                         viewModelScope.coroutineContext,
                     )
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfFavouriteLinks: StateFlow<Long?> =
@@ -206,8 +200,7 @@ class AccountViewModel(
                     .mapToOneOrNull(
                         viewModelScope.coroutineContext,
                     )
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     private val sortOrder: Flow<@SortType String> =
         preferenceDataStore.getSortingOrder
@@ -388,8 +381,7 @@ class AccountViewModel(
             selectedProfileId,
         ) { query, sorting, tags, favourite, profileId ->
             listOf(query, sorting, tags, favourite, profileId)
-        }
-        .flatMapLatest { combined ->
+        }.flatMapLatest { combined ->
             val query = combined[0] as String
             val sorting = (combined[1] as String).split("_")
             val tags = combined[2] as List<Tags>
@@ -418,11 +410,9 @@ class AccountViewModel(
                     sortField,
                     sortType,
                     sortField,
-                )
-                .asFlow()
+                ).asFlow()
                 .mapToList(viewModelScope.coroutineContext)
-        }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun search(query: String) {
         searchQuery.update { query }
