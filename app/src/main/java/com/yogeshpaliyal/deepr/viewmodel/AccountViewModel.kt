@@ -902,6 +902,7 @@ class AccountViewModel(
             }
         }
     }
+
     suspend fun updateProfile(
         id: Long,
         name: String,

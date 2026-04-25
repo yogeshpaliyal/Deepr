@@ -690,18 +690,19 @@ object TagSelectionScreen : TopLevelRoute {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val fullMessage = stringResource(R.string.delete_tag_confirmation_with_name, tag.name)
-                            val tagIndex = fullMessage.indexOf(tag.name)
+                            val template = stringResource(R.string.delete_tag_confirmation_with_name)
+                            val tagPlaceholder = "%s"
+                            val tagIndex = template.indexOf(tagPlaceholder)
                             val annotatedString =
                                 buildAnnotatedString {
                                     if (tagIndex >= 0) {
-                                        append(fullMessage.substring(0, tagIndex))
+                                        append(template.substring(0, tagIndex))
                                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                                             append(tag.name)
                                         }
-                                        append(fullMessage.substring(tagIndex + tag.name.length))
+                                        append(template.substring(tagIndex + tagPlaceholder.length))
                                     } else {
-                                        append(fullMessage)
+                                        append(stringResource(R.string.delete_tag_confirmation_with_name, tag.name))
                                     }
                                 }
                             Text(

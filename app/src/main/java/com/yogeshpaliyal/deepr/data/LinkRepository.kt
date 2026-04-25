@@ -6,7 +6,10 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
 
-data class ProfilePriorityUpdate(val profileId: Long, val priority: Long)
+data class ProfilePriorityUpdate(
+    val profileId: Long,
+    val priority: Long,
+)
 
 interface LinkRepository {
     // Profile operations

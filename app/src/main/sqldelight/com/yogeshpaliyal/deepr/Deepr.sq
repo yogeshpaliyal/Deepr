@@ -82,7 +82,11 @@ FROM
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
   Deepr.profileId = ?
-  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%' OR Tags.name LIKE '%' || ? || '%')
+  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%' OR EXISTS (
+    SELECT 1 FROM LinkTags 
+    JOIN Tags ON LinkTags.tagId = Tags.id 
+    WHERE LinkTags.linkId = Deepr.id AND Tags.name LIKE '%' || ? || '%'
+  ))
   AND (
     ? = -1 OR Deepr.isFavourite = ?
   )
