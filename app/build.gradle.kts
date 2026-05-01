@@ -22,9 +22,10 @@ android {
         versionName = "1.0.28"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments += mapOf(
-            "clearPackageData" to "true",
-        )
+        testInstrumentationRunnerArguments +=
+            mapOf(
+                "clearPackageData" to "true",
+            )
     }
 
     testOptions {
@@ -36,7 +37,6 @@ android {
             isDefault = true
         }
         create("free") {
-
         }
         create("pro") {
             applicationIdSuffix = ".pro"
@@ -65,7 +65,6 @@ android {
             res.srcDirs("src/proFree/res", "src/freeGithub/res")
         }
     }
-
 
     buildTypes {
         debug {

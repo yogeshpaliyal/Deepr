@@ -104,14 +104,45 @@ fun AddLinkScreen(
     val fetchMetadataErrorText = stringResource(R.string.failed_to_fetch_metadata)
     val removeTagText = stringResource(R.string.remove_tag)
     val deeplinkExistsText = stringResource(R.string.deeplink_already_exists)
-    var deeprInfo by remember(selectedLink) {
-        mutableStateOf(
-            selectedLink,
-        )
+
+    var deeprInfo by remember(selectedLink.id, selectedLink.link) {
+        mutableStateOf(selectedLink)
     }
+
+    // Force update state if selectedLink changes (important for some navigation scenarios)
+    LaunchedEffect(selectedLink.id, selectedLink.link) {
+        if (selectedLink.link.isNotEmpty() && deeprInfo.link.isEmpty()) {
+            deeprInfo = selectedLink
+        }
+    }
+
     var isError by remember { mutableStateOf(false) }
     var isNameError by remember { mutableStateOf(false) }
-    var isFetchingMetadata by remember { mutableStateOf(false) }
+    val isFetchingMetadata = remember { mutableStateOf(false) }
+
+    val fetchMetadata: (String?) -> Unit = { link ->
+        val urlToFetch = link ?: deeprInfo.link
+        if (urlToFetch.isNotBlank()) {
+            isFetchingMetadata.value = true
+            viewModel.fetchMetaData(urlToFetch) {
+                isFetchingMetadata.value = false
+                if (it != null && normalizeLink(deeprInfo.link) == urlToFetch) {
+                    deeprInfo = deeprInfo.copy(name = it.title ?: "", thumbnail = it.image ?: "")
+                    isNameError = false
+                } else {
+                    Toast.makeText(context, fetchMetadataErrorText, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // Pre-populate and fetch if link is provided (e.g. from long press)
+    LaunchedEffect(deeprInfo.link) {
+        val normalized = normalizeLink(deeprInfo.link)
+        if (isValidDeeplink(normalized) && deeprInfo.name.isEmpty()) {
+            fetchMetadata(normalized)
+        }
+    }
 
     val qrScanner =
         rememberLauncherForActivityResult(
@@ -134,39 +165,16 @@ fun AddLinkScreen(
 
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     var selectedProfileId by remember(selectedLink) {
-        mutableStateOf(selectedLink.profileId)
+        mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
     }
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
-    val fetchMetadata: () -> Unit = {
-        isFetchingMetadata = true
-        viewModel.fetchMetaData(deeprInfo.link) {
-            isFetchingMetadata = false
-            if (it != null) {
-                deeprInfo = deeprInfo.copy(name = it.title ?: "", thumbnail = it.image ?: "")
-                isNameError = false
-            } else {
-                Toast
-                    .makeText(
-                        context,
-                        fetchMetadataErrorText,
-                        Toast.LENGTH_SHORT,
-                    ).show()
-            }
-        }
-    }
-
-    LaunchedEffect(selectedLink) {
-        if (isValidDeeplink(selectedLink.link) && selectedLink.name.isEmpty()) {
-            fetchMetadata()
-        }
-    }
-
     // Initialize selected tags if in edit mode
-    LaunchedEffect(isCreate) {
-        if (isCreate.not()) {
+    LaunchedEffect(selectedLink.id) {
+        if (!isCreate) {
             val existingTags =
                 selectedLink.tagsIds?.split(",")?.mapIndexed { index, tagId ->
                     Tags(
@@ -174,7 +182,7 @@ fun AddLinkScreen(
                         selectedLink.tagsNames
                             ?.split(",")
                             ?.getOrNull(index)
-                            ?.trim() ?: "Unknown",
+                            ?.trim() ?: context.getString(R.string.unknown),
                     )
                 }
             selectedTags.clear()
@@ -299,7 +307,7 @@ fun AddLinkScreen(
                                 isError = false
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text("https://example.com or app://deeplink") },
+                            placeholder = { Text(stringResource(R.string.link_placeholder)) },
                             isError = isError,
                             supportingText = {
                                 if (isError) {
@@ -333,10 +341,10 @@ fun AddLinkScreen(
 
                         FilledTonalButton(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = deeprInfo.link.isNotBlank() && !isFetchingMetadata,
-                            onClick = fetchMetadata,
+                            enabled = deeprInfo.link.isNotBlank() && !isFetchingMetadata.value,
+                            onClick = { fetchMetadata(null) },
                         ) {
-                            if (isFetchingMetadata) {
+                            if (isFetchingMetadata.value) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(18.dp),
                                     strokeWidth = 2.dp,
@@ -382,7 +390,7 @@ fun AddLinkScreen(
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
                                 Text(
-                                    text = "Preview",
+                                    text = stringResource(R.string.preview),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                 )

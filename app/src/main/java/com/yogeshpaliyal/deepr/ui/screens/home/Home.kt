@@ -878,7 +878,7 @@ fun Content(
             is ResetCounter -> {
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
                 viewModel.resetOpenedCount(it.item.id)
-                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.opened_count_reset), Toast.LENGTH_SHORT).show()
             }
 
             is Shortcut -> {
