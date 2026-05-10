@@ -59,7 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -90,7 +89,6 @@ import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
-import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -106,8 +104,16 @@ fun AddLinkScreen(
     val fetchMetadataErrorText = stringResource(R.string.failed_to_fetch_metadata)
     val removeTagText = stringResource(R.string.remove_tag)
     val deeplinkExistsText = stringResource(R.string.deeplink_already_exists)
+
     var deeprInfo by remember(selectedLink.id, selectedLink.link) {
         mutableStateOf(selectedLink)
+    }
+
+    // Force update state if selectedLink changes (important for some navigation scenarios)
+    LaunchedEffect(selectedLink.id, selectedLink.link) {
+        if (selectedLink.link.isNotEmpty() && deeprInfo.link.isEmpty()) {
+            deeprInfo = selectedLink
+        }
     }
 
     var isError by remember { mutableStateOf(false) }
@@ -134,7 +140,6 @@ fun AddLinkScreen(
     LaunchedEffect(deeprInfo.link) {
         val normalized = normalizeLink(deeprInfo.link)
         if (isValidDeeplink(normalized) && deeprInfo.name.isEmpty()) {
-            delay(500) // Debounce for manual typing
             fetchMetadata(normalized)
         }
     }
@@ -163,12 +168,6 @@ fun AddLinkScreen(
     val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     var selectedProfileId by remember(selectedLink) {
         mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
-    }
-
-    LaunchedEffect(currentProfile, isCreate) {
-        if (isCreate && currentProfile != null && (selectedProfileId == 1L || selectedProfileId == 0L)) {
-            selectedProfileId = currentProfile!!.id
-        }
     }
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
@@ -437,27 +436,20 @@ fun AddLinkScreen(
                     }
 
                     // Notes Section (Icon inside box, non-accent color)
-                    var isNotesFocused by remember { mutableStateOf(false) }
                     OutlinedTextField(
                         value = deeprInfo.notes,
                         onValueChange = { deeprInfo = deeprInfo.copy(notes = it) },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { isNotesFocused = it.isFocused },
+                        modifier = Modifier.fillMaxWidth(),
                         label = {
-                            if (isNotesFocused || deeprInfo.notes.isNotEmpty()) {
-                                Text(stringResource(R.string.notes))
-                            } else {
-                                Text(
-                                    stringResource(
-                                        R.string.format_optional,
-                                        stringResource(R.string.notes),
-                                        stringResource(R.string.web_optional),
-                                    ),
-                                )
-                            }
+                            Text(
+                                stringResource(
+                                    R.string.format_optional,
+                                    stringResource(R.string.notes),
+                                    stringResource(R.string.web_optional),
+                                ),
+                            )
                         },
+                        placeholder = { Text(stringResource(R.string.enter_notes)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = TablerIcons.Note,
@@ -525,7 +517,6 @@ fun AddLinkScreen(
 
                     // Tags Input (On its own line)
                     var tagsExpanded by remember { mutableStateOf(false) }
-                    var isTagsFocused by remember { mutableStateOf(false) }
                     val filteredTags = allTags.filter { it.name.contains(newTagName, ignoreCase = true) && !selectedTags.contains(it) }
                     val showCreateTag = newTagName.isNotBlank() && allTags.none { it.name.equals(newTagName, ignoreCase = true) }
 
@@ -541,23 +532,18 @@ fun AddLinkScreen(
                                 tagsExpanded = true
                             },
                             label = {
-                                if (isTagsFocused || newTagName.isNotEmpty()) {
-                                    Text(stringResource(R.string.tags))
-                                } else {
-                                    Text(
-                                        stringResource(
-                                            R.string.format_optional,
-                                            stringResource(R.string.tags),
-                                            stringResource(R.string.web_optional),
-                                        ),
-                                    )
-                                }
+                                Text(
+                                    stringResource(
+                                        R.string.format_optional,
+                                        stringResource(R.string.tags),
+                                        stringResource(R.string.web_optional),
+                                    ),
+                                )
                             },
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
-                                    .onFocusChanged { isTagsFocused = it.isFocused },
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true),
                             singleLine = true,
                             leadingIcon = { Icon(TablerIcons.Tag, contentDescription = null, modifier = Modifier.size(18.dp)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tagsExpanded) },

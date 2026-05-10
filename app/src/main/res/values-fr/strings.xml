@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
+    
     <string name="settings">Paramètres</string>
     <string name="about_us">À propos de nous</string>
     <string name="back">Retour</string>
@@ -21,6 +22,8 @@
     <string name="new_tag">Nouvelle étiquette</string>
     <string name="no_links_saved_yet">Aucun lien sauvegardé pour le moment</string>
     <string name="save_your_link_below">Enregistrez votre lien ci-dessous pour y accéder rapidement plus tard</string>
+
+    
     <string name="more_options">Plus d\'options</string>
     <string name="copy_link">Copier le lien</string>
     <string name="link_copied">Lien copié</string>
@@ -36,6 +39,8 @@
     <string name="edit_shortcut">Modifier le raccourci</string>
     <string name="show_qr_code">Afficher le code QR</string>
     <string name="deeplink_already_exists">Le lien profond existe déjà</string>
+
+    
     <string name="sort_by_date_ascending">Trier par Date Croissante</string>
     <string name="sort_by_date_descending">Trier par Date Décroissante</string>
     <string name="sort_by_opened_ascending">Trier par Ouverture Croissante</string>
@@ -44,6 +49,8 @@
     <string name="sort_by_name_descending">Trier par Nom Décroissant</string>
     <string name="sort_by_link_ascending">Trier par Lien Croissant</string>
     <string name="sort_by_link_descending">Trier par Lien Décroissant</string>
+
+    
     <string name="edit_tag">Modifier le Tag</string>
     <string name="delete_tag">Supprimer le Tag</string>
     <string name="delete_tag_confirmation">Êtes-vous sûr de vouloir supprimer ce tag ?</string>
@@ -55,6 +62,8 @@
     <string name="tag_deleted_successfully">Tag supprimé avec succès</string>
     <string name="edit_tag_description">Modifier le Tag</string>
     <string name="delete_tag_description">Supprimer le Tag</string>
+
+    
     <string name="import_deeplinks">Importer des Deeplinks</string>
     <string name="import_deeplinks_description">Importer des Deeplinks depuis un fichier CSV</string>
     <string name="export_deeplinks">Exporter des Deeplinks</string>
@@ -75,6 +84,8 @@
     <string name="urdu">اردو</string>
     <string name="app_version">Version de l\'application : %s</string>
     <string name="made_with_love">Fait avec ❤️ en Inde</string>
+
+    
     <string name="app_logo">Logo de l\'application</string>
     <string name="version_format">Version %s</string>
     <string name="app_description">Une application simple pour sauvegarder, organiser et lancer des liens profonds.</string>
@@ -84,23 +95,33 @@
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
     <string name="view_on_github">Voir sur GitHub</string>
+
+    
     <string name="save_deeplink">Sauvegarder le lien profond</string>
     <string name="save_deeplink_message">Sauvegarder le lien profond : %s ?</string>
     <string name="enter_link_name">Veuillez saisir le nom du lien</string>
     <string name="enter_link_name_error">Veuillez saisir le nom du lien.</string>
     <string name="save_and_execute">Sauvegarder et exécuter</string>
+
+    
     <string name="enter_deeplink_command">Entrez un lien</string>
     <string name="invalid_empty_deeplink">Lien profond invalide ou vide.</string>
+
+    
     <string name="invalid_deeplink_toast">Lien profond invalide : %s</string>
     <string name="no_data_to_export">Aucune donnée trouvée dans la base de données à exporter.</string>
     <string name="no_data_available_export">Aucune donnée disponible à exporter après mapping.</string>
     <string name="export_success">Exporté avec succès vers %s</string>
     <string name="export_failed">Échec de la création du fichier CSV.</string>
+
+    
     <string name="select_sync_file">Sélectionner le fichier de synchronisation</string>
     <string name="sync_now">Synchroniser maintenant</string>
     <string name="last_sync_time">Dernière synchronisation :</string>
     <string name="last_sync_time_never">Jamais synchronisé</string>
     <string name="last_sync_time_format">%s</string>
+
+    
     <string name="sync_disabled">La synchronisation est désactivée</string>
     <string name="sync_file_not_selected">Aucun fichier de synchronisation sélectionné</string>
     <string name="sync_success">Synchronisé avec succès avec %s</string>
@@ -108,6 +129,8 @@
     <string name="no_file_path_provided">Aucun chemin de fichier fourni</string>
     <string name="invalid_markdown_format">Format de tableau markdown invalide</string>
     <string name="file_validation_error">Erreur de validation du fichier : %s</string>
+
+    
     <string name="sync_to_file">Synchroniser vers un fichier local (Bêta)</string>
     <string name="sync_to_file_description">Synchroniser automatiquement les liens profonds vers un fichier markdown</string>
     <string name="select_sync_file_description">Choisir l\'emplacement du fichier pour la synchronisation markdown</string>
@@ -116,6 +139,8 @@
     <string name="sync_status_invalid">⚠ Le format du fichier est invalide</string>
     <string name="sync_status_no_file">Aucun fichier de synchronisation sélectionné</string>
     <string name="sync_now_description">Synchroniser manuellement les liens profonds vers le fichier sélectionné</string>
+
+    
     <string name="all_tags">Toutes les Étiquettes</string>
     <string name="favourites">Favoris</string>
     <string name="add_to_favourites">Ajouter aux favoris</string>
@@ -131,9 +156,15 @@
     <string name="no_favourites_with_tags">Aucun favori avec ces étiquettes</string>
     <string name="no_favourites_with_tags_description">Marquez des liens avec ces étiquettes comme favoris.</string>
     <string name="remove_thumbnail">Supprimer l\'aperçu</string>
+
+    
+
+    
     <string name="scan_qr_code">Scanner le Code QR</string>
     <string name="transfer_link_server_instructions">1. Activez l\'interrupteur ci-dessus pour démarrer le serveur\n2. Assurez-vous que les deux appareils sont sur le même réseau Wi-Fi\n3. Scannez le code QR depuis l\'option d\'importation de liens sur un autre appareil</string>
-    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un autre appareil</string>
+    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un altro dispositivo</string>
+
+    
     <string name="profiles">Profils</string>
     <string name="reorder">Réorganiser</string>
     <string name="profile">Profil</string>
@@ -154,6 +185,8 @@
     <string name="manage_profiles">Gérer les Profils</string>
     <string name="no_profiles_yet">Aucun profil pour le moment</string>
     <string name="create_first_profile">Créez votre premier profil pour organiser vos liens</string>
+
+    
     <string name="save_silently">Enregistrer silencieusement</string>
     <string name="link_saved_silently">Lien enregistré avec succès</string>
     <string name="invalid_link_silent_save">Lien invalide</string>
@@ -161,17 +194,23 @@
     <string name="link_already_exists">Le lien existe déjà</string>
     <string name="silent_save_profile">Profil d\'enregistrement silencieux</string>
     <string name="silent_save_profile_description">Les liens enregistrés via \'Enregistrer silencieusement\' iront dans ce profil</string>
+
+    
     <string name="theme">Thème</string>
     <string name="theme_dialog_title">Sélectionner le Thème</string>
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="close">Fermer</string>
+
+    
     <string name="finish_reordering">Terminer la réorganisation</string>
     <string name="move_up">Déplacer vers le haut</string>
     <string name="move_down">Déplacer vers le bas</string>
     <string name="profile_delete_confirmation_template">Êtes-vous sûr de vouloir supprimer le profil %1$s et tous les liens associés ? Cette action est irréversible.</string>
     <string name="profile_delete_failed">Échec de la suppression du profil</string>
     <string name="profile_update_failed">Échec de la mise à jour du profil</string>
+
+    
     <string name="web_sort_opens">Ouvertures</string>
     <string name="web_opens">ouvertures</string>
     <string name="web_clear">Effacer</string>
@@ -210,5 +249,4 @@
     <string name="preview">Aperçu</string>
     <string name="link_placeholder">https://exemple.com ou app://deeplink</string>
     <string name="switch_profile">Changer de profil</string>
-    <string name="web_optional">Optional</string>
-</resources>
+<string name="web_optional">Optional</string></resources>

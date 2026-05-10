@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
     <string name="settings">設定</string>
@@ -88,7 +88,7 @@
     <string name="delete_tag_description">Tagを削除</string>
     <string name="clear_all_filters">全てのFilterを解除</string>
     <string name="selected_tags_count">%d 個のtagを選択中</string>
-    <string name="filtered_tags_count">%2$d 中 %1$d</string>
+    <string name="filtered_tags_count">%1$d of %2$d</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="import_deeplinks">Import links</string>
@@ -96,7 +96,4 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
-    <string name="web_optional">オプション</string>
-    <string name="notes_optional">Notes (オプション)</string>
-    <string name="tags_optional">Tags (オプション)</string>
-</resources>
+<string name="web_optional">Optional</string><string name="notes_optional">Notes (Optional)</string><string name="tags_optional">Tags (Optional)</string></resources>

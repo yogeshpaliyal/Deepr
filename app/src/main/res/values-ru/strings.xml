@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="settings">Настройки</string>
     <string name="about_us">О нас</string>
@@ -208,7 +208,4 @@
     <string name="import_deeplinks_description">Импортировать ссылки из файла CSV</string>
     <string name="import_deeplinks">Импортировать ссылки</string>
     <string name="copy_link">Копировать ссылку</string>
-    <string name="web_optional">Опционально</string>
-    <string name="notes_optional">Заметки (Опционально)</string>
-    <string name="tags_optional">Теги (Опционально)</string>
-</resources>
+<string name="web_optional">Опционально</string><string name="notes_optional">Заметки (Опционально)</string><string name="tags_optional">Теги (Опционально)</string></resources>

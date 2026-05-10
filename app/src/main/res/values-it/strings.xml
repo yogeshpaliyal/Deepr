@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
+
+    
     <string name="settings">Impostazioni</string>
     <string name="about_us">Chi Siamo</string>
     <string name="back">Indietro</string>
@@ -38,6 +40,8 @@
     <string name="remove_thumbnail">Rimuovi miniatura</string>
     <string name="thumbnail_url">URL Miniatura</string>
     <string name="edit_thumbnail_url">Modifica URL miniatura</string>
+
+    
     <string name="more_options">Più opzioni</string>
     <string name="copy_link">Copia link</string>
     <string name="link_copied">Link copiato</string>
@@ -52,6 +56,7 @@
     <string name="last_opened">Ultima Apertura: %s</string>
     <string name="notes">Note</string>
     <string name="note">Nota</string>
+
     <string name="note_copied">Nota copiata</string>
     <string name="cannot_open_link">Impossibile aprire il link</string>
     <string name="view_note">Vedi Nota</string>
@@ -69,6 +74,8 @@
     <string name="open_with">Apri Con</string>
     <string name="share_link">Condividi link</string>
     <string name="deeplink_already_exists">Link già esistente</string>
+
+    
     <string name="sort_by_date_ascending">Ordina per Data Crescente</string>
     <string name="sort_by_date_descending">Ordina per Data Decrescente</string>
     <string name="sort_by_opened_ascending">Ordina per Aperture Crescente</string>
@@ -77,6 +84,8 @@
     <string name="sort_by_name_descending">Ordina per Nome Decrescente</string>
     <string name="sort_by_link_ascending">Ordina per Link Crescente</string>
     <string name="sort_by_link_descending">Ordina per Link Decrescente</string>
+
+    
     <string name="edit_tag">Modifica Tag</string>
     <string name="delete_tag">Elimina Tag</string>
     <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questo tag?</string>
@@ -91,6 +100,8 @@
     <string name="clear_all_filters">Pulisci Tutti i Filtri</string>
     <string name="selected_tags_count">%d tag selezionati</string>
     <string name="filtered_tags_count">%1$d di %2$d</string>
+
+    
     <string name="backup">Backup</string>
     <string name="restore">Ripristina</string>
     <string name="import_deeplinks">Importa link</string>
@@ -118,6 +129,8 @@
     <string name="show_open_counter_description">Visualizza quante volte ogni link è stato aperto</string>
     <string name="app_version">Versione App: %s</string>
     <string name="made_with_love">Fatto con ❤️ in India</string>
+
+    
     <string name="app_logo">Logo dell\'App</string>
     <string name="version_format">Versione %s</string>
     <string name="app_description">Una semplice app per salvare, organizzare e lanciare link.</string>
@@ -130,18 +143,26 @@
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
     <string name="view_on_github">Visualizza su GitHub</string>
+
+    
     <string name="save_deeplink">Salva Link</string>
     <string name="save_deeplink_message">Salvare il link: %s ?</string>
     <string name="enter_link_name">Inserisci il nome per il link (Facoltativo)</string>
     <string name="enter_link_name_error">Inserisci un nome per il link.</string>
     <string name="save_and_execute">Salva ed Esegui</string>
+
+    
     <string name="enter_deeplink_command">Inserisci link</string>
     <string name="invalid_empty_deeplink">Link non valido o vuoto.</string>
+
+    
     <string name="invalid_deeplink_toast">Link non valido: %s</string>
     <string name="no_data_to_export">Nessun dato trovato nel database da esportare.</string>
     <string name="no_data_available_export">Nessun dato disponibile per l\'esportazione dopo la mappatura.</string>
     <string name="export_success">Esportato con successo in %s</string>
     <string name="export_failed">Impossibile creare il file CSV.</string>
+
+    
     <string name="sync_to_file">Sincronizza su File Locale (Beta)</string>
     <string name="sync_to_file_description">Sincronizza automaticamente i link in un file markdown</string>
     <string name="select_sync_file">Seleziona File di Sincronizzazione</string>
@@ -155,6 +176,8 @@
     <string name="last_sync_time">Ultima Sincronizzazione</string>
     <string name="last_sync_time_never">Mai sincronizzato</string>
     <string name="last_sync_time_format">%s</string>
+
+    
     <string name="sync_disabled">Sincronizzazione disabilitata</string>
     <string name="sync_file_not_selected">Nessun file di sincronizzazione selezionato</string>
     <string name="sync_success">Sincronizzato con successo in %s</string>
@@ -162,6 +185,8 @@
     <string name="no_file_path_provided">Nessun percorso file fornito</string>
     <string name="invalid_markdown_format">Formato tabella markdown non valido</string>
     <string name="file_validation_error">Errore di validazione del file: %s</string>
+
+    
     <string name="auto_backup">Backup Automatico</string>
     <string name="auto_backup_description">Backup automatico dei link in un file CSV</string>
     <string name="select_backup_location">Seleziona Posizione di Backup</string>
@@ -179,6 +204,8 @@
     <string name="backup_location_not_selected">Nessuna posizione di backup selezionata</string>
     <string name="select_interval">Seleziona Intervallo</string>
     <string name="backup_interval_dialog_title">Seleziona l\'Intervallo di Backup</string>
+
+    
     <string name="local_network_server">Server di Rete Locale</string>
     <string name="local_server_running">Server Locale in Esecuzione</string>
     <string name="server_status">Stato del Server</string>
@@ -214,10 +241,14 @@
     <string name="invalid_port">Numero di porta non valido. Deve essere compreso tra 1024 e 65535.</string>
     <string name="port_changed_restart">Porta cambiata. Riavvio del server...</string>
     <string name="change_port">Cambia Porta</string>
+
+    
     <string name="transfer_link_server">Server Trasferimento Link</string>
     <string name="transfer_link_to_another_device">Trasferisci Link a un altro Dispositivo (Beta)</string>
     <string name="transfer_link_server_instructions">1. Attiva l\'interruttore sopra per avviare il server\n2. Assicurati che entrambi i dispositivi siano sulla stessa rete Wi-Fi\n3. Scansiona il codice QR dall\'opzione di importazione link in un altro dispositivo</string>
     <string name="scan_qr_to_get_data">Scansiona per ottenere i link da un altro dispositivo</string>
+
+    
     <string name="profiles">Profili</string>
     <string name="reorder">Riordina</string>
     <string name="profile">Profilo</string>
@@ -239,6 +270,8 @@
     <string name="manage_profiles">Gestisci Profili</string>
     <string name="no_profiles_yet">Nessun profilo ancora</string>
     <string name="create_first_profile">Crea il tuo primo profilo per organizzare i tuoi link</string>
+
+    
     <string name="save_silently">Salva silenziosamente</string>
     <string name="link_saved_silently">Link salvato con successo</string>
     <string name="invalid_link_silent_save">Link non valido</string>
@@ -246,6 +279,8 @@
     <string name="link_already_exists">Il link esiste già</string>
     <string name="silent_save_profile">Profilo per Salvataggio Silenzioso</string>
     <string name="silent_save_profile_description">I link salvati tramite \'Salva silenziosamente\' andranno in questo profilo</string>
+
+    
     <string name="web_title">Deepr - Gestore Link</string>
     <string name="web_subtitle">Il tuo gestore di link personale</string>
     <string name="web_profile_label">Profilo:</string>
@@ -253,10 +288,9 @@
     <string name="web_add_new_link">Aggiungi Nuovo Link</string>
     <string name="web_link_url">URL del Link</string>
     <string name="web_link_name">Nome del Link</string>
-    <string name="web_link_name_placeholder">Il mio link fantastico</string>
     <string name="web_optional">Facoltativo</string>
     <string name="web_notes_optional">Note (Facoltativo)</string>
-    <string name="web_tags_optional">Etichette (Facoltativo)</string>
+    <string name="web_tags_optional">Tag (Facoltativo)</string>
     <string name="web_add_link_button">Aggiungi Link</string>
     <string name="web_your_links">I Tuoi Link</string>
     <string name="web_refresh">Aggiorna</string>
@@ -288,6 +322,8 @@
     <string name="web_msg_filtered">Filtrato per tag: </string>
     <string name="web_msg_filters_cleared">Filtri rimossi</string>
     <string name="web_open_link">Apri Link</string>
+
+    
     <string name="enter_profile_name">Inserisci nome profilo</string>
     <string name="all_profiles">Tutti i Profili</string>
     <string name="failed_to_fetch_data">Impossibile recuperare i dati da %1$s, codice stato: %2$d</string>
@@ -301,19 +337,19 @@
     <string name="unknown">Sconosciuto</string>
     <string name="preview">Anteprima</string>
     <string name="link_placeholder">https://esempio.com o app://deeplink</string>
+
+    
     <string name="theme">Tema</string>
     <string name="theme_dialog_title">Seleziona Tema</string>
     <string name="theme_light">Chiaro</string>
     <string name="theme_dark">Scuro</string>
     <string name="close">Chiudi</string>
+
+    
     <string name="finish_reordering">Termina Riordinamento</string>
     <string name="move_up">Sposta Su</string>
     <string name="move_down">Sposta Giù</string>
     <string name="profile_delete_confirmation_template">Sei sicuro di voler eliminare il profilo %1$s e tutti i link associati? Questa azione non può essere annullata.</string>
     <string name="profile_delete_failed">Eliminazione profilo fallita</string>
     <string name="profile_update_failed">Aggiornamento profilo fallito</string>
-    <string name="notes_optional">Note (Facoltativo)</string>
-    <string name="tags_optional">Etichette (Facoltativo)</string>
-    <string name="no_qr_data_found">Nessun dato trovato</string>
-    <string name="invalid_deeplink">Deeplink non valido</string>
-</resources>
+<string name="notes_optional">Note (Facoltativo)</string><string name="tags_optional">Etichette (Facoltativo)</string></resources>
