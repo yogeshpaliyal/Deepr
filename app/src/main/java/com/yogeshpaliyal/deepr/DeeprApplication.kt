@@ -53,12 +53,13 @@ class DeeprApplication : Application() {
                             schema = DeeprDB.Schema,
                             context = this@DeeprApplication,
                             name = "deepr.db",
-                            callback = object : AndroidSqliteDriver.Callback(DeeprDB.Schema) {
-                                override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-                                    super.onOpen(db)
-                                    db.setForeignKeyConstraintsEnabled(true)
-                                }
-                            },
+                            callback =
+                                object : AndroidSqliteDriver.Callback(DeeprDB.Schema) {
+                                    override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                                        super.onOpen(db)
+                                        db.setForeignKeyConstraintsEnabled(true)
+                                    }
+                                },
                         ),
                     ) {
                         Log.d("loggingDB", it)

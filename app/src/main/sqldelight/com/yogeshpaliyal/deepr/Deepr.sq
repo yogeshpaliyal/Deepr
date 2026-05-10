@@ -3,8 +3,12 @@ id INTEGER PRIMARY KEY NOT NULL,
 name TEXT NOT NULL UNIQUE,
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 themeMode TEXT NOT NULL DEFAULT 'system',
-colorTheme TEXT NOT NULL DEFAULT 'dynamic'
+colorTheme TEXT NOT NULL DEFAULT 'dynamic',
+priority INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE INDEX IF NOT EXISTS idx_profile_priority_createdAt
+ON Profile(priority, createdAt);
 
 CREATE TABLE Deepr (
 id INTEGER PRIMARY KEY NOT NULL,
@@ -268,8 +272,15 @@ UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 insertProfile:
 INSERT OR IGNORE INTO Profile (name) VALUES (?);
 
+insertProfileWithPriority:
+INSERT OR IGNORE INTO Profile (name, priority) VALUES (?, ?);
+
+insertProfileAutoPriority:
+INSERT OR IGNORE INTO Profile (name, priority)
+VALUES (?, (SELECT COALESCE(MAX(priority), 0) + 1 FROM Profile));
+
 getAllProfiles:
-SELECT * FROM Profile ORDER BY createdAt ASC;
+SELECT * FROM Profile ORDER BY priority ASC, createdAt ASC;
 
 getProfileById:
 SELECT * FROM Profile WHERE id = ?;
@@ -279,6 +290,12 @@ SELECT * FROM Profile WHERE name = ?;
 
 updateProfile:
 UPDATE Profile SET name = ?, themeMode = ?, colorTheme = ? WHERE id = ?;
+
+updateProfilePriority:
+UPDATE Profile SET priority = ? WHERE id = ?;
+
+maxPriority:
+SELECT MAX(priority) FROM Profile;
 
 deleteProfile:
 DELETE FROM Profile WHERE id = ?;
