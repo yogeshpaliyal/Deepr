@@ -146,7 +146,6 @@
     <string name="add_to_favourites">Ajouter aux favoris</string>
     <string name="remove_from_favourites">Retirer des favoris</string>
     <string name="add">Ajouter</string>
-    <string name="clipboard_link_detected">Lien détecté dans le presse-papiers</string>
     <string name="add_tag">Ajouter une étiquette</string>
     <string name="no_favourites_found">Aucun favori pour le moment</string>
     <string name="no_favourites_description">Marquez des liens comme favoris pour les voir ici</string>
@@ -195,10 +194,6 @@
     <string name="link_already_exists">Le lien existe déjà</string>
     <string name="silent_save_profile">Profil d\'enregistrement silencieux</string>
     <string name="silent_save_profile_description">Les liens enregistrés via \'Enregistrer silencieusement\' iront dans ce profil</string>
-
-    
-    <string name="clipboard_link_detection">Détection de liens dans le presse-papiers</string>
-    <string name="clipboard_link_detection_description">Détecter automatiquement les liens dans le presse-papiers et afficher une bannière pour les ajouter</string>
 
     
     <string name="theme">Thème</string>
@@ -254,4 +249,4 @@
     <string name="preview">Aperçu</string>
     <string name="link_placeholder">https://exemple.com ou app://deeplink</string>
     <string name="switch_profile">Changer de profil</string>
-</resources>
+<string name="web_optional">Optional</string></resources>

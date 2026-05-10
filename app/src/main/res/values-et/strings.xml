@@ -105,7 +105,6 @@
     <string name="api_get_server_info">Tuvasta serveri teave ja API juhend</string>
     <string name="delete">Kustuta</string>
     <string name="linkedin">LinkedIn</string>
-    <string name="clipboard_link_detected">Tuvastasin lõikelaualt lingi</string>
     <string name="notes">Märkmed</string>
     <string name="custom_port">Sinu valitud port</string>
     <string name="sync_status_invalid">⚠ Failivorming on vigane</string>
@@ -244,4 +243,4 @@
     <string name="invalid_link_silent_save">Vigane link</string>
     <string name="failed_to_save_link">Lingi salvestamine ei õnnestunud</string>
     <string name="link_already_exists">Selline link on juba olemas</string>
-</resources>
+<string name="web_optional">Kui tahad</string><string name="notes_optional">Märkmed (Kui tahad)</string><string name="tags_optional">Sildid (Kui tahad)</string></resources>

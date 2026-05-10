@@ -146,7 +146,6 @@
     <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
     <string name="remove_from_favourites">Aus Favoriten entfernen</string>
     <string name="add">Hinzufügen</string>
-    <string name="clipboard_link_detected">Link in Zwischenablage erkannt</string>
     <string name="add_tag">Tag hinzufügen</string>
     <string name="no_favourites_found">Noch keine Favoriten</string>
     <string name="no_favourites_description">Markiere Links als Favoriten, um sie hier zu sehen</string>
@@ -195,10 +194,6 @@
     <string name="link_already_exists">Link existiert bereits</string>
     <string name="silent_save_profile">Profil für lautloses Speichern</string>
     <string name="silent_save_profile_description">Über \'Lautlos speichern\' gespeicherte Links landen in diesem Profil</string>
-
-    
-    <string name="clipboard_link_detection">Link-Erkennung in Zwischenablage</string>
-    <string name="clipboard_link_detection_description">Links in der Zwischenablage automatisch erkennen und Banner zum Hinzufügen anzeigen</string>
 
     
     <string name="theme">Design</string>
@@ -254,4 +249,4 @@
     <string name="preview">Vorschau</string>
     <string name="link_placeholder">https://beispiel.de oder app://deeplink</string>
     <string name="switch_profile">Profil wechseln</string>
-</resources>
+<string name="web_optional">Optional</string></resources>

@@ -146,7 +146,6 @@
     <string name="add_to_favourites">Añadir a favoritos</string>
     <string name="remove_from_favourites">Quitar de favoritos</string>
     <string name="add">Añadir</string>
-    <string name="clipboard_link_detected">Enlace detectado en el portapapeles</string>
     <string name="add_tag">Añadir etiqueta</string>
     <string name="no_favourites_found">No hay favoritos aún</string>
     <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí</string>
@@ -195,10 +194,6 @@
     <string name="link_already_exists">El enlace ya existe</string>
     <string name="silent_save_profile">Perfil de guardado silencioso</string>
     <string name="silent_save_profile_description">Los enlaces guardados mediante \'Guardar silenciosamente\' irán a este perfil</string>
-
-    
-    <string name="clipboard_link_detection">Detección de enlaces en el portapapeles</string>
-    <string name="clipboard_link_detection_description">Detectar automáticamente enlaces en el portapapeles y mostrar un banner para añadirlos</string>
 
     
     <string name="theme">Tema</string>
@@ -254,4 +249,4 @@
     <string name="preview">Vista previa</string>
     <string name="link_placeholder">https://ejemplo.com o app://deeplink</string>
     <string name="switch_profile">Cambiar de perfil</string>
-</resources>
+<string name="web_optional">Optional</string></resources>

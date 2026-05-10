@@ -84,7 +84,6 @@
     <string name="delete_tag_description">Удалить тег</string>
     <string name="api_get_server_info">Получить информацию о сервере и документацию по API</string>
     <string name="linkedin">linkedin</string>
-    <string name="clipboard_link_detected">В буфере обмена обнаружена ссылка</string>
     <string name="custom_port">Пользовательский порт</string>
     <string name="sync_status_invalid">⚠ Формат файла неверный</string>
     <string name="app_logo">Логотип приложения</string>
@@ -209,4 +208,4 @@
     <string name="import_deeplinks_description">Импортировать ссылки из файла CSV</string>
     <string name="import_deeplinks">Импортировать ссылки</string>
     <string name="copy_link">Копировать ссылку</string>
-</resources>
+<string name="web_optional">Опционально</string><string name="notes_optional">Заметки (Опционально)</string><string name="tags_optional">Теги (Опционально)</string></resources>

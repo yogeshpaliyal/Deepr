@@ -133,7 +133,6 @@
     <string name="add_to_favourites">अपनी पसंद में जोड़ें</string>
     <string name="remove_from_favourites">अपनी पसंद से हटाएं</string>
     <string name="no_favourites_found">पसंदीदा सूची खाली है</string>
-    <string name="clipboard_link_detected">क्लिपबोर्ड में लिंक मिला</string>
     <string name="all_tags">सारे टैग्स</string>
     <string name="no_search_results">कोई नतीजा नहीं मिला</string>
     <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें</string>
@@ -250,4 +249,4 @@
     <string name="local_server_instructions">1. ऊपर दिए गए स्विच को चालू करके सर्वर शुरू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस से URL (लिंक) का उपयोग करें या QR कोड स्कैन करें\n4. अपने लिंक प्रबंधित करने के लिए वेब इंटरफ़ेस या API एंडपॉइंट्स का उपयोग करें</string>
     <string name="api_endpoints">API एंडपोइनट्स</string>
     <string name="api_endpoints_description">प्रोग्रामेटिक एक्सेस के लिए उपलब्ध REST API एंडपॉइंट्स</string>
-</resources>
+<string name="web_optional">Optional</string><string name="notes_optional">टिप्पणियाँ (Optional)</string><string name="tags_optional">टैग्स (Optional)</string></resources>

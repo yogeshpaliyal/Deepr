@@ -23,7 +23,6 @@
     <string name="remove_from_favourites">Rimuovi dai preferiti</string>
     <string name="add_link">Aggiungi Link</string>
     <string name="add">Aggiungi</string>
-    <string name="clipboard_link_detected">Link rilevato negli appunti</string>
     <string name="fetch_name_from_link">Recupera metadati dal link</string>
     <string name="create_tag">Crea Tag</string>
     <string name="new_tag">Nuova etichetta (Facoltativo)</string>
@@ -282,10 +281,6 @@
     <string name="silent_save_profile_description">I link salvati tramite \'Salva silenziosamente\' andranno in questo profilo</string>
 
     
-    <string name="clipboard_link_detection">Rilevamento link negli appunti</string>
-    <string name="clipboard_link_detection_description">Rileva automaticamente i link negli appunti e mostra un banner per aggiungerli</string>
-
-    
     <string name="web_title">Deepr - Gestore Link</string>
     <string name="web_subtitle">Il tuo gestore di link personale</string>
     <string name="web_profile_label">Profilo:</string>
@@ -293,9 +288,9 @@
     <string name="web_add_new_link">Aggiungi Nuovo Link</string>
     <string name="web_link_url">URL del Link</string>
     <string name="web_link_name">Nome del Link</string>
-    <string name="web_optional">Opzionale</string>
-    <string name="web_notes_optional">Note (Opzionale)</string>
-    <string name="web_tags_optional">Tag (Opzionale)</string>
+    <string name="web_optional">Facoltativo</string>
+    <string name="web_notes_optional">Note (Facoltativo)</string>
+    <string name="web_tags_optional">Tag (Facoltativo)</string>
     <string name="web_add_link_button">Aggiungi Link</string>
     <string name="web_your_links">I Tuoi Link</string>
     <string name="web_refresh">Aggiorna</string>
@@ -357,4 +352,4 @@
     <string name="profile_delete_confirmation_template">Sei sicuro di voler eliminare il profilo %1$s e tutti i link associati? Questa azione non può essere annullata.</string>
     <string name="profile_delete_failed">Eliminazione profilo fallita</string>
     <string name="profile_update_failed">Aggiornamento profilo fallito</string>
-</resources>
+<string name="notes_optional">Note (Facoltativo)</string><string name="tags_optional">Etichette (Facoltativo)</string></resources>

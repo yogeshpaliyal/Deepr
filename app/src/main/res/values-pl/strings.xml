@@ -61,4 +61,4 @@
     <string name="sort_by_opened_descending">Sortuj według daty otwarcia (od najnowszych)</string>
     <string name="sort_by_name_ascending">Sortuj wg Nazwy (A-Z)</string>
     <string name="sort_by_name_descending">Sortuj wg nazwy (Z-A)</string>
-</resources>
+<string name="web_optional">Optional</string><string name="notes_optional">Notatki (Optional)</string><string name="tags_optional">Tagi (Optional)</string></resources>
