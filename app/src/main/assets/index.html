@@ -119,13 +119,13 @@
 
                     <div class="flex-1">
                         <label for="linkName" class="block text-sm font-medium text-gray-700 mb-2">
-                            Link Name (Optional)
+                            Link Name
                         </label>
                         <input
                             type="text"
                             id="linkName"
-                            placeholder="My Awesome Link (Optional)"
-                            
+                            placeholder="My Awesome Link"
+                            required
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
                     </div>
@@ -677,14 +677,15 @@
                                 ` : ''}
 
                                 <div class="mt-4 pt-4 border-t border-gray-100">
-                                    <button
-                                       onclick="handleOpenLink(${link.id}, '${escapeHtml(link.link)}')"
+                                    <a href="${escapeHtml(link.link)}"
+                                       target="_blank"
+                                       onclick="handleOpenLink(${link.id})"
                                        class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                         </svg>
                                         Open Link
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -693,18 +694,17 @@
             `;
         }
 
-        // Handle opening a link and incrementing count
-        async function handleOpenLink(id, url) {
-            // Open link in new tab
-            window.open(url, '_blank');
-
-            // Increment count in background
+        // Update statistics when opening a link
+        async function handleOpenLink(linkId) {
             try {
-                await fetch(`/api/links/increment-count?id=${id}`, { method: 'POST' });
-                // Optional: refresh links to see updated count
-                setTimeout(loadLinks, 1000);
+                await fetch('/api/links/increment-count', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: linkId })
+                });
+                loadLinks(); // Refresh count in UI
             } catch (error) {
-                console.error('Error incrementing count:', error);
+                console.error('Error tracking link open:', error);
             }
         }
 
