@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
-    <!-- Navigation and UI Labels -->
+    
     <string name="settings">सेटिंग्स</string>
     <string name="about_us">हमारे बारे में</string>
     <string name="back">वापस</string>
@@ -21,8 +21,8 @@
     <string name="create_tag">टैग बनाएं</string>
     <string name="new_tag">नया टैग</string>
     <string name="no_links_saved_yet">अभी तक कोई लिंक सहेजे नहीं गए</string>
-    <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें।</string>
-    <!-- Menu and Dialog Items -->
+    <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें</string>
+    
     <string name="more_options">अधिक विकल्प</string>
     <string name="copy_link">लिंक कॉपी करें</string>
     <string name="link_copied">लिंक कॉपी किया गया</string>
@@ -38,7 +38,7 @@
     <string name="edit_shortcut">शॉर्टकट संपादित करें</string>
     <string name="show_qr_code">QR कोड दिखाएं</string>
     <string name="deeplink_already_exists">डीपलिंक पहले से मौजूद है</string>
-    <!-- Sort Menu Items -->
+    
     <string name="sort_by_date_ascending">दिनांक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_date_descending">दिनांक के अनुसार अवरोही क्रम में</string>
     <string name="sort_by_opened_ascending">खोले गए के अनुसार आरोही क्रम में</string>
@@ -47,7 +47,7 @@
     <string name="sort_by_name_descending">नाम के अनुसार अवरोही क्रम में</string>
     <string name="sort_by_link_ascending">लिंक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_link_descending">लिंक के अनुसार अवरोही क्रम में</string>
-    <!-- Tag Management -->
+    
     <string name="edit_tag">टैग संपादित करें</string>
     <string name="delete_tag">टैग हटाएँ</string>
     <string name="delete_tag_confirmation">क्या आप वाकई इस टैग को हटाना चाहते हैं?</string>
@@ -58,7 +58,7 @@
     <string name="tag_deleted_successfully">टैग सफलतापूर्वक हटाया गया</string>
     <string name="edit_tag_description">टैग संपादित करें</string>
     <string name="delete_tag_description">टैग हटाएँ</string>
-    <!-- Settings Screen -->
+    
     <string name="import_deeplinks">Deeplinks आयात करें</string>
     <string name="import_deeplinks_description">CSV फ़ाइल से Deeplinks आयात करें</string>
     <string name="export_deeplinks">Deeplinks निर्यात करें</string>
@@ -79,38 +79,38 @@
     <string name="urdu">उर्दू</string>
     <string name="app_version">ऐप संस्करण: %s</string>
     <string name="made_with_love">भारत में ❤️ के साथ बनाया गया</string>
-    <!-- About Us Screen -->
+    
     <string name="app_logo">ऐप लोगो</string>
     <string name="version_format">संस्करण %s</string>
-    <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप।</string>
+    <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप</string>
     <string name="author">लेखक</string>
     <string name="author_name">योगेश चौधरी</string>
     <string name="twitter">ट्विटर</string>
     <string name="github">गिटहब</string>
     <string name="linkedin">लिंक्डइन</string>
     <string name="view_on_github">गिटहब पर देखें</string>
-    <!-- Save Dialog -->
+    
     <string name="save_deeplink">डीपलिंक सहेजें</string>
     <string name="save_deeplink_message">डीपलिंक सहेजें: %s ?</string>
     <string name="enter_link_name">कृपया लिंक का नाम दर्ज करें</string>
-    <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें।</string>
+    <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें</string>
     <string name="save_and_execute">सहेजें और निष्पादित करें</string>
-    <!-- Home Screen -->
+    
     <string name="enter_deeplink_command">लिंक दर्ज करें</string>
-    <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक।</string>
-    <!-- Error Messages -->
+    <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक</string>
+    
     <string name="invalid_deeplink_toast">अमान्य डीपलिंक: %s</string>
-    <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला।</string>
-    <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं।</string>
+    <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला</string>
+    <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं</string>
     <string name="export_success">सफलतापूर्वक %s में निर्यात किया गया</string>
-    <string name="export_failed">CSV फ़ाइल बनाने में विफल।</string>
-    <!-- Sync Settings -->
+    <string name="export_failed">CSV फ़ाइल बनाने में विफल</string>
+    
     <string name="select_sync_file">सिंक फ़ाइल चुनें</string>
     <string name="sync_now">अभी सिंक करें</string>
     <string name="last_sync_time">आख़िरी (पिछला) सिंक</string>
     <string name="last_sync_time_never">कभी सिंक नहीं हुआ</string>
     <string name="last_sync_time_format">%s</string>
-    <!-- Sync Messages -->
+    
     <string name="sync_disabled">सिंक अक्षम है</string>
     <string name="sync_file_not_selected">कोई सिंक फ़ाइल नहीं चुनी गई</string>
     <string name="sync_success">%s के साथ सफलतापूर्वक सिंक हो गया</string>
@@ -118,7 +118,7 @@
     <string name="no_file_path_provided">कोई फ़ाइल पथ प्रदान नहीं किया गया</string>
     <string name="invalid_markdown_format">अमान्य मार्कडाउन तालिका प्रारूप</string>
     <string name="file_validation_error">फ़ाइल सत्यापन त्रुटि: %s</string>
-    <!-- Additional Sync Settings -->
+    
     <string name="sync_to_file">स्थानीय फ़ाइल में सिंक करें (बीटा)</string>
     <string name="sync_to_file_description">डीपलिंक्स को मार्कडाउन फ़ाइल में स्वचालित रूप से सिंक करें</string>
     <string name="select_sync_file_description">मार्कडाउन सिंक के लिए फ़ाइल स्थान चुनें</string>
@@ -136,7 +136,7 @@
     <string name="clipboard_link_detected">क्लिपबोर्ड में लिंक मिला</string>
     <string name="all_tags">सारे टैग्स</string>
     <string name="no_search_results">कोई नतीजा नहीं मिला</string>
-    <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें।</string>
+    <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें</string>
     <string name="delete_confirmation_title">क्या लिंक हटाना है?</string>
     <string name="note">टिप्पणी</string>
     <string name="note_copied">नोट कॉपी हो गया</string>
@@ -163,7 +163,7 @@
     <string name="failed_to_create_profile">प्रोफ़ाइल बनाने में विफल</string>
     <string name="profile_updated_successfully">प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई</string>
     <string name="cannot_delete_only_profile">एकमात्र प्रोफ़ाइल को हटाया नहीं जा सकता</string>
-    <string name="profile_delete_confirmation">क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? इस प्रोफ़ाइल के सभी लिंक और टैग हटा दिए जाएंगे।</string>
+    <string name="profile_delete_confirmation">क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? इस प्रोफ़ाइल के सभी लिंक और टैग हटा दिए जाएंगे</string>
     <string name="switch_profile">अगली प्रोफ़ाइल में स्विच करें</string>
     <string name="manage_profiles">प्रोफाइल प्रबंधित करें</string>
     <string name="no_profiles_yet">अभी तक कोई प्रोफ़ाइल नहीं बनाई गई है</string>
@@ -186,18 +186,18 @@
     <string name="default_port">डिफ़ॉल्ट: 8080</string>
     <string name="api_get_links">सभी सहेजे गए लिंक प्राप्त करें</string>
     <string name="port_range_hint">पोर्ट दर्ज करें (1024–65535)</string>
-    <string name="invalid_port">अमान्य पोर्ट नंबर। यह 1024 और 65535 के बीच होना चाहिए।</string>
+    <string name="invalid_port">अमान्य पोर्ट नंबर। यह 1024 और 65535 के बीच होना चाहिए</string>
     <string name="port_changed_restart">पोर्ट बदल दिया गया है। सर्वर फिर से शुरू हो रहा है…</string>
     <string name="change_port">पोर्ट बदलें</string>
     <string name="transfer_link_server">लिंक ट्रांसफ़र सर्वर</string>
     <string name="transfer_link_to_another_device">लिंक को दूसरे डिवाइस पर ट्रांसफ़र करें (बीटा)</string>
     <string name="transfer_link_server_instructions">1. सर्वर शुरू करने के लिए ऊपर दिए गए स्विच को चालू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस में “Import Links” विकल्प से QR कोड स्कैन करें</string>
     <string name="scan_qr_to_get_data">दूसरे डिवाइस से लिंक पाने के लिए स्कैन करें</string>
-    <string name="no_favourites_description">यहाँ देखने के लिए लिंक को पसंदीदा के रूप में चिह्नित करें।</string>
+    <string name="no_favourites_description">यहाँ देखने के लिए लिंक को पसंदीदा के रूप में चिह्नित करें</string>
     <string name="no_links_with_tags">चुने गए टैग के साथ कोई लिंक नहीं है</string>
-    <string name="no_links_with_tags_description">अलग टैग चुनने की कोशिश करें या फ़िल्टर हटाएँ।</string>
+    <string name="no_links_with_tags_description">अलग टैग चुनने की कोशिश करें या फ़िल्टर हटाएँ</string>
     <string name="no_favourites_with_tags">चुने गए टैग में कोई पसंदीदा नहीं है</string>
-    <string name="no_favourites_with_tags_description">इन टैग्स वाले लिंक को पसंदीदा के रूप में चिन्हित करें या अलग टैग्स आज़माएँ।</string>
+    <string name="no_favourites_with_tags_description">इन टैग्स वाले लिंक को पसंदीदा के रूप में चिन्हित करें या अलग टैग्स आज़माएँ</string>
     <string name="remove_thumbnail">थंबनेल हटाएँ</string>
     <string name="thumbnail_url">थंबनेल URL (लिंक)</string>
     <string name="edit_thumbnail_url">थंबनेल URL संपादित करें</string>
