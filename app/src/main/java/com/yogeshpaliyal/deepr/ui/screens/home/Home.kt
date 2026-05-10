@@ -11,9 +11,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -44,12 +48,13 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -58,6 +63,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -68,6 +74,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
@@ -85,6 +92,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -134,9 +142,10 @@ import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.ArrowsSort
+import compose.icons.tablericons.Check
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.ExternalLink
-import compose.icons.tablericons.Home
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Plus
@@ -146,6 +155,7 @@ import compose.icons.tablericons.Search
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.User
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -167,9 +177,9 @@ class Dashboard2(
     val mSelectedLink: GetLinksAndTags? = null,
 ) : TopLevelRoute {
     override val icon: ImageVector
-        get() = TablerIcons.Home
+        get() = TablerIcons.User
     override val label: Int
-        get() = R.string.home
+        get() = R.string.profiles
 
     @Composable
     override fun Content(windowInsets: WindowInsets) {
@@ -197,6 +207,7 @@ data class FilterTagItem(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeMaterialsApi::class,
     ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
 )
 @Composable
 fun HomeScreen(
@@ -210,10 +221,12 @@ fun HomeScreen(
 ) {
     val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
-    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
+
+    val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
+    val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -243,12 +256,29 @@ fun HomeScreen(
         }
     }
 
-    BackHandler(enabled = selectedTag.isNotEmpty() || searchBarState.currentValue == SearchBarValue.Expanded) {
+    var showCreateProfileDialog by remember { mutableStateOf(false) }
+    var profileToManage by remember { mutableStateOf<com.yogeshpaliyal.deepr.Profile?>(null) }
+    var isReordering by remember { mutableStateOf(false) }
+
+    BackHandler(
+        enabled =
+            isReordering ||
+                profileToManage != null ||
+                !showProfilesGrid ||
+                selectedTag.isNotEmpty() ||
+                searchBarState.currentValue == SearchBarValue.Expanded,
+    ) {
         hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-        if (searchBarState.currentValue == SearchBarValue.Expanded) {
+        if (isReordering) {
+            isReordering = false
+        } else if (profileToManage != null) {
+            profileToManage = null
+        } else if (searchBarState.currentValue == SearchBarValue.Expanded) {
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
+        } else if (!showProfilesGrid) {
+            viewModel.setShowProfilesGrid(true)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
         }
@@ -260,10 +290,10 @@ fun HomeScreen(
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =
-                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "", profileId = currentProfile?.id ?: 1L)
+                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
             } else {
                 Toast
-                    .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
+                    .makeText(context, context.getString(R.string.invalid_shared_link), Toast.LENGTH_SHORT)
                     .show()
             }
             // Reset shared text even on error to prevent stuck state
@@ -369,18 +399,7 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.profiles)) } },
-                                state = rememberTooltipState(),
-                            ) {
-                                ProfileSelectorMenu(viewModel = viewModel)
-                            }
-
-                            TooltipBox(
-                                positionProvider =
-                                    TooltipDefaults.rememberTooltipPositionProvider(
-                                        TooltipAnchorPosition.Below,
-                                    ),
-                                tooltip = { PlainTooltip { Text("View Type") } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.view_type)) } },
                                 state = rememberTooltipState(),
                             ) {
                                 ViewTypeMenu(currentViewType, {
@@ -414,88 +433,186 @@ fun HomeScreen(
             )
         }
 
+    val interactionSource = remember { MutableInteractionSource() }
+
     Scaffold(
         contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Column(
-                modifier =
-                    Modifier
-                        .hazeEffect(
-                            state = hazeState,
-                            style = HazeMaterials.ultraThin(),
-                        ).fillMaxWidth(),
-            ) {
-                AppBarWithSearch(
-                    scrollBehavior = scrollBehavior,
-                    state = searchBarState,
-                    inputField = inputField,
-                    colors =
-                        SearchBarDefaults.appBarWithSearchColors(
-                            appBarContainerColor = Color.Transparent,
-                        ),
-                )
-                ServerStatusBar(
-                    onServerStatusClick = {
-                        // Navigate to LocalNetworkServer screen when status bar is clicked
-                        analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
-                        if (localNavigator.getLast() !is LocalNetworkServer) {
-                            localNavigator.add(LocalNetworkServer)
+            if (showProfilesGrid) {
+                TopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.profiles),
+                            )
+                            if (allProfiles.isNotEmpty()) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(12.dp),
+                                ) {
+                                    Text(
+                                        text = "${allProfiles.size}",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier =
+                                            Modifier.padding(
+                                                horizontal = 10.dp,
+                                                vertical = 4.dp,
+                                            ),
+                                    )
+                                }
+                            }
                         }
                     },
+                    actions = {
+                        if (allProfiles.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    isReordering = !isReordering
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = if (isReordering) TablerIcons.Check else TablerIcons.ArrowsSort,
+                                    contentDescription =
+                                        if (isReordering) {
+                                            stringResource(
+                                                R.string.finish_reordering,
+                                            )
+                                        } else {
+                                            stringResource(R.string.reorder)
+                                        },
+                                    tint = if (isReordering) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
                 )
-
-                LazyRow(
+            } else {
+                Column(
                     modifier =
                         Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                            .hazeEffect(
+                                state = hazeState,
+                                style = HazeMaterials.ultraThin(),
+                            ).fillMaxWidth(),
                 ) {
-                    item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
-                            viewModel.setFavouriteFilter(-1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
-                    }
-                    item {
-                        FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
-                            viewModel.setFavouriteFilter(1)
-                            viewModel.setTagFilter(null)
-                        }, label = {
-                            Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
-                    }
+                    AppBarWithSearch(
+                        scrollBehavior = scrollBehavior,
+                        state = searchBarState,
+                        inputField = inputField,
+                        colors =
+                            SearchBarDefaults.appBarWithSearchColors(
+                                appBarContainerColor = Color.Transparent,
+                            ),
+                    )
+                    ServerStatusBar(
+                        onServerStatusClick = {
+                            // Navigate to LocalNetworkServer screen when status bar is clicked
+                            analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
+                            if (localNavigator.getLast() !is LocalNetworkServer) {
+                                localNavigator.add(LocalNetworkServer)
+                            }
+                        },
+                    )
 
-                    items(finalTagsInfo ?: listOf()) {
-                        FilterChip(it.isSelected, {
-                            viewModel.setSelectedTagByName(it.name)
-                        }, label = {
-                            Text(it.name + " (${it.count})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                    LazyRow(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp),
+                    ) {
+                        if (textFieldState.text.isEmpty()) {
+                            item {
+                                FilterChip(selectedTag.isEmpty() && favouriteFilter == -1, {
+                                    viewModel.setFavouriteFilter(-1)
+                                    viewModel.setTagFilter(null)
+                                }, label = {
+                                    Text(stringResource(R.string.all) + " (${totalLinks ?: 0})")
+                                }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                            }
+                            item {
+                                FilterChip(selectedTag.isEmpty() && favouriteFilter == 1, {
+                                    viewModel.setFavouriteFilter(1)
+                                    viewModel.setTagFilter(null)
+                                }, label = {
+                                    Text(stringResource(R.string.favourites) + " (${favouriteLinks ?: 0})")
+                                }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                            }
+                        }
+
+                        items(finalTagsInfo ?: listOf()) {
+                            FilterChip(it.isSelected, {
+                                viewModel.setSelectedTagByName(it.name)
+                            }, label = {
+                                Text(it.name + " (${it.count})")
+                            }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        }
                     }
                 }
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
+            if (!showProfilesGrid) {
+                FloatingActionButton(
+                    onClick = {},
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(56.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            localNavigator.add(AddLinkScreen(createDeeprObject()))
+                                        },
+                                        onLongPress = {
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            var linkToPass = ""
+
+                                            // Fallback: try to read directly from clipboard manager if state is empty
+                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            val clipData = clipboard.primaryClip
+                                            if (clipData != null && clipData.itemCount > 0) {
+                                                val text = clipData.getItemAt(0).text?.toString()
+                                                if (!text.isNullOrBlank()) {
+                                                    val normalized = normalizeLink(text)
+                                                    if (isValidDeeplink(normalized)) {
+                                                        linkToPass = normalized
+                                                    }
+                                                }
+                                            }
+
+                                            localNavigator.add(AddLinkScreen(createDeeprObject(link = linkToPass)))
+                                        },
+                                    )
+                                },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            TablerIcons.Plus,
+                            contentDescription = stringResource(R.string.add_link),
+                        )
+                    }
+                }
+            } else {
+                FloatingActionButton(
+                    onClick = {
+                        showCreateProfileDialog = true
+                    },
+                ) {
                     Icon(
                         TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.add_link),
+                        contentDescription = stringResource(R.string.create_profile),
                     )
-                },
-                text = {
-                    Text(stringResource(R.string.add_link))
-                },
-                expanded = isExpanded,
-                onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
-                },
-            )
+                }
+            }
         },
     ) { contentPadding ->
         Box(
@@ -504,31 +621,160 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             val layoutDirection = LocalLayoutDirection.current
-            Content(
-                listState = listState,
-                viewModel = viewModel,
-                hazeState = hazeState,
-                contentPaddingValues =
-                    PaddingValues(
-                        start = contentPadding.calculateLeftPadding(layoutDirection),
-                        end = contentPadding.calculateRightPadding(layoutDirection),
-                        top = contentPadding.calculateTopPadding() + 8.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 8.dp,
-                    ),
-                selectedTag = selectedTag,
-                currentViewType = currentViewType,
-                searchQuery = textFieldState.text.toString(),
-                favouriteFilter = favouriteFilter,
-                editDeepr = {
-                    localNavigator.add(AddLinkScreen(it))
-                },
-            )
+            if (showProfilesGrid) {
+                ProfilesGrid(
+                    profiles = allProfiles,
+                    isReordering = isReordering,
+                    currentProfileId =
+                        viewModel.currentProfile
+                            .collectAsStateWithLifecycle()
+                            .value
+                            ?.id ?: -1L,
+                    contentPaddingValues =
+                        PaddingValues(
+                            start = contentPadding.calculateLeftPadding(layoutDirection) + 16.dp,
+                            end = contentPadding.calculateRightPadding(layoutDirection) + 16.dp,
+                            top = contentPadding.calculateTopPadding() + 16.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                        ),
+                    onProfileClick = {
+                        if (!isReordering) {
+                            viewModel.setSelectedProfile(it.id)
+                            viewModel.setShowProfilesGrid(false)
+                        }
+                    },
+                    onProfileLongClick = {
+                        if (!isReordering) {
+                            profileToManage = it
+                        }
+                    },
+                    onMoveUp = {
+                        viewModel.moveProfileUp(it.id)
+                    },
+                    onMoveDown = {
+                        viewModel.moveProfileDown(it.id)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Content(
+                    listState = listState,
+                    viewModel = viewModel,
+                    hazeState = hazeState,
+                    contentPaddingValues =
+                        PaddingValues(
+                            start = contentPadding.calculateLeftPadding(layoutDirection),
+                            end = contentPadding.calculateRightPadding(layoutDirection),
+                            top = contentPadding.calculateTopPadding() + 8.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 8.dp,
+                        ),
+                    selectedTag = selectedTag,
+                    currentViewType = currentViewType,
+                    searchQuery = textFieldState.text.toString(),
+                    favouriteFilter = favouriteFilter,
+                    editDeepr = {
+                        localNavigator.add(AddLinkScreen(it))
+                    },
+                )
+            }
         }
 
         selectedLink?.let {
             localNavigator.add(AddLinkScreen(it))
             selectedLink = null
         }
+
+        profileToManage?.let { profile ->
+            RenameDeleteProfileDialog(
+                profile = profile,
+                onDismiss = { profileToManage = null },
+                viewModel = viewModel,
+                allProfiles = allProfiles,
+            )
+        }
+    }
+
+    if (showCreateProfileDialog) {
+        var newProfileName by remember { mutableStateOf("") }
+        var profileCreationError by remember { mutableStateOf<String?>(null) }
+
+        AlertDialog(
+            onDismissRequest = {
+                showCreateProfileDialog = false
+                profileCreationError = null
+            },
+            title = {
+                Text(stringResource(R.string.create_profile))
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = newProfileName,
+                        onValueChange = {
+                            newProfileName = it
+                            profileCreationError = null
+                        },
+                        label = { Text(stringResource(R.string.profile_name)) },
+                        singleLine = true,
+                        isError = profileCreationError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    profileCreationError?.let { errorMessage ->
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val trimmedProfileName = newProfileName.trim()
+                        if (trimmedProfileName.isBlank()) {
+                            profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
+                            return@TextButton
+                        }
+
+                        val existingProfile =
+                            allProfiles.find {
+                                it.name.equals(trimmedProfileName, ignoreCase = true)
+                            }
+
+                        if (existingProfile != null) {
+                            profileCreationError = context.getString(R.string.profile_name_exists)
+                        } else {
+                            viewModel.insertProfile(trimmedProfileName)
+                            showCreateProfileDialog = false
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.profile_created_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                    },
+                    enabled = newProfileName.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.create_profile))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showCreateProfileDialog = false
+                        showCreateProfileDialog = false
+                        profileCreationError = null
+                    },
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
     }
 }
 
