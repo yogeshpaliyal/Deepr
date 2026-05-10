@@ -46,6 +46,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
@@ -57,7 +58,7 @@ open class LocalServerRepositoryImpl(
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     companion object {
-        private val htmlCache = mutableMapOf<Locale, String>()
+        private val htmlCache = ConcurrentHashMap<Locale, String>()
     }
 
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
@@ -149,6 +150,7 @@ open class LocalServerRepositoryImpl(
                                             "{{WEB_ADD_NEW_LINK}}" to R.string.web_add_new_link,
                                             "{{WEB_LINK_URL}}" to R.string.web_link_url,
                                             "{{WEB_LINK_NAME}}" to R.string.web_link_name,
+                                            "{{WEB_LINK_NAME_PLACEHOLDER}}" to R.string.web_link_name_placeholder,
                                             "{{WEB_OPTIONAL}}" to R.string.web_optional,
                                             "{{WEB_NOTES_OPTIONAL}}" to R.string.web_notes_optional,
                                             "{{WEB_TAGS_OPTIONAL}}" to R.string.web_tags_optional,
@@ -399,13 +401,9 @@ open class LocalServerRepositoryImpl(
 
                         post("/api/links/increment-count") {
                             try {
-                                val id = call.request.queryParameters["id"]?.toLongOrNull()
-                                if (id != null) {
-                                    accountViewModel.incrementOpenedCount(id)
-                                    call.respond(HttpStatusCode.OK, SuccessResponse("Count incremented"))
-                                } else {
-                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
-                                }
+                                val request = call.receive<IncrementCountRequest>()
+                                accountViewModel.incrementOpenedCount(request.id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Count incremented"))
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error incrementing count", e)
                                 call.respond(
@@ -569,6 +567,11 @@ open class LocalServerRepositoryImpl(
         return null
     }
 }
+
+@Serializable
+data class IncrementCountRequest(
+    val id: Long,
+)
 
 @Serializable
 data class LinkResponse(

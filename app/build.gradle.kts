@@ -66,6 +66,14 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../keystores/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -93,15 +101,6 @@ android {
     }
 
     flavorDimensions("default")
-
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("../keystores/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
 
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")

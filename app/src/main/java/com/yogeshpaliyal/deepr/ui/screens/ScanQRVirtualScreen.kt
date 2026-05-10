@@ -27,7 +27,7 @@ fun ScanQRCode() {
             QRScanner(),
         ) { result ->
             if (result.contents == null) {
-                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.no_qr_data_found), Toast.LENGTH_SHORT).show()
             } else {
                 val normalizedLink = normalizeLink(result.contents)
                 if (isValidDeeplink(normalizedLink)) {
@@ -40,7 +40,7 @@ fun ScanQRCode() {
                         ),
                     )
                 } else {
-                    Toast.makeText(context, "Invalid deeplink", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.invalid_deeplink), Toast.LENGTH_SHORT).show()
                 }
             }
         }

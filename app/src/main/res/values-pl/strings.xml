@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings">Ustawienia</string>
     <string name="about_us">O nas</string>
@@ -61,4 +61,7 @@
     <string name="sort_by_opened_descending">Sortuj według daty otwarcia (od najnowszych)</string>
     <string name="sort_by_name_ascending">Sortuj wg Nazwy (A-Z)</string>
     <string name="sort_by_name_descending">Sortuj wg nazwy (Z-A)</string>
+    <string name="web_optional">Opcjonalnie</string>
+    <string name="notes_optional">Notatki (Opcjonalnie)</string>
+    <string name="tags_optional">Tagi (Opcjonalnie)</string>
 </resources>

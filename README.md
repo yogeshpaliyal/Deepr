@@ -24,19 +24,20 @@
 - Import/Export links
 - QR Code support: Generate and scan
 - Organize links by tags
-- Manage multiple profiles. When the user is inside a profile list of links, clicking the Profile icon at the bottom bar or using the device back button will send them back to the profiles selection grid.
-- Save link by sharing from other app (eg: chrome, etc.)
+- Manage multiple profiles
+  - From a profile's link list, tapping the Profile icon or using the device back button returns to the profiles selection grid.
+- Save link by sharing from other apps (e.g., Chrome, etc.)
 - **Silent save option:** Save links from share sheet without opening the app
 - Save links to markdown file in local storage. (can be used for obsidian)
 - **Local network server:** Access and manage links from other devices on the same network
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | F-droid | Play Store | Pro Version on Play Store |
+| Feature                           | GitHub Release | F-droid | Play Store | Pro Version on Play Store |
 |-----------------------------------|----------------|---------|------------|-----------|
 | Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
 | Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
-| Profile speicific themes | ❌              | ❌       | ❌          | ✅  |
+| Profile specific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 

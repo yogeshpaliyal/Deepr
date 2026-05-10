@@ -1,7 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Deepr</string>
-    
     <string name="settings">सेटिंग्स</string>
     <string name="about_us">हमारे बारे में</string>
     <string name="back">वापस</string>
@@ -22,7 +21,6 @@
     <string name="new_tag">नया टैग</string>
     <string name="no_links_saved_yet">अभी तक कोई लिंक सहेजे नहीं गए</string>
     <string name="save_your_link_below">बाद में तुरंत एक्सेस करने के लिए अपना लिंक नीचे सेव करें</string>
-    
     <string name="more_options">अधिक विकल्प</string>
     <string name="copy_link">लिंक कॉपी करें</string>
     <string name="link_copied">लिंक कॉपी किया गया</string>
@@ -38,7 +36,6 @@
     <string name="edit_shortcut">शॉर्टकट संपादित करें</string>
     <string name="show_qr_code">QR कोड दिखाएं</string>
     <string name="deeplink_already_exists">डीपलिंक पहले से मौजूद है</string>
-    
     <string name="sort_by_date_ascending">दिनांक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_date_descending">दिनांक के अनुसार अवरोही क्रम में</string>
     <string name="sort_by_opened_ascending">खोले गए के अनुसार आरोही क्रम में</string>
@@ -47,7 +44,6 @@
     <string name="sort_by_name_descending">नाम के अनुसार अवरोही क्रम में</string>
     <string name="sort_by_link_ascending">लिंक के अनुसार आरोही क्रम में</string>
     <string name="sort_by_link_descending">लिंक के अनुसार अवरोही क्रम में</string>
-    
     <string name="edit_tag">टैग संपादित करें</string>
     <string name="delete_tag">टैग हटाएँ</string>
     <string name="delete_tag_confirmation">क्या आप वाकई इस टैग को हटाना चाहते हैं?</string>
@@ -58,7 +54,6 @@
     <string name="tag_deleted_successfully">टैग सफलतापूर्वक हटाया गया</string>
     <string name="edit_tag_description">टैग संपादित करें</string>
     <string name="delete_tag_description">टैग हटाएँ</string>
-    
     <string name="import_deeplinks">Deeplinks आयात करें</string>
     <string name="import_deeplinks_description">CSV फ़ाइल से Deeplinks आयात करें</string>
     <string name="export_deeplinks">Deeplinks निर्यात करें</string>
@@ -79,7 +74,6 @@
     <string name="urdu">उर्दू</string>
     <string name="app_version">ऐप संस्करण: %s</string>
     <string name="made_with_love">भारत में ❤️ के साथ बनाया गया</string>
-    
     <string name="app_logo">ऐप लोगो</string>
     <string name="version_format">संस्करण %s</string>
     <string name="app_description">डीपलिंक सहेजने, व्यवस्थित करने और लॉन्च करने के लिए एक सरल ऐप</string>
@@ -89,28 +83,23 @@
     <string name="github">गिटहब</string>
     <string name="linkedin">लिंक्डइन</string>
     <string name="view_on_github">गिटहब पर देखें</string>
-    
     <string name="save_deeplink">डीपलिंक सहेजें</string>
     <string name="save_deeplink_message">डीपलिंक सहेजें: %s ?</string>
     <string name="enter_link_name">कृपया लिंक का नाम दर्ज करें</string>
     <string name="enter_link_name_error">कृपया लिंक का नाम दर्ज करें</string>
     <string name="save_and_execute">सहेजें और निष्पादित करें</string>
-    
     <string name="enter_deeplink_command">लिंक दर्ज करें</string>
     <string name="invalid_empty_deeplink">अमान्य या खाली डीपलिंक</string>
-    
     <string name="invalid_deeplink_toast">अमान्य डीपलिंक: %s</string>
     <string name="no_data_to_export">निर्यात करने के लिए डेटाबेस में कोई डेटा नहीं मिला</string>
     <string name="no_data_available_export">मैपिंग के बाद निर्यात करने के लिए कोई डेटा उपलब्ध नहीं</string>
     <string name="export_success">सफलतापूर्वक %s में निर्यात किया गया</string>
     <string name="export_failed">CSV फ़ाइल बनाने में विफल</string>
-    
     <string name="select_sync_file">सिंक फ़ाइल चुनें</string>
     <string name="sync_now">अभी सिंक करें</string>
     <string name="last_sync_time">आख़िरी (पिछला) सिंक</string>
     <string name="last_sync_time_never">कभी सिंक नहीं हुआ</string>
     <string name="last_sync_time_format">%s</string>
-    
     <string name="sync_disabled">सिंक अक्षम है</string>
     <string name="sync_file_not_selected">कोई सिंक फ़ाइल नहीं चुनी गई</string>
     <string name="sync_success">%s के साथ सफलतापूर्वक सिंक हो गया</string>
@@ -118,7 +107,6 @@
     <string name="no_file_path_provided">कोई फ़ाइल पथ प्रदान नहीं किया गया</string>
     <string name="invalid_markdown_format">अमान्य मार्कडाउन तालिका प्रारूप</string>
     <string name="file_validation_error">फ़ाइल सत्यापन त्रुटि: %s</string>
-    
     <string name="sync_to_file">स्थानीय फ़ाइल में सिंक करें (बीटा)</string>
     <string name="sync_to_file_description">डीपलिंक्स को मार्कडाउन फ़ाइल में स्वचालित रूप से सिंक करें</string>
     <string name="select_sync_file_description">मार्कडाउन सिंक के लिए फ़ाइल स्थान चुनें</string>
@@ -133,7 +121,6 @@
     <string name="add_to_favourites">अपनी पसंद में जोड़ें</string>
     <string name="remove_from_favourites">अपनी पसंद से हटाएं</string>
     <string name="no_favourites_found">पसंदीदा सूची खाली है</string>
-    <string name="clipboard_link_detected">क्लिपबोर्ड में लिंक मिला</string>
     <string name="all_tags">सारे टैग्स</string>
     <string name="no_search_results">कोई नतीजा नहीं मिला</string>
     <string name="no_search_results_description">अलग-अलग शब्दों से खोजकर देखें</string>
@@ -250,4 +237,7 @@
     <string name="local_server_instructions">1. ऊपर दिए गए स्विच को चालू करके सर्वर शुरू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस से URL (लिंक) का उपयोग करें या QR कोड स्कैन करें\n4. अपने लिंक प्रबंधित करने के लिए वेब इंटरफ़ेस या API एंडपॉइंट्स का उपयोग करें</string>
     <string name="api_endpoints">API एंडपोइनट्स</string>
     <string name="api_endpoints_description">प्रोग्रामेटिक एक्सेस के लिए उपलब्ध REST API एंडपॉइंट्स</string>
+    <string name="web_optional">Optional</string>
+    <string name="notes_optional">टिप्पणियाँ (Optional)</string>
+    <string name="tags_optional">टैग्स (Optional)</string>
 </resources>

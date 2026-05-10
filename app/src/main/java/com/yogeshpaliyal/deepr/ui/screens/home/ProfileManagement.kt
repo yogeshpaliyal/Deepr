@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -77,10 +77,9 @@ fun ProfilesGrid(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(profiles, key = { it.id }) { profile ->
+            itemsIndexed(profiles, key = { _, p -> p.id }) { index, profile ->
                 val isSelected = profile.id == currentProfileId
                 val hapticFeedback = LocalHapticFeedback.current
-                val index = profiles.indexOf(profile)
 
                 ElevatedCard(
                     modifier =
@@ -238,19 +237,16 @@ fun RenameDeleteProfileDialog(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     val template = stringResource(R.string.profile_delete_confirmation_template)
-                    val placeholder = "%1" + "$" + "s"
-                    val placeholderIndex = template.indexOf(placeholder)
+                    val parts = template.split("%1\$s", "%s", limit = 2)
 
                     val annotatedString =
                         buildAnnotatedString {
-                            if (placeholderIndex >= 0) {
-                                append(template.substring(0, placeholderIndex))
+                            append(parts[0])
+                            if (parts.size == 2) {
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                                     append(profile.name)
                                 }
-                                append(template.substring(placeholderIndex + placeholder.length))
-                            } else {
-                                append(template)
+                                append(parts[1])
                             }
                         }
                     Text(
