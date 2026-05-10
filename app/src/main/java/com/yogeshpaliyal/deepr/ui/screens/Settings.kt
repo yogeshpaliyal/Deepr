@@ -54,7 +54,6 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
@@ -106,7 +105,6 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
-    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Collect profiles and silent save profile preference
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
@@ -303,21 +301,6 @@ fun SettingsScreen(
                             ?: stringResource(R.string.silent_save_profile_description),
                     onClick = {
                         showSilentSaveProfileDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Clipboard,
-                    title = stringResource(R.string.clipboard_link_detection),
-                    description = stringResource(R.string.clipboard_link_detection_description),
-                    onClick = {
-                        viewModel.setClipboardLinkDetectionEnabled(!clipboardLinkDetectionEnabled)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = clipboardLinkDetectionEnabled,
-                            onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
-                        )
                     },
                 )
             }

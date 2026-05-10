@@ -1,6 +1,5 @@
 package com.yogeshpaliyal.deepr
 
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -21,10 +20,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -50,8 +47,6 @@ import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import com.yogeshpaliyal.deepr.ui.screens.home.TagSelectionScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
 import com.yogeshpaliyal.deepr.util.LanguageUtil
-import com.yogeshpaliyal.deepr.util.isValidDeeplink
-import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -171,9 +166,6 @@ private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
 val LocalSharedText =
     compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
 
-val LocalClipboardLink =
-    compositionLocalOf<Pair<ClipboardLink?, () -> Unit>?> { null }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(
@@ -193,100 +185,74 @@ fun Dashboard(
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
     val viewModel: AccountViewModel = koinViewModel()
-
-    // Collect clipboard link detection preference
-    val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
-
-    // Clipboard link detection
-    var clipboardLink by remember { mutableStateOf<ClipboardLink?>(null) }
-
-    LaunchedEffect(clipboardLinkDetectionEnabled) {
-        if (clipboardLinkDetectionEnabled) {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData = clipboard.primaryClip
-            if (clipData != null && clipData.itemCount > 0) {
-                val text = clipData.getItemAt(0).text?.toString()
-                if (!text.isNullOrBlank()) {
-                    val normalizedLink = normalizeLink(text)
-                    if (isValidDeeplink(normalizedLink)) {
-                        clipboardLink = ClipboardLink(normalizedLink)
-                    }
-                }
-            }
-        } else {
-            clipboardLink = null
-        }
-    }
-
-    val resetClipboardLink: () -> Unit = { clipboardLink = null }
-
     CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
-        CompositionLocalProvider(LocalClipboardLink provides Pair(clipboardLink, resetClipboardLink)) {
-            CompositionLocalProvider(LocalNavigator provides backStack) {
-                Scaffold(
-                    modifier = modifier,
-                    bottomBar = {
-                        AnimatedVisibility(
-                            (TOP_LEVEL_ROUTES.any { it::class == current::class }),
-                            enter = slideInVertically(initialOffsetY = { it }),
-                            exit = slideOutVertically(targetOffsetY = { it }),
-                        ) {
-                            BottomAppBar(scrollBehavior = scrollBehavior) {
-                                TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
-                                    val isSelected =
-                                        topLevelRoute::class == backStack.topLevelKey::class
-                                    NavigationBarItem(
-                                        selected = isSelected,
-                                        onClick = {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                            backStack.addTopLevel(topLevelRoute)
-                                        },
-                                        label = {
-                                            Text(stringResource(topLevelRoute.label))
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = topLevelRoute.icon,
-                                                contentDescription = null,
-                                            )
-                                        },
-                                    )
-                                }
+        CompositionLocalProvider(LocalNavigator provides backStack) {
+            Scaffold(
+                modifier = modifier,
+                bottomBar = {
+                    AnimatedVisibility(
+                        (TOP_LEVEL_ROUTES.any { it::class == current::class }),
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it }),
+                    ) {
+                        BottomAppBar(scrollBehavior = scrollBehavior) {
+                            TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
+                                val isSelected =
+                                    topLevelRoute::class == backStack.topLevelKey::class
+                                NavigationBarItem(
+                                    selected = isSelected,
+                                    onClick = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        if (topLevelRoute is Dashboard2) {
+                                            viewModel.setShowProfilesGrid(true)
+                                        }
+                                        backStack.addTopLevel(topLevelRoute)
+                                    },
+                                    label = {
+                                        Text(stringResource(topLevelRoute.label))
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = topLevelRoute.icon,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            ) { contentPadding ->
+                NavDisplay(
+                    backStack = backStack.backStack,
+                    entryDecorators =
+                        listOf(
+                            // Add the default decorators for managing scenes and saving state
+                            rememberSceneSetupNavEntryDecorator(),
+                            rememberSavedStateNavEntryDecorator(),
+                            // Then add the view model store decorator
+                            rememberViewModelStoreNavEntryDecorator(),
+                        ),
+                    onBack = {
+                        backStack.removeLast()
+                    },
+                    entryProvider = {
+                        NavEntry(it) { entryItem ->
+                            if (entryItem is TopLevelRoute) {
+                                entryItem.Content(
+                                    WindowInsets(
+                                        left = contentPadding.calculateLeftPadding(layoutDirection),
+                                        right = contentPadding.calculateRightPadding(layoutDirection),
+                                        top = contentPadding.calculateTopPadding(),
+                                        bottom = contentPadding.calculateBottomPadding(),
+                                    ),
+                                )
+                            } else if (entryItem is Screen) {
+                                entryItem.Content()
                             }
                         }
                     },
-                ) { contentPadding ->
-                    NavDisplay(
-                        backStack = backStack.backStack,
-                        entryDecorators =
-                            listOf(
-                                // Add the default decorators for managing scenes and saving state
-                                rememberSceneSetupNavEntryDecorator(),
-                                rememberSavedStateNavEntryDecorator(),
-                                // Then add the view model store decorator
-                                rememberViewModelStoreNavEntryDecorator(),
-                            ),
-                        onBack = {
-                            backStack.removeLast()
-                        },
-                        entryProvider = {
-                            NavEntry(it) { entryItem ->
-                                if (entryItem is TopLevelRoute) {
-                                    entryItem.Content(
-                                        WindowInsets(
-                                            left = contentPadding.calculateLeftPadding(layoutDirection),
-                                            right = contentPadding.calculateRightPadding(layoutDirection),
-                                            top = contentPadding.calculateTopPadding(),
-                                            bottom = contentPadding.calculateBottomPadding(),
-                                        ),
-                                    )
-                                } else if (entryItem is Screen) {
-                                    entryItem.Content()
-                                }
-                            }
-                        },
-                    )
-                }
+                )
             }
         }
     }

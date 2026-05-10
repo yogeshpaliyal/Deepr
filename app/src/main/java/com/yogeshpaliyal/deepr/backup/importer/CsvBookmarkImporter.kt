@@ -68,7 +68,7 @@ class CsvBookmarkImporter(
                                         profileName?.let {
                                             val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                             if (profile == null) {
-                                                deeprQueries.insertProfile(it)
+                                                deeprQueries.insertProfileAutoPriority(it)
                                                 deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                             } else {
                                                 profile.id
