@@ -657,11 +657,7 @@ fun AddLinkScreen(
                                 onClick = {
                                     val normalizedLink = normalizeLink(deeprInfo.link)
                                     if (isValidDeeplink(normalizedLink)) {
-                                        if (deeprQueries.getDeeprByLink(normalizedLink).executeAsList().isNotEmpty()) {
-                                            Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            save(true)
-                                        }
+                                        save(true)
                                     } else {
                                         isError = true
                                     }
@@ -681,11 +677,7 @@ fun AddLinkScreen(
                                     onClick = {
                                         val normalizedLink = normalizeLink(deeprInfo.link)
                                         if (isValidDeeplink(normalizedLink)) {
-                                            if (deeprQueries.getDeeprByLink(normalizedLink).executeAsList().isNotEmpty()) {
-                                                Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                save(false)
-                                            }
+                                            save(false)
                                         } else {
                                             isError = true
                                         }

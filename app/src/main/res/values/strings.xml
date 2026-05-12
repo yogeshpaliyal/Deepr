@@ -28,7 +28,7 @@
     <string name="new_tag">New tag (Optional)</string>
     <string name="add_tag">Add tag</string>
     <string name="no_links_saved_yet">No links saved yet</string>
-    <string name="save_your_link_below">Save your link below to quickly access them later</string>
+    <string name="save_your_link_below">Save your link below to quickly access it later</string>
     <string name="no_favourites_found">No favourites yet</string>
     <string name="no_favourites_description">Mark links as favourites to see them here</string>
     <string name="no_search_results">No results found</string>
