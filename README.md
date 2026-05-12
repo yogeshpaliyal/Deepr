@@ -58,7 +58,7 @@ You can download from any of the sources mentioned below.
 All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
-- Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+- GitHub Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 - Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
