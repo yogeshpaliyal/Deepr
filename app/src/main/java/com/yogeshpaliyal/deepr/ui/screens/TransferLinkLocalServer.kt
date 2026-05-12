@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -316,10 +318,24 @@ fun TransferLinkLocalServerScreen(
                                 textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            QrCodeView(
-                                data = qrCodeData ?: "",
-                                modifier = Modifier.size(200.dp),
-                            )
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .background(
+                                            Color.White,
+                                            RoundedCornerShape(12.dp),
+                                        ).padding(16.dp),
+                            ) {
+                                QrCodeView(
+                                    data = qrCodeData ?: "",
+                                    modifier = Modifier.size(200.dp),
+                                    colors =
+                                        com.lightspark.composeqr.QrCodeColors(
+                                            background = Color.White,
+                                            foreground = Color.Black,
+                                        ),
+                                )
+                            }
                         }
                     }
                 }

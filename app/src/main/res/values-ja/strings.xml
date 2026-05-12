@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
     <string name="settings">設定</string>
@@ -21,7 +21,6 @@
     <string name="remove_from_favourites">お気に入りから削除</string>
     <string name="add_link">Linkを追加</string>
     <string name="add">追加</string>
-    <string name="clipboard_link_detected">ClipboardにLinkが見つかりました</string>
     <string name="fetch_name_from_link">Linkから名前を取得</string>
     <string name="create_tag">新規Tagを作成</string>
     <string name="new_tag">新規Tag(オプション)</string>
@@ -34,8 +33,6 @@
     <string name="no_search_results_description">別のキーワードでお試し下さい</string>
     <string name="no_links_with_tags">選択中のTagにLinkは見つかりませんでした</string>
     <string name="no_links_with_tags_description">別のTagを選択するか、フィルターを解除して下さい</string>
-    <string name="clipboard_link_detection">クリップボードにLinkを検出しました。</string>
-    <string name="clipboard_link_detection_description">クリップボード内のリンクを自動的に検出・追加するためのバナーを表示します。</string>
     <string name="no_favourites_with_tags">選択中のTagにお気に入りは見つかりませんでした</string>
     <string name="no_favourites_with_tags_description">これらのタグが付いたリンクをお気に入りとして登録するか、別のタグを試してください。</string>
     <string name="remove_thumbnail">サムネイルを削除する</string>
@@ -99,4 +96,4 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
-</resources>
+<string name="web_optional">Optional</string><string name="notes_optional">Notes (Optional)</string><string name="tags_optional">Tags (Optional)</string></resources>
