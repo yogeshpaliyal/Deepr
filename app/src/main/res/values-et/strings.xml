@@ -93,7 +93,7 @@
     <string name="backup_interval_description">Automaatse varunduse sagedus</string>
     <string name="shortcut_icon">Otselingi ikoon</string>
     <string name="show_open_counter_description">Näita iga lingi avamiskordade arvu</string>
-    <string name="port_changed_restart">Pordi number muutus. Käivitan uuesti..</string>
+    <string name="port_changed_restart">Pordi number muutus. Käivitan uuesti</string>
     <string name="api_endpoints_description">Programseks kasutuseks saadaval olevad REST API otspunktid</string>
     <string name="backup_interval">Varunduse välp</string>
     <string name="delete_confirmation_title">Kas kustutame lingi?</string>

@@ -75,7 +75,7 @@
     <string name="copy">Копировать</string>
     <string name="invalid_empty_deeplink">Недопустимая или пустая ссылка</string>
     <string name="backup_interval_description">Как часто выполнять автоматическое резервное копирование</string>
-    <string name="port_changed_restart">Порт изменён. Перезапуск сервера..</string>
+    <string name="port_changed_restart">Порт изменён. Перезапуск сервера</string>
     <string name="api_endpoints_description">Доступные конечные точки REST API для программного доступа</string>
     <string name="backup_interval">Интервал резервного копирования</string>
     <string name="default_page">Страница по умолчанию</string>
