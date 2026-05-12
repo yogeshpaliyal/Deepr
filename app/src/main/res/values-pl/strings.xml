@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="settings">Ustawienia</string>
     <string name="about_us">O nas</string>
@@ -22,9 +22,9 @@
     <string name="create_tag">Stwórz tag</string>
     <string name="new_tag">Nowy tag (Opcjonalnie)</string>
     <string name="no_links_saved_yet">Nie zapisano żadnych linków</string>
-    <string name="save_your_link_below">Zapisz link poniżej, aby mieć do niego szybki dostęp.</string>
+    <string name="save_your_link_below">Zapisz link poniżej, aby mieć do niego szybki dostęp</string>
     <string name="no_favourites_found">Brak ulubionych</string>
-    <string name="no_favourites_description">Oznacz linki jako ulubione, aby zobaczyć je tutaj.</string>
+    <string name="no_favourites_description">Oznacz linki jako ulubione, aby zobaczyć je tutaj</string>
     <string name="no_search_results">Brak wyników</string>
     <string name="no_search_results_description">Spróbuj wyszukać, przy użyciu innych słów kluczowych.</string>
     <string name="no_links_with_tags">Brak linków z wybranymi tagami</string>
@@ -61,4 +61,4 @@
     <string name="sort_by_opened_descending">Sortuj według daty otwarcia (od najnowszych)</string>
     <string name="sort_by_name_ascending">Sortuj wg Nazwy (A-Z)</string>
     <string name="sort_by_name_descending">Sortuj wg nazwy (Z-A)</string>
-</resources>
+<string name="web_optional">Opcjonalne</string><string name="notes_optional">Notatki (Opcjonalne)</string><string name="tags_optional">Tagi (Opcjonalne)</string></resources>

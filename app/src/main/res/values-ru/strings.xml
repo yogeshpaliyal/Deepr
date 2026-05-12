@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="settings">Настройки</string>
     <string name="about_us">О нас</string>
@@ -84,7 +84,6 @@
     <string name="delete_tag_description">Удалить тег</string>
     <string name="api_get_server_info">Получить информацию о сервере и документацию по API</string>
     <string name="linkedin">linkedin</string>
-    <string name="clipboard_link_detected">В буфере обмена обнаружена ссылка</string>
     <string name="custom_port">Пользовательский порт</string>
     <string name="sync_status_invalid">⚠ Формат файла неверный</string>
     <string name="app_logo">Логотип приложения</string>
@@ -183,11 +182,11 @@
     <string name="deeplink_already_exists">Такая ссылка уже существует</string>
     <string name="delete">Удалить</string>
     <string name="notes">Заметки</string>
-    <string name="save_your_link_below">Сохраните ссылку ниже, чтобы быстро получать к ней доступ позже.</string>
+    <string name="save_your_link_below">Сохраните ссылку ниже, чтобы быстро получать к ней доступ позже</string>
     <string name="edit_shortcut">Изменить ярлык</string>
     <string name="sort_by_link_ascending">Сортировать по ссылке (По возрастанию)</string>
     <string name="no_favourites_found">В избранном пока ничего нет</string>
-    <string name="no_favourites_description">Отметьте ссылки как избранные, чтобы они появились здесь.</string>
+    <string name="no_favourites_description">Отметьте ссылки как избранные, чтобы они появились здесь</string>
     <string name="opened_count">Открыто: %d</string>
     <string name="backup">Резервная копия</string>
     <string name="sort_by_opened_descending">Сортировать по числу открытий (По убыванию)</string>
@@ -209,4 +208,4 @@
     <string name="import_deeplinks_description">Импортировать ссылки из файла CSV</string>
     <string name="import_deeplinks">Импортировать ссылки</string>
     <string name="copy_link">Копировать ссылку</string>
-</resources>
+<string name="web_optional">Опционально</string><string name="notes_optional">Заметки (Опционально)</string><string name="tags_optional">Теги (Опционально)</string></resources>
