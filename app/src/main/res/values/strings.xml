@@ -355,4 +355,7 @@
     <string name="preview">Preview</string>
     <string name="link_placeholder">https://example.com or app://deeplink</string>
     <string name="switch_profile">Switch Profile</string>
-<string name="notes_optional">Notes (Optional)</string><string name="tags_optional">Tags (Optional)</string></resources>
+<string name="notes_optional">Notes (Optional)</string><string name="tags_optional">Tags (Optional)</string>    <string name="clipboard_link_detected">Link detected in clipboard</string>
+    <string name="clipboard_link_detection">Clipboard link detection</string>
+    <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
+</resources>
