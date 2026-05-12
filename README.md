@@ -32,11 +32,11 @@
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | Play Store | F-droid | Pro Version on Play Store |
-|-----------------------------------|----------------|------------|---------|-----------|
-| Firebase Analytics                | ❌              | ✅          | ❌       | ✅  |
-| Google Drive Backup | ❌              | ❌         | ❌       | ✅  |
-| Profile speicific themes | ❌              | ❌          | ❌       | ✅  |
+| Feature                           | Github Release | F-droid | Play Store | Pro Version on Play Store |
+|-----------------------------------|----------------|---------|------------|-----------|
+| Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
+| Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
+| Profile speicific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 
@@ -58,11 +58,10 @@ You can download from any of the sources mentioned below.
 All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
-- F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+- F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
-- Play Store (All features
-  unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
+- Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 
 
