@@ -17,7 +17,6 @@ import com.yogeshpaliyal.deepr.backup.ImportRepository
 import com.yogeshpaliyal.deepr.data.LinkInfo
 import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.data.ProfilePriorityUpdate
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,8 +36,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -84,16 +80,8 @@ class AccountViewModel(
 ) : ViewModel(),
     KoinComponent {
     private val preferenceDataStore: AppPreferenceDataStore = get()
-    private val reorderMutex = Mutex()
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
-
-    private val _showProfilesGrid = MutableStateFlow(false)
-    val showProfilesGrid: StateFlow<Boolean> = _showProfilesGrid.asStateFlow()
-
-    fun setShowProfilesGrid(show: Boolean) {
-        _showProfilesGrid.value = show
-    }
 
     // Profile state
     val allProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
@@ -135,28 +123,8 @@ class AccountViewModel(
                     .first()
             if (profileCount == 0L) {
                 // Create default profile if none exists
-                linkRepository.insertProfile("Default", 0)
-            } else {
-                // Normalize priorities for existing profiles if needed
-                reorderMutex.withLock {
-                    normalizePriorities()
-                }
+                linkRepository.insertProfile("Default")
             }
-        }
-    }
-
-    private suspend fun normalizePriorities() {
-        val profiles = linkRepository.getAllProfiles().executeAsList()
-        val updates =
-            profiles.mapIndexedNotNull { index, profile ->
-                if (profile.priority != index.toLong()) {
-                    ProfilePriorityUpdate(profileId = profile.id, priority = index.toLong())
-                } else {
-                    null
-                }
-            }
-        if (updates.isNotEmpty()) {
-            linkRepository.updateProfilesPriority(updates)
         }
     }
 
@@ -401,7 +369,6 @@ class AccountViewModel(
             linkRepository
                 .getLinksAndTags(
                     profileId,
-                    query,
                     query,
                     query,
                     query,
@@ -708,17 +675,6 @@ class AccountViewModel(
         }
     }
 
-    // Clipboard link detection preference methods
-    val clipboardLinkDetectionEnabled =
-        preferenceDataStore.getClipboardLinkDetectionEnabled
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
-
-    fun setClipboardLinkDetectionEnabled(enabled: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            preferenceDataStore.setClipboardLinkDetectionEnabled(enabled)
-        }
-    }
-
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceDataStore.getAutoBackupEnabled
@@ -858,52 +814,6 @@ class AccountViewModel(
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.CREATE_PROFILE,
             )
-        }
-    }
-
-    fun moveProfileUp(profileId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            reorderMutex.withLock {
-                // First, ensure all profiles have unique, sequential priorities
-                normalizePriorities()
-
-                val profiles = linkRepository.getAllProfiles().executeAsList()
-                val index = profiles.indexOfFirst { it.id == profileId }
-                if (index > 0) {
-                    val currentProfile = profiles[index]
-                    val previousProfile = profiles[index - 1]
-
-                    linkRepository.updateProfilesPriority(
-                        listOf(
-                            ProfilePriorityUpdate(profileId = currentProfile.id, priority = previousProfile.priority),
-                            ProfilePriorityUpdate(profileId = previousProfile.id, priority = currentProfile.priority),
-                        ),
-                    )
-                }
-            }
-        }
-    }
-
-    fun moveProfileDown(profileId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            reorderMutex.withLock {
-                // First, ensure all profiles have unique, sequential priorities
-                normalizePriorities()
-
-                val profiles = linkRepository.getAllProfiles().executeAsList()
-                val index = profiles.indexOfFirst { it.id == profileId }
-                if (index != -1 && index < profiles.size - 1) {
-                    val currentProfile = profiles[index]
-                    val nextProfile = profiles[index + 1]
-
-                    linkRepository.updateProfilesPriority(
-                        listOf(
-                            ProfilePriorityUpdate(profileId = currentProfile.id, priority = nextProfile.priority),
-                            ProfilePriorityUpdate(profileId = nextProfile.id, priority = currentProfile.priority),
-                        ),
-                    )
-                }
-            }
         }
     }
 
