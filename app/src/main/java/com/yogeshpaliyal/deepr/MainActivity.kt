@@ -203,9 +203,6 @@ fun Dashboard(
                                     selected = isSelected,
                                     onClick = {
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        if (topLevelRoute is Dashboard2) {
-                                            viewModel.setShowProfilesGrid(true)
-                                        }
                                         backStack.addTopLevel(topLevelRoute)
                                     },
                                     label = {
