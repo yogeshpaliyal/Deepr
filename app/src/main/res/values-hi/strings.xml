@@ -249,4 +249,4 @@
     <string name="local_server_instructions">1. ऊपर दिए गए स्विच को चालू करके सर्वर शुरू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस से URL (लिंक) का उपयोग करें या QR कोड स्कैन करें\n4. अपने लिंक प्रबंधित करने के लिए वेब इंटरफ़ेस या API एंडपॉइंट्स का उपयोग करें</string>
     <string name="api_endpoints">API एंडपोइनट्स</string>
     <string name="api_endpoints_description">प्रोग्रामेटिक एक्सेस के लिए उपलब्ध REST API एंडपॉइंट्स</string>
-<string name="web_optional">Optional</string><string name="notes_optional">टिप्पणियाँ (Optional)</string><string name="tags_optional">टैग्स (Optional)</string></resources>
+<string name="web_optional">वैकल्पिक</string><string name="notes_optional">टिप्पणियाँ (वैकल्पिक)</string><string name="tags_optional">टैग्स (वैकल्पिक)</string></resources>

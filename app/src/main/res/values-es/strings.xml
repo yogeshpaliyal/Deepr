@@ -227,7 +227,7 @@
     <string name="web_status_creating">Creando...</string>
     <string name="web_status_added">¡Añadido!</string>
     <string name="web_success_link_added">¡Enlace añadido con éxito!</string>
-    <string name="web_error_add_link">"Error al añadir el enlace. Inténtalo de nuevo."</string>
+    <string name="web_error_add_link">Error al añadir el enlace. Inténtalo de nuevo.</string>
     <string name="web_error_loading">Error al cargar los enlaces</string>
     <string name="web_error_refresh">Prueba a refrescar la página.</string>
     <string name="web_error_fetch">No se han podido recuperar los enlaces. Inténtalo de nuevo.</string>
@@ -249,4 +249,4 @@
     <string name="preview">Vista previa</string>
     <string name="link_placeholder">https://ejemplo.com o app://deeplink</string>
     <string name="switch_profile">Cambiar de perfil</string>
-<string name="web_optional">Optional</string></resources>
+<string name="web_optional">Opcional</string></resources>

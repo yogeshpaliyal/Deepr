@@ -124,12 +124,15 @@ fun AddLinkScreen(
         val urlToFetch = normalizeLink(link ?: deeprInfo.link)
         if (urlToFetch.isNotBlank()) {
             isFetchingMetadata.value = true
-            viewModel.fetchMetaData(urlToFetch) {
+            viewModel.fetchMetaData(urlToFetch) { result ->
                 isFetchingMetadata.value = false
-                if (it != null && normalizeLink(deeprInfo.link) == urlToFetch) {
-                    deeprInfo = deeprInfo.copy(name = it.title ?: "", thumbnail = it.image ?: "")
-                    isNameError = false
-                } else {
+                if (result != null) {
+                    if (normalizeLink(deeprInfo.link) == urlToFetch) {
+                        deeprInfo = deeprInfo.copy(name = result.title ?: "", thumbnail = result.image ?: "")
+                        isNameError = false
+                    }
+                } else if (normalizeLink(deeprInfo.link) == urlToFetch) {
+                    // Only show error if the link hasn't changed
                     Toast.makeText(context, fetchMetadataErrorText, Toast.LENGTH_SHORT).show()
                 }
             }
@@ -166,13 +169,21 @@ fun AddLinkScreen(
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
     val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
-    var selectedProfileId by remember(selectedLink) {
+    var selectedProfileId by remember(selectedLink.id) {
         mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
     }
+
+    // Sync selectedProfileId when currentProfile is loaded in create mode
+    LaunchedEffect(currentProfile) {
+        if (isCreate && currentProfile != null) {
+            selectedProfileId = currentProfile!!.id
+        }
+    }
+
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
-    // Initialize selected tags if in edit mode
+    // Initialize selected tags
     LaunchedEffect(selectedLink.id) {
         if (!isCreate) {
             val existingTags =
@@ -191,6 +202,10 @@ fun AddLinkScreen(
                 selectedTags.addAll(it)
                 initialSelectedTags.addAll(it)
             }
+        } else {
+            // Explicitly clear tags in create mode to avoid state leakage
+            selectedTags.clear()
+            initialSelectedTags.clear()
         }
     }
 

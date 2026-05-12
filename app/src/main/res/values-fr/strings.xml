@@ -162,7 +162,7 @@
     
     <string name="scan_qr_code">Scanner le Code QR</string>
     <string name="transfer_link_server_instructions">1. Activez l\'interrupteur ci-dessus pour démarrer le serveur\n2. Assurez-vous que les deux appareils sont sur le même réseau Wi-Fi\n3. Scannez le code QR depuis l\'option d\'importation de liens sur un autre appareil</string>
-    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un altro dispositivo</string>
+    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un autre appareil</string>
 
     
     <string name="profiles">Profils</string>
@@ -227,7 +227,7 @@
     <string name="web_status_creating">Création...</string>
     <string name="web_status_added">Ajouté !</string>
     <string name="web_success_link_added">Lien ajouté avec succès !</string>
-    <string name="web_error_add_link">"Erreur lors de l'ajout du lien. Veuillez réessayer."</string>
+    <string name="web_error_add_link">Erreur lors de l\'ajout du lien. Veuillez réessayer.</string>
     <string name="web_error_loading">Erreur lors du chargement des liens</string>
     <string name="web_error_refresh">Essayez de rafraîchir la page.</string>
     <string name="web_error_fetch">Impossible de récupérer les liens. Veuillez réessayer.</string>
@@ -249,4 +249,4 @@
     <string name="preview">Aperçu</string>
     <string name="link_placeholder">https://exemple.com ou app://deeplink</string>
     <string name="switch_profile">Changer de profil</string>
-<string name="web_optional">Optional</string></resources>
+<string name="web_optional">Optionnel</string></resources>
