@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,13 +25,26 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew assembleFreeDebug
+      - name: Force Debug Signing on Release
+        run: |
+          # Extract signingConfigs block
+          sed -n '/signingConfigs {/,/    }/p' app/build.gradle.kts > signing_block.txt
+          
+          # Remove original signingConfigs block
+          awk '/signingConfigs \{/{skip=1} skip{if(/    \}/) skip=0; next} 1' app/build.gradle.kts > tmp.kts && mv tmp.kts app/build.gradle.kts
+          
+          # Insert signingConfigs block before buildTypes
+          awk '/buildTypes \{/ { system("cat signing_block.txt") } 1' app/build.gradle.kts > tmp.kts && mv tmp.kts app/build.gradle.kts
+          
+          # Link release build to debug signing
+          awk '/release \{/ { print; print "            signingConfig = signingConfigs.getByName(\"debug\")"; next } 1' app/build.gradle.kts > tmp.kts && mv tmp.kts app/build.gradle.kts
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Build with Gradle
+        run: ./gradlew assembleGithubRelease
+
+      - uses: "softprops/action-gh-release@v2"
         with:
-          repo_token: "${{ github.token }}"
-          automatic_release_tag: "latest-master"
+          tag_name: "latest-master"
           prerelease: true
-          title: "Latest Master Build"
-          files: app/build/outputs/apk/free/debug/*.apk
+          name: "Latest Master Build"
+          files: app/build/outputs/apk/github/release/*.apk
