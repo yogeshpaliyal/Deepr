@@ -1,6 +1,7 @@
 package com.yogeshpaliyal.deepr.server
 
 import android.content.Context
+import android.content.res.Configuration
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
