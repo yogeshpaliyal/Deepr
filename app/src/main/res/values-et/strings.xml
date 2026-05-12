@@ -110,7 +110,7 @@
     <string name="custom_port">Sinu valitud port</string>
     <string name="sync_status_invalid">⚠ Failivorming on vigane</string>
     <string name="app_logo">Rakenduse logo</string>
-    <string name="save_your_link_below">Hilisemaks mugavaks ligipääsuks salvesta järgnev link.</string>
+    <string name="save_your_link_below">Hilisemaks mugavaks ligipääsuks salvesta järgnev link</string>
     <string name="enter_link_name_error">Palun sisesta lingi jaoks nimi.</string>
     <string name="tag_name_exists">Sellise nimega silt on juba olemas</string>
     <string name="edit_shortcut">Muuda otselinki</string>
@@ -127,7 +127,7 @@
     <string name="backup_location_not_selected">Varukoopiate asukoht on valimata</string>
     <string name="interval_24_hours">Iga 24 tunni järel (kord päevas)</string>
     <string name="no_favourites_found">Lemmikuid veel pole</string>
-    <string name="no_favourites_description">Nägemaks neid siinkohal märgi lingid lemmikuteks.</string>
+    <string name="no_favourites_description">Nägemaks neid siinkohal märgi lingid lemmikuteks</string>
     <string name="sync_success">Sünkroonimine „%s“ faili õnnestus</string>
     <string name="number_tags">Sildid: %d</string>
     <string name="opened_count">Avamisi: %d</string>
@@ -244,8 +244,4 @@
     <string name="invalid_link_silent_save">Vigane link</string>
     <string name="failed_to_save_link">Lingi salvestamine ei õnnestunud</string>
     <string name="link_already_exists">Selline link on juba olemas</string>
-    <string name="clipboard_link_detection">Lingi tuvastus lõikelaualt</string>
-    <string name="clipboard_link_detection_description">Tuvasta lõikelaual asuvad lingid automaatselt ja kuva teade nende lisamiseks</string>
-    <string name="silent_save_profile">Profiili vaikne salvestamine</string>
-    <string name="silent_save_profile_description">„Salvesta vaikselt“ valiku puhul salvestuvad lingid siia profiili</string>
 </resources>
