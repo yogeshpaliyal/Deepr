@@ -36,7 +36,7 @@
 |-----------------------------------|----------------|---------|------------|-----------|
 | Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
 | Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
-| Profile speicific themes | ❌              | ❌       | ❌          | ✅  |
+| Profile specific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 
