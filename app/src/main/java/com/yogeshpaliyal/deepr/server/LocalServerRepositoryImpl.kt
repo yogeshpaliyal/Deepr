@@ -132,6 +132,11 @@ open class LocalServerRepositoryImpl(
                                     return@get
                                 }
 
+                                // Create a localized context to ensure correct strings are fetched
+                                val config = Configuration(context.resources.configuration)
+                                config.setLocale(locale)
+                                val localizedContext = context.createConfigurationContext(config)
+
                                 var htmlContent =
                                     context.assets
                                         .open("index.html")
@@ -186,7 +191,7 @@ open class LocalServerRepositoryImpl(
                                         )
 
                                     placeholders.forEach { (placeholder, resId) ->
-                                        htmlContent = htmlContent.replace(placeholder, context.getString(resId))
+                                        htmlContent = htmlContent.replace(placeholder, localizedContext.getString(resId))
                                     }
                                 }
 
