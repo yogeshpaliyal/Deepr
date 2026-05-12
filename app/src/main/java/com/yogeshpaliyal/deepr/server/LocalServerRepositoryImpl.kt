@@ -12,6 +12,8 @@ import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.deepr.util.LanguageUtil
+import kotlinx.coroutines.flow.first
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.timeout
@@ -126,17 +128,20 @@ open class LocalServerRepositoryImpl(
                     routing {
                         get("/") {
                             try {
-                                val locale = Locale.getDefault()
+                                val languageCode = appPreferenceDataStore.getLanguageCode.first()
+                                val localizedContext = LanguageUtil.updateLocale(context, languageCode)
+                                val locale = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                    localizedContext.resources.configuration.locales[0]
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    localizedContext.resources.configuration.locale
+                                }
+
                                 val cachedHtmlContent = htmlCache[locale]
                                 if (cachedHtmlContent != null) {
                                     call.respondText(cachedHtmlContent, ContentType.Text.Html)
                                     return@get
                                 }
-
-                                // Create a localized context to ensure correct strings are fetched
-                                val config = Configuration(context.resources.configuration)
-                                config.setLocale(locale)
-                                val localizedContext = context.createConfigurationContext(config)
 
                                 var htmlContent =
                                     context.assets
