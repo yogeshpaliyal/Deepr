@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
-    <!-- Navigation and UI Labels -->
+    
     <string name="settings">Configuración</string>
     <string name="about_us">Acerca de nosotros</string>
     <string name="back">Atrás</string>
@@ -22,7 +22,8 @@
     <string name="new_tag">Nueva etiqueta</string>
     <string name="no_links_saved_yet">Aún no hay enlaces guardados</string>
     <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde</string>
-    <!-- Menu and Dialog Items -->
+
+    
     <string name="more_options">Más opciones</string>
     <string name="copy_link">Copiar enlace</string>
     <string name="link_copied">Enlace copiado</string>
@@ -38,7 +39,8 @@
     <string name="edit_shortcut">Editar acceso directo</string>
     <string name="show_qr_code">Mostrar código QR</string>
     <string name="deeplink_already_exists">El enlace profundo ya existe</string>
-    <!-- Sort Menu Items -->
+
+    
     <string name="sort_by_date_ascending">Ordenar por Fecha Ascendente</string>
     <string name="sort_by_date_descending">Ordenar por Fecha Descendente</string>
     <string name="sort_by_opened_ascending">Ordenar por Abierto Ascendente</string>
@@ -47,10 +49,12 @@
     <string name="sort_by_name_descending">Ordenar por Nombre Descendente</string>
     <string name="sort_by_link_ascending">Ordenar por Enlace Ascendente</string>
     <string name="sort_by_link_descending">Ordenar por Enlace Descendente</string>
-    <!-- Tag Management -->
+
+    
     <string name="edit_tag">Editar Etiqueta</string>
     <string name="delete_tag">Eliminar Etiqueta</string>
     <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
+    <string name="delete_tag_confirmation_with_name">¿Estás seguro de que quieres eliminar la etiqueta %s?</string>
     <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
     <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
     <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
@@ -58,7 +62,8 @@
     <string name="tag_deleted_successfully">Etiqueta eliminada exitosamente</string>
     <string name="edit_tag_description">Editar Etiqueta</string>
     <string name="delete_tag_description">Eliminar Etiqueta</string>
-    <!-- Settings Screen -->
+
+    
     <string name="import_deeplinks">Importar Deeplinks</string>
     <string name="import_deeplinks_description">Importar Deeplinks desde archivo CSV</string>
     <string name="export_deeplinks">Exportar Deeplinks</string>
@@ -79,38 +84,44 @@
     <string name="urdu">اردو</string>
     <string name="app_version">Versión de la aplicación: %s</string>
     <string name="made_with_love">Hecho con ❤️ en India</string>
-    <!-- About Us Screen -->
+
+    
     <string name="app_logo">Logo de la aplicación</string>
     <string name="version_format">Versión %s</string>
-    <string name="app_description">Una aplicación simple para guardar, organizar y lanzar enlaces profundos</string>
+    <string name="app_description">Una aplicación simple para guardar, organizar y lanzar enlaces profundos.</string>
     <string name="author">Autor</string>
     <string name="author_name">Yogesh Choudhary</string>
     <string name="twitter">Twitter</string>
     <string name="github">GitHub</string>
     <string name="linkedin">LinkedIn</string>
     <string name="view_on_github">Ver en GitHub</string>
-    <!-- Save Dialog -->
+
+    
     <string name="save_deeplink">Guardar enlace profundo</string>
     <string name="save_deeplink_message">¿Guardar el enlace profundo: %s?</string>
     <string name="enter_link_name">Por favor, ingresa el nombre del enlace</string>
-    <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace</string>
+    <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace.</string>
     <string name="save_and_execute">Guardar y ejecutar</string>
-    <!-- Home Screen -->
+
+    
     <string name="enter_deeplink_command">Introducir enlace</string>
-    <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío</string>
-    <!-- Error Messages -->
+    <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío.</string>
+
+    
     <string name="invalid_deeplink_toast">Enlace profundo inválido: %s</string>
-    <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar</string>
-    <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo</string>
+    <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar.</string>
+    <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo.</string>
     <string name="export_success">Exportado exitosamente a %s</string>
-    <string name="export_failed">Error al crear archivo CSV</string>
-    <!-- Sync Settings -->
+    <string name="export_failed">Error al crear archivo CSV.</string>
+
+    
     <string name="select_sync_file">Seleccionar archivo de sincronización</string>
     <string name="sync_now">Sincronizar ahora</string>
     <string name="last_sync_time">Última sincronización:</string>
     <string name="last_sync_time_never">Nunca sincronizado</string>
     <string name="last_sync_time_format">%s</string>
-    <!-- Sync Messages -->
+
+    
     <string name="sync_disabled">Sincronización deshabilitada</string>
     <string name="sync_file_not_selected">No se seleccionó archivo de sincronización</string>
     <string name="sync_success">Sincronizado exitosamente con %s</string>
@@ -118,7 +129,8 @@
     <string name="no_file_path_provided">No se proporcionó ruta de archivo</string>
     <string name="invalid_markdown_format">Formato de tabla markdown inválido</string>
     <string name="file_validation_error">Error de validación de archivo: %s</string>
-    <!-- Additional Sync Settings -->
+
+    
     <string name="sync_to_file">Sincronizar a archivo local (Beta)</string>
     <string name="sync_to_file_description">Sincronizar automáticamente enlaces profundos a un archivo markdown</string>
     <string name="select_sync_file_description">Elegir ubicación del archivo para sincronización markdown</string>
@@ -127,19 +139,114 @@
     <string name="sync_status_invalid">⚠ El formato del archivo es inválido</string>
     <string name="sync_status_no_file">No se seleccionó archivo de sincronización</string>
     <string name="sync_now_description">Sincronizar manualmente enlaces profundos al archivo seleccionado</string>
+
+    
     <string name="all_tags">Todas las etiquetas</string>
     <string name="favourites">Favoritos</string>
     <string name="add_to_favourites">Añadir a favoritos</string>
-    <string name="remove_from_favourites">Eliminar de favoritos</string>
+    <string name="remove_from_favourites">Quitar de favoritos</string>
     <string name="add">Añadir</string>
-    <string name="clipboard_link_detected">Enlace detectado en el portapapeles</string>
     <string name="add_tag">Añadir etiqueta</string>
-    <string name="no_favourites_found">Sin favoritos todavía</string>
+    <string name="no_favourites_found">No hay favoritos aún</string>
     <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí</string>
-    <string name="no_search_results">Sin resutados</string>
-    <string name="no_search_results_description">Pruebe a buscar diferentes palabras clave</string>
-    <string name="no_links_with_tags">No hay enlaces con las etiquetas seleccionadas</string>
-    <string name="no_links_with_tags_description">Prueba a seleccionar diferentes etiquetas o reestablecer los filtros</string>
-    <string name="no_favourites_with_tags">Sin favoritos en las etiquetas seleccionadas</string>
-    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos o pruebe diferentes etiquetas</string>
-</resources>
+    <string name="no_search_results">No se encontraron resultados</string>
+    <string name="no_search_results_description">Prueba a buscar con otras palabras clave.</string>
+    <string name="no_links_with_tags">No hay enlaces con estas etiquetas</string>
+    <string name="no_links_with_tags_description">Asigna estas etiquetas a tus enlaces para verlos aquí.</string>
+    <string name="no_favourites_with_tags">No hay favoritos con estas etiquetas</string>
+    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos.</string>
+    <string name="remove_thumbnail">Quitar miniatura</string>
+
+    
+
+    
+    <string name="scan_qr_code">Escanear código QR</string>
+    <string name="transfer_link_server_instructions">1. Activa el interruptor de arriba para iniciar el servidor\n2. Asegúrate de que ambos dispositivos estén en la misma red Wi-Fi\n3. Escanea el código QR desde la opción de importar enlaces en otro dispositivo</string>
+    <string name="scan_qr_to_get_data">Escanea para obtener los enlaces de otro dispositivo</string>
+
+    
+    <string name="profiles">Perfiles</string>
+    <string name="reorder">Reordenar</string>
+    <string name="profile">Perfil</string>
+    <string name="select_profile">Seleccionar perfil</string>
+    <string name="create_profile">Crear Perfil</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="delete_profile">Eliminar Perfil</string>
+    <string name="profile_name">Nombre del perfil</string>
+    <string name="profile_created_successfully">Perfil creado exitosamente</string>
+    <string name="profile_updated_successfully">Perfil actualizado exitosamente</string>
+    <string name="profile_deleted_successfully">Perfil eliminado exitosamente</string>
+    <string name="profile_name_exists">Ya existe un perfil con este nombre</string>
+    <string name="profile_name_cannot_be_blank">El nombre del perfil no puede estar vacío</string>
+    <string name="failed_to_create_profile">Error al crear el perfil</string>
+    <string name="failed_to_update_profile">Error al actualizar el perfil</string>
+    <string name="cannot_delete_only_profile">No se puede eliminar el único perfil existente</string>
+    <string name="profile_delete_confirmation">¿Estás seguro de que quieres eliminar este perfil? Se eliminarán todos los enlaces y etiquetas de este perfil.</string>
+    <string name="manage_profiles">Gestionar Perfiles</string>
+    <string name="no_profiles_yet">No hay perfiles aún</string>
+    <string name="create_first_profile">Crea tu primer perfil para organizar tus enlaces</string>
+
+    
+    <string name="save_silently">Guardar silenciosamente</string>
+    <string name="link_saved_silently">Enlace guardado exitosamente</string>
+    <string name="invalid_link_silent_save">Enlace no válido</string>
+    <string name="failed_to_save_link">Error al guardar el enlace</string>
+    <string name="link_already_exists">El enlace ya existe</string>
+    <string name="silent_save_profile">Perfil de guardado silencioso</string>
+    <string name="silent_save_profile_description">Los enlaces guardados mediante \'Guardar silenciosamente\' irán a este perfil</string>
+
+    
+    <string name="theme">Tema</string>
+    <string name="theme_dialog_title">Seleccionar Tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="close">Cerrar</string>
+
+    
+    <string name="finish_reordering">Terminar reordenamiento</string>
+    <string name="move_up">Subir</string>
+    <string name="move_down">Bajar</string>
+    <string name="profile_delete_confirmation_template">¿Estás seguro de que quieres eliminar el perfil %1$s y todos sus enlaces asociados? Esta acción no se puede deshacer.</string>
+    <string name="profile_delete_failed">Error al eliminar el perfil</string>
+    <string name="profile_update_failed">Error al actualizar el perfil</string>
+
+    
+    <string name="web_sort_opens">Aperturas</string>
+    <string name="web_opens">aperturas</string>
+    <string name="web_clear">Limpiar</string>
+    <string name="web_loading_links">Cargando enlaces...</string>
+    <string name="web_loading_description">Por favor, espera mientras recuperamos tus enlaces.</string>
+    <string name="web_no_links">¡Aún no hay enlaces!</string>
+    <string name="web_no_links_description">Añade tu primer enlace arriba para empezar.</string>
+    <string name="web_no_matching">¡No se han encontrado enlaces coincidentes!</string>
+    <string name="web_no_matching_description">Prueba a ajustar tus términos de búsqueda o filtros.</string>
+    <string name="web_create_profile_title">Crear nuevo perfil</string>
+    <string name="web_profile_name_label">Nombre del perfil</string>
+    <string name="web_cancel">Cancelar</string>
+    <string name="web_create_profile_button">Crear perfil</string>
+    <string name="web_status_creating">Creando...</string>
+    <string name="web_status_added">¡Añadido!</string>
+    <string name="web_success_link_added">¡Enlace añadido con éxito!</string>
+    <string name="web_error_add_link">Error al añadir el enlace. Inténtalo de nuevo.</string>
+    <string name="web_error_loading">Error al cargar los enlaces</string>
+    <string name="web_error_refresh">Prueba a refrescar la página.</string>
+    <string name="web_error_fetch">No se han podido recuperar los enlaces. Inténtalo de nuevo.</string>
+    <string name="web_msg_switched">Cambiado al perfil: </string>
+    <string name="web_msg_filtered">Filtrado por etiqueta: </string>
+    <string name="web_msg_filters_cleared">Filtros limpiados</string>
+    <string name="web_open_link">Abrir enlace</string>
+    <string name="enter_profile_name">Introduce el nombre del perfil</string>
+    <string name="all_profiles">Todos los perfiles</string>
+    <string name="failed_to_fetch_data">Error al recuperar datos de %1$s, código: %2$d</string>
+    <string name="error_fetching_data">Error al recuperar datos de %1$s: %2$s</string>
+    <string name="current_profile">Perfil actual</string>
+    <string name="server_info">Información del servidor</string>
+    <string name="invalid_shared_link">Deeplink no válido del contenido compartido</string>
+    <string name="view_type">Tipo de vista</string>
+    <string name="deleted">Eliminado</string>
+    <string name="opened_count_reset">Contador de aperturas restablecido</string>
+    <string name="unknown">Desconocido</string>
+    <string name="preview">Vista previa</string>
+    <string name="link_placeholder">https://ejemplo.com o app://deeplink</string>
+    <string name="switch_profile">Cambiar de perfil</string>
+<string name="web_optional">Opcional</string></resources>

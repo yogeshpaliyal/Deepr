@@ -5,7 +5,7 @@
 > Deepr is a native Android application designed to streamline the management and testing of links.
 > It provides a simple and efficient way to store, organize, and open links.
 
-[![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+[![GitHub Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
 [![Android Weekly](https://img.shields.io/badge/Android%20Weekly-%23685-2CA3E6.svg?style=for-the-badge)](http://androidweekly.net/issues/issue-685)    
 
@@ -24,7 +24,7 @@
 - Import/Export links
 - QR Code support: Generate and scan
 - Organize links by tags
-- Manage multiple profiles. When the user is inside a profile list of links, clicking the Profile icon at the bottom bar or using the device back button will send them back to the profiles selection grid.
+- Manage multiple profiles
 - Save link by sharing from other app (eg: chrome, etc.)
 - **Silent save option:** Save links from share sheet without opening the app
 - Save links to markdown file in local storage. (can be used for obsidian)
@@ -32,7 +32,7 @@
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | F-droid | Play Store | Pro Version on Play Store |
+| Feature                           | GitHub Release | F-droid | Play Store | Pro Version on Play Store |
 |-----------------------------------|----------------|---------|------------|-----------|
 | Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
 | Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
@@ -58,7 +58,7 @@ You can download from any of the sources mentioned below.
 All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
-- Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+- GitHub Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
 - Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
