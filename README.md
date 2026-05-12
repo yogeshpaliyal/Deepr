@@ -5,7 +5,7 @@
 > Deepr is a native Android application designed to streamline the management and testing of links.
 > It provides a simple and efficient way to store, organize, and open links.
 
-[![Github Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
+[![GitHub Releases](https://img.shields.io/github/v/release/yogeshpaliyal/Deepr?style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 [![Latest Master](https://img.shields.io/badge/Master-master?color=7885FF&label=Build&logo=android&style=for-the-badge)](https://github.com/yogeshpaliyal/Deepr/releases/download/latest-master/app-debug.apk)
 [![Android Weekly](https://img.shields.io/badge/Android%20Weekly-%23685-2CA3E6.svg?style=for-the-badge)](http://androidweekly.net/issues/issue-685)    
 
@@ -32,11 +32,11 @@
 
 ### Build Variant specific features
 
-| Feature                           | Github Release | Play Store | F-droid | Pro Version on Play Store |
-|-----------------------------------|----------------|------------|---------|-----------|
-| Firebase Analytics                | ❌              | ✅          | ❌       | ✅  |
-| Google Drive Backup | ❌              | ❌         | ❌       | ✅  |
-| Profile speicific themes | ❌              | ❌          | ❌       | ✅  |
+| Feature                           | GitHub Release | F-droid | Play Store | Pro Version on Play Store |
+|-----------------------------------|----------------|---------|------------|-----------|
+| Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
+| Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
+| Profile specific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 
@@ -58,11 +58,10 @@ You can download from any of the sources mentioned below.
 All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
+- GitHub Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - F-Droid : [Download](https://f-droid.org/packages/com.yogeshpaliyal.deepr/)
-- Github Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
 - Play Store: [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr)
-- Play Store (All features
-  unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
+- Play Store (All features unlocked) : [Download](https://play.google.com/store/apps/details?id=com.yogeshpaliyal.deepr.pro)
 
 
 
