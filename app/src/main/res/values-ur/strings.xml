@@ -127,4 +127,9 @@
     <string name="sync_status_invalid">⚠ فائل فارمیٹ غلط ہے</string>
     <string name="sync_status_no_file">کوئی ہم آہنگی فائل منتخب نہیں</string>
     <string name="sync_now_description">منتخب کردہ فائل میں ڈیپ لنکس کو دستی طور پر ہم آہنگ کریں</string>
-<string name="web_optional">اختیاری</string></resources>
+    <string name="delete_tag_confirmation_with_name">کیا آپ واقعی %1$s ٹیگ حذف کرنا چاہتے ہیں؟</string>
+    <plurals name="tag_used_by_links">
+        <item quantity="one">یہ ٹیگ %1$d لنک استعمال کر رہا ہے۔ اسے حذف کرنے سے اس لنک سے ٹیگ ختم ہو جائے گا۔</item>
+        <item quantity="other">یہ ٹیگ %1$d لنکس استعمال کر رہے ہیں۔ اسے حذف کرنے سے ان لنکس سے ٹیگ ختم ہو جائے گا۔</item>
+    </plurals>
+</resources>

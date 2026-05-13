@@ -78,7 +78,7 @@
     <string name="edit_tag">Tagを編集</string>
     <string name="delete_tag">Tag0を削除</string>
     <string name="delete_tag_confirmation">このTagを削除してもよろしいですか？</string>
-    <string name="delete_tag_confirmation_with_name">\'%s\' tagを削除してもよろしいですか？</string>
+    <string name="delete_tag_confirmation_with_name">タグ「%1$s」を削除してもよろしいですか？</string>
     <string name="tag_name_exists">この名前のTagは既に存在します</string>
     <string name="failed_to_edit_tag">Tagを編集出来ませんでした</string>
     <string name="tag_edited_successfully">Tagを編集しました</string>
@@ -88,6 +88,9 @@
     <string name="delete_tag_description">Tagを削除</string>
     <string name="clear_all_filters">全てのFilterを解除</string>
     <string name="selected_tags_count">%d 個のtagを選択中</string>
+        <plurals name="tag_used_by_links">
+        <item quantity="other">このタグは %1$d 個のリンクで使用されています。削除すると、これらのリンクからタグが削除されます。</item>
+    </plurals>
     <string name="filtered_tags_count">%1$d of %2$d</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>

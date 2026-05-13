@@ -61,4 +61,11 @@
     <string name="sort_by_opened_descending">Sortuj według daty otwarcia (od najnowszych)</string>
     <string name="sort_by_name_ascending">Sortuj wg Nazwy (A-Z)</string>
     <string name="sort_by_name_descending">Sortuj wg nazwy (Z-A)</string>
-<string name="web_optional">Opcjonalne</string><string name="notes_optional">Notatki (Opcjonalne)</string><string name="tags_optional">Tagi (Opcjonalne)</string></resources>
+    <string name="delete_tag_confirmation_with_name">Czy na pewno chcesz usunąć tag %1$s?</string>
+    <plurals name="tag_used_by_links">
+        <item quantity="one">Ten tag jest używany przez %1$d link. Usunięcie go spowoduje usunięcie tagu z tego linku.</item>
+        <item quantity="few">Ten tag jest używany przez %1$d linki. Usunięcie go spowoduje usunięcie tagu z tych linków.</item>
+        <item quantity="many">Ten tag jest używany przez %1$d linków. Usunięcie go spowoduje usunięcie tagu z tych linków.</item>
+        <item quantity="other">Ten tag jest używany przez %1$d linków. Usunięcie go spowoduje usunięcie tagu z tych linków.</item>
+    </plurals>
+</resources>
