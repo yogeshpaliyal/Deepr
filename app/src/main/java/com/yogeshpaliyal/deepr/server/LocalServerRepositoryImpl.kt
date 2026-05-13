@@ -312,12 +312,18 @@ open class LocalServerRepositoryImpl(
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
-                                            profileId = profileId,
-                                            query = "",
-                                            isFavourite = -1L,
-                                            tagId = "",
-                                            sortOrder = "DESC",
-                                            orderBy = "createdAt",
+                                            profileId,
+                                            "",
+                                            "",
+                                            "",
+                                            -1L,
+                                            -1L,
+                                            "",
+                                            "",
+                                            "DESC",
+                                            "createdAt",
+                                            "DESC",
+                                            "createdAt",
                                         ).executeAsList()
                                 val response =
                                     links.map { link ->

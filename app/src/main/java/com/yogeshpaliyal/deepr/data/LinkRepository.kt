@@ -173,22 +173,37 @@ interface LinkRepository {
     // Link operations
 
     /**
-     * Retrieves links and their associated tags based on filter criteria.
-     * @param profileId The ID of the profile.
-     * @param query Search query for link name or URL.
-     * @param isFavourite Filter for favourites (-1 for all, 1 for only favourites).
-     * @param tagId Filter by tag ID (empty string for all).
-     * @param sortOrder The sort direction (ASC or DESC).
-     * @param orderBy The column to order by.
-     * @return A [Query] for a list of [GetLinksAndTags].
+     * Retrieves links and their associated tags for a specific profile,
+     * with support for searching, filtering by favorites, filtering by tags, and sorting.
+     * This version uses positional parameters to match the SQL query contract.
+     *
+     * @param profileId The ID of the profile to fetch links for.
+     * @param searchQuery1 Part of the search query (for link field).
+     * @param searchQuery2 Part of the search query (for name field).
+     * @param searchQuery3 Part of the search query (for notes field).
+     * @param favouriteFilter1 Flag to include all links (-1) or filter by favorite status.
+     * @param favouriteFilter2 The favorite status to filter by (if filter is active).
+     * @param tagIdsString1 Parameter for the tag filter logic.
+     * @param tagIdsString2 Parameter for the tag filter logic.
+     * @param sortType1 The sort direction ('ASC' or 'DESC').
+     * @param sortField1 The field to sort by.
+     * @param sortType2 Secondary sort direction for fallback.
+     * @param sortField2 Secondary field to sort by for fallback.
+     * @return A [Query] object for [GetLinksAndTags].
      */
     fun getLinksAndTags(
         profileId: Long,
-        query: String,
-        isFavourite: Long,
-        tagId: String,
-        sortOrder: String,
-        orderBy: String,
+        searchQuery1: String,
+        searchQuery2: String,
+        searchQuery3: String,
+        favouriteFilter1: Long,
+        favouriteFilter2: Long,
+        tagIdsString1: String,
+        tagIdsString2: String,
+        sortType1: String,
+        sortField1: String,
+        sortType2: String,
+        sortField2: String,
     ): Query<GetLinksAndTags>
 
     /**

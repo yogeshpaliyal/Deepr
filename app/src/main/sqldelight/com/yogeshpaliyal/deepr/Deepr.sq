@@ -81,24 +81,24 @@ FROM
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
-  Deepr.profileId = :profileId
-  AND (:query = '' OR Deepr.link LIKE '%' || :query || '%' OR Deepr.name LIKE '%' || :query || '%' OR Deepr.notes LIKE '%' || :query || '%')
+  Deepr.profileId = ?
+  AND (Deepr.link LIKE '%' || ? || '%' OR Deepr.name LIKE '%' || ? || '%' OR Deepr.notes LIKE '%' || ? || '%')
   AND (
-    :isFavourite = -1 OR Deepr.isFavourite = :isFavourite
+    ? = -1 OR Deepr.isFavourite = ?
   )
   AND (
-    :tagId = '' OR (
+    ? = '' OR (
       SELECT COUNT(DISTINCT lt.tagId)
       FROM LinkTags lt
       WHERE lt.linkId = Deepr.id
-        AND (',' || :tagId || ',' LIKE '%,' || CAST(lt.tagId AS TEXT) || ',%')
+        AND (',' || ? || ',' LIKE '%,' || CAST(lt.tagId AS TEXT) || ',%')
     ) > 0
   )
 GROUP BY
   Deepr.id
 ORDER BY
-    CASE WHEN :sortOrder = 'ASC' THEN
-        CASE :orderBy
+    CASE WHEN ? = 'ASC' THEN
+        CASE ?
             WHEN 'createdAt' THEN Deepr.createdAt
             WHEN 'openedCount' THEN Deepr.openedCount
             WHEN 'name' THEN Deepr.name
@@ -106,17 +106,15 @@ ORDER BY
             ELSE Deepr.createdAt
         END
     END ASC,
-    CASE WHEN :sortOrder = 'DESC' THEN
-        CASE :orderBy
+    CASE WHEN ? = 'DESC' THEN
+        CASE ?
             WHEN 'createdAt' THEN Deepr.createdAt
             WHEN 'openedCount' THEN Deepr.openedCount
             WHEN 'name' THEN Deepr.name
             WHEN 'link' THEN Deepr.link
             ELSE Deepr.createdAt
         END
-    END DESC,
-    Deepr.createdAt DESC,
-    Deepr.id DESC;
+    END DESC;
 
 getLinksForBackup:
 SELECT
