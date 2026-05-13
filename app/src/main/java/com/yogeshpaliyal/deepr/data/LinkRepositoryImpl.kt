@@ -170,31 +170,19 @@ class LinkRepositoryImpl(
     // Link operations
     override fun getLinksAndTags(
         profileId: Long,
-        searchQuery1: String,
-        searchQuery2: String,
-        searchQuery3: String,
-        favouriteFilter1: Long,
-        favouriteFilter2: Long,
-        tagIdsString1: String,
-        tagIdsString2: String,
-        sortType1: String,
-        sortField1: String,
-        sortType2: String,
-        sortField2: String,
+        query: String,
+        isFavourite: Long,
+        tagId: String,
+        sortOrder: String,
+        orderBy: String,
     ): Query<GetLinksAndTags> =
         deeprQueries.getLinksAndTags(
-            profileId,
-            searchQuery1,
-            searchQuery2,
-            searchQuery3,
-            favouriteFilter1,
-            favouriteFilter2,
-            tagIdsString1,
-            tagIdsString2,
-            sortType1,
-            sortField1,
-            sortType2,
-            sortField2,
+            profileId = profileId,
+            query = query,
+            isFavourite = isFavourite,
+            tagId = tagId,
+            sortOrder = sortOrder,
+            orderBy = orderBy,
         )
 
     override fun countOfLinks(profileId: Long): Query<Long> = deeprQueries.countOfLinks(profileId)

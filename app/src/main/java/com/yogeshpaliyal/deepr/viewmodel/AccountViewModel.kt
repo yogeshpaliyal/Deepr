@@ -370,14 +370,8 @@ class AccountViewModel(
                 .getLinksAndTags(
                     profileId,
                     query,
-                    query,
-                    query,
-                    favourite.toLong(),
                     favourite.toLong(),
                     tagIdsString,
-                    tagIdsString,
-                    sortType,
-                    sortField,
                     sortType,
                     sortField,
                 ).asFlow()

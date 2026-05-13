@@ -84,17 +84,11 @@ interface LinkRepository {
     // Link operations
     fun getLinksAndTags(
         profileId: Long,
-        searchQuery1: String,
-        searchQuery2: String,
-        searchQuery3: String,
-        favouriteFilter1: Long,
-        favouriteFilter2: Long,
-        tagIdsString1: String,
-        tagIdsString2: String,
-        sortType1: String,
-        sortField1: String,
-        sortType2: String,
-        sortField2: String,
+        query: String,
+        isFavourite: Long,
+        tagId: String,
+        sortOrder: String,
+        orderBy: String,
     ): Query<GetLinksAndTags>
 
     fun countOfLinks(profileId: Long): Query<Long>

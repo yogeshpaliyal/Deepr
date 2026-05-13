@@ -271,17 +271,11 @@ open class LocalServerRepositoryImpl(
                                     deeprQueries
                                         .getLinksAndTags(
                                             profileId = profileId,
-                                            link = "",
-                                            name = "",
-                                            notes = "",
+                                            query = "",
                                             isFavourite = -1L,
-                                            isFavourite_ = -1L,
                                             tagId = "",
-                                            tagId_ = "",
                                             sortOrder = "DESC",
                                             orderBy = "createdAt",
-                                            sortOrder_ = "DESC",
-                                            orderBy_ = "createdAt",
                                         ).executeAsList()
                                 val response =
                                     links.map { link ->
@@ -347,17 +341,11 @@ open class LocalServerRepositoryImpl(
                                             deeprQueries
                                                 .getLinksAndTags(
                                                     profileId = 1L, // Default profile
-                                                    link = "",
-                                                    name = "",
-                                                    notes = "",
+                                                    query = "",
                                                     isFavourite = -1L,
-                                                    isFavourite_ = -1L,
                                                     tagId = tag.id.toString(),
-                                                    tagId_ = tag.id.toString(),
                                                     sortOrder = "DESC",
                                                     orderBy = "createdAt",
-                                                    sortOrder_ = "DESC",
-                                                    orderBy_ = "createdAt",
                                                 ).executeAsList()
                                                 .size
                                         TagResponse(
