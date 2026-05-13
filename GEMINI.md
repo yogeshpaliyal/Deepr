@@ -25,3 +25,6 @@ The application is built using modern Android development practices and librarie
 - **Dependency Injection:** Koin
 - **Asynchronous Operations:** Kotlin Coroutines
 - **HTTP Client & Server:** Ktor
+# Regole di Sviluppo e Git
+- Prima di ogni git commit o push, devo SEMPRE eseguire il Lint check locale sui file modificati utilizzando il comando: java -jar ktlint <files>. Se vengono rilevati errori di formattazione, devo correggerli prima di procedere. 
+- Dopo ogni modifica e relativo Lint check superato, devo SEMPRE eseguire il push sul fork senza aspettare ulteriori conferme.
