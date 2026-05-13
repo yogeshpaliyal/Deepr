@@ -128,7 +128,7 @@ open class LocalServerRepositoryImpl(
                     routing {
                         get("/") {
                             try {
-                                val languageCode = appPreferenceDataStore.getLanguageCode.first()
+                                val languageCode = preferenceDataStore.getLanguageCode.first()
                                 val localizedContext = LanguageUtil.updateLocale(context, languageCode)
                                 val locale = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                                     localizedContext.resources.configuration.locales[0]
@@ -194,6 +194,12 @@ open class LocalServerRepositoryImpl(
                                             "{{WEB_NO_MATCHING_DESCRIPTION}}" to R.string.web_no_matching_description,
                                             "{{WEB_OPEN_LINK}}" to R.string.web_open_link,
                                             "{{WEB_OPENS}}" to R.string.web_opens,
+                                            "{{WEB_LINK_URL_PLACEHOLDER}}" to R.string.link_placeholder,
+                                            "{{WEB_LINK_NAME_PLACEHOLDER}}" to R.string.enter_link_name,
+                                            "{{WEB_NOTES_PLACEHOLDER}}" to R.string.enter_notes,
+                                            "{{WEB_TAGS_PLACEHOLDER}}" to R.string.web_tags_optional,
+                                            "{{WEB_PROFILE_PLACEHOLDER}}" to R.string.enter_profile_name,
+                                            "{{WEB_UNKNOWN}}" to R.string.unknown,
                                         )
 
                                     placeholders.forEach { (placeholder, resId) ->
