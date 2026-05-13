@@ -81,7 +81,7 @@
     <string name="edit_tag">Tagを編集</string>
     <string name="delete_tag">Tag0を削除</string>
     <string name="delete_tag_confirmation">このTagを削除してもよろしいですか？</string>
-    <string name="delete_tag_confirmation_with_name">タグ「%1$s」を削除してもよろしいですか？</string>
+    <string name="delete_tag_confirmation_with_name">タグ「<b>%1$s</b>」を削除してもよろしいですか？</string>
     <string name="tag_name_exists">この名前のTagは既に存在します</string>
     <string name="failed_to_edit_tag">Tagを編集出来ませんでした</string>
     <string name="tag_edited_successfully">Tagを編集しました</string>

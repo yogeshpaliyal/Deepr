@@ -1,6 +1,11 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.database.sqlite.SQLiteConstraintException
+import android.graphics.Typeface
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -54,16 +59,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
@@ -690,36 +698,15 @@ object TagSelectionScreen : TopLevelRoute {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val template = stringResource(R.string.delete_tag_confirmation_with_name)
-                            val tagPlaceholderPositional = "%1\$s"
-                            val tagPlaceholderSimple = "%s"
-
-                            val tagIndex =
-                                if (template.contains(tagPlaceholderPositional)) {
-                                    template.indexOf(tagPlaceholderPositional)
-                                } else {
-                                    template.indexOf(tagPlaceholderSimple)
-                                }
-
-                            val placeholderLength =
-                                if (template.contains(tagPlaceholderPositional)) {
-                                    tagPlaceholderPositional.length
-                                } else {
-                                    tagPlaceholderSimple.length
-                                }
-
                             val annotatedString =
-                                buildAnnotatedString {
-                                    if (tagIndex >= 0) {
-                                        append(template.substring(0, tagIndex))
-                                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                            append(tag.name)
-                                        }
-                                        append(template.substring(tagIndex + placeholderLength))
-                                    } else {
-                                        append(stringResource(R.string.delete_tag_confirmation_with_name, tag.name))
-                                    }
+                                remember(tag.name) {
+                                    HtmlCompat
+                                        .fromHtml(
+                                            context.getString(R.string.delete_tag_confirmation_with_name, tag.name),
+                                            HtmlCompat.FROM_HTML_MODE_LEGACY,
+                                        ).toAnnotatedString()
                                 }
+
                             Text(
                                 text = annotatedString,
                                 textAlign = TextAlign.Center,
@@ -938,4 +925,36 @@ private fun TagItem(
             }
         }
     }
+}
+
+/**
+ * Extension function to convert a [Spanned] to an [AnnotatedString].
+ * Reference: https://stackoverflow.com/a/66499622
+ */
+fun Spanned.toAnnotatedString(): AnnotatedString {
+    val build = AnnotatedString.Builder()
+    build.append(this.toString())
+    val spans = getSpans(0, length, Any::class.java)
+
+    spans.forEach { span ->
+        val start = getSpanStart(span)
+        val end = getSpanEnd(span)
+        when (span) {
+            is StyleSpan -> {
+                when (span.style) {
+                    Typeface.BOLD -> build.addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
+                    Typeface.ITALIC -> build.addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
+                    Typeface.BOLD_ITALIC ->
+                        build.addStyle(
+                            SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic),
+                            start,
+                            end,
+                        )
+                }
+            }
+            is ForegroundColorSpan -> build.addStyle(SpanStyle(color = Color(span.foregroundColor)), start, end)
+            is UnderlineSpan -> build.addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
+        }
+    }
+    return build.toAnnotatedString()
 }

@@ -146,7 +146,7 @@
     <string name="load_more_tags">+%d और</string>
     <string name="enter_notes">टिप्पड़ियां लिखें (वैकल्पिक)</string>
     <string name="open_with">इसके साथ खोलें</string>
-    <string name="delete_tag_confirmation_with_name">क्या आप वाकई %1$s टैग हटाना चाहते हैं?</string>
+    <string name="delete_tag_confirmation_with_name">क्या आप वाकई <b>%1$s</b> टैग हटाना चाहते हैं?</string>
     <string name="share_link">लिंक शेयर करें</string>
     <string name="view_note">टिप्पड़ी देखें</string>
     <string name="reset_opened_count">खोली गई गिनती रीसेट करें</string>
