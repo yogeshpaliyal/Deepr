@@ -143,7 +143,7 @@
     <string name="all_tags">Alle Tags</string>
     <string name="favourites">Favoriten</string>
     <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
-    <string name="delete_tag_confirmation_with_name">Sind Sie sicher, dass Sie das Tag %1$s löschen möchten?</string>
+    <string name="delete_tag_confirmation_with_name">Sind Sie sicher, dass Sie das Tag <b>%1$s</b> löschen möchten?</string>
     <plurals name="tag_used_by_links">
         <item quantity="one">Dieses Tag wird von %1$d Link verwendet. Durch das Löschen wird das Tag von diesem Link entfernt.</item>
         <item quantity="other">Dieses Tag wird von %1$d Links verwendet. Durch das Löschen wird das Tag von diesen Links entfernt.</item>

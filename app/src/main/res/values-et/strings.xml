@@ -140,7 +140,7 @@
     <string name="last_sync_time">Viimane sünkroonimine</string>
     <string name="contributors">Kaasautorid</string>
     <string name="hindi">hindi keel (हिंदी)</string>
-    <string name="delete_tag_confirmation_with_name">Kas olete kindel, et soovite sildi %1$s kustutada?</string>
+    <string name="delete_tag_confirmation_with_name">Kas olete kindel, et soovite sildi <b>%1$s</b> kustutada?</string>
     <string name="default_port">Vaikimisi: 8080</string>
     <string name="no_favourites_with_tags_description">Märgi nende siltidega linke lemmikuteks või proovi otsida muid silte.</string>
     <string name="sync_file_validation">Failivormingu õigsuse kontroll</string>
