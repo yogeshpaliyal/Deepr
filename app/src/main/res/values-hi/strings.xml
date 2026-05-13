@@ -254,3 +254,5 @@
     <string name="api_endpoints">API एंडपोइनट्स</string>
     <string name="api_endpoints_description">प्रोग्रामेटिक एक्सेस के लिए उपलब्ध REST API एंडपॉइंट्स</string>
 <string name="web_optional">वैकल्पिक</string><string name="notes_optional">टिप्पणियाँ (वैकल्पिक)</string><string name="tags_optional">टैग्स (वैकल्पिक)</string></resources>
+</resources>
+

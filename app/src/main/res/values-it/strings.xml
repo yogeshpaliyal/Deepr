@@ -90,6 +90,8 @@
     <string name="delete_tag">Elimina Tag</string>
     <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questo tag?</string>
     <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag <b>%1$s</b>?</string>
+    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag %s?</string>
+
     <string name="tag_name_exists">Un tag con questo nome esiste già</string>
     <string name="failed_to_edit_tag">Impossibile modificare il tag</string>
     <string name="tag_edited_successfully">Tag modificato con successo</string>
@@ -285,6 +287,11 @@
     <string name="silent_save_profile_description">I link salvati tramite \'Salva silenziosamente\' andranno in questo profilo</string>
 
     
+    <string name="clipboard_link_detection">Rilevamento link negli appunti</string>
+    <string name="clipboard_link_detection_description">Rileva automaticamente i link negli appunti e mostra un banner per aggiungerli</string>
+
+    
+
     <string name="web_title">Deepr - Gestore Link</string>
     <string name="web_subtitle">Il tuo gestore di link personale</string>
     <string name="web_profile_label">Profilo:</string>
@@ -295,6 +302,10 @@
     <string name="web_optional">Facoltativo</string>
     <string name="web_notes_optional">Note (Facoltativo)</string>
     <string name="web_tags_optional">Tag (Facoltativo)</string>
+    <string name="web_optional">Opzionale</string>
+    <string name="web_notes_optional">Note (Opzionale)</string>
+    <string name="web_tags_optional">Tag (Opzionale)</string>
+
     <string name="web_add_link_button">Aggiungi Link</string>
     <string name="web_your_links">I Tuoi Link</string>
     <string name="web_refresh">Aggiorna</string>
@@ -357,3 +368,5 @@
     <string name="profile_delete_failed">Eliminazione profilo fallita</string>
     <string name="profile_update_failed">Aggiornamento profilo fallito</string>
 <string name="notes_optional">Note (Facoltativo)</string><string name="tags_optional">Etichette (Facoltativo)</string></resources>
+</resources>
+

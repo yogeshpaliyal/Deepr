@@ -248,3 +248,5 @@
     <string name="failed_to_save_link">Lingi salvestamine ei õnnestunud</string>
     <string name="link_already_exists">Selline link on juba olemas</string>
 <string name="web_optional">Kui tahad</string><string name="notes_optional">Märkmed (Kui tahad)</string><string name="tags_optional">Sildid (Kui tahad)</string></resources>
+</resources>
+

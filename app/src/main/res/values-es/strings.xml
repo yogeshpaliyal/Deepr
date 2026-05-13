@@ -54,6 +54,7 @@
     <string name="edit_tag">Editar Etiqueta</string>
     <string name="delete_tag">Eliminar Etiqueta</string>
     <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
+    <string name="delete_tag_confirmation_with_name">¿Estás seguro de que quieres eliminar la etiqueta %s?</string>
     <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
     <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
     <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
@@ -160,3 +161,111 @@
         <item quantity="other">Esta etiqueta es usada por %1$d enlaces. Al eliminarla, se quitará de estos enlaces.</item>
     </plurals>
 </resources>
+    <string name="no_favourites_found">No hay favoritos aún</string>
+    <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí</string>
+    <string name="no_search_results">No se encontraron resultados</string>
+    <string name="no_search_results_description">Prueba a buscar con otras palabras clave.</string>
+    <string name="no_links_with_tags">No hay enlaces con estas etiquetas</string>
+    <string name="no_links_with_tags_description">Asigna estas etiquetas a tus enlaces para verlos aquí.</string>
+    <string name="no_favourites_with_tags">No hay favoritos con estas etiquetas</string>
+    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos.</string>
+    <string name="remove_thumbnail">Quitar miniatura</string>
+
+    
+
+    
+    <string name="scan_qr_code">Escanear código QR</string>
+    <string name="transfer_link_server_instructions">1. Activa el interruptor de arriba para iniciar el servidor\n2. Asegúrate de que ambos dispositivos estén en la misma red Wi-Fi\n3. Escanea el código QR desde la opción de importar enlaces en otro dispositivo</string>
+    <string name="scan_qr_to_get_data">Escanea para obtener los enlaces de otro dispositivo</string>
+
+    
+    <string name="profiles">Perfiles</string>
+    <string name="reorder">Reordenar</string>
+    <string name="profile">Perfil</string>
+    <string name="select_profile">Seleccionar perfil</string>
+    <string name="create_profile">Crear Perfil</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="delete_profile">Eliminar Perfil</string>
+    <string name="profile_name">Nombre del perfil</string>
+    <string name="profile_created_successfully">Perfil creado exitosamente</string>
+    <string name="profile_updated_successfully">Perfil actualizado exitosamente</string>
+    <string name="profile_deleted_successfully">Perfil eliminado exitosamente</string>
+    <string name="profile_name_exists">Ya existe un perfil con este nombre</string>
+    <string name="profile_name_cannot_be_blank">El nombre del perfil no puede estar vacío</string>
+    <string name="failed_to_create_profile">Error al crear el perfil</string>
+    <string name="failed_to_update_profile">Error al actualizar el perfil</string>
+    <string name="cannot_delete_only_profile">No se puede eliminar el único perfil existente</string>
+    <string name="profile_delete_confirmation">¿Estás seguro de que quieres eliminar este perfil? Se eliminarán todos los enlaces y etiquetas de este perfil.</string>
+    <string name="manage_profiles">Gestionar Perfiles</string>
+    <string name="no_profiles_yet">No hay perfiles aún</string>
+    <string name="create_first_profile">Crea tu primer perfil para organizar tus enlaces</string>
+
+    
+    <string name="save_silently">Guardar silenciosamente</string>
+    <string name="link_saved_silently">Enlace guardado exitosamente</string>
+    <string name="invalid_link_silent_save">Enlace no válido</string>
+    <string name="failed_to_save_link">Error al guardar el enlace</string>
+    <string name="link_already_exists">El enlace ya existe</string>
+    <string name="silent_save_profile">Perfil de guardado silencioso</string>
+    <string name="silent_save_profile_description">Los enlaces guardados mediante \'Guardar silenciosamente\' irán a este perfil</string>
+
+    
+    <string name="clipboard_link_detection">Detección de enlaces en el portapapeles</string>
+    <string name="clipboard_link_detection_description">Detectar automáticamente enlaces en el portapapeles y mostrar un banner para añadirlos</string>
+
+    
+    <string name="theme">Tema</string>
+    <string name="theme_dialog_title">Seleccionar Tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="close">Cerrar</string>
+
+    
+    <string name="finish_reordering">Terminar reordenamiento</string>
+    <string name="move_up">Subir</string>
+    <string name="move_down">Bajar</string>
+    <string name="profile_delete_confirmation_template">¿Estás seguro de que quieres eliminar el perfil %1$s y todos sus enlaces asociados? Esta acción no se puede deshacer.</string>
+    <string name="profile_delete_failed">Error al eliminar el perfil</string>
+    <string name="profile_update_failed">Error al actualizar el perfil</string>
+
+    
+    <string name="web_sort_opens">Aperturas</string>
+    <string name="web_opens">aperturas</string>
+    <string name="web_clear">Limpiar</string>
+    <string name="web_loading_links">Cargando enlaces...</string>
+    <string name="web_loading_description">Por favor, espera mientras recuperamos tus enlaces.</string>
+    <string name="web_no_links">¡Aún no hay enlaces!</string>
+    <string name="web_no_links_description">Añade tu primer enlace arriba para empezar.</string>
+    <string name="web_no_matching">¡No se han encontrado enlaces coincidentes!</string>
+    <string name="web_no_matching_description">Prueba a ajustar tus términos de búsqueda o filtros.</string>
+    <string name="web_create_profile_title">Crear nuevo perfil</string>
+    <string name="web_profile_name_label">Nombre del perfil</string>
+    <string name="web_cancel">Cancelar</string>
+    <string name="web_create_profile_button">Crear perfil</string>
+    <string name="web_status_creating">Creando...</string>
+    <string name="web_status_added">¡Añadido!</string>
+    <string name="web_success_link_added">¡Enlace añadido con éxito!</string>
+    <string name="web_error_add_link">"Error al añadir el enlace. Inténtalo de nuevo."</string>
+    <string name="web_error_loading">Error al cargar los enlaces</string>
+    <string name="web_error_refresh">Prueba a refrescar la página.</string>
+    <string name="web_error_fetch">No se han podido recuperar los enlaces. Inténtalo de nuevo.</string>
+    <string name="web_msg_switched">Cambiado al perfil: </string>
+    <string name="web_msg_filtered">Filtrado por etiqueta: </string>
+    <string name="web_msg_filters_cleared">Filtros limpiados</string>
+    <string name="web_open_link">Abrir enlace</string>
+    <string name="enter_profile_name">Introduce el nombre del perfil</string>
+    <string name="all_profiles">Todos los perfiles</string>
+    <string name="failed_to_fetch_data">Error al recuperar datos de %1$s, código: %2$d</string>
+    <string name="error_fetching_data">Error al recuperar datos de %1$s: %2$s</string>
+    <string name="current_profile">Perfil actual</string>
+    <string name="server_info">Información del servidor</string>
+    <string name="invalid_shared_link">Deeplink no válido del contenido compartido</string>
+    <string name="view_type">Tipo de vista</string>
+    <string name="deleted">Eliminado</string>
+    <string name="opened_count_reset">Contador de aperturas restablecido</string>
+    <string name="unknown">Desconocido</string>
+    <string name="preview">Vista previa</string>
+    <string name="link_placeholder">https://ejemplo.com o app://deeplink</string>
+    <string name="switch_profile">Cambiar de perfil</string>
+</resources>
+

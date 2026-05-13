@@ -43,11 +43,13 @@ object LanguageUtil {
         val locale =
             if (languageCode.isEmpty()) {
                 // Use system default locale
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    context.resources.configuration.locales[0]
-                } else {
-                    @Suppress("DEPRECATION")
-                    context.resources.configuration.locale
+                android.content.res.Resources.getSystem().configuration.let { 
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        it.locales[0]
+                    } else {
+                        @Suppress("DEPRECATION")
+                        it.locale
+                    }
                 }
             } else {
                 Locale(languageCode)
