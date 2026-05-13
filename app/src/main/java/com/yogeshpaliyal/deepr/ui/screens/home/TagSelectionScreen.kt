@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr.ui.screens.home
 import android.database.sqlite.SQLiteConstraintException
 import android.graphics.Typeface
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
@@ -698,11 +699,16 @@ object TagSelectionScreen : TopLevelRoute {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
+                            val confirmationHtml =
+                                stringResource(
+                                    R.string.delete_tag_confirmation_with_name,
+                                    TextUtils.htmlEncode(tag.name),
+                                )
                             val annotatedString =
-                                remember(tag.name) {
+                                remember(confirmationHtml) {
                                     HtmlCompat
                                         .fromHtml(
-                                            context.getString(R.string.delete_tag_confirmation_with_name, tag.name),
+                                            confirmationHtml,
                                             HtmlCompat.FROM_HTML_MODE_LEGACY,
                                         ).toAnnotatedString()
                                 }
