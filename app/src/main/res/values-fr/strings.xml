@@ -54,7 +54,6 @@
     <string name="edit_tag">Modifier le Tag</string>
     <string name="delete_tag">Supprimer le Tag</string>
     <string name="delete_tag_confirmation">Êtes-vous sûr de vouloir supprimer ce tag ?</string>
-    <string name="delete_tag_confirmation_with_name">Êtes-vous sûr de vouloir supprimer le tag %s ?</string>
     <string name="tag_name_exists">Un tag avec ce nom existe déjà</string>
     <string name="failed_to_edit_tag">Échec de la modification du tag</string>
     <string name="tag_edited_successfully">Tag modifié avec succès</string>

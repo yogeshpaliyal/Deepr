@@ -54,7 +54,6 @@
     <string name="edit_tag">Tag bearbeiten</string>
     <string name="delete_tag">Tag löschen</string>
     <string name="delete_tag_confirmation">Möchten Sie diesen Tag wirklich löschen?</string>
-    <string name="delete_tag_confirmation_with_name">Möchten Sie den Tag %s wirklich löschen?</string>
     <string name="tag_name_exists">Ein Tag mit diesem Namen existiert bereits</string>
     <string name="failed_to_edit_tag">Tag konnte nicht bearbeitet werden</string>
     <string name="tag_edited_successfully">Tag erfolgreich bearbeitet</string>

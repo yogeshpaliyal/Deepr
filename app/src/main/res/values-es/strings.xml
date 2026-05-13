@@ -54,7 +54,6 @@
     <string name="edit_tag">Editar Etiqueta</string>
     <string name="delete_tag">Eliminar Etiqueta</string>
     <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
-    <string name="delete_tag_confirmation_with_name">¿Estás seguro de que quieres eliminar la etiqueta %s?</string>
     <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
     <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
     <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
