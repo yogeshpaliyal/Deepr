@@ -270,18 +270,18 @@ open class LocalServerRepositoryImpl(
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
-                                            profileId,
-                                            "",
-                                            "",
-                                            "",
-                                            -1L,
-                                            -1L,
-                                            "",
-                                            "",
-                                            "DESC",
-                                            "createdAt",
-                                            "DESC",
-                                            "createdAt",
+                                            profileId = profileId,
+                                            link = "",
+                                            name = "",
+                                            notes = "",
+                                            isFavourite = -1L,
+                                            isFavourite_ = -1L,
+                                            tagId = "",
+                                            tagId_ = "",
+                                            sortOrder = "DESC",
+                                            orderBy = "createdAt",
+                                            sortOrder_ = "DESC",
+                                            orderBy_ = "createdAt",
                                         ).executeAsList()
                                 val response =
                                     links.map { link ->
@@ -346,18 +346,18 @@ open class LocalServerRepositoryImpl(
                                         val linkCount =
                                             deeprQueries
                                                 .getLinksAndTags(
-                                                    1L, // Default profile
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    -1L,
-                                                    -1L,
-                                                    tag.id.toString(),
-                                                    tag.id.toString(),
-                                                    "DESC",
-                                                    "createdAt",
-                                                    "DESC",
-                                                    "createdAt",
+                                                    profileId = 1L, // Default profile
+                                                    link = "",
+                                                    name = "",
+                                                    notes = "",
+                                                    isFavourite = -1L,
+                                                    isFavourite_ = -1L,
+                                                    tagId = tag.id.toString(),
+                                                    tagId_ = tag.id.toString(),
+                                                    sortOrder = "DESC",
+                                                    orderBy = "createdAt",
+                                                    sortOrder_ = "DESC",
+                                                    orderBy_ = "createdAt",
                                                 ).executeAsList()
                                                 .size
                                         TagResponse(

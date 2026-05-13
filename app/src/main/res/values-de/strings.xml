@@ -254,4 +254,22 @@
     <string name="preview">Vorschau</string>
     <string name="link_placeholder">https://beispiel.de oder app://deeplink</string>
     <string name="switch_profile">Profil wechseln</string>
+    <string name="web_title">Deepr - Link Manager</string>
+    <string name="web_subtitle">Your Personal Link Manager</string>
+    <string name="web_profile_label">Profile:</string>
+    <string name="web_new_profile">New Profile</string>
+    <string name="web_add_new_link">Add New Link</string>
+    <string name="web_link_url">Link URL</string>
+    <string name="web_link_name">Link Name</string>
+    <string name="web_optional">Optional</string>
+    <string name="web_notes_optional">Notes (Optional)</string>
+    <string name="web_tags_optional">Tags (Optional)</string>
+    <string name="web_add_link_button">Add Link</string>
+    <string name="web_your_links">Your Links</string>
+    <string name="web_refresh">Refresh</string>
+    <string name="web_search_placeholder">Search links by name or URL...</string>
+    <string name="web_all_tags">All Tags</string>
+    <string name="web_sort_date">Date Added</string>
+    <string name="web_sort_name">Name</string>
+    <string name="web_status_error">Error</string>
 </resources>
