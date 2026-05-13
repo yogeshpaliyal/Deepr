@@ -11,9 +11,8 @@ import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
-import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import com.yogeshpaliyal.deepr.util.LanguageUtil
-import kotlinx.coroutines.flow.first
+import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.timeout
@@ -42,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -130,12 +130,13 @@ open class LocalServerRepositoryImpl(
                             try {
                                 val languageCode = preferenceDataStore.getLanguageCode.first()
                                 val localizedContext = LanguageUtil.updateLocale(context, languageCode)
-                                val locale = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                    localizedContext.resources.configuration.locales[0]
-                                } else {
-                                    @Suppress("DEPRECATION")
-                                    localizedContext.resources.configuration.locale
-                                }
+                                val locale =
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                        localizedContext.resources.configuration.locales[0]
+                                    } else {
+                                        @Suppress("DEPRECATION")
+                                        localizedContext.resources.configuration.locale
+                                    }
 
                                 val cachedHtmlContent = htmlCache[locale]
                                 if (cachedHtmlContent != null) {
@@ -332,26 +333,14 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/tags") {
                             try {
-                                // Get all tags from the database with their IDs
-                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val profileId = call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
+                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId).executeAsList()
                                 val response =
                                     allTags.map { tag ->
-                                        // Count how many links use this tag
-                                        val linkCount =
-                                            deeprQueries
-                                                .getLinksAndTags(
-                                                    profileId = 1L, // Default profile
-                                                    query = "",
-                                                    isFavourite = -1L,
-                                                    tagId = tag.id.toString(),
-                                                    sortOrder = "DESC",
-                                                    orderBy = "createdAt",
-                                                ).executeAsList()
-                                                .size
                                         TagResponse(
                                             id = tag.id,
                                             name = tag.name,
-                                            count = linkCount,
+                                            count = tag.linkCount.toInt(),
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)

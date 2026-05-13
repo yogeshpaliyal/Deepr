@@ -357,5 +357,5 @@
     <string name="profile_delete_confirmation_template">Sei sicuro di voler eliminare il profilo %1$s e tutti i link associati? Questa azione non può essere annullata.</string>
     <string name="profile_delete_failed">Eliminazione profilo fallita</string>
     <string name="profile_update_failed">Aggiornamento profilo fallito</string>
-    <string name="web_status_error">Error</string>
+    <string name="web_status_error">Errore</string>
 </resources>

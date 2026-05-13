@@ -464,7 +464,7 @@
                         loadLinks();
                     }
                 } else {
-                    throw new {{WEB_STATUS_ERROR}}('Failed to create profile');
+                    throw new Error('Failed to create profile');
                 }
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} creating profile:', error);
@@ -783,14 +783,14 @@
         async function loadLinks() {
             try {
                 const response = await fetch(`/api/links?profileId=${selectedProfileId}`);
-                const {{WEB_OPENS}} = await response.json();
+                const linksData = await response.json();
 
-                allLinks = {{WEB_OPENS}};
+                allLinks = linksData;
                 populateTagFilter();
                 filterAndDisplayLinks();
 
             } catch (error) {
-                console.error('{{WEB_STATUS_ERROR}} loading {{WEB_OPENS}}:', error);
+                console.error('{{WEB_STATUS_ERROR}} loading links:', error);
                 document.getElementById('linksContainer').innerHTML = `
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -863,7 +863,7 @@
                         button.textContent = originalText;
                     }, 2000);
                 } else {
-                    throw new {{WEB_STATUS_ERROR}}('{{WEB_ERROR_ADD_LINK}}');
+                    throw new Error('{{WEB_ERROR_ADD_LINK}}');
                 }
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} adding link:', error);
