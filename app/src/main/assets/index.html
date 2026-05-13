@@ -369,9 +369,12 @@
         // Load available tags from API
         async function loadAvailableTags() {
             try {
-                const response = await fetch('/api/tags');
+                const response = await fetch(`/api/tags?profileId=${selectedProfileId}`);
                 const tags = await response.json();
-                availableTags = tags; // tags now have {id, name, count} format
+                if (!response.ok) {
+                    throw new Error(tags.error || 'Failed to load tags');
+                }
+                availableTags = Array.isArray(tags) ? tags : [];
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} loading tags:', error);
                 availableTags = [];
@@ -382,7 +385,11 @@
         async function loadProfiles() {
             try {
                 const response = await fetch('/api/profiles');
-                profiles = await response.json();
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load profiles');
+                }
+                profiles = data;
                 populateProfileSelect();
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} loading profiles:', error);
@@ -393,6 +400,10 @@
         // Populate profile dropdown
         function populateProfileSelect() {
             const profileSelect = document.getElementById('profileSelect');
+            if (!Array.isArray(profiles) || profiles.length === 0) {
+                profileSelect.innerHTML = '<option value="1">Default</option>';
+                return;
+            }
             profileSelect.innerHTML = profiles.map(profile => `
                 <option value="${profile.id}" ${profile.id === selectedProfileId ? 'selected' : ''}>
                     ${escapeHtml(profile.name)}
@@ -405,6 +416,7 @@
             const profileSelect = document.getElementById('profileSelect');
             selectedProfileId = parseInt(profileSelect.value, 10);
             loadLinks();
+            loadAvailableTags();
             showToast(`{{WEB_MSG_SWITCHED}}${profiles.find(p => p.id === selectedProfileId)?.name || '{{WEB_UNKNOWN}}'}`, 'info');
         }
 
@@ -785,7 +797,11 @@
                 const response = await fetch(`/api/links?profileId=${selectedProfileId}`);
                 const linksData = await response.json();
 
-                allLinks = linksData;
+                if (!response.ok) {
+                    throw new Error(linksData.error || 'Failed to fetch links');
+                }
+
+                allLinks = Array.isArray(linksData) ? linksData : [];
                 populateTagFilter();
                 filterAndDisplayLinks();
 
@@ -799,10 +815,11 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">{{WEB_ERROR_LOADING}}</h3>
-                        <p class="text-gray-500 text-center">{{WEB_ERROR_REFRESH}}</p>
+                        <p class="text-gray-500 text-center">${escapeHtml(error.message)}</p>
+                        <p class="text-gray-400 text-sm mt-2">{{WEB_ERROR_REFRESH}}</p>
                     </div>
                 `;
-                showToast('{{WEB_ERROR_FETCH}}', 'error');
+                showToast(error.message, 'error');
             }
         }
 
