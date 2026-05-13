@@ -333,7 +333,6 @@
     <string name="web_create_profile_button">Create Profile</string>
     <string name="web_status_creating">Creating...</string>
     <string name="web_status_added">Added!</string>
-    <string name="web_status_creating">Creating...</string>
     <string name="web_status_error">Error</string>
     <string name="web_success_link_added">Link added successfully!</string>
     <string name="web_error_add_link">Failed to add link. Please try again.</string>
