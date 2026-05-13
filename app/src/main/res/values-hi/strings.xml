@@ -278,7 +278,7 @@
     <string name="web_no_matching_description">अपनी खोज शब्दों या फ़िल्टर को समायोजित करने का प्रयास करें।</string>
     <string name="web_create_profile_title">नई प्रोफाइल बनाएं</string>
     <string name="web_profile_name_label">प्रोफाइल का नाम</string>
-    <string name="web_cancel">رद्द करें</string>
+    <string name="web_cancel">रद्द करें</string>
     <string name="web_create_profile_button">प्रोफाइल बनाएं</string>
     <string name="web_status_creating">बनाया जा रहा है...</string>
     <string name="web_status_added">जोड़ा गया!</string>

@@ -50,6 +50,10 @@ import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
 import java.util.Locale
 
+/**
+ * Implementation of [LocalServerRepository] that runs an embedded Ktor server
+ * to provide a web interface and API for managing links and profiles.
+ */
 open class LocalServerRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
@@ -60,21 +64,41 @@ open class LocalServerRepositoryImpl(
     private val preferenceDataStore: AppPreferenceDataStore,
 ) : LocalServerRepository {
     companion object {
+        /**
+         * Cache for generated HTML content indexed by [Locale].
+         */
         private val htmlCache = mutableMapOf<Locale, String>()
     }
 
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
+
     private val _isRunning = MutableStateFlow(false)
+
+    /**
+     * [StateFlow] indicating whether the server is currently running.
+     */
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
 
     private val _serverUrl = MutableStateFlow<String?>(null)
+
+    /**
+     * [StateFlow] providing the URL where the server is accessible.
+     */
     override val serverUrl: StateFlow<String?> = _serverUrl.asStateFlow()
 
     private val _serverPort = MutableStateFlow(8080)
+
+    /**
+     * [StateFlow] providing the current server port.
+     */
     override val serverPort: StateFlow<Int> = _serverPort.asStateFlow()
 
     private val _qrCodeData = MutableStateFlow<String?>(null)
+
+    /**
+     * [StateFlow] providing the JSON data for generating a QR code to connect to the server.
+     */
     override val qrCodeData: StateFlow<String?> = _qrCodeData
 
     init {
@@ -91,6 +115,10 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Sets the server port and persists it to preferences.
+     * @param port The port number (must be between 1024 and 65535).
+     */
     override suspend fun setServerPort(port: Int) {
         if (port in 1024..65535) {
             _serverPort.update { port }
@@ -98,6 +126,10 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Starts the embedded Ktor server on the specified port.
+     * @param port The port to listen on.
+     */
     override suspend fun startServer(port: Int) {
         if (isRunning.value) {
             Log.d("LocalServer", "Server is already running")
@@ -110,8 +142,6 @@ open class LocalServerRepositoryImpl(
                 Log.e("LocalServer", "Unable to get IP address")
                 return
             }
-
-            val port = port
 
             server =
                 embeddedServer(CIO, host = "0.0.0.0", port = port) {
@@ -266,8 +296,19 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/links") {
                             try {
+                                val profileIdParam = call.request.queryParameters["profileId"]
                                 val profileId =
-                                    call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
+                                    if (profileIdParam == null) {
+                                        1L
+                                    } else {
+                                        profileIdParam.toLongOrNull() ?: run {
+                                            call.respond(
+                                                HttpStatusCode.BadRequest,
+                                                ErrorResponse("Invalid profileId: $profileIdParam"),
+                                            )
+                                            return@get
+                                        }
+                                    }
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
@@ -333,7 +374,19 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/tags") {
                             try {
-                                val profileId = call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
+                                val profileIdParam = call.request.queryParameters["profileId"]
+                                val profileId =
+                                    if (profileIdParam == null) {
+                                        1L
+                                    } else {
+                                        profileIdParam.toLongOrNull() ?: run {
+                                            call.respond(
+                                                HttpStatusCode.BadRequest,
+                                                ErrorResponse("Invalid profileId: $profileIdParam"),
+                                            )
+                                            return@get
+                                        }
+                                    }
                                 val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId).executeAsList()
                                 val response =
                                     allTags.map { tag ->
@@ -431,6 +484,9 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Stops the embedded Ktor server.
+     */
     override fun stopServer() {
         try {
             server?.stop(1000, 2000)
@@ -444,6 +500,11 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Fetches link data from a remote sender via its QR transfer info and imports it into the local database.
+     * @param qrTransferInfo Connection details for the sender.
+     * @return [Result] indicating success or failure.
+     */
     override suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
@@ -477,6 +538,10 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Imports a list of [LinkResponse] into the local database.
+     * @param links The list of links to import.
+     */
     private fun importToDatabase(links: List<LinkResponse>) {
         deeprQueries.transaction {
             links.forEach { deeplink ->
@@ -507,6 +572,11 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Generates a JSON string containing [QRTransferInfo] for QR code generation.
+     * @param port The port the server is running on.
+     * @return The JSON string or null if IP is unavailable or serialization fails.
+     */
     private fun generateQRCode(port: Int): String? {
         val ipAddress = getIpAddress() ?: return null
 
@@ -525,6 +595,11 @@ open class LocalServerRepositoryImpl(
         }
     }
 
+    /**
+     * Retrieves the current IP address of the device.
+     * Tries WiFi IP first, then falls back to other network interfaces.
+     * @return The IP address string or null if not found.
+     */
     private fun getIpAddress(): String? {
         try {
             // Try to get WiFi IP first
@@ -562,6 +637,9 @@ open class LocalServerRepositoryImpl(
     }
 }
 
+/**
+ * Data class representing a link in API responses.
+ */
 @Serializable
 data class LinkResponse(
     val id: Long,
@@ -575,14 +653,23 @@ data class LinkResponse(
     val tags: List<String>,
 )
 
+/**
+ * Data class representing tag information in API requests.
+ */
 @Serializable
 data class TagData(
     val id: Long,
     val name: String,
 ) {
+    /**
+     * Converts this [TagData] to a [Tags] database object.
+     */
     fun toDbTag() = Tags(id, name)
 }
 
+/**
+ * Data class representing a request to add a new link.
+ */
 @Serializable
 data class AddLinkRequest(
     val link: String,
@@ -592,6 +679,9 @@ data class AddLinkRequest(
     val profileId: Long = 1L,
 )
 
+/**
+ * Data class representing a profile in API responses.
+ */
 @Serializable
 data class ProfileResponse(
     val id: Long,
@@ -599,27 +689,42 @@ data class ProfileResponse(
     val createdAt: String,
 )
 
+/**
+ * Data class representing a request to add a new profile.
+ */
 @Serializable
 data class AddProfileRequest(
     val name: String,
 )
 
+/**
+ * Data class representing link metadata (title and thumbnail).
+ */
 @Serializable
 data class LinkInfoResponse(
     val title: String?,
     val imageUrl: String?,
 )
 
+/**
+ * Data class representing a successful API operation.
+ */
 @Serializable
 data class SuccessResponse(
     val message: String,
 )
 
+/**
+ * Data class representing an API error.
+ */
 @Serializable
 data class ErrorResponse(
     val error: String,
 )
 
+/**
+ * Data class representing a tag and its link count in API responses.
+ */
 @Serializable
 data class TagResponse(
     val id: Long,
@@ -627,6 +732,9 @@ data class TagResponse(
     val count: Int,
 )
 
+/**
+ * Data class containing connection details for transferring data between devices via QR code.
+ */
 @Serializable
 data class QRTransferInfo(
     val ip: String,

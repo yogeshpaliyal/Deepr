@@ -82,7 +82,7 @@ FROM
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
 WHERE
   Deepr.profileId = :profileId
-  AND (Deepr.link LIKE '%' || :query || '%' OR Deepr.name LIKE '%' || :query || '%' OR Deepr.notes LIKE '%' || :query || '%')
+  AND (:query = '' OR Deepr.link LIKE '%' || :query || '%' OR Deepr.name LIKE '%' || :query || '%' OR Deepr.notes LIKE '%' || :query || '%')
   AND (
     :isFavourite = -1 OR Deepr.isFavourite = :isFavourite
   )
@@ -114,7 +114,9 @@ ORDER BY
             WHEN 'link' THEN Deepr.link
             ELSE Deepr.createdAt
         END
-    END DESC;
+    END DESC,
+    Deepr.createdAt DESC,
+    Deepr.id DESC;
 
 getLinksForBackup:
 SELECT
