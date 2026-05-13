@@ -146,7 +146,7 @@
     <string name="load_more_tags">+%d और</string>
     <string name="enter_notes">टिप्पड़ियां लिखें (वैकल्पिक)</string>
     <string name="open_with">इसके साथ खोलें</string>
-    <string name="delete_tag_confirmation_with_name">क्या आप वाकई ‘%s’ टैग को हटाना चाहते हैं?</string>
+    <string name="delete_tag_confirmation_with_name">क्या आप वाकई %1$s टैग हटाना चाहते हैं?</string>
     <string name="share_link">लिंक शेयर करें</string>
     <string name="view_note">टिप्पड़ी देखें</string>
     <string name="reset_opened_count">खोली गई गिनती रीसेट करें</string>
@@ -205,6 +205,10 @@
     <string name="delete_link_confirmation_with_name">क्या आप वाकई \'%s\' को हटाना चाहते हैं?</string>
     <string name="clear_all_filters">सभी फ़िल्टर हटाएँ</string>
     <string name="selected_tags_count">%d टैग्स चुने गए</string>
+        <plurals name="tag_used_by_links">
+        <item quantity="one">यह टैग %1$d लिंक द्वारा उपयोग किया जा रहा है। इसे हटाने से इस लिंक से टैग हट जाएगा।</item>
+        <item quantity="other">यह टैग %1$d लिंक द्वारा उपयोग किया जा रहा है। इसे हटाने से इन लिंक से टैग हट जाएगा।</item>
+    </plurals>
     <string name="filtered_tags_count">%1$d में से %2$d</string>
     <string name="backup">बैकअप</string>
     <string name="restore">रीस्टोर (पुनर्स्थापित) करें</string>

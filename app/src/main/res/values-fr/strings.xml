@@ -127,4 +127,9 @@
     <string name="sync_status_invalid">⚠ Le format du fichier est invalide</string>
     <string name="sync_status_no_file">Aucun fichier de synchronisation sélectionné</string>
     <string name="sync_now_description">Synchroniser manuellement les liens profonds vers le fichier sélectionné</string>
+    <string name="delete_tag_confirmation_with_name">Êtes-vous sûr de vouloir supprimer l\'étiquette %1$s ?</string>
+    <plurals name="tag_used_by_links">
+        <item quantity="one">Cette étiquette est utilisée par %1$d lien. Sa suppression la retirera de ce lien.</item>
+        <item quantity="other">Cette étiquette est utilisée par %1$d liens. Sa suppression la retirera de ces liens.</item>
+    </plurals>
 </resources>

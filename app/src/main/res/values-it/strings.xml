@@ -89,7 +89,7 @@
     <string name="edit_tag">Modifica Tag</string>
     <string name="delete_tag">Elimina Tag</string>
     <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questo tag?</string>
-    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag \'%s\'?</string>
+    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag %1$s?</string>
     <string name="tag_name_exists">Un tag con questo nome esiste già</string>
     <string name="failed_to_edit_tag">Impossibile modificare il tag</string>
     <string name="tag_edited_successfully">Tag modificato con successo</string>
@@ -99,6 +99,10 @@
     <string name="delete_tag_description">Elimina Tag</string>
     <string name="clear_all_filters">Pulisci Tutti i Filtri</string>
     <string name="selected_tags_count">%d tag selezionati</string>
+        <plurals name="tag_used_by_links">
+        <item quantity="one">Questo tag è usato da %1$d link. Eliminandolo verrà rimosso da questo link.</item>
+        <item quantity="other">Questo tag è usato da %1$d link. Eliminandolo verrà rimosso da questi link.</item>
+    </plurals>
     <string name="filtered_tags_count">%1$d di %2$d</string>
 
     <!-- Settings Screen -->
