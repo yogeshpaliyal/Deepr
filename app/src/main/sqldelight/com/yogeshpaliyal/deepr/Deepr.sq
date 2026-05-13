@@ -84,7 +84,7 @@ WHERE
   Deepr.profileId = :profileId
   AND (Deepr.link LIKE '%' || :query || '%' OR Deepr.name LIKE '%' || :query || '%' OR Deepr.notes LIKE '%' || :query || '%')
   AND (
-    :isFavourite = -1L OR Deepr.isFavourite = :isFavourite
+    :isFavourite = -1 OR Deepr.isFavourite = :isFavourite
   )
   AND (
     :tagId = '' OR (
