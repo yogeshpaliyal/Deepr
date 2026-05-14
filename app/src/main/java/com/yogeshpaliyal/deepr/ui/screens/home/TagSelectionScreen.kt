@@ -56,7 +56,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -680,57 +679,28 @@ object TagSelectionScreen : TopLevelRoute {
                         Text(
                             text = stringResource(R.string.delete_tag),
                             style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
                         )
                     },
                     text = {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            val template = stringResource(R.string.delete_tag_confirmation_with_name)
-                            val tagPlaceholderPositional = "%1\$s"
-                            val tagPlaceholderSimple = "%s"
-
-                            val tagIndex =
-                                if (template.contains(tagPlaceholderPositional)) {
-                                    template.indexOf(tagPlaceholderPositional)
-                                } else {
-                                    template.indexOf(tagPlaceholderSimple)
-                                }
-
-                            val placeholderLength =
-                                if (template.contains(tagPlaceholderPositional)) {
-                                    tagPlaceholderPositional.length
-                                } else {
-                                    tagPlaceholderSimple.length
-                                }
-
-                            val annotatedString =
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            val message =
                                 buildAnnotatedString {
-                                    if (tagIndex >= 0) {
-                                        append(template.substring(0, tagIndex))
-                                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                            append(tag.name)
-                                        }
-                                        append(template.substring(tagIndex + placeholderLength))
-                                    } else {
-                                        append(stringResource(R.string.delete_tag_confirmation_with_name, tag.name))
+                                    append("Are you sure you want to delete ")
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                        append("'${tag.name}'")
                                     }
+                                    append(" tag?")
                                 }
-                            Text(
-                                text = annotatedString,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+                            Text(text = message)
 
                             if (tag.linkCount > 0) {
                                 Card(
                                     colors =
                                         CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                                            containerColor =
+                                                MaterialTheme.colorScheme.errorContainer.copy(
+                                                    alpha = 0.5f,
+                                                ),
                                         ),
                                     shape = RoundedCornerShape(12.dp),
                                 ) {
@@ -746,12 +716,7 @@ object TagSelectionScreen : TopLevelRoute {
                                             modifier = Modifier.size(16.dp),
                                         )
                                         Text(
-                                            text =
-                                                pluralStringResource(
-                                                    R.plurals.tag_used_by_links,
-                                                    tag.linkCount.toInt(),
-                                                    tag.linkCount,
-                                                ),
+                                            text = "This tag is used by ${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,
                                         )
