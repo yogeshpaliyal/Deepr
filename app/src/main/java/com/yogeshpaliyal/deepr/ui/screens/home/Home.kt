@@ -258,10 +258,7 @@ fun HomeScreen(
     var isReordering by remember { mutableStateOf(false) }
 
     BackHandler(
-        enabled =
-            isReordering ||
-                profileToManage != null ||
-                !showProfilesGrid ||
+        enabled = showProfilesGrid || isReordering || profileToManage != null ||
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
@@ -274,8 +271,8 @@ fun HomeScreen(
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
-        } else if (!showProfilesGrid) {
-            viewModel.setShowProfilesGrid(true)
+        } else if (showProfilesGrid) {
+            viewModel.setShowProfilesGrid(false)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
         }
@@ -716,7 +713,7 @@ fun HomeScreen(
                                 ).show()
                         }
                     },
-                    enabled = newProfileName.isNotBlank(),
+                    enabled = showProfilesGrid || isReordering || profileToManage != null || newProfileName.isNotBlank(),
                 ) {
                     Text(stringResource(R.string.create_profile))
                 }
