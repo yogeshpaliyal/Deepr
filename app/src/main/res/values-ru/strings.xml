@@ -249,7 +249,6 @@
     <string name="web_create_profile_button">Создать профиль</string>
     <string name="web_status_creating">Создание...</string>
     <string name="web_status_added">Добавлено!</string>
-    <string name="web_status_error">Ошибка</string>
     <string name="web_success_link_added">Ссылка успешно добавлена!</string>
     <string name="web_error_add_link">Не удалось добавить ссылку. Пожалуйста, попробуйте еще раз.</string>
     <string name="web_error_loading">Ошибка при загрузке ссылок</string>

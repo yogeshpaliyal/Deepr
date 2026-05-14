@@ -103,7 +103,6 @@
     <string name="web_create_profile_button">Utwórz profil</string>
     <string name="web_status_creating">Tworzenie...</string>
     <string name="web_status_added">Dodano!</string>
-    <string name="web_status_error">Błąd</string>
     <string name="web_success_link_added">Link został pomyślnie dodany!</string>
     <string name="web_error_add_link">Nie udało się dodać linku. Spróbuj ponownie.</string>
     <string name="web_error_loading">Błąd ładowania linków</string>

@@ -167,7 +167,6 @@
     <string name="web_create_profile_button">پروفائل بنائیں</string>
     <string name="web_status_creating">بنایا جا رہا ہے...</string>
     <string name="web_status_added">شامل ہو گیا!</string>
-    <string name="web_status_error">غلطی</string>
     <string name="web_success_link_added">لنک کامیابی کے ساتھ شامل ہو گیا!</string>
     <string name="web_error_add_link">لنک شامل کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="web_error_loading">لنکس لوڈ کرنے میں غلطی</string>

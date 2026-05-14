@@ -134,7 +134,6 @@
     <string name="web_create_profile_button">プロフィールを作成</string>
     <string name="web_status_creating">作成中...</string>
     <string name="web_status_added">追加されました！</string>
-    <string name="web_status_error">エラー</string>
     <string name="web_success_link_added">リンクが正常に追加されました！</string>
     <string name="web_error_add_link">リンクの追加に失敗しました。もう一度お試しください。</string>
     <string name="web_error_loading">リンクの読み込みエラー</string>

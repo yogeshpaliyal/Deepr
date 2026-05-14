@@ -282,7 +282,6 @@
     <string name="web_create_profile_button">Loo profiil</string>
     <string name="web_status_creating">Loomine...</string>
     <string name="web_status_added">Lisatud!</string>
-    <string name="web_status_error">Viga</string>
     <string name="web_success_link_added">Link on edukalt lisatud!</string>
     <string name="web_error_add_link">Lingi lisamine ebaõnnestus. Palun proovi uuesti.</string>
     <string name="web_error_loading">Viga linkide laadimisel</string>

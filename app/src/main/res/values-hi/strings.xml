@@ -287,7 +287,6 @@
     <string name="web_create_profile_button">प्रोफाइल बनाएं</string>
     <string name="web_status_creating">बनाया जा रहा है...</string>
     <string name="web_status_added">जोड़ा गया!</string>
-    <string name="web_status_error">त्रुटि</string>
     <string name="web_success_link_added">लिंक सफलतापूर्वक जोड़ा गया!</string>
     <string name="web_error_add_link">लिंक जोड़ने में विफल। कृपया पुन: प्रयास करें।</string>
     <string name="web_error_loading">लिंक लोड करने में त्रुटि</string>
