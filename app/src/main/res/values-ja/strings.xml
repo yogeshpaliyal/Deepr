@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Deepr</string>
     <string name="settings">設定</string>
@@ -21,7 +21,6 @@
     <string name="remove_from_favourites">お気に入りから削除</string>
     <string name="add_link">Linkを追加</string>
     <string name="add">追加</string>
-    <string name="clipboard_link_detected">ClipboardにLinkが見つかりました</string>
     <string name="fetch_name_from_link">Linkから名前を取得</string>
     <string name="create_tag">新規Tagを作成</string>
     <string name="new_tag">新規Tag(オプション)</string>
@@ -34,8 +33,6 @@
     <string name="no_search_results_description">別のキーワードでお試し下さい</string>
     <string name="no_links_with_tags">選択中のTagにLinkは見つかりませんでした</string>
     <string name="no_links_with_tags_description">別のTagを選択するか、フィルターを解除して下さい</string>
-    <string name="clipboard_link_detection">クリップボードにLinkを検出しました。</string>
-    <string name="clipboard_link_detection_description">クリップボード内のリンクを自動的に検出・追加するためのバナーを表示します。</string>
     <string name="no_favourites_with_tags">選択中のTagにお気に入りは見つかりませんでした</string>
     <string name="no_favourites_with_tags_description">これらのタグが付いたリンクをお気に入りとして登録するか、別のタグを試してください。</string>
     <string name="remove_thumbnail">サムネイルを削除する</string>
@@ -81,7 +78,7 @@
     <string name="edit_tag">Tagを編集</string>
     <string name="delete_tag">Tag0を削除</string>
     <string name="delete_tag_confirmation">このTagを削除してもよろしいですか？</string>
-    <string name="delete_tag_confirmation_with_name">\'%s\' tagを削除してもよろしいですか？</string>
+    <string name="delete_tag_confirmation_with_name">タグ「<b>%1$s</b>」を削除してもよろしいですか？</string>
     <string name="tag_name_exists">この名前のTagは既に存在します</string>
     <string name="failed_to_edit_tag">Tagを編集出来ませんでした</string>
     <string name="tag_edited_successfully">Tagを編集しました</string>
@@ -91,6 +88,9 @@
     <string name="delete_tag_description">Tagを削除</string>
     <string name="clear_all_filters">全てのFilterを解除</string>
     <string name="selected_tags_count">%d 個のtagを選択中</string>
+        <plurals name="tag_used_by_links">
+        <item quantity="other">このタグは %1$d 個のリンクで使用されています。削除すると、これらのリンクからタグが削除されます。</item>
+    </plurals>
     <string name="filtered_tags_count">%1$d of %2$d</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -99,4 +99,48 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
+<string name="notes_optional">メモ (任意)</string><string name="tags_optional">タグ (任意)</string>
+
+
+    <string name="web_title">Deepr - リンクマネージャー</string>
+    <string name="web_subtitle">あなた専用のリンクマネージャー</string>
+    <string name="web_profile_label">プロフィール:</string>
+    <string name="web_new_profile">新しいプロフィール</string>
+    <string name="web_add_new_link">新しいリンクを追加</string>
+    <string name="web_link_url">リンクURL</string>
+    <string name="web_link_name">リンク名</string>
+    <string name="web_optional">オプション</string>
+    <string name="web_notes_optional">メモ (オプション)</string>
+    <string name="web_tags_optional">タグ (オプション)</string>
+    <string name="web_add_link_button">リンクを追加</string>
+    <string name="web_your_links">あなたのリンク</string>
+    <string name="web_refresh">更新</string>
+    <string name="web_search_placeholder">名前またはURLでリンクを検索...</string>
+    <string name="web_all_tags">すべてのタグ</string>
+    <string name="web_sort_date">追加日</string>
+    <string name="web_sort_name">名前</string>
+    <string name="web_sort_opens">開いた回数</string>
+    <string name="web_opens">回開きました</string>
+    <string name="web_clear">クリア</string>
+    <string name="web_loading_links">リンクを読み込み中...</string>
+    <string name="web_loading_description">保存されたリンクを取得するまでしばらくお待ちください。</string>
+    <string name="web_no_links">リンクがまだありません！</string>
+    <string name="web_no_links_description">上のフォームを使って最初のリンクを追加して始めましょう。</string>
+    <string name="web_no_matching">一致するリンクが見つかりません！</string>
+    <string name="web_no_matching_description">検索ワードやフィルターを調整してみてください。</string>
+    <string name="web_create_profile_title">新しいプロフィールを作成</string>
+    <string name="web_profile_name_label">プロフィール名</string>
+    <string name="web_cancel">キャンセル</string>
+    <string name="web_create_profile_button">プロフィールを作成</string>
+    <string name="web_status_creating">作成中...</string>
+    <string name="web_status_added">追加されました！</string>
+    <string name="web_success_link_added">リンクが正常に追加されました！</string>
+    <string name="web_error_add_link">リンクの追加に失敗しました。もう一度お試しください。</string>
+    <string name="web_error_loading">リンクの読み込みエラー</string>
+    <string name="web_error_refresh">ページを更新してみてください。</string>
+    <string name="web_error_fetch">リンクの読み込みに失敗しました。もう一度お試しください。</string>
+    <string name="web_msg_switched">プロフィールを切り替えました: </string>
+    <string name="web_msg_filtered">タグでフィルタリングしました: </string>
+    <string name="web_msg_filters_cleared">フィルターをクリアしました</string>
+    <string name="web_open_link">リンクを開く</string>
 </resources>

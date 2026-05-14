@@ -135,7 +135,7 @@ class AccountViewModel(
                     .first()
             if (profileCount == 0L) {
                 // Create default profile if none exists
-                linkRepository.insertProfile("Default", 0)
+                linkRepository.insertProfile("Default", 0L)
             } else {
                 // Normalize priorities for existing profiles if needed
                 reorderMutex.withLock {
@@ -705,17 +705,6 @@ class AccountViewModel(
     fun setGoogleDriveAutoBackupEnabled(enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceDataStore.setGoogleDriveAutoBackupEnabled(enabled)
-        }
-    }
-
-    // Clipboard link detection preference methods
-    val clipboardLinkDetectionEnabled =
-        preferenceDataStore.getClipboardLinkDetectionEnabled
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
-
-    fun setClipboardLinkDetectionEnabled(enabled: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            preferenceDataStore.setClipboardLinkDetectionEnabled(enabled)
         }
     }
 

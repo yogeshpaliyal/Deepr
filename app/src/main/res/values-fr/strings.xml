@@ -127,4 +127,24 @@
     <string name="sync_status_invalid">⚠ Le format du fichier est invalide</string>
     <string name="sync_status_no_file">Aucun fichier de synchronisation sélectionné</string>
     <string name="sync_now_description">Synchroniser manuellement les liens profonds vers le fichier sélectionné</string>
+    <string name="profiles">Profils</string>
+    <string name="reorder">Réordonner</string>
+    <string name="profile">Profil</string>
+    <string name="select_profile">Sélectionner un profil</string>
+    <string name="create_profile">Créer un profil</string>
+    <string name="edit_profile">Modifier le profil</string>
+    <string name="delete_profile">Supprimer le profil</string>
+    <string name="profile_name">Nom du profil</string>
+    <string name="profile_created_successfully">Profil créé avec succès</string>
+    <string name="profile_updated_successfully">Profil mis à jour avec succès</string>
+    <string name="profile_deleted_successfully">Profil supprimé avec succès</string>
+    <string name="profile_name_exists">Un profil avec ce nom existe déjà</string>
+    <string name="profile_name_cannot_be_blank">Le nom du profil ne peut pas être vide</string>
+    <string name="failed_to_create_profile">Échec de la création du profil</string>
+    <string name="failed_to_update_profile">Échec de la mise à jour du profil</string>
+    <string name="cannot_delete_only_profile">Impossible de supprimer le seul profil</string>
+    <string name="profile_delete_confirmation">Êtes-vous sûr de vouloir supprimer ce profil ? Tous les liens et tags de ce profil seront supprimés.</string>
+    <string name="manage_profiles">Gérer les profils</string>
+    <string name="no_profiles_yet">Aucun profil pour le moment</string>
+    <string name="create_first_profile">Créez votre premier profil pour organiser vos liens</string>
 </resources>

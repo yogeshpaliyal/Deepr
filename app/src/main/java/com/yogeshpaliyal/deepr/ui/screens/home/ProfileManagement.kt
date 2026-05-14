@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -40,12 +42,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.R
@@ -237,49 +236,44 @@ fun RenameDeleteProfileDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    val template = stringResource(R.string.profile_delete_confirmation_template)
-                    val placeholder = "%1" + "$" + "s"
-                    val placeholderIndex = template.indexOf(placeholder)
-
-                    val annotatedString =
-                        buildAnnotatedString {
-                            if (placeholderIndex >= 0) {
-                                append(template.substring(0, placeholderIndex))
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append(profile.name)
-                                }
-                                append(template.substring(placeholderIndex + placeholder.length))
-                            } else {
-                                append(template)
-                            }
-                        }
                     Text(
-                        text = annotatedString,
+                        text = stringResource(R.string.profile_delete_confirmation_template, profile.name),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.deleteProfile(profile.id)
-                            showDeleteConfirmation = false
-                            onDismiss()
-                            Toast.makeText(context, context.getString(R.string.profile_deleted_successfully), Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.delete))
+                    TextButton(onClick = { showDeleteConfirmation = false }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.deleteProfile(profile.id)
+                                showDeleteConfirmation = false
+                                onDismiss()
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.profile_deleted_successfully),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    ) {
+                        Text(stringResource(R.string.delete))
+                    }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteConfirmation = false }) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 
@@ -307,7 +301,17 @@ fun RenameDeleteProfileDialog(
                 }
             },
             confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
                     if (allProfiles.size > 1) {
                         TextButton(
                             onClick = {
@@ -352,11 +356,7 @@ fun RenameDeleteProfileDialog(
                     }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 }

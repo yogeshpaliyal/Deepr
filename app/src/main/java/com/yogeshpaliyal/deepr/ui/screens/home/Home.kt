@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -53,6 +54,7 @@ import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -222,6 +224,7 @@ fun HomeScreen(
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
 
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
 
@@ -259,9 +262,9 @@ fun HomeScreen(
 
     BackHandler(
         enabled =
-            showProfilesGrid ||
-                isReordering ||
+            isReordering ||
                 profileToManage != null ||
+                !showProfilesGrid ||
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
@@ -274,10 +277,10 @@ fun HomeScreen(
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
-        } else if (showProfilesGrid) {
-            viewModel.setShowProfilesGrid(false)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
+        } else if (!showProfilesGrid) {
+            viewModel.setShowProfilesGrid(true)
         }
     }
 
@@ -556,21 +559,21 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
-                    Icon(
-                        TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.add_link),
-                    )
-                },
-                text = {
-                    Text(stringResource(R.string.add_link))
-                },
-                expanded = isExpanded,
+            FloatingActionButton(
+                shape = RoundedCornerShape(16.dp),
                 onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                    if (showProfilesGrid) {
+                        showCreateProfileDialog = true
+                    } else {
+                        localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                    }
                 },
-            )
+            ) {
+                Icon(
+                    TablerIcons.Plus,
+                    contentDescription = stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link),
+                )
+            }
         },
     ) { contentPadding ->
         Box(
@@ -690,48 +693,55 @@ fun HomeScreen(
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val trimmedProfileName = newProfileName.trim()
-                        if (trimmedProfileName.isBlank()) {
-                            profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
-                            return@TextButton
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(
+                        onClick = {
+                            showCreateProfileDialog = false
+                            profileCreationError = null
+                        },
+                    ) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
 
-                        val existingProfile =
-                            allProfiles.find {
-                                it.name.equals(trimmedProfileName, ignoreCase = true)
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    TextButton(
+                        onClick = {
+                            val trimmedProfileName = newProfileName.trim()
+                            if (trimmedProfileName.isBlank()) {
+                                profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
+                                return@TextButton
                             }
 
-                        if (existingProfile != null) {
-                            profileCreationError = context.getString(R.string.profile_name_exists)
-                        } else {
-                            viewModel.insertProfile(trimmedProfileName)
-                            showCreateProfileDialog = false
-                            Toast
-                                .makeText(
-                                    context,
-                                    context.getString(R.string.profile_created_successfully),
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        }
-                    },
-                    enabled = showProfilesGrid || isReordering || profileToManage != null || newProfileName.isNotBlank(),
-                ) {
-                    Text(stringResource(R.string.create_profile))
+                            val existingProfile =
+                                allProfiles.find {
+                                    it.name.equals(trimmedProfileName, ignoreCase = true)
+                                }
+
+                            if (existingProfile != null) {
+                                profileCreationError = context.getString(R.string.profile_name_exists)
+                            } else {
+                                viewModel.insertProfile(trimmedProfileName)
+                                showCreateProfileDialog = false
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.profile_created_successfully),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        },
+                        enabled = newProfileName.isNotBlank(),
+                    ) {
+                        Text(stringResource(R.string.create_profile))
+                    }
                 }
             },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showCreateProfileDialog = false
-                        showCreateProfileDialog = false
-                        profileCreationError = null
-                    },
-                ) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 }
