@@ -150,10 +150,6 @@ class DeeprApplication : Application() {
                 viewModel {
                     TransferLinkLocalServerViewModel(get())
                 }
-
-                viewModel {
-                    TransferLinkLocalServerViewModel(get())
-                }
                 single<AnalyticsManager> {
                     AnalyticsManagerFactoryImpl.create(get())
                 }

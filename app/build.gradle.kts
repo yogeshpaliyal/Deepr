@@ -153,6 +153,8 @@ dependencies {
     implementation(libs.accompanist)
     implementation(libs.opencsv)
     implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.multiplatform)
     implementation(libs.zxing.scanner)
     ktlint(libs.ktlint)
     implementation(libs.haze)
