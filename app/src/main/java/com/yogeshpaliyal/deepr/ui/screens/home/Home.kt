@@ -1,5 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -130,6 +132,8 @@ import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Share
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.Shortcut
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ShowQrCode
 import com.yogeshpaliyal.deepr.ui.screens.home.MenuItem.ViewNote
+import com.yogeshpaliyal.deepr.util.isValidDeeplink
+import com.yogeshpaliyal.deepr.util.normalizeLink
 import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.util.openDeeplinkExternal
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
