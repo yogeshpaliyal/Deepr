@@ -43,7 +43,7 @@ object LanguageUtil {
         val locale =
             if (languageCode.isEmpty()) {
                 // Use system default locale
-                android.content.res.Resources.getSystem().configuration.let { 
+                android.content.res.Resources.getSystem().configuration.let {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         it.locales[0]
                     } else {
