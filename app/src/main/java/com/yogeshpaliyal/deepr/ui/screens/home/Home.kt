@@ -258,7 +258,10 @@ fun HomeScreen(
     var isReordering by remember { mutableStateOf(false) }
 
     BackHandler(
-        enabled = showProfilesGrid || isReordering || profileToManage != null ||
+        enabled =
+            showProfilesGrid ||
+                isReordering ||
+                profileToManage != null ||
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
