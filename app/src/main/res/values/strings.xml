@@ -38,6 +38,7 @@
     <string name="no_favourites_with_tags">No favourites in selected tags</string>
     <string name="no_favourites_with_tags_description">Mark links with these tags as favourites or try different tags.</string>
     <string name="remove_thumbnail">Remove thumbnail</string>
+    <string name="finish_reordering">Finish Reordering</string>
     <string name="move_up">Move Up</string>
     <string name="move_down">Move Down</string>
     <string name="profile_delete_confirmation_template">Are you sure you want to delete the profile %1$s and all its associated links? This action cannot be undone.</string>
