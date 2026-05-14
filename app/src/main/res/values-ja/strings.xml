@@ -99,7 +99,7 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
-<string name="web_optional">任意</string><string name="notes_optional">メモ (任意)</string><string name="tags_optional">タグ (任意)</string>
+<string name="notes_optional">メモ (任意)</string><string name="tags_optional">タグ (任意)</string>
 
 
     <string name="web_title">Deepr - リンクマネージャー</string>
