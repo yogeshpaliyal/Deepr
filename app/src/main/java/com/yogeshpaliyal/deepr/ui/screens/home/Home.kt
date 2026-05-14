@@ -166,7 +166,7 @@ data object Home
     ExperimentalHazeMaterialsApi::class,
     ExperimentalMaterial3ExpressiveApi::class,
 )
-class Dashboard2(
+data class Dashboard2(
     val mSelectedLink: GetLinksAndTags? = null,
 ) : TopLevelRoute {
     override val icon: ImageVector
