@@ -237,8 +237,8 @@
     <string name="web_link_url">URL del enlace</string>
     <string name="web_link_name">Nombre del enlace</string>
     <string name="web_optional">Opcional</string>
-    <string name="web_notes_optional">Notas (opcional)</string>
-    <string name="web_tags_optional">Etiquetas (opcional)</string>
+    <string name="web_notes_optional">Notas (Opcional)</string>
+    <string name="web_tags_optional">Etiquetas (Opcional)</string>
     <string name="web_add_link_button">Añadir enlace</string>
     <string name="web_your_links">Tus enlaces</string>
     <string name="web_refresh">Actualizar</string>

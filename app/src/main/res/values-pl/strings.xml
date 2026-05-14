@@ -69,8 +69,8 @@
     <string name="web_link_url">URL linku</string>
     <string name="web_link_name">Nazwa linku</string>
     <string name="web_optional">Opcjonalne</string>
-    <string name="web_notes_optional">Notatki (opcjonalnie)</string>
-    <string name="web_tags_optional">Tagi (opcjonalnie)</string>
+    <string name="web_notes_optional">Notatki (Opcjonalnie)</string>
+    <string name="web_tags_optional">Tagi (Opcjonalnie)</string>
     <string name="web_add_link_button">Dodaj link</string>
     <string name="web_your_links">Twoje linki</string>
     <string name="web_refresh">Odśwież</string>

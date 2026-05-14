@@ -216,9 +216,9 @@
     <string name="web_add_new_link">Добавить новую ссылку</string>
     <string name="web_link_url">URL ссылки</string>
     <string name="web_link_name">Название ссылки</string>
-    <string name="web_optional">Опционально</string>
-    <string name="web_notes_optional">Заметки (опционально)</string>
-    <string name="web_tags_optional">Теги (опционально)</string>
+    <string name="web_optional">Необязательно</string>
+    <string name="web_notes_optional">Заметки (Необязательно)</string>
+    <string name="web_tags_optional">Теги (Необязательно)</string>
     <string name="web_add_link_button">Добавить ссылку</string>
     <string name="web_your_links">Ваши ссылки</string>
     <string name="web_refresh">Обновить</string>

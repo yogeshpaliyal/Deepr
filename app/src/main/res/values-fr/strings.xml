@@ -236,9 +236,9 @@
     <string name="web_add_new_link">Ajouter un nouveau lien</string>
     <string name="web_link_url">URL du lien</string>
     <string name="web_link_name">Nom du lien</string>
-    <string name="web_optional">Optionnel</string>
-    <string name="web_notes_optional">Notes (optionnel)</string>
-    <string name="web_tags_optional">Étiquettes (optionnel)</string>
+    <string name="web_optional">Facultatif</string>
+    <string name="web_notes_optional">Notes (Facultatif)</string>
+    <string name="web_tags_optional">Étiquettes (Facultatif)</string>
     <string name="web_add_link_button">Ajouter le lien</string>
     <string name="web_your_links">Vos liens</string>
     <string name="web_refresh">Actualiser</string>

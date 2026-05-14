@@ -252,8 +252,8 @@
     <string name="web_link_url">Lingi URL</string>
     <string name="web_link_name">Lingi nimi</string>
     <string name="web_optional">Valikuline</string>
-    <string name="web_notes_optional">Märkmed (valikuline)</string>
-    <string name="web_tags_optional">Sildid (valikuline)</string>
+    <string name="web_notes_optional">Märkmed (Valikuline)</string>
+    <string name="web_tags_optional">Sildid (Valikuline)</string>
     <string name="web_add_link_button">Lisa link</string>
     <string name="web_your_links">Sinu lingid</string>
     <string name="web_refresh">Värskenda</string>
