@@ -169,4 +169,24 @@
     <string name="sync_status_valid">✓ Il formato del file è valido</string>
     <string name="sync_status_invalid">⚠ Il formato del file non è valido</string>
     <string name="sync_status_no_file">Nessun file di sincronizzazione selezionato</string>
+    <string name="profiles">Profili</string>
+    <string name="reorder">Riordina</string>
+    <string name="profile">Profilo</string>
+    <string name="select_profile">Seleziona profilo</string>
+    <string name="create_profile">Crea Profilo</string>
+    <string name="edit_profile">Modifica Profilo</string>
+    <string name="delete_profile">Elimina Profilo</string>
+    <string name="profile_name">Nome profilo</string>
+    <string name="profile_created_successfully">Profilo creato con successo</string>
+    <string name="profile_updated_successfully">Profilo aggiornato con successo</string>
+    <string name="profile_deleted_successfully">Profilo eliminato con successo</string>
+    <string name="profile_name_exists">Un profilo con questo nome esiste già</string>
+    <string name="profile_name_cannot_be_blank">Il nome del profilo non può essere vuoto</string>
+    <string name="failed_to_create_profile">Impossibile creare il profilo</string>
+    <string name="failed_to_update_profile">Impossibile aggiornare il profilo</string>
+    <string name="cannot_delete_only_profile">Impossibile eliminare l\'unico profilo</string>
+    <string name="profile_delete_confirmation">Sei sicuro di voler eliminare questo profilo? Tutti i link e i tag in questo profilo verranno eliminati.</string>
+    <string name="manage_profiles">Gestisci Profili</string>
+    <string name="no_profiles_yet">Nessun profilo ancora</string>
+    <string name="create_first_profile">Crea il tuo primo profilo per organizzare i tuoi link</string>
 </resources>

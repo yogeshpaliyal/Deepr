@@ -129,4 +129,24 @@
     <string name="sync_now_description">Deeplinks manuell mit ausgewählter Datei synchronisieren</string>
     <string name="favourites">Favoriten</string>
     <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
+    <string name="profiles">Profile</string>
+    <string name="reorder">Neu ordnen</string>
+    <string name="profile">Profil</string>
+    <string name="select_profile">Profil auswählen</string>
+    <string name="create_profile">Profil erstellen</string>
+    <string name="edit_profile">Profil bearbeiten</string>
+    <string name="delete_profile">Profil löschen</string>
+    <string name="profile_name">Profilname</string>
+    <string name="profile_created_successfully">Profil erfolgreich erstellt</string>
+    <string name="profile_updated_successfully">Profil erfolgreich aktualisiert</string>
+    <string name="profile_deleted_successfully">Profil erfolgreich gelöscht</string>
+    <string name="profile_name_exists">Ein Profil mit diesem Namen existiert bereits</string>
+    <string name="profile_name_cannot_be_blank">Profilname darf nicht leer sein</string>
+    <string name="failed_to_create_profile">Profil konnte nicht erstellt werden</string>
+    <string name="failed_to_update_profile">Profil konnte nicht aktualisiert werden</string>
+    <string name="cannot_delete_only_profile">Das einzige Profil kann nicht gelöscht werden</string>
+    <string name="profile_delete_confirmation">Sind Sie sicher, dass Sie dieses Profil löschen möchten? Alle Links und Tags in diesem Profil werden gelöscht.</string>
+    <string name="manage_profiles">Profile verwalten</string>
+    <string name="no_profiles_yet">Noch keine Profile</string>
+    <string name="create_first_profile">Erstellen Sie Ihr erstes Profil, um Ihre Links zu organisieren</string>
 </resources>
