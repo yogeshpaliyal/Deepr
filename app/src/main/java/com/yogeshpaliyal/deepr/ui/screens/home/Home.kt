@@ -15,7 +15,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,7 +53,6 @@ import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -92,7 +90,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -559,60 +556,21 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            if (!showProfilesGrid) {
-                FloatingActionButton(
-                    onClick = {},
-                ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .size(56.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            localNavigator.add(AddLinkScreen(createDeeprObject()))
-                                        },
-                                        onLongPress = {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            var linkToPass = ""
-
-                                            // Fallback: try to read directly from clipboard manager if state is empty
-                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                            val clipData = clipboard.primaryClip
-                                            if (clipData != null && clipData.itemCount > 0) {
-                                                val text = clipData.getItemAt(0).text?.toString()
-                                                if (!text.isNullOrBlank()) {
-                                                    val normalized = normalizeLink(text)
-                                                    if (isValidDeeplink(normalized)) {
-                                                        linkToPass = normalized
-                                                    }
-                                                }
-                                            }
-
-                                            localNavigator.add(AddLinkScreen(createDeeprObject(link = linkToPass)))
-                                        },
-                                    )
-                                },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            TablerIcons.Plus,
-                            contentDescription = stringResource(R.string.add_link),
-                        )
-                    }
-                }
-            } else {
-                FloatingActionButton(
-                    onClick = {
-                        showCreateProfileDialog = true
-                    },
-                ) {
+            ExtendedFloatingActionButton(
+                icon = {
                     Icon(
                         TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.create_profile),
+                        contentDescription = stringResource(R.string.add_link),
                     )
-                }
-            }
+                },
+                text = {
+                    Text(stringResource(R.string.add_link))
+                },
+                expanded = isExpanded,
+                onClick = {
+                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                },
+            )
         },
     ) { contentPadding ->
         Box(
