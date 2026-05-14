@@ -1,6 +1,12 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
 import android.database.sqlite.SQLiteConstraintException
+import android.graphics.Typeface
+import android.text.Spanned
+import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -54,15 +60,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
@@ -679,28 +689,41 @@ object TagSelectionScreen : TopLevelRoute {
                         Text(
                             text = stringResource(R.string.delete_tag),
                             style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     },
                     text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            val message =
-                                buildAnnotatedString {
-                                    append("Are you sure you want to delete ")
-                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                        append("'${tag.name}'")
-                                    }
-                                    append(" tag?")
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            val confirmationHtml =
+                                stringResource(
+                                    R.string.delete_tag_confirmation_with_name,
+                                    TextUtils.htmlEncode(tag.name),
+                                )
+                            val annotatedString =
+                                remember(confirmationHtml) {
+                                    HtmlCompat
+                                        .fromHtml(
+                                            confirmationHtml,
+                                            HtmlCompat.FROM_HTML_MODE_LEGACY,
+                                        ).toAnnotatedString()
                                 }
-                            Text(text = message)
+
+                            Text(
+                                text = annotatedString,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
 
                             if (tag.linkCount > 0) {
                                 Card(
                                     colors =
                                         CardDefaults.cardColors(
-                                            containerColor =
-                                                MaterialTheme.colorScheme.errorContainer.copy(
-                                                    alpha = 0.5f,
-                                                ),
+                                            containerColor = MaterialTheme.colorScheme.errorContainer,
                                         ),
                                     shape = RoundedCornerShape(12.dp),
                                 ) {
@@ -716,7 +739,12 @@ object TagSelectionScreen : TopLevelRoute {
                                             modifier = Modifier.size(16.dp),
                                         )
                                         Text(
-                                            text = "This tag is used by ${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                                            text =
+                                                pluralStringResource(
+                                                    R.plurals.tag_used_by_links,
+                                                    tag.linkCount.toInt(),
+                                                    tag.linkCount,
+                                                ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,
                                         )
@@ -903,4 +931,36 @@ private fun TagItem(
             }
         }
     }
+}
+
+/**
+ * Extension function to convert a [Spanned] to an [AnnotatedString].
+ * Reference: https://stackoverflow.com/a/66499622
+ */
+fun Spanned.toAnnotatedString(): AnnotatedString {
+    val build = AnnotatedString.Builder()
+    build.append(this.toString())
+    val spans = getSpans(0, length, Any::class.java)
+
+    spans.forEach { span ->
+        val start = getSpanStart(span)
+        val end = getSpanEnd(span)
+        when (span) {
+            is StyleSpan -> {
+                when (span.style) {
+                    Typeface.BOLD -> build.addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
+                    Typeface.ITALIC -> build.addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
+                    Typeface.BOLD_ITALIC ->
+                        build.addStyle(
+                            SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic),
+                            start,
+                            end,
+                        )
+                }
+            }
+            is ForegroundColorSpan -> build.addStyle(SpanStyle(color = Color(span.foregroundColor)), start, end)
+            is UnderlineSpan -> build.addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
+        }
+    }
+    return build.toAnnotatedString()
 }
