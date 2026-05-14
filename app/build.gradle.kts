@@ -154,6 +154,7 @@ dependencies {
     implementation(libs.opencsv)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
+    implementation(libs.zxing.scanner)
     implementation(libs.tabler.icons)
     ktlint(libs.ktlint)
     implementation(libs.haze)
