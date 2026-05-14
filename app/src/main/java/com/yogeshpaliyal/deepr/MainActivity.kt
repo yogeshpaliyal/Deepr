@@ -52,7 +52,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 data class SharedLink(
     val url: String,
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
-            val viewModel: AccountViewModel = koinViewModel()
+            val viewModel: AccountViewModel = koinActivityViewModel()
 
             // Pro users use per-profile theme, non-pro users use global theme
             val themeMode =
@@ -184,7 +184,7 @@ fun Dashboard(
     val hapticFeedback = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
-    val viewModel: AccountViewModel = koinViewModel()
+    val viewModel: AccountViewModel = koinActivityViewModel()
     val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
     CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
         CompositionLocalProvider(LocalNavigator provides backStack) {
