@@ -185,6 +185,7 @@ fun Dashboard(
     val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
     val viewModel: AccountViewModel = koinViewModel()
+    val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
     CompositionLocalProvider(LocalSharedText provides Pair(sharedText, resetSharedText)) {
         CompositionLocalProvider(LocalNavigator provides backStack) {
             Scaffold(
@@ -203,7 +204,7 @@ fun Dashboard(
                                     selected = isSelected,
                                     onClick = {
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        if (topLevelRoute is Dashboard2) {
+                                        if (topLevelRoute is Dashboard2 && !showProfilesGrid) {
                                             viewModel.setShowProfilesGrid(true)
                                         }
                                         backStack.addTopLevel(topLevelRoute)
