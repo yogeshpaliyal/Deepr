@@ -562,15 +562,19 @@ fun HomeScreen(
                 icon = {
                     Icon(
                         TablerIcons.Plus,
-                        contentDescription = stringResource(R.string.add_link),
+                        contentDescription = stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link),
                     )
                 },
                 text = {
-                    Text(stringResource(R.string.add_link))
+                    Text(stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link))
                 },
                 expanded = isExpanded,
                 onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                    if (showProfilesGrid) {
+                        showCreateProfileDialog = true
+                    } else {
+                        localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                    }
                 },
             )
         },
