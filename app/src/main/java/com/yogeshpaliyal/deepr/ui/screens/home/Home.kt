@@ -52,8 +52,8 @@ import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -558,17 +558,8 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
-                    Icon(
-                        TablerIcons.Plus,
-                        contentDescription = stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link),
-                    )
-                },
-                text = {
-                    Text(stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link))
-                },
-                expanded = isExpanded,
+            FloatingActionButton(
+                shape = RoundedCornerShape(16.dp),
                 onClick = {
                     if (showProfilesGrid) {
                         showCreateProfileDialog = true
@@ -576,7 +567,12 @@ fun HomeScreen(
                         localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
                     }
                 },
-            )
+            ) {
+                Icon(
+                    TablerIcons.Plus,
+                    contentDescription = stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link),
+                )
+            }
         },
     ) { contentPadding ->
         Box(
