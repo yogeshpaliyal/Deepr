@@ -261,7 +261,7 @@ fun HomeScreen(
         enabled =
             isReordering ||
                 profileToManage != null ||
-                !showProfilesGrid ||
+                showProfilesGrid ||
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
@@ -274,8 +274,8 @@ fun HomeScreen(
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
-        } else if (!showProfilesGrid) {
-            viewModel.setShowProfilesGrid(true)
+        } else if (showProfilesGrid) {
+            viewModel.setShowProfilesGrid(false)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
         }
