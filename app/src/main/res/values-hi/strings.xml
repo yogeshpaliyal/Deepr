@@ -263,7 +263,6 @@
     <string name="web_add_new_link">नया लिंक जोड़ें</string>
     <string name="web_link_url">लिंक URL</string>
     <string name="web_link_name">लिंक का नाम</string>
-    <string name="web_optional">वैकल्पिक</string>
     <string name="web_notes_optional">नोट्स (वैकल्पिक)</string>
     <string name="web_tags_optional">टैग (वैकल्पिक)</string>
     <string name="web_add_link_button">लिंक जोड़ें</string>
