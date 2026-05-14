@@ -2,9 +2,7 @@ name: Build Stable APK
 on:
   push:
     branches:
-      - master
-      - main
-      - 'release/**'
+      - '**'
   workflow_dispatch:
 
 jobs:
