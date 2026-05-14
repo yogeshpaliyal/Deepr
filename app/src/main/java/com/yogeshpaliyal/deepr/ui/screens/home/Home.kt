@@ -263,8 +263,8 @@ fun HomeScreen(
         enabled =
             isReordering ||
                 profileToManage != null ||
-                showProfilesGrid ||
-                !showProfilesGrid || // When viewing links, back should go to profiles grid
+                !showProfilesGrid ||
+                // Only intercept when viewing links to go back to grid
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
@@ -277,12 +277,10 @@ fun HomeScreen(
             scope.launch {
                 searchBarState.animateToCollapsed()
             }
-        } else if (showProfilesGrid) {
-            viewModel.setShowProfilesGrid(false)
-        } else if (!showProfilesGrid) {
-            viewModel.setShowProfilesGrid(true)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
+        } else if (!showProfilesGrid) {
+            viewModel.setShowProfilesGrid(true)
         }
     }
 
@@ -729,7 +727,6 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        showCreateProfileDialog = false
                         showCreateProfileDialog = false
                         profileCreationError = null
                     },

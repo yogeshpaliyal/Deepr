@@ -150,14 +150,14 @@
     <string name="edit_profile">Editar perfil</string>
     <string name="delete_profile">Eliminar perfil</string>
     <string name="profile_name">Nombre del perfil</string>
-    <string name="profile_created_successfully">Perfil creato con éxito</string>
+    <string name="profile_created_successfully">Perfil creado con éxito</string>
     <string name="profile_updated_successfully">Perfil actualizado con éxito</string>
     <string name="profile_deleted_successfully">Perfil eliminado con éxito</string>
     <string name="profile_name_exists">Ya existe un perfil con este nombre</string>
     <string name="profile_name_cannot_be_blank">El nombre del perfil no puede estar en blanco</string>
-    <string name="failed_to_create_profile">No se pudo crear il perfil</string>
+    <string name="failed_to_create_profile">No se pudo crear el perfil</string>
     <string name="failed_to_update_profile">No se pudo actualizar el perfil</string>
-    <string name="cannot_delete_only_profile">No si puede eliminar el único perfil</string>
+    <string name="cannot_delete_only_profile">No se puede eliminar el único perfil</string>
     <string name="profile_delete_confirmation">¿Está seguro de que desea eliminar este perfil? Todos los enlaces y etiquetas de este perfil se eliminarán.</string>
     <string name="manage_profiles">Gestionar perfiles</string>
     <string name="no_profiles_yet">Aún no hay perfiles</string>

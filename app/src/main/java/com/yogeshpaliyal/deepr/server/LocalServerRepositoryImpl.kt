@@ -256,33 +256,16 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/tags") {
                             try {
-                                // Get all tags from the database with their IDs
-                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val profileId =
+                                    call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
+                                // Get all tags from the database with their IDs and counts for the specific profile
+                                val allTags = deeprQueries.getAllTagsWithCount(profileId).executeAsList()
                                 val response =
                                     allTags.map { tag ->
-                                        // Count how many links use this tag
-                                        val linkCount =
-                                            deeprQueries
-                                                .getLinksAndTags(
-                                                    1L, // Default profile
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    -1L,
-                                                    -1L,
-                                                    tag.id.toString(),
-                                                    tag.id.toString(),
-                                                    "DESC",
-                                                    "createdAt",
-                                                    "DESC",
-                                                    "createdAt",
-                                                ).executeAsList()
-                                                .size
                                         TagResponse(
                                             id = tag.id,
                                             name = tag.name,
-                                            count = linkCount,
+                                            count = tag.linkCount.toInt(),
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)

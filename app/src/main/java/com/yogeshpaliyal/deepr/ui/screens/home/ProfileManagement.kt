@@ -40,12 +40,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.R
@@ -237,24 +234,8 @@ fun RenameDeleteProfileDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    val template = stringResource(R.string.profile_delete_confirmation_template)
-                    val placeholder = "%1" + "$" + "s"
-                    val placeholderIndex = template.indexOf(placeholder)
-
-                    val annotatedString =
-                        buildAnnotatedString {
-                            if (placeholderIndex >= 0) {
-                                append(template.substring(0, placeholderIndex))
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append(profile.name)
-                                }
-                                append(template.substring(placeholderIndex + placeholder.length))
-                            } else {
-                                append(template)
-                            }
-                        }
                     Text(
-                        text = annotatedString,
+                        text = stringResource(R.string.profile_delete_confirmation_template, profile.name),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
