@@ -242,25 +242,36 @@ fun RenameDeleteProfileDialog(
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.deleteProfile(profile.id)
-                            showDeleteConfirmation = false
-                            onDismiss()
-                            Toast.makeText(context, context.getString(R.string.profile_deleted_successfully), Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.delete))
+                    TextButton(onClick = { showDeleteConfirmation = false }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.deleteProfile(profile.id)
+                                showDeleteConfirmation = false
+                                onDismiss()
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.profile_deleted_successfully),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    ) {
+                        Text(stringResource(R.string.delete))
+                    }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteConfirmation = false }) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 
@@ -288,7 +299,17 @@ fun RenameDeleteProfileDialog(
                 }
             },
             confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
                     if (allProfiles.size > 1) {
                         TextButton(
                             onClick = {
@@ -333,11 +354,7 @@ fun RenameDeleteProfileDialog(
                     }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 }

@@ -693,47 +693,55 @@ fun HomeScreen(
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val trimmedProfileName = newProfileName.trim()
-                        if (trimmedProfileName.isBlank()) {
-                            profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
-                            return@TextButton
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(
+                        onClick = {
+                            showCreateProfileDialog = false
+                            profileCreationError = null
+                        },
+                    ) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
 
-                        val existingProfile =
-                            allProfiles.find {
-                                it.name.equals(trimmedProfileName, ignoreCase = true)
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    TextButton(
+                        onClick = {
+                            val trimmedProfileName = newProfileName.trim()
+                            if (trimmedProfileName.isBlank()) {
+                                profileCreationError = context.getString(R.string.profile_name_cannot_be_blank)
+                                return@TextButton
                             }
 
-                        if (existingProfile != null) {
-                            profileCreationError = context.getString(R.string.profile_name_exists)
-                        } else {
-                            viewModel.insertProfile(trimmedProfileName)
-                            showCreateProfileDialog = false
-                            Toast
-                                .makeText(
-                                    context,
-                                    context.getString(R.string.profile_created_successfully),
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        }
-                    },
-                    enabled = newProfileName.isNotBlank(),
-                ) {
-                    Text(stringResource(R.string.create_profile))
+                            val existingProfile =
+                                allProfiles.find {
+                                    it.name.equals(trimmedProfileName, ignoreCase = true)
+                                }
+
+                            if (existingProfile != null) {
+                                profileCreationError = context.getString(R.string.profile_name_exists)
+                            } else {
+                                viewModel.insertProfile(trimmedProfileName)
+                                showCreateProfileDialog = false
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.profile_created_successfully),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        },
+                        enabled = newProfileName.isNotBlank(),
+                    ) {
+                        Text(stringResource(R.string.create_profile))
+                    }
                 }
             },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showCreateProfileDialog = false
-                        profileCreationError = null
-                    },
-                ) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            },
+            dismissButton = null,
         )
     }
 }
