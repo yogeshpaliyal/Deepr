@@ -264,6 +264,7 @@ fun HomeScreen(
             isReordering ||
                 profileToManage != null ||
                 showProfilesGrid ||
+                !showProfilesGrid || // When viewing links, back should go to profiles grid
                 selectedTag.isNotEmpty() ||
                 searchBarState.currentValue == SearchBarValue.Expanded,
     ) {
@@ -278,6 +279,8 @@ fun HomeScreen(
             }
         } else if (showProfilesGrid) {
             viewModel.setShowProfilesGrid(false)
+        } else if (!showProfilesGrid) {
+            viewModel.setShowProfilesGrid(true)
         } else if (selectedTag.isNotEmpty()) {
             viewModel.setTagFilter(null)
         }
