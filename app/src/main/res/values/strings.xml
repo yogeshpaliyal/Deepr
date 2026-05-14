@@ -29,8 +29,6 @@
     <string name="add_tag">Add tag</string>
     <string name="no_links_saved_yet">No links saved yet</string>
     <string name="save_your_link_below">Save your link below to quickly access it later</string>
-    <string name="save_your_link_below">Save your link below to quickly access them later</string>
-
     <string name="no_favourites_found">No favourites yet</string>
     <string name="no_favourites_description">Mark links as favourites to see them here</string>
     <string name="no_search_results">No results found</string>
@@ -96,9 +94,7 @@
     <string name="edit_tag">Edit Tag</string>
     <string name="delete_tag">Delete Tag</string>
     <string name="delete_tag_confirmation">Are you sure you want to delete this tag?</string>
-    <string name="delete_tag_confirmation_with_name">Are you sure you want to delete <b>%1$s</b> tag?</string>
     <string name="delete_tag_confirmation_with_name">Are you sure you want to delete %1$s tag?</string>
-
     <string name="tag_name_exists">Tag with this name already exists</string>
     <string name="failed_to_edit_tag">Failed to edit tag</string>
     <string name="tag_edited_successfully">Tag edited successfully</string>
@@ -136,7 +132,7 @@
     <string name="spanish">Español</string>
     <string name="french">Français</string>
     <string name="german">Deutsch</string>
-    <string name="urdu">Urdu</string>
+    <string name="urdu">اردو</string>
     <string name="default_page">Default Page</string>
     <string name="default_page_all">Start with All links</string>
     <string name="default_page_favourites">Start with Favourites</string>
@@ -295,20 +291,12 @@
     <string name="silent_save_profile_description">Links saved via \'Save Silently\' will go to this profile</string>
 
     
-    <!-- Clipboard Link Detection Setting -->
-    <string name="clipboard_link_detection">Clipboard link detection</string>
-    <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
-
-    <!-- Theme Selection -->
-
     <string name="theme_dialog_title">Select Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="close">Close</string>
 
     
-    <!-- Local Server Web Interface -->
-
     <string name="web_title">Deepr - Link Manager</string>
     <string name="web_subtitle">Your Personal Link Manager</string>
     <string name="web_profile_label">Profile:</string>
@@ -317,7 +305,6 @@
     <string name="web_link_url">Link URL</string>
     <string name="web_link_name">Link Name</string>
     <string name="format_optional">%1$s (%2$s)</string>
-
     <string name="web_optional">Optional</string>
     <string name="web_notes_optional">Notes (Optional)</string>
     <string name="web_tags_optional">Tags (Optional)</string>
@@ -343,8 +330,6 @@
     <string name="web_create_profile_button">Create Profile</string>
     <string name="web_status_creating">Creating...</string>
     <string name="web_status_added">Added!</string>
-    <string name="web_status_error">Error</string>
-
     <string name="web_success_link_added">Link added successfully!</string>
     <string name="web_error_add_link">Failed to add link. Please try again.</string>
     <string name="web_error_loading">Error loading links</string>
@@ -356,8 +341,6 @@
     <string name="web_open_link">Open Link</string>
 
     
-    <!-- Other missing strings -->
-
     <string name="enter_profile_name">Enter profile name</string>
     <string name="all_profiles">All Profiles</string>
     <string name="failed_to_fetch_data">Failed to fetch data from %1$s, status code: %2$d</string>
