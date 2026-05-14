@@ -112,6 +112,7 @@
     <string name="contributors">Участники</string>
     <string name="hindi">Хинди</string>
     <string name="delete_tag_confirmation_with_name">Вы уверены, что хотите удалить тег <b>%1$s</b>?</string>
+    <string name="delete_tag_confirmation_with_name">Вы уверены, что хотите удалить тег «%1$s»?</string>
     <string name="create_tag">Создать тег</string>
     <string name="default_port">По умолчанию: 8080</string>
     <string name="no_favourites_with_tags_description">Отметьте ссылки с этими тегами как избранные или выберите другие теги</string>
@@ -214,6 +215,49 @@
         <item quantity="many">Этот тег используется в %1$d ссылках. Удаление тега приведет к его удалению из этих ссылок.</item>
         <item quantity="other">Этот тег используется в %1$d ссылках. Удаление тега приведет к его удалению из этих ссылок.</item>
     </plurals>
-</resources>
-</resources>
 
+
+
+    <string name="web_title">Deepr - Менеджер ссылок</string>
+    <string name="web_subtitle">Ваш персональный менеджер ссылок</string>
+    <string name="web_profile_label">Профиль:</string>
+    <string name="web_new_profile">Новый профиль</string>
+    <string name="web_add_new_link">Добавить новую ссылку</string>
+    <string name="web_link_url">URL ссылки</string>
+    <string name="web_link_name">Название ссылки</string>
+    <string name="web_optional">Необязательно</string>
+    <string name="web_notes_optional">Заметки (Необязательно)</string>
+    <string name="web_tags_optional">Теги (Необязательно)</string>
+    <string name="web_add_link_button">Добавить ссылку</string>
+    <string name="web_your_links">Ваши ссылки</string>
+    <string name="web_refresh">Обновить</string>
+    <string name="web_search_placeholder">Поиск ссылок по названию или URL...</string>
+    <string name="web_all_tags">Все теги</string>
+    <string name="web_sort_date">Дата добавления</string>
+    <string name="web_sort_name">Название</string>
+    <string name="web_sort_opens">Открытия</string>
+    <string name="web_opens">открытий</string>
+    <string name="web_clear">Очистить</string>
+    <string name="web_loading_links">Загрузка ссылок...</string>
+    <string name="web_loading_description">Пожалуйста, подождите, пока мы получаем ваши сохраненные ссылки.</string>
+    <string name="web_no_links">Ссылок пока нет!</string>
+    <string name="web_no_links_description">Добавьте свою первую ссылку, используя форму выше, чтобы начать.</string>
+    <string name="web_no_matching">Совпадающих ссылок не найдено!</string>
+    <string name="web_no_matching_description">Попробуйте изменить поисковые запросы или фильтры.</string>
+    <string name="web_create_profile_title">Создать новый профиль</string>
+    <string name="web_profile_name_label">Имя профиля</string>
+    <string name="web_cancel">Отмена</string>
+    <string name="web_create_profile_button">Создать профиль</string>
+    <string name="web_status_creating">Создание...</string>
+    <string name="web_status_added">Добавлено!</string>
+    <string name="web_status_error">Ошибка</string>
+    <string name="web_success_link_added">Ссылка успешно добавлена!</string>
+    <string name="web_error_add_link">Не удалось добавить ссылку. Пожалуйста, попробуйте еще раз.</string>
+    <string name="web_error_loading">Ошибка при загрузке ссылок</string>
+    <string name="web_error_refresh">Пожалуйста, попробуйте обновить страницу.</string>
+    <string name="web_error_fetch">Не удалось загрузить ссылки. Пожалуйста, попробуйте еще раз.</string>
+    <string name="web_msg_switched">Переключено на профиль: </string>
+    <string name="web_msg_filtered">Отфильтровано по тегу: </string>
+    <string name="web_msg_filters_cleared">Фильтры очищены</string>
+    <string name="web_open_link">Открыть ссылку</string>
+</resources>

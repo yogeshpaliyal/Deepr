@@ -68,6 +68,49 @@
         <item quantity="many">Ten tag jest używany przez %1$d linków. Usunięcie go spowoduje usunięcie tagu z tych linków.</item>
         <item quantity="other">Ten tag jest używany przez %1$d linków. Usunięcie go spowoduje usunięcie tagu z tych linków.</item>
     </plurals>
-</resources>
-</resources>
 
+
+
+    <string name="web_title">Deepr - Menedżer linków</string>
+    <string name="web_subtitle">Twój osobisty menedżer linków</string>
+    <string name="web_profile_label">Profil:</string>
+    <string name="web_new_profile">Nowy profil</string>
+    <string name="web_add_new_link">Dodaj nowy link</string>
+    <string name="web_link_url">URL linku</string>
+    <string name="web_link_name">Nazwa linku</string>
+    <string name="web_optional">Opcjonalne</string>
+    <string name="web_notes_optional">Notatki (Opcjonalnie)</string>
+    <string name="web_tags_optional">Tagi (Opcjonalnie)</string>
+    <string name="web_add_link_button">Dodaj link</string>
+    <string name="web_your_links">Twoje linki</string>
+    <string name="web_refresh">Odśwież</string>
+    <string name="web_search_placeholder">Szukaj linków po nazwie lub adresie URL...</string>
+    <string name="web_all_tags">Wszystkie tagi</string>
+    <string name="web_sort_date">Data dodania</string>
+    <string name="web_sort_name">Nazwa</string>
+    <string name="web_sort_opens">Otwarcia</string>
+    <string name="web_opens">otwarć</string>
+    <string name="web_clear">Wyczyść</string>
+    <string name="web_loading_links">Ładowanie linków...</string>
+    <string name="web_loading_description">Proszę czekać, trwa pobieranie zapisanych linków.</string>
+    <string name="web_no_links">Nie ma jeszcze żadnych linków!</string>
+    <string name="web_no_links_description">Dodaj swój pierwszy link za pomocą powyższego formularza, aby rozpocząć.</string>
+    <string name="web_no_matching">Nie znaleziono pasujących linków!</string>
+    <string name="web_no_matching_description">Spróbuj zmienić słowa kluczowe lub filtry.</string>
+    <string name="web_create_profile_title">Utwórz nowy profil</string>
+    <string name="web_profile_name_label">Nazwa profilu</string>
+    <string name="web_cancel">Anuluj</string>
+    <string name="web_create_profile_button">Utwórz profil</string>
+    <string name="web_status_creating">Tworzenie...</string>
+    <string name="web_status_added">Dodano!</string>
+    <string name="web_status_error">Błąd</string>
+    <string name="web_success_link_added">Link został pomyślnie dodany!</string>
+    <string name="web_error_add_link">Nie udało się dodać linku. Spróbuj ponownie.</string>
+    <string name="web_error_loading">Błąd ładowania linków</string>
+    <string name="web_error_refresh">Spróbuj odświeżyć stronę.</string>
+    <string name="web_error_fetch">Nie udało się załadować linków. Spróbuj ponownie.</string>
+    <string name="web_msg_switched">Przełączono na profil: </string>
+    <string name="web_msg_filtered">Przefiltrowano według tagu: </string>
+    <string name="web_msg_filters_cleared">Filtry wyczyszczone</string>
+    <string name="web_open_link">Otwórz link</string>
+</resources>

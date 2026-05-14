@@ -56,6 +56,7 @@
     <string name="delete_tag_confirmation">Möchten Sie diesen Tag wirklich löschen?</string>
     <string name="delete_tag_confirmation_with_name">Möchten Sie den Tag %s wirklich löschen?</string>
 
+    <string name="delete_tag_confirmation_with_name">Möchten Sie den Tag %1$s wirklich löschen?</string>
     <string name="tag_name_exists">Ein Tag mit diesem Namen existiert bereits</string>
     <string name="failed_to_edit_tag">Tag konnte nicht bearbeitet werden</string>
     <string name="tag_edited_successfully">Tag erfolgreich bearbeitet</string>
@@ -150,7 +151,7 @@
         <item quantity="one">Dieses Tag wird von %1$d Link verwendet. Durch das Löschen wird das Tag von diesem Link entfernt.</item>
         <item quantity="other">Dieses Tag wird von %1$d Links verwendet. Durch das Löschen wird das Tag von diesen Links entfernt.</item>
     </plurals>
-</resources>
+
     <string name="remove_from_favourites">Aus Favoriten entfernen</string>
     <string name="add">Hinzufügen</string>
     <string name="clipboard_link_detected">Link in Zwischenablage erkannt</string>
@@ -222,31 +223,6 @@
     <string name="profile_delete_failed">Profil konnte nicht gelöscht werden</string>
     <string name="profile_update_failed">Profil konnte nicht aktualisiert werden</string>
 
-    
-    <string name="web_sort_opens">Öffnungen</string>
-    <string name="web_opens">Öffnungen</string>
-    <string name="web_clear">Leeren</string>
-    <string name="web_loading_links">Links werden geladen...</string>
-    <string name="web_loading_description">Bitte warten, während wir deine Links abrufen.</string>
-    <string name="web_no_links">Noch keine Links!</string>
-    <string name="web_no_links_description">Füge oben deinen ersten Link hinzu, um loszulegen.</string>
-    <string name="web_no_matching">Keine passenden Links gefunden!</string>
-    <string name="web_no_matching_description">Versuche, deine Suchbegriffe oder Filter anzupassen.</string>
-    <string name="web_create_profile_title">Neues Profil erstellen</string>
-    <string name="web_profile_name_label">Profilname</string>
-    <string name="web_cancel">Abbrechen</string>
-    <string name="web_create_profile_button">Profil erstellen</string>
-    <string name="web_status_creating">Wird erstellt...</string>
-    <string name="web_status_added">Hinzugefügt!</string>
-    <string name="web_success_link_added">Link erfolgreich hinzugefügt!</string>
-    <string name="web_error_add_link">"Fehler beim Hinzufügen des Links. Bitte versuche es erneut."</string>
-    <string name="web_error_loading">Fehler beim Laden der Links</string>
-    <string name="web_error_refresh">Versuche, die Seite neu zu laden.</string>
-    <string name="web_error_fetch">Links konnten nicht abgerufen werden. Bitte versuche es erneut.</string>
-    <string name="web_msg_switched">Zu Profil gewechselt: </string>
-    <string name="web_msg_filtered">Gefiltert nach Tag: </string>
-    <string name="web_msg_filters_cleared">Filter gelöscht</string>
-    <string name="web_open_link">Link öffnen</string>
     <string name="enter_profile_name">Profilname eingeben</string>
     <string name="all_profiles">Alle Profile</string>
     <string name="failed_to_fetch_data">Daten von %1$s konnten nicht abgerufen werden, Statuscode: %2$d</string>
@@ -261,5 +237,49 @@
     <string name="preview">Vorschau</string>
     <string name="link_placeholder">https://beispiel.de oder app://deeplink</string>
     <string name="switch_profile">Profil wechseln</string>
-</resources>
 
+
+
+    <string name="web_title">Deepr - Link-Manager</string>
+    <string name="web_subtitle">Ihr persönlicher Link-Manager</string>
+    <string name="web_profile_label">Profil:</string>
+    <string name="web_new_profile">Neues Profil</string>
+    <string name="web_add_new_link">Neuen Link hinzufügen</string>
+    <string name="web_link_url">Link-URL</string>
+    <string name="web_link_name">Link-Name</string>
+    <string name="web_optional">Optional</string>
+    <string name="web_notes_optional">Notizen (Optional)</string>
+    <string name="web_tags_optional">Tags (Optional)</string>
+    <string name="web_add_link_button">Link hinzufügen</string>
+    <string name="web_your_links">Ihre Links</string>
+    <string name="web_refresh">Aktualisieren</string>
+    <string name="web_search_placeholder">Links nach Name oder URL suchen...</string>
+    <string name="web_all_tags">Alle Tags</string>
+    <string name="web_sort_date">Hinzufügedatum</string>
+    <string name="web_sort_name">Name</string>
+    <string name="web_sort_opens">Öffnungen</string>
+    <string name="web_opens">Öffnungen</string>
+    <string name="web_clear">Leeren</string>
+    <string name="web_loading_links">Links werden geladen...</string>
+    <string name="web_loading_description">Bitte warten Sie, während wir Ihre gespeicherten Links abrufen.</string>
+    <string name="web_no_links">Noch keine Links!</string>
+    <string name="web_no_links_description">Fügen Sie oben Ihren ersten Link hinzu, um loszulegen.</string>
+    <string name="web_no_matching">Keine passenden Links gefunden!</string>
+    <string name="web_no_matching_description">Versuchen Sie, Ihre Suchbegriffe oder Filter anzupassen.</string>
+    <string name="web_create_profile_title">Neues Profil erstellen</string>
+    <string name="web_profile_name_label">Profilname</string>
+    <string name="web_cancel">Abbrechen</string>
+    <string name="web_create_profile_button">Profil erstellen</string>
+    <string name="web_status_creating">Wird erstellt...</string>
+    <string name="web_status_added">Hinzugefügt!</string>
+    <string name="web_status_error">Fehler</string>
+    <string name="web_success_link_added">Link erfolgreich hinzugefügt!</string>
+    <string name="web_error_add_link">Fehler beim Hinzufügen des Links. Bitte versuchen Sie es erneut.</string>
+    <string name="web_error_loading">Fehler beim Laden der Links</string>
+    <string name="web_error_refresh">Bitte versuchen Sie, die Seite zu aktualisieren.</string>
+    <string name="web_error_fetch">Links konnten nicht geladen werden. Bitte versuchen Sie es erneut.</string>
+    <string name="web_msg_switched">Zum Profil gewechselt: </string>
+    <string name="web_msg_filtered">Gefiltert nach Tag: </string>
+    <string name="web_msg_filters_cleared">Filter gelöscht</string>
+    <string name="web_open_link">Link öffnen</string>
+</resources>

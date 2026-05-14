@@ -369,11 +369,14 @@
         // Load available tags from API
         async function loadAvailableTags() {
             try {
-                const response = await fetch('/api/tags');
+                const response = await fetch(`/api/tags?profileId=${selectedProfileId}`);
                 const tags = await response.json();
-                availableTags = tags; // tags now have {id, name, count} format
+                if (!response.ok) {
+                    throw new Error(tags.error || 'Failed to load tags');
+                }
+                availableTags = Array.isArray(tags) ? tags : [];
             } catch (error) {
-                console.error('{{WEB_STATUS_ERROR}} loading tags:', error);
+                console.error(`{{WEB_STATUS_ERROR}} loading tags:`, error);
                 availableTags = [];
             }
         }
@@ -382,7 +385,11 @@
         async function loadProfiles() {
             try {
                 const response = await fetch('/api/profiles');
-                profiles = await response.json();
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load profiles');
+                }
+                profiles = data;
                 populateProfileSelect();
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} loading profiles:', error);
@@ -393,6 +400,10 @@
         // Populate profile dropdown
         function populateProfileSelect() {
             const profileSelect = document.getElementById('profileSelect');
+            if (!Array.isArray(profiles) || profiles.length === 0) {
+                profileSelect.innerHTML = '<option value="1">Default</option>';
+                return;
+            }
             profileSelect.innerHTML = profiles.map(profile => `
                 <option value="${profile.id}" ${profile.id === selectedProfileId ? 'selected' : ''}>
                     ${escapeHtml(profile.name)}
@@ -405,7 +416,8 @@
             const profileSelect = document.getElementById('profileSelect');
             selectedProfileId = parseInt(profileSelect.value, 10);
             loadLinks();
-            showToast(`{{WEB_MSG_SWITCHED}}${profiles.find(p => p.id === selectedProfileId)?.name || '{{WEB_UNKNOWN}}'}`, 'info');
+            loadAvailableTags();
+            showToast(`{{WEB_MSG_SWITCHED}}${profiles.find(p => p.id === selectedProfileId)?.name || `{{WEB_UNKNOWN}}`}`, 'info');
         }
 
         // Open add profile modal
@@ -464,7 +476,7 @@
                         loadLinks();
                     }
                 } else {
-                    throw new {{WEB_STATUS_ERROR}}('Failed to create profile');
+                    throw new Error('Failed to create profile');
                 }
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} creating profile:', error);
@@ -507,7 +519,7 @@
                     ${escapeHtml(tag.name)}
                     <button
                         type="button"
-                        onclick="removeSelectedTag('${escapeHtml(tag.name)}')"
+                        onclick="removeSelectedTag(decodeURIComponent('${encodeURIComponent(tag.name)}'))"
                         class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
                     >
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -538,7 +550,7 @@
             if (filteredTags.length === 0) {
                 // Show option to create new tag
                 suggestions.innerHTML = `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -552,7 +564,7 @@
                         <span class="text-xs text-gray-500">${tagObj.count} {{WEB_OPENS}}</span>
                     </div>
                 `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -612,7 +624,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">
-                            ${isEmpty ? 'No {{WEB_OPENS}} yet!' : 'No matching {{WEB_OPENS}} found!'}
+                            ${isEmpty ? `No {{WEB_OPENS}} yet!` : `No matching {{WEB_OPENS}} found!`}
                         </h3>
                         <p class="text-gray-500 text-center">
                             ${isEmpty ? 'Add your first link using the form above to get started.' : 'Try adjusting your search terms or filters.'}
@@ -736,7 +748,7 @@
             updateSortOrderIcon();
             updateClearSearchButton();
             filterAndDisplayLinks();
-            showToast('{{WEB_MSG_FILTERS_CLEARED}}', 'info');
+            showToast(`{{WEB_MSG_FILTERS_CLEARED}}`, 'info');
         }
 
         // Toggle sort order
@@ -783,14 +795,14 @@
         async function loadLinks() {
             try {
                 const response = await fetch(`/api/links?profileId=${selectedProfileId}`);
-                const {{WEB_OPENS}} = await response.json();
+                const links = await response.json();
 
-                allLinks = {{WEB_OPENS}};
+                allLinks = links;
                 populateTagFilter();
                 filterAndDisplayLinks();
 
             } catch (error) {
-                console.error('{{WEB_STATUS_ERROR}} loading {{WEB_OPENS}}:', error);
+                console.error('{{WEB_STATUS_ERROR}} loading links:', error);
                 document.getElementById('linksContainer').innerHTML = `
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -802,7 +814,7 @@
                         <p class="text-gray-500 text-center">{{WEB_ERROR_REFRESH}}</p>
                     </div>
                 `;
-                showToast('{{WEB_ERROR_FETCH}}', 'error');
+                showToast(`{{WEB_ERROR_FETCH}}`, 'error');
             }
         }
 
@@ -857,16 +869,16 @@
                         {{WEB_STATUS_ADDED}}
                     `;
 
-                    showToast('{{WEB_SUCCESS_LINK_ADDED}}', 'success');
+                    showToast(`{{WEB_SUCCESS_LINK_ADDED}}`, 'success');
 
                     setTimeout(() => {
                         button.textContent = originalText;
                     }, 2000);
                 } else {
-                    throw new {{WEB_STATUS_ERROR}}('{{WEB_ERROR_ADD_LINK}}');
+                    throw new Error(`{{WEB_ERROR_ADD_LINK}}`);
                 }
             } catch (error) {
-                console.error('{{WEB_STATUS_ERROR}} adding link:', error);
+                console.error(`{{WEB_STATUS_ERROR}} adding link:`, error);
                 button.innerHTML = `
                     <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
@@ -874,7 +886,7 @@
                     {{WEB_STATUS_ERROR}}
                 `;
 
-                showToast('{{WEB_ERROR_ADD_LINK}}. Please try again.', 'error');
+                showToast(`{{WEB_ERROR_ADD_LINK}}. Please try again.`, 'error');
 
                 setTimeout(() => {
                     button.textContent = originalText;

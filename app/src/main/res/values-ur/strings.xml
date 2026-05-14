@@ -132,6 +132,49 @@
         <item quantity="one">یہ ٹیگ %1$d لنک استعمال کر رہا ہے۔ اسے حذف کرنے سے اس لنک سے ٹیگ ختم ہو جائے گا۔</item>
         <item quantity="other">یہ ٹیگ %1$d لنکس استعمال کر رہے ہیں۔ اسے حذف کرنے سے ان لنکس سے ٹیگ ختم ہو جائے گا۔</item>
     </plurals>
-</resources>
-</resources>
 
+
+
+    <string name="web_title">Deepr - لنک منیجر</string>
+    <string name="web_subtitle">آپ کا ذاتی لنک منیجر</string>
+    <string name="web_profile_label">پروفائل:</string>
+    <string name="web_new_profile">نئی پروفائل</string>
+    <string name="web_add_new_link">نیا لنک شامل کریں</string>
+    <string name="web_link_url">لنک URL</string>
+    <string name="web_link_name">لنک کا نام</string>
+    <string name="web_optional">اختیاری</string>
+    <string name="web_notes_optional">نوٹس (اختیاری)</string>
+    <string name="web_tags_optional">ٹیگز (اختیاری)</string>
+    <string name="web_add_link_button">لنک شامل کریں</string>
+    <string name="web_your_links">آپ کے لنکس</string>
+    <string name="web_refresh">تازہ کریں</string>
+    <string name="web_search_placeholder">نام یا URL کے ذریعے لنکس تلاش کریں...</string>
+    <string name="web_all_tags">تمام ٹیگز</string>
+    <string name="web_sort_date">شامل کرنے کی تاریخ</string>
+    <string name="web_sort_name">نام</string>
+    <string name="web_sort_opens">کھلنے کی تعداد</string>
+    <string name="web_opens">بار کھلا</string>
+    <string name="web_clear">صاف کریں</string>
+    <string name="web_loading_links">لنکس لوڈ ہو رہے ہیں...</string>
+    <string name="web_loading_description">براہ کرم انتظار کریں جب تک ہم آپ کے محفوظ کردہ لنکس حاصل کریں۔</string>
+    <string name="web_no_links">ابھی تک کوئی لنکس نہیں!</string>
+    <string name="web_no_links_description">شروع کرنے کے لیے اوپر دیا گیا فارم استعمال کرکے اپنا پہلا لنک شامل کریں۔</string>
+    <string name="web_no_matching">کوئی مماثل لنکس نہیں ملے!</string>
+    <string name="web_no_matching_description">اپنی تلاش کی شرائط یا فلٹرز کو تبدیل کرنے کی کوشش کریں۔</string>
+    <string name="web_create_profile_title">نئی پروفائل بنائیں</string>
+    <string name="web_profile_name_label">پروفائل کا نام</string>
+    <string name="web_cancel">منسوخ کریں</string>
+    <string name="web_create_profile_button">پروفائل بنائیں</string>
+    <string name="web_status_creating">بنایا جا رہا ہے...</string>
+    <string name="web_status_added">شامل ہو گیا!</string>
+    <string name="web_status_error">غلطی</string>
+    <string name="web_success_link_added">لنک کامیابی کے ساتھ شامل ہو گیا!</string>
+    <string name="web_error_add_link">لنک شامل کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="web_error_loading">لنکس لوڈ کرنے میں غلطی</string>
+    <string name="web_error_refresh">براہ کرم صفحہ تازہ کرنے کی کوشش کریں۔</string>
+    <string name="web_error_fetch">لنکس لوڈ کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="web_msg_switched">پروفائل تبدیل کر دیا گیا: </string>
+    <string name="web_msg_filtered">ٹیگ کے ذریعے فلٹر کیا گیا: </string>
+    <string name="web_msg_filters_cleared">فلٹرز صاف کر دیے گئے</string>
+    <string name="web_open_link">لنک کھولیں</string>
+</resources>

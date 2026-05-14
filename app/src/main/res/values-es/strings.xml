@@ -54,7 +54,7 @@
     <string name="edit_tag">Editar Etiqueta</string>
     <string name="delete_tag">Eliminar Etiqueta</string>
     <string name="delete_tag_confirmation">¿Estás seguro de que quieres eliminar esta etiqueta?</string>
-    <string name="delete_tag_confirmation_with_name">¿Estás seguro de que quieres eliminar la etiqueta %s?</string>
+    <string name="delete_tag_confirmation_with_name">¿Estás seguro de que quieres eliminar la etiqueta %1$s?</string>
     <string name="tag_name_exists">Ya existe una etiqueta con este nombre</string>
     <string name="failed_to_edit_tag">Error al editar la etiqueta</string>
     <string name="tag_edited_successfully">Etiqueta editada exitosamente</string>
@@ -160,7 +160,7 @@
         <item quantity="one">Esta etiqueta es usada por %1$d enlace. Al eliminarla, se quitará de este enlace.</item>
         <item quantity="other">Esta etiqueta es usada por %1$d enlaces. Al eliminarla, se quitará de estos enlaces.</item>
     </plurals>
-</resources>
+
     <string name="no_favourites_found">No hay favoritos aún</string>
     <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí</string>
     <string name="no_search_results">No se encontraron resultados</string>
@@ -228,31 +228,6 @@
     <string name="profile_delete_failed">Error al eliminar el perfil</string>
     <string name="profile_update_failed">Error al actualizar el perfil</string>
 
-    
-    <string name="web_sort_opens">Aperturas</string>
-    <string name="web_opens">aperturas</string>
-    <string name="web_clear">Limpiar</string>
-    <string name="web_loading_links">Cargando enlaces...</string>
-    <string name="web_loading_description">Por favor, espera mientras recuperamos tus enlaces.</string>
-    <string name="web_no_links">¡Aún no hay enlaces!</string>
-    <string name="web_no_links_description">Añade tu primer enlace arriba para empezar.</string>
-    <string name="web_no_matching">¡No se han encontrado enlaces coincidentes!</string>
-    <string name="web_no_matching_description">Prueba a ajustar tus términos de búsqueda o filtros.</string>
-    <string name="web_create_profile_title">Crear nuevo perfil</string>
-    <string name="web_profile_name_label">Nombre del perfil</string>
-    <string name="web_cancel">Cancelar</string>
-    <string name="web_create_profile_button">Crear perfil</string>
-    <string name="web_status_creating">Creando...</string>
-    <string name="web_status_added">¡Añadido!</string>
-    <string name="web_success_link_added">¡Enlace añadido con éxito!</string>
-    <string name="web_error_add_link">"Error al añadir el enlace. Inténtalo de nuevo."</string>
-    <string name="web_error_loading">Error al cargar los enlaces</string>
-    <string name="web_error_refresh">Prueba a refrescar la página.</string>
-    <string name="web_error_fetch">No se han podido recuperar los enlaces. Inténtalo de nuevo.</string>
-    <string name="web_msg_switched">Cambiado al perfil: </string>
-    <string name="web_msg_filtered">Filtrado por etiqueta: </string>
-    <string name="web_msg_filters_cleared">Filtros limpiados</string>
-    <string name="web_open_link">Abrir enlace</string>
     <string name="enter_profile_name">Introduce el nombre del perfil</string>
     <string name="all_profiles">Todos los perfiles</string>
     <string name="failed_to_fetch_data">Error al recuperar datos de %1$s, código: %2$d</string>
@@ -267,5 +242,49 @@
     <string name="preview">Vista previa</string>
     <string name="link_placeholder">https://ejemplo.com o app://deeplink</string>
     <string name="switch_profile">Cambiar de perfil</string>
-</resources>
 
+
+
+    <string name="web_title">Deepr - Gestor de enlaces</string>
+    <string name="web_subtitle">Tu gestor de enlaces personal</string>
+    <string name="web_profile_label">Perfil:</string>
+    <string name="web_new_profile">Nuevo perfil</string>
+    <string name="web_add_new_link">Añadir nuevo enlace</string>
+    <string name="web_link_url">URL del enlace</string>
+    <string name="web_link_name">Nombre del enlace</string>
+    <string name="web_optional">Opcional</string>
+    <string name="web_notes_optional">Notas (Opcional)</string>
+    <string name="web_tags_optional">Etiquetas (Opcional)</string>
+    <string name="web_add_link_button">Añadir enlace</string>
+    <string name="web_your_links">Tus enlaces</string>
+    <string name="web_refresh">Actualizar</string>
+    <string name="web_search_placeholder">Buscar enlaces por nombre o URL...</string>
+    <string name="web_all_tags">Todas las etiquetas</string>
+    <string name="web_sort_date">Fecha añadida</string>
+    <string name="web_sort_name">Nombre</string>
+    <string name="web_sort_opens">Aperturas</string>
+    <string name="web_opens">aperturas</string>
+    <string name="web_clear">Limpiar</string>
+    <string name="web_loading_links">Cargando enlaces...</string>
+    <string name="web_loading_description">Por favor, espera mientras recuperamos tus enlaces guardados.</string>
+    <string name="web_no_links">¡Aún no hay enlaces!</string>
+    <string name="web_no_links_description">Añade tu primer enlace usando el formulario de arriba para empezar.</string>
+    <string name="web_no_matching">¡No se han encontrado enlaces coincidentes!</string>
+    <string name="web_no_matching_description">Prueba a ajustar tus términos de búsqueda o filtros.</string>
+    <string name="web_create_profile_title">Crear nuevo perfil</string>
+    <string name="web_profile_name_label">Nombre del perfil</string>
+    <string name="web_cancel">Cancelar</string>
+    <string name="web_create_profile_button">Crear perfil</string>
+    <string name="web_status_creating">Creando...</string>
+    <string name="web_status_added">¡Añadido!</string>
+    <string name="web_status_error">Error</string>
+    <string name="web_success_link_added">¡Enlace añadido con éxito!</string>
+    <string name="web_error_add_link">Error al añadir el enlace. Inténtalo de nuevo.</string>
+    <string name="web_error_loading">Error al cargar los enlaces</string>
+    <string name="web_error_refresh">Prueba a refrescar la página.</string>
+    <string name="web_error_fetch">No se han podido cargar los enlaces. Inténtalo de nuevo.</string>
+    <string name="web_msg_switched">Cambiado al perfil: </string>
+    <string name="web_msg_filtered">Filtrado por etiqueta: </string>
+    <string name="web_msg_filters_cleared">Filtros limpiados</string>
+    <string name="web_open_link">Abrir enlace</string>
+</resources>

@@ -79,6 +79,7 @@
     <string name="delete_tag">Tag0を削除</string>
     <string name="delete_tag_confirmation">このTagを削除してもよろしいですか？</string>
     <string name="delete_tag_confirmation_with_name">タグ「<b>%1$s</b>」を削除してもよろしいですか？</string>
+    <string name="delete_tag_confirmation_with_name">\'%1$s\' tagを削除してもよろしいですか？</string>
     <string name="tag_name_exists">この名前のTagは既に存在します</string>
     <string name="failed_to_edit_tag">Tagを編集出来ませんでした</string>
     <string name="tag_edited_successfully">Tagを編集しました</string>
@@ -99,6 +100,49 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
-<string name="web_optional">任意</string><string name="notes_optional">メモ (任意)</string><string name="tags_optional">タグ (任意)</string></resources>
-</resources>
+<string name="web_optional">任意</string><string name="notes_optional">メモ (任意)</string><string name="tags_optional">タグ (任意)</string>
 
+
+    <string name="web_title">Deepr - リンクマネージャー</string>
+    <string name="web_subtitle">あなた専用のリンクマネージャー</string>
+    <string name="web_profile_label">プロフィール:</string>
+    <string name="web_new_profile">新しいプロフィール</string>
+    <string name="web_add_new_link">新しいリンクを追加</string>
+    <string name="web_link_url">リンクURL</string>
+    <string name="web_link_name">リンク名</string>
+    <string name="web_optional">オプション</string>
+    <string name="web_notes_optional">メモ (オプション)</string>
+    <string name="web_tags_optional">タグ (オプション)</string>
+    <string name="web_add_link_button">リンクを追加</string>
+    <string name="web_your_links">あなたのリンク</string>
+    <string name="web_refresh">更新</string>
+    <string name="web_search_placeholder">名前またはURLでリンクを検索...</string>
+    <string name="web_all_tags">すべてのタグ</string>
+    <string name="web_sort_date">追加日</string>
+    <string name="web_sort_name">名前</string>
+    <string name="web_sort_opens">開いた回数</string>
+    <string name="web_opens">回開きました</string>
+    <string name="web_clear">クリア</string>
+    <string name="web_loading_links">リンクを読み込み中...</string>
+    <string name="web_loading_description">保存されたリンクを取得するまでしばらくお待ちください。</string>
+    <string name="web_no_links">リンクがまだありません！</string>
+    <string name="web_no_links_description">上のフォームを使って最初のリンクを追加して始めましょう。</string>
+    <string name="web_no_matching">一致するリンクが見つかりません！</string>
+    <string name="web_no_matching_description">検索ワードやフィルターを調整してみてください。</string>
+    <string name="web_create_profile_title">新しいプロフィールを作成</string>
+    <string name="web_profile_name_label">プロフィール名</string>
+    <string name="web_cancel">キャンセル</string>
+    <string name="web_create_profile_button">プロフィールを作成</string>
+    <string name="web_status_creating">作成中...</string>
+    <string name="web_status_added">追加されました！</string>
+    <string name="web_status_error">エラー</string>
+    <string name="web_success_link_added">リンクが正常に追加されました！</string>
+    <string name="web_error_add_link">リンクの追加に失敗しました。もう一度お試しください。</string>
+    <string name="web_error_loading">リンクの読み込みエラー</string>
+    <string name="web_error_refresh">ページを更新してみてください。</string>
+    <string name="web_error_fetch">リンクの読み込みに失敗しました。もう一度お試しください。</string>
+    <string name="web_msg_switched">プロフィールを切り替えました: </string>
+    <string name="web_msg_filtered">タグでフィルタリングしました: </string>
+    <string name="web_msg_filters_cleared">フィルターをクリアしました</string>
+    <string name="web_open_link">リンクを開く</string>
+</resources>

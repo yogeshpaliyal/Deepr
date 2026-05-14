@@ -253,6 +253,49 @@
     <string name="local_server_instructions">1. ऊपर दिए गए स्विच को चालू करके सर्वर शुरू करें\n2. सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क पर हों\n3. दूसरे डिवाइस से URL (लिंक) का उपयोग करें या QR कोड स्कैन करें\n4. अपने लिंक प्रबंधित करने के लिए वेब इंटरफ़ेस या API एंडपॉइंट्स का उपयोग करें</string>
     <string name="api_endpoints">API एंडपोइनट्स</string>
     <string name="api_endpoints_description">प्रोग्रामेटिक एक्सेस के लिए उपलब्ध REST API एंडपॉइंट्स</string>
-<string name="web_optional">वैकल्पिक</string><string name="notes_optional">टिप्पणियाँ (वैकल्पिक)</string><string name="tags_optional">टैग्स (वैकल्पिक)</string></resources>
-</resources>
+<string name="web_optional">वैकल्पिक</string><string name="notes_optional">टिप्पणियाँ (वैकल्पिक)</string><string name="tags_optional">टैग्स (वैकल्पिक)</string>
 
+
+    <string name="web_title">Deepr - लिंक मैनेजर</string>
+    <string name="web_subtitle">आपका व्यक्तिगत लिंक मैनेजर</string>
+    <string name="web_profile_label">प्रोफाइल:</string>
+    <string name="web_new_profile">नई प्रोफाइल</string>
+    <string name="web_add_new_link">नया लिंक जोड़ें</string>
+    <string name="web_link_url">लिंक URL</string>
+    <string name="web_link_name">लिंक का नाम</string>
+    <string name="web_optional">वैकल्पिक</string>
+    <string name="web_notes_optional">नोट्स (वैकल्पिक)</string>
+    <string name="web_tags_optional">टैग (वैकल्पिक)</string>
+    <string name="web_add_link_button">लिंक जोड़ें</string>
+    <string name="web_your_links">आपके लिंक</string>
+    <string name="web_refresh">रिफ्रेश करें</string>
+    <string name="web_search_placeholder">नाम या URL द्वारा लिंक खोजें...</string>
+    <string name="web_all_tags">सभी टैग</string>
+    <string name="web_sort_date">जोड़ने की तिथि</string>
+    <string name="web_sort_name">नाम</string>
+    <string name="web_sort_opens">बार खोला गया</string>
+    <string name="web_opens">बार खोला गया</string>
+    <string name="web_clear">साफ़ करें</string>
+    <string name="web_loading_links">लिंक लोड हो रहे हैं...</string>
+    <string name="web_loading_description">कृपया प्रतीक्षा करें जब तक हम आपके सहेजे गए लिंक प्राप्त कर रहे हैं।</string>
+    <string name="web_no_links">अभी तक कोई लिंक नहीं!</string>
+    <string name="web_no_links_description">शुरू करने के लिए ऊपर दिए गए फॉर्म का उपयोग करके अपना पहला लिंक जोड़ें।</string>
+    <string name="web_no_matching">कोई मेल खाने वाला लिंक नहीं मिला!</string>
+    <string name="web_no_matching_description">अपनी खोज शब्दों या फ़िल्टर को समायोजित करने का प्रयास करें।</string>
+    <string name="web_create_profile_title">नई प्रोफाइल बनाएं</string>
+    <string name="web_profile_name_label">प्रोफाइल का नाम</string>
+    <string name="web_cancel">रद्द करें</string>
+    <string name="web_create_profile_button">प्रोफाइल बनाएं</string>
+    <string name="web_status_creating">बनाया जा रहा है...</string>
+    <string name="web_status_added">जोड़ा गया!</string>
+    <string name="web_status_error">त्रुटि</string>
+    <string name="web_success_link_added">लिंक सफलतापूर्वक जोड़ा गया!</string>
+    <string name="web_error_add_link">लिंक जोड़ने में विफल। कृपया पुन: प्रयास करें।</string>
+    <string name="web_error_loading">लिंक लोड करने में त्रुटि</string>
+    <string name="web_error_refresh">कृपया पेज को रिफ्रेश करने का प्रयास करें।</string>
+    <string name="web_error_fetch">लिंक लोड करने में विफल। कृपया पुन: प्रयास करें।</string>
+    <string name="web_msg_switched">प्रोफाइल में स्विच किया गया: </string>
+    <string name="web_msg_filtered">टैग द्वारा फ़िल्टर किया गया: </string>
+    <string name="web_msg_filters_cleared">फ़िल्टर साफ़ किए गए</string>
+    <string name="web_open_link">लिंक खोलें</string>
+</resources>
