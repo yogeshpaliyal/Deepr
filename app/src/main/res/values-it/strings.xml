@@ -90,7 +90,7 @@
     <string name="edit_tag">Modifica Tag</string>
     <string name="delete_tag">Elimina Tag</string>
     <string name="delete_tag_confirmation">Sei sicuro di voler eliminare questo tag?</string>
-    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag %s?</string>
+    <string name="delete_tag_confirmation_with_name">Sei sicuro di voler eliminare il tag %1$s?</string>
     <string name="tag_name_exists">Un tag con questo nome esiste già</string>
     <string name="failed_to_edit_tag">Impossibile modificare il tag</string>
     <string name="tag_edited_successfully">Tag modificato con successo</string>

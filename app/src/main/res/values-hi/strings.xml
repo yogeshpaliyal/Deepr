@@ -263,7 +263,7 @@
     <string name="web_add_link_button">लिंक जोड़ें</string>
     <string name="web_your_links">आपके लिंक</string>
     <string name="web_refresh">रिफ्रेश करें</string>
-    <string name="web_search_placeholder">नाम या URL द्वारा लिंक खोजیں...</string>
+    <string name="web_search_placeholder">नाम या URL द्वारा लिंक खोजें...</string>
     <string name="web_all_tags">सभी टैग</string>
     <string name="web_sort_date">जोड़ने की तिथि</string>
     <string name="web_sort_name">नाम</string>

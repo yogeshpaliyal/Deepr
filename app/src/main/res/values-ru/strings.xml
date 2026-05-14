@@ -112,7 +112,7 @@
     <string name="last_sync_time">Последняя синхронизация</string>
     <string name="contributors">Участники</string>
     <string name="hindi">Хинди</string>
-    <string name="delete_tag_confirmation_with_name">Вы уверены, что хотите удалить тег «%s»?</string>
+    <string name="delete_tag_confirmation_with_name">Вы уверены, что хотите удалить тег «%1$s»?</string>
     <string name="create_tag">Создать тег</string>
     <string name="default_port">По умолчанию: 8080</string>
     <string name="no_favourites_with_tags_description">Отметьте ссылки с этими тегами как избранные или выберите другие теги.</string>

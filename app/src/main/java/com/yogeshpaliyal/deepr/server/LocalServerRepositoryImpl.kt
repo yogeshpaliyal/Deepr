@@ -67,7 +67,7 @@ open class LocalServerRepositoryImpl(
         /**
          * Cache for generated HTML content indexed by [Locale].
          */
-        private val htmlCache = mutableMapOf<Locale, String>()
+        private val htmlCache = java.util.concurrent.ConcurrentHashMap<Locale, String>()
     }
 
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
@@ -301,13 +301,15 @@ open class LocalServerRepositoryImpl(
                                     if (profileIdParam == null) {
                                         1L
                                     } else {
-                                        profileIdParam.toLongOrNull() ?: run {
+                                        val parsedId = profileIdParam.toLongOrNull()
+                                        if (parsedId == null || parsedId <= 0) {
                                             call.respond(
                                                 HttpStatusCode.BadRequest,
                                                 ErrorResponse("Invalid profileId: $profileIdParam"),
                                             )
                                             return@get
                                         }
+                                        parsedId
                                     }
                                 val links =
                                     deeprQueries
@@ -385,13 +387,15 @@ open class LocalServerRepositoryImpl(
                                     if (profileIdParam == null) {
                                         1L
                                     } else {
-                                        profileIdParam.toLongOrNull() ?: run {
+                                        val parsedId = profileIdParam.toLongOrNull()
+                                        if (parsedId == null || parsedId <= 0) {
                                             call.respond(
                                                 HttpStatusCode.BadRequest,
                                                 ErrorResponse("Invalid profileId: $profileIdParam"),
                                             )
                                             return@get
                                         }
+                                        parsedId
                                     }
                                 val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId).executeAsList()
                                 val response =

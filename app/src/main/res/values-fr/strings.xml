@@ -163,7 +163,7 @@
     
     <string name="scan_qr_code">Scanner le Code QR</string>
     <string name="transfer_link_server_instructions">1. Activez l\'interrupteur ci-dessus pour démarrer le serveur\n2. Assurez-vous que les deux appareils sont sur le même réseau Wi-Fi\n3. Scannez le code QR depuis l\'option d\'importation de liens sur un autre appareil</string>
-    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un altro dispositivo</string>
+    <string name="scan_qr_to_get_data">Scannez pour obtenir les liens d\'un autre appareil</string>
 
     
     <string name="profiles">Profils</string>

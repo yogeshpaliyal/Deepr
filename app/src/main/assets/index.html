@@ -519,7 +519,7 @@
                     ${escapeHtml(tag.name)}
                     <button
                         type="button"
-                        onclick="removeSelectedTag('${escapeHtml(tag.name)}')"
+                        onclick="removeSelectedTag(decodeURIComponent('${encodeURIComponent(tag.name)}'))"
                         class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
                     >
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -550,7 +550,7 @@
             if (filteredTags.length === 0) {
                 // Show option to create new tag
                 suggestions.innerHTML = `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -564,7 +564,7 @@
                         <span class="text-xs text-gray-500">${tagObj.count} {{WEB_OPENS}}</span>
                     </div>
                 `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
