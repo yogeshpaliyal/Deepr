@@ -25,6 +25,7 @@ class CsvWriter {
                         Constants.Header.THUMBNAIL,
                         Constants.Header.IS_FAVOURITE,
                         Constants.Header.PROFILE_NAME,
+                        Constants.Header.PROFILE_PRIORITY,
                     ),
                 )
                 // Write Data
@@ -40,6 +41,7 @@ class CsvWriter {
                             item.thumbnail,
                             item.isFavourite.toString(),
                             item.profileName,
+                            item.profilePriority.toString(),
                         ),
                     )
                 }

@@ -128,6 +128,7 @@ SELECT
   D.thumbnail,
   D.profileId,
   P.name AS profileName,
+  P.priority AS profilePriority,
   DOL_Max.lastOpenedAt,
   GROUP_CONCAT(T.name, ', ') AS tags
 FROM Deepr AS D

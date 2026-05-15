@@ -11,5 +11,6 @@ object Constants {
         const val THUMBNAIL = "Thumbnail"
         const val IS_FAVOURITE = "isFavourite"
         const val PROFILE_NAME = "profileName"
+        const val PROFILE_PRIORITY = "profilePriority"
     }
 }
