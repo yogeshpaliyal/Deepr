@@ -11,6 +11,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,7 +38,7 @@ fun DeeprItemSwipable(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    var itemWidth by remember { mutableStateOf(0) }
+    var itemWidth by remember { mutableIntStateOf(0) }
     val dismissStateHolder = remember { mutableStateOf<androidx.compose.material3.SwipeToDismissBoxState?>(null) }
     val dismissState =
         rememberSwipeToDismissBoxState(
