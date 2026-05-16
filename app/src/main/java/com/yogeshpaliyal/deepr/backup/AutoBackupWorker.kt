@@ -32,13 +32,10 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
-                val count = deeprQueries.countDeepr().executeAsOne()
-                if (count == 0L) {
-                    return@withContext
-                }
+                val profilesToExport = deeprQueries.getProfilesForBackup().executeAsList()
+                val linksToExport = deeprQueries.getLinksForBackup().executeAsList()
 
-                val dataToExport = deeprQueries.getLinksForBackup().executeAsList()
-                if (dataToExport.isEmpty()) {
+                if (profilesToExport.isEmpty() && linksToExport.isEmpty()) {
                     return@withContext
                 }
 
@@ -46,7 +43,12 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
-                val success = saveToSelectedLocation(location = location, data = dataToExport)
+                val success =
+                    saveToSelectedLocation(
+                        location = location,
+                        profiles = profilesToExport,
+                        links = linksToExport,
+                    )
 
                 if (success) {
                     // Record backup time on successful completion
@@ -60,7 +62,8 @@ class AutoBackupWorker(
     private fun saveToSelectedLocation(
         location: String,
         fileName: String = "deepr_backup.csv",
-        data: List<GetLinksForBackup>,
+        profiles: List<com.yogeshpaliyal.deepr.Profile>,
+        links: List<GetLinksForBackup>,
     ): Boolean =
         try {
             // For content:// URIs from document picker, create a new document in that folder
@@ -79,7 +82,7 @@ class AutoBackupWorker(
                 context.contentResolver
                     .openOutputStream(docFile.uri, "wt")
                     ?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, data)
+                        csvWriter.writeToCsv(outputStream, profiles, links)
                     }
                 true
             } else {
