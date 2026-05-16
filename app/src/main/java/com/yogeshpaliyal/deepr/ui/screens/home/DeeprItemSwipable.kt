@@ -51,7 +51,7 @@ fun DeeprItemSwipable(
                     true
                 }
             },
-            positionalThreshold = { it * 0.7f },
+            positionalThreshold = { it * 0.5f },
         )
     dismissStateHolder.value = dismissState
 
