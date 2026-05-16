@@ -88,6 +88,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Initializes the activity, sets up the splash screen, and configures the Compose UI
+     * with theme and color mode based on user preferences.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
