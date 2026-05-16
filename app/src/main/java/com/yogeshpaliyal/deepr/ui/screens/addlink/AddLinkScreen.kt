@@ -134,9 +134,19 @@ fun AddLinkScreen(
 
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     var selectedProfileId by remember(selectedLink) {
         mutableStateOf(selectedLink.profileId)
     }
+
+    // Pre-populate with current profile if it's a new link and we are currently at default
+    // This handles cases where the current profile might take a moment to load
+    LaunchedEffect(currentProfile) {
+        if (isCreate && selectedProfileId == 1L && currentProfile != null) {
+            selectedProfileId = currentProfile!!.id
+        }
+    }
+
     var showCreateProfileDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
