@@ -10,13 +10,16 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -25,6 +28,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.Trash
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @Composable
 fun DeeprItemSwipable(
@@ -33,14 +37,25 @@ fun DeeprItemSwipable(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    var itemWidth by remember { mutableStateOf(0) }
     val dismissStateHolder = remember { mutableStateOf<androidx.compose.material3.SwipeToDismissBoxState?>(null) }
     val dismissState =
         rememberSwipeToDismissBoxState(
             initialValue = SwipeToDismissBoxValue.Settled,
             confirmValueChange = { newValue ->
                 if (newValue != SwipeToDismissBoxValue.Settled) {
-                    val progress = dismissStateHolder.value?.progress ?: 0f
-                    progress >= 0.35f
+                    val state = dismissStateHolder.value
+                    if (state != null && itemWidth > 0) {
+                        val offset =
+                            try {
+                                abs(state.requireOffset())
+                            } catch (e: Exception) {
+                                0f
+                            }
+                        offset >= (itemWidth * 0.35f)
+                    } else {
+                        false
+                    }
                 } else {
                     true
                 }
@@ -55,6 +70,7 @@ fun DeeprItemSwipable(
         modifier =
             modifier
                 .fillMaxSize()
+                .onSizeChanged { itemWidth = it.width }
                 .clip(RoundedCornerShape(8.dp)),
         state = dismissState,
         onDismiss = {
