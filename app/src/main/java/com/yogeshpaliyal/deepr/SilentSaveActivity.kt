@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
@@ -24,6 +25,7 @@ import org.koin.android.ext.android.inject
  */
 class SilentSaveActivity : ComponentActivity() {
     private val linkRepository: LinkRepository by inject()
+    private val networkRepository: NetworkRepository by inject()
     private val preferenceDataStore: AppPreferenceDataStore by inject()
     private val deeprQueries: DeeprQueries by inject()
 
@@ -84,12 +86,23 @@ class SilentSaveActivity : ComponentActivity() {
                     return@launch
                 }
 
+                var finalTitle = title
+                var finalThumbnail = ""
+
+                // If title is blank, try to fetch it
+                if (finalTitle.isBlank()) {
+                    networkRepository.getLinkInfo(link).onSuccess { linkInfo ->
+                        finalTitle = linkInfo.title ?: ""
+                        finalThumbnail = linkInfo.image ?: ""
+                    }
+                }
+
                 linkRepository.insertDeepr(
                     link = link,
-                    name = title,
+                    name = finalTitle,
                     openedCount = 0,
                     notes = "",
-                    thumbnail = "",
+                    thumbnail = finalThumbnail,
                     profileId = profileId,
                 )
 
