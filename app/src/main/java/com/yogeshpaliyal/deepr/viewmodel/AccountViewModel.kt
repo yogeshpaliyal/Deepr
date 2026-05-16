@@ -291,6 +291,13 @@ class AccountViewModel(
         }
     }
 
+    // Insert a new tag
+    fun insertTag(tagName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkRepository.insertTag(tagName)
+        }
+    }
+
     // Add tag to link
     private suspend fun addTagToLink(
         linkId: Long,

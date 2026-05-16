@@ -1054,19 +1054,28 @@ fun AddLinkScreen(
                     onClick = {
                         val trimmedTagName = newTagNameDialog.trim()
                         if (trimmedTagName.isBlank()) {
-                            tagCreationError = "Tag name cannot be blank"
+                            tagCreationError = context.getString(R.string.tag_name_cannot_be_blank)
                             return@TextButton
                         }
 
-                        val existingTag =
-                            allTags.find {
+                        val isDuplicateInAll =
+                            allTags.any {
+                                it.name.equals(trimmedTagName, ignoreCase = true)
+                            }
+                        val isDuplicateInSelected =
+                            selectedTags.any {
                                 it.name.equals(trimmedTagName, ignoreCase = true)
                             }
 
-                        if (existingTag != null) {
+                        if (isDuplicateInAll || isDuplicateInSelected) {
                             tagCreationError = context.getString(R.string.tag_name_exists)
                         } else {
+                            // Persist immediately as suggested in review
+                            viewModel.insertTag(trimmedTagName)
+
+                            // Add to current selection (using ID 0 as placeholder until DB syncs)
                             selectedTags.add(Tags(0, trimmedTagName))
+
                             showCreateTagDialog = false
                             Toast
                                 .makeText(
