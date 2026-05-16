@@ -6,9 +6,14 @@ import com.yogeshpaliyal.deepr.util.Constants
 import java.io.OutputStream
 
 class CsvWriter {
+    companion object {
+        private const val COLUMN_COUNT = 9
+    }
+
     fun writeToCsv(
         outputStream: OutputStream,
         data: List<GetLinksForBackup>,
+        settings: Map<String, String> = emptyMap(),
     ) {
         outputStream.bufferedWriter().use { writer ->
             // Write Header
@@ -42,6 +47,14 @@ class CsvWriter {
                             item.profileName,
                         ),
                     )
+                }
+                // Write settings rows (blank link for backward compatibility)
+                settings.forEach { (key, value) ->
+                    val row = Array(COLUMN_COUNT) { "" }
+                    row[1] = Constants.Settings.MARKER
+                    row[2] = key
+                    row[3] = value
+                    csvWriter.writeNext(row)
                 }
             }
         }

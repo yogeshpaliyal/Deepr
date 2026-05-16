@@ -82,7 +82,7 @@ class DeeprApplication : Application() {
 
                 single<LinkRepository> { LinkRepositoryImpl(androidContext(), get()) }
 
-                single<ExportRepository> { ExportRepositoryImpl(androidContext(), get()) }
+                single<ExportRepository> { ExportRepositoryImpl(androidContext(), get(), get()) }
                 single<DriveSyncManager> { DriveSyncManagerFactoryImpl.create(androidContext(), get()) }
 
                 single<ImportRepository> { ImportRepositoryImpl(androidContext(), get(), get()) }

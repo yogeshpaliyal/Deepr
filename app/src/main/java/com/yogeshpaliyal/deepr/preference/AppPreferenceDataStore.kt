@@ -10,8 +10,10 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
+import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
@@ -258,5 +260,22 @@ class AppPreferenceDataStore(
         context.appDataStore.edit { prefs ->
             prefs[CLIPBOARD_LINK_DETECTION_ENABLED] = enabled
         }
+    }
+
+    /**
+     * Collects user-facing settings suitable for export to CSV.
+     * Device-specific settings (paths, timestamps, IDs) are excluded.
+     */
+    suspend fun collectExportableSettings(): Map<String, String> {
+        val settings = mutableMapOf<String, String>()
+        settings[Constants.Settings.SORTING_ORDER] = getSortingOrder.first()
+        settings[Constants.Settings.VIEW_TYPE] = viewType.first().toString()
+        settings[Constants.Settings.USE_LINK_BASED_ICONS] = getUseLinkBasedIcons.first().toString()
+        settings[Constants.Settings.DEFAULT_PAGE_FAVOURITES] = getDefaultPageFavourites.first().toString()
+        settings[Constants.Settings.IS_THUMBNAIL_ENABLE] = isThumbnailEnable.first().toString()
+        settings[Constants.Settings.THEME_MODE] = getThemeMode.first()
+        settings[Constants.Settings.SHOW_OPEN_COUNTER] = getShowOpenCounter.first().toString()
+        settings[Constants.Settings.CLIPBOARD_LINK_DETECTION_ENABLED] = getClipboardLinkDetectionEnabled.first().toString()
+        return settings
     }
 }
