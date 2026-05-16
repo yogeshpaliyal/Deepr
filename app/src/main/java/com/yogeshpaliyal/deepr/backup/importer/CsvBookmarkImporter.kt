@@ -61,6 +61,10 @@ class CsvBookmarkImporter(
                                             deeprQueries.insertProfileWithPriority(profileName, priority)
                                             val profileId = deeprQueries.lastInsertRowId().executeAsOne()
                                             deeprQueries.updateProfile(profileName, themeMode, colorTheme, profileId)
+                                        } else {
+                                            // Update existing profile settings and priority
+                                            deeprQueries.updateProfile(profileName, themeMode, colorTheme, existing.id)
+                                            deeprQueries.updateProfilePriority(priority, existing.id)
                                         }
                                     }
                                 }

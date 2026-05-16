@@ -117,7 +117,7 @@ ORDER BY
     END DESC;
 
 getProfilesForBackup:
-SELECT * FROM Profile;
+SELECT * FROM Profile ORDER BY priority ASC, createdAt ASC;
 
 getLinksForBackup:
 SELECT
