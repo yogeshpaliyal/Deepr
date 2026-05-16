@@ -52,7 +52,9 @@ fun DeeprItemSwipable(
                             } catch (e: Exception) {
                                 0f
                             }
-                        offset >= (itemWidth * 0.35f)
+                        // Block accidental micro-flicks (e.g. from vertical scrolling)
+                        // but allow intentional fast flings once they cross 20% of the item.
+                        offset >= (itemWidth * 0.20f)
                     } else {
                         false
                     }
