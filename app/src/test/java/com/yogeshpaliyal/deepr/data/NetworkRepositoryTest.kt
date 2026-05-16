@@ -3,7 +3,6 @@ package com.yogeshpaliyal.deepr.data
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.UserAgent
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
@@ -169,13 +168,7 @@ class NetworkRepositoryTest {
                     )
                 }
 
-            val httpClient =
-                HttpClient(mockEngine) {
-                    install(UserAgent) {
-                        agent =
-                            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-                    }
-                }
+            val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
             val repository = NetworkRepository(htmlParser, httpClient)
 
