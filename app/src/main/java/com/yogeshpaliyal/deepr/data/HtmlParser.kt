@@ -15,19 +15,24 @@ class HtmlParser {
     }
 
     // Get title and image from Open Graph, or fallback as described
-    fun getTitleAndImageFromHtml(html: String): LinkInfo {
-        val doc = Jsoup.parse(html)
+    fun getTitleAndImageFromHtml(
+        html: String,
+        url: String? = null,
+    ): LinkInfo {
+        val doc = if (url != null) Jsoup.parse(html, url) else Jsoup.parse(html)
 
         // 1. Try og:title and og:image from <meta>
-        val ogTitle = getOgContent(doc, "og:title")
+        val ogTitle = getOgContent(doc, "og:title") ?: getOgContent(doc, "twitter:title")
         val ogDescription = getOgContent(doc, "og:description")
-        val ogImage = getOgContent(doc, "og:image")
+            ?: getOgContent(doc, "twitter:description")
+            ?: getOgContent(doc, "description")
+        val ogImage = getOgContent(doc, "og:image") ?: getOgContent(doc, "twitter:image")
 
-        // 2. Fallback for title: biggest heading in document
+        // 2. Fallback for title: doc title or biggest heading in document
         val headingTags = listOf("h1", "h2", "h3", "h4", "h5", "h6")
         val fallbackTitle =
             if (ogTitle.isNullOrBlank()) {
-                headingTags.firstNotNullOfOrNull { tag ->
+                doc.title().takeIf { it.isNotBlank() } ?: headingTags.firstNotNullOfOrNull { tag ->
                     doc.selectFirst(tag)?.text()?.takeIf { it.isNotBlank() }
                 }
             } else {
