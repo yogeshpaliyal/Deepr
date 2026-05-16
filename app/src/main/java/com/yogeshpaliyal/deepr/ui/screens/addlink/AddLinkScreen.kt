@@ -81,10 +81,12 @@ import com.yogeshpaliyal.deepr.util.openDeeplink
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Check
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
+import compose.icons.tablericons.Plus
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
@@ -159,7 +161,6 @@ fun AddLinkScreen(
         }
 
     // Tags
-    var newTagName by remember { mutableStateOf("") }
     val allTags by viewModel.allTags.collectAsStateWithLifecycle()
     val selectedTags = remember { mutableStateListOf<Tags>() }
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
@@ -173,15 +174,15 @@ fun AddLinkScreen(
         mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
     }
 
-    // Pre-populate with current profile if it's a new link and we are currently at default
-    // This handles cases where the current profile might take a moment to load
+    // Sync selectedProfileId when currentProfile is loaded in create mode
     LaunchedEffect(currentProfile) {
-        if (isCreate && selectedProfileId == 1L && currentProfile != null) {
+        if (isCreate && currentProfile != null) {
             selectedProfileId = currentProfile!!.id
         }
     }
 
     var showCreateProfileDialog by remember { mutableStateOf(false) }
+    var showCreateTagDialog by remember { mutableStateOf(false) }
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
     // Initialize selected tags
@@ -483,151 +484,286 @@ fun AddLinkScreen(
                         shape = RoundedCornerShape(12.dp),
                     )
 
-                    // Profile Selection (On its own line)
-                    var profileExpanded by remember { mutableStateOf(false) }
-                    val selectedProfile = allProfiles.firstOrNull { it.id == selectedProfileId }
-
-                    ExposedDropdownMenuBox(
-                        expanded = profileExpanded,
-                        onExpandedChange = { profileExpanded = !profileExpanded },
+                    // Profile Selection Section
+                    ElevatedCard(
                         modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.elevatedCardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
                     ) {
-                        OutlinedTextField(
-                            value = selectedProfile?.name ?: "",
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.profile)) },
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = profileExpanded) },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            shape = RoundedCornerShape(12.dp),
-                            leadingIcon = { Icon(TablerIcons.User, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = profileExpanded,
-                            onDismissRequest = { profileExpanded = false },
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            allProfiles.forEach { profile ->
-                                DropdownMenuItem(
-                                    text = { Text(profile.name) },
-                                    onClick = {
-                                        selectedProfileId = profile.id
-                                        profileExpanded = false
-                                    },
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = TablerIcons.User,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
-                            }
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.create_profile), color = MaterialTheme.colorScheme.primary) },
-                                onClick = {
-                                    profileExpanded = false
-                                    showCreateProfileDialog = true
-                                },
-                            )
-                        }
-                    }
-
-                    // Tags Input (On its own line)
-                    var tagsExpanded by remember { mutableStateOf(false) }
-                    val filteredTags = allTags.filter { it.name.contains(newTagName, ignoreCase = true) && !selectedTags.contains(it) }
-                    val showCreateTag = newTagName.isNotBlank() && allTags.none { it.name.equals(newTagName, ignoreCase = true) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = tagsExpanded && (showCreateTag || filteredTags.isNotEmpty()),
-                        onExpandedChange = { tagsExpanded = !tagsExpanded },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        OutlinedTextField(
-                            value = newTagName,
-                            onValueChange = {
-                                newTagName = it
-                                tagsExpanded = true
-                            },
-                            label = {
                                 Text(
-                                    stringResource(
-                                        R.string.format_optional,
-                                        stringResource(R.string.tags),
-                                        stringResource(R.string.web_optional),
-                                    ),
-                                )
-                            },
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true),
-                            singleLine = true,
-                            leadingIcon = { Icon(TablerIcons.Tag, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tagsExpanded) },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            shape = RoundedCornerShape(12.dp),
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = tagsExpanded && (showCreateTag || filteredTags.isNotEmpty()),
-                            onDismissRequest = { tagsExpanded = false },
-                        ) {
-                            if (showCreateTag) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            stringResource(R.string.create_tag) + ": \"$newTagName\"",
-                                            color = MaterialTheme.colorScheme.primary,
-                                        )
-                                    },
-                                    onClick = {
-                                        selectedTags.add(Tags(0, newTagName))
-                                        newTagName = ""
-                                        tagsExpanded = false
-                                    },
+                                    text = stringResource(R.string.profile),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
                                 )
                             }
-                            filteredTags.forEach { tag ->
-                                DropdownMenuItem(
-                                    text = { Text(tag.name) },
-                                    onClick = {
-                                        selectedTags.add(tag)
-                                        newTagName = ""
-                                        tagsExpanded = false
-                                    },
+
+                            // Profile Dropdown
+                            var profileExpanded by remember { mutableStateOf(false) }
+                            val selectedProfile = allProfiles.firstOrNull { it.id == selectedProfileId }
+
+                            ExposedDropdownMenuBox(
+                                expanded = profileExpanded,
+                                onExpandedChange = { profileExpanded = !profileExpanded },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedProfile?.name ?: "",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.select_profile)) },
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = profileExpanded) },
+                                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                    shape = RoundedCornerShape(12.dp),
                                 )
+
+                                ExposedDropdownMenu(
+                                    expanded = profileExpanded,
+                                    onDismissRequest = { profileExpanded = false },
+                                ) {
+                                    allProfiles.forEach { profile ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                ) {
+                                                    if (profile.id == selectedProfileId) {
+                                                        Icon(
+                                                            imageVector = TablerIcons.Check,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(18.dp),
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                        )
+                                                    }
+                                                    Text(profile.name)
+                                                }
+                                            },
+                                            onClick = {
+                                                selectedProfileId = profile.id
+                                                profileExpanded = false
+                                            },
+                                        )
+                                    }
+
+                                    if (allProfiles.isNotEmpty()) {
+                                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                    }
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
+                                                Icon(
+                                                    imageVector = TablerIcons.Plus,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp),
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                )
+                                                Text(
+                                                    text = stringResource(R.string.create_profile),
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                )
+                                            }
+                                        },
+                                        onClick = {
+                                            profileExpanded = false
+                                            showCreateProfileDialog = true
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
 
-                    // Selected Tags Display
-                    AnimatedVisibility(
-                        visible = selectedTags.isNotEmpty(),
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically(),
+                    // Tags Section
+                    ElevatedCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.elevatedCardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
                     ) {
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            selectedTags.forEach { tag ->
-                                InputChip(
-                                    selected = true,
-                                    onClick = { /* Do nothing */ },
-                                    label = { Text(tag.name, style = MaterialTheme.typography.bodyMedium) },
-                                    trailingIcon = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = TablerIcons.Tag,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text = stringResource(R.string.tags),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+
+                            // Tag Dropdown
+                            var expanded by remember { mutableStateOf(false) }
+
+                            ExposedDropdownMenuBox(
+                                expanded = expanded,
+                                onExpandedChange = { expanded = !expanded },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                OutlinedTextField(
+                                    value =
+                                        if (selectedTags.isEmpty()) {
+                                            ""
+                                        } else {
+                                            stringResource(
+                                                R.string.selected_tags_count,
+                                                selectedTags.size,
+                                            )
+                                        },
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.tags)) },
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    leadingIcon = {
                                         Icon(
-                                            imageVector = TablerIcons.X,
-                                            contentDescription = removeTagText,
-                                            modifier =
-                                                Modifier
-                                                    .padding(end = 4.dp)
-                                                    .size(16.dp)
-                                                    .clickable { selectedTags.remove(tag) },
+                                            imageVector = TablerIcons.Tag,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(18.dp),
                                         )
                                     },
-                                    shape = RoundedCornerShape(percent = 50),
                                 )
+
+                                ExposedDropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                ) {
+                                    allTags.forEach { tag ->
+                                        val isSelected = selectedTags.any { it.id == tag.id }
+                                        DropdownMenuItem(
+                                            text = {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                ) {
+                                                    if (isSelected) {
+                                                        Icon(
+                                                            imageVector = TablerIcons.Check,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(18.dp),
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                        )
+                                                    }
+                                                    Text(tag.name)
+                                                }
+                                            },
+                                            onClick = {
+                                                if (isSelected) {
+                                                    selectedTags.removeIf { it.id == tag.id }
+                                                } else {
+                                                    selectedTags.add(tag)
+                                                }
+                                            },
+                                        )
+                                    }
+
+                                    if (allTags.isNotEmpty()) {
+                                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                    }
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
+                                                Icon(
+                                                    imageVector = TablerIcons.Plus,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp),
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                )
+                                                Text(
+                                                    text = stringResource(R.string.create_tag),
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                )
+                                            }
+                                        },
+                                        onClick = {
+                                            expanded = false
+                                            showCreateTagDialog = true
+                                        },
+                                    )
+                                }
+                            }
+
+                            // Selected Tags Display
+                            AnimatedVisibility(
+                                visible = selectedTags.isNotEmpty(),
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically(),
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text(
+                                        stringResource(R.string.tags_label),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        selectedTags.forEach { tag ->
+                                            InputChip(
+                                                selected = true,
+                                                onClick = { /* Do nothing on click */ },
+                                                label = { Text(tag.name) },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        imageVector = TablerIcons.X,
+                                                        contentDescription = removeTagText,
+                                                        modifier =
+                                                            Modifier
+                                                                .padding(end = 4.dp)
+                                                                .size(16.dp)
+                                                                .clickable { selectedTags.remove(tag) },
+                                                    )
+                                                },
+                                                shape = RoundedCornerShape(percent = 50),
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -778,6 +914,89 @@ fun AddLinkScreen(
                     onClick = {
                         showCreateProfileDialog = false
                         profileCreationError = null
+                    },
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
+    }
+
+    // Create Tag Dialog
+    if (showCreateTagDialog) {
+        var newTagNameDialog by remember { mutableStateOf("") }
+        var tagCreationError by remember { mutableStateOf<String?>(null) }
+
+        AlertDialog(
+            onDismissRequest = {
+                showCreateTagDialog = false
+                tagCreationError = null
+            },
+            title = {
+                Text(stringResource(R.string.create_tag))
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = newTagNameDialog,
+                        onValueChange = {
+                            newTagNameDialog = it
+                            tagCreationError = null
+                        },
+                        label = { Text(stringResource(R.string.add_tag)) },
+                        singleLine = true,
+                        isError = tagCreationError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    tagCreationError?.let { errorMessage ->
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val trimmedTagName = newTagNameDialog.trim()
+                        if (trimmedTagName.isBlank()) {
+                            tagCreationError = "Tag name cannot be blank"
+                            return@TextButton
+                        }
+
+                        val existingTag =
+                            allTags.find {
+                                it.name.equals(trimmedTagName, ignoreCase = true)
+                            }
+
+                        if (existingTag != null) {
+                            tagCreationError = context.getString(R.string.tag_name_exists)
+                        } else {
+                            selectedTags.add(Tags(0, trimmedTagName))
+                            showCreateTagDialog = false
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.tag_created_successfully),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                    },
+                    enabled = newTagNameDialog.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.create_tag))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showCreateTagDialog = false
+                        tagCreationError = null
                     },
                 ) {
                     Text(stringResource(android.R.string.cancel))
