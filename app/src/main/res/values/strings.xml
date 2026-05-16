@@ -90,6 +90,10 @@
     <string name="delete_tag_confirmation">Are you sure you want to delete this tag?</string>
     <string name="delete_tag_confirmation_with_name">Are you sure you want to delete \'%s\' tag?</string>
     <string name="tag_name_exists">Tag with this name already exists</string>
+    <string name="tag_name_cannot_be_blank">Tag name cannot be blank</string>
+    <string name="tag_created_successfully">Tag created successfully</string>
+    <string name="tag_added_successfully">Tag added successfully</string>
+    <string name="tag_already_selected">Tag already selected</string>
     <string name="failed_to_edit_tag">Failed to edit tag</string>
     <string name="tag_edited_successfully">Tag edited successfully</string>
     <string name="failed_to_delete_tag">Failed to delete tag: %s</string>
