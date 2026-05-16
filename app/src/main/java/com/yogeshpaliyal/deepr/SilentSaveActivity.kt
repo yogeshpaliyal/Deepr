@@ -45,6 +45,9 @@ class SilentSaveActivity : ComponentActivity() {
         handleSharedLink(intent, appContext)
     }
 
+    /**
+     * Processes the incoming share intent.
+     */
     private fun handleSharedLink(
         intent: Intent,
         appContext: Context,
@@ -66,6 +69,9 @@ class SilentSaveActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Saves the link to the database, fetching metadata if title or thumbnail is missing.
+     */
     private fun saveLinkSilently(
         link: String,
         title: String,
@@ -89,11 +95,15 @@ class SilentSaveActivity : ComponentActivity() {
                 var finalTitle = title
                 var finalThumbnail = ""
 
-                // If title is blank, try to fetch it
-                if (finalTitle.isBlank()) {
+                // If title or thumbnail is blank, try to fetch it
+                if (finalTitle.isBlank() || finalThumbnail.isBlank()) {
                     networkRepository.getLinkInfo(link).onSuccess { linkInfo ->
-                        finalTitle = linkInfo.title ?: ""
-                        finalThumbnail = linkInfo.image ?: ""
+                        if (finalTitle.isBlank()) {
+                            finalTitle = linkInfo.title ?: ""
+                        }
+                        if (finalThumbnail.isBlank()) {
+                            finalThumbnail = linkInfo.image ?: ""
+                        }
                     }
                 }
 
@@ -114,6 +124,9 @@ class SilentSaveActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Helper to show toast messages and finish the activity.
+     */
     private fun showToast(
         context: Context,
         message: String,
