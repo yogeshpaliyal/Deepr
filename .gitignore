@@ -14,5 +14,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-ktlint
 GEMINI.md
