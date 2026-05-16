@@ -33,6 +33,7 @@ googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 playCore = "2.0.2"
 orchestrator = "1.4.2"
+splashscreen = "1.0.1"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
