@@ -173,9 +173,10 @@ fun AddLinkScreen(
         mutableStateOf(selectedLink.profileId.takeIf { !isCreate } ?: currentProfile?.id ?: 1L)
     }
 
-    // Sync selectedProfileId when currentProfile is loaded in create mode
+    // Pre-populate with current profile if it's a new link and we are currently at default
+    // This handles cases where the current profile might take a moment to load
     LaunchedEffect(currentProfile) {
-        if (isCreate && currentProfile != null) {
+        if (isCreate && selectedProfileId == 1L && currentProfile != null) {
             selectedProfileId = currentProfile!!.id
         }
     }
