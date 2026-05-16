@@ -39,8 +39,14 @@ fun DeeprItemSwipable(
             initialValue = SwipeToDismissBoxValue.Settled,
             confirmValueChange = { newValue ->
                 if (newValue != SwipeToDismissBoxValue.Settled) {
-                    val progress = dismissStateHolder.value?.progress ?: 0f
-                    progress >= 0.7f
+                    val state = dismissStateHolder.value
+                    if (state != null) {
+                        // Reject velocity-based flings: only allow dismiss if the user
+                        // has actually dragged past the positional threshold (70%).
+                        state.targetValue == newValue
+                    } else {
+                        false
+                    }
                 } else {
                     true
                 }
