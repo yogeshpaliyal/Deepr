@@ -34,6 +34,10 @@ fun DeeprItemSwipable(
     val dismissState =
         rememberSwipeToDismissBoxState(
             initialValue = SwipeToDismissBoxValue.Settled,
+            confirmValueChange = {
+                val progress = dismissState.progress
+                progress >= 0.5f
+            },
             positionalThreshold = { it * 0.5f },
         )
 
