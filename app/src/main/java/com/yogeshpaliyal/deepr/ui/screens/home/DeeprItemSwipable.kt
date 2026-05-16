@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun DeeprItemSwipable(
     val dismissState =
         rememberSwipeToDismissBoxState(
             initialValue = SwipeToDismissBoxValue.Settled,
-            positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold,
+            positionalThreshold = { it * 0.35f },
         )
 
     val scope = rememberCoroutineScope()
@@ -46,6 +45,8 @@ fun DeeprItemSwipable(
                 .fillMaxSize()
                 .clip(RoundedCornerShape(8.dp)),
         state = dismissState,
+        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = true,
         onDismiss = {
             scope.launch {
                 dismissState.reset()
