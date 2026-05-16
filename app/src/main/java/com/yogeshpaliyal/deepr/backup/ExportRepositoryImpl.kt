@@ -26,12 +26,10 @@ class ExportRepositoryImpl(
     }
 
     override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
-        val count = deeprQueries.countDeepr().executeAsOne()
-        if (count == 0L) {
-            return RequestResult.Error(context.getString(R.string.no_data_to_export))
-        }
+        val profilesToExport = deeprQueries.getProfilesForBackup().executeAsList()
         val dataToExportInCsvFormat = deeprQueries.getLinksForBackup().executeAsList()
-        if (dataToExportInCsvFormat.isEmpty()) {
+
+        if (profilesToExport.isEmpty() && dataToExportInCsvFormat.isEmpty()) {
             return RequestResult.Error(context.getString(R.string.no_data_available_export))
         }
 
@@ -43,7 +41,7 @@ class ExportRepositoryImpl(
             if (uri != null) {
                 return@withContext try {
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, profilesToExport, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -74,7 +72,7 @@ class ExportRepositoryImpl(
 
                 if (defaultUri != null) {
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, profilesToExport, dataToExportInCsvFormat)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -96,7 +94,7 @@ class ExportRepositoryImpl(
                 val file = File(downloadsDir, fileName)
 
                 FileOutputStream(file).use { outputStream ->
-                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                    csvWriter.writeToCsv(outputStream, profilesToExport, dataToExportInCsvFormat)
                 }
                 RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
             }

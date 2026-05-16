@@ -116,6 +116,9 @@ ORDER BY
         END
     END DESC;
 
+getProfilesForBackup:
+SELECT * FROM Profile;
+
 getLinksForBackup:
 SELECT
   D.id,

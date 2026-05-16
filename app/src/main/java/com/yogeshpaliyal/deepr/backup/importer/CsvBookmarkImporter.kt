@@ -38,85 +38,159 @@ class CsvBookmarkImporter(
                             .withCSVParser(customParser)
                             .build()
 
-                    // verify header first
-                    val header = csvReader.readNext()
-                    if (header == null ||
-                        header.size < 3 ||
-                        header[0] != Constants.Header.LINK ||
-                        header[1] != Constants.Header.CREATED_AT ||
-                        header[2] != Constants.Header.OPENED_COUNT
-                    ) {
-                        return RequestResult.Error("Invalid CSV header")
-                    }
+                    val allRows = csvReader.readAll()
+                    var currentSection = ""
 
-                    csvReader.forEach { row ->
-                        if (row.size >= 3) {
-                            val link = row[0]
-                            val createdAt = row[1]
-                            val openedCount = row[2].toLongOrNull() ?: 0L
-                            val name = row.getOrNull(3) ?: ""
-                            val notes = row.getOrNull(4) ?: ""
-                            val tagsString = row.getOrNull(5) ?: ""
-                            val thumbnail = row.getOrNull(6) ?: ""
-                            val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
-                            val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
-                            val profilePriority = row.getOrNull(9)?.toLongOrNull()
-                            val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
-                            if (link.isNotBlank() && existing == null) {
-                                updatedCount++
-                                deeprQueries.transaction {
-                                    val profileID =
-                                        profileName?.let {
-                                            val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
-                                            if (profile == null) {
-                                                if (profilePriority != null) {
-                                                    deeprQueries.insertProfileWithPriority(it, profilePriority)
-                                                } else {
-                                                    deeprQueries.insertProfileAutoPriority(it)
-                                                }
-                                                deeprQueries.lastInsertRowId().executeAsOneOrNull()
-                                            } else {
-                                                profile.id
-                                            }
-                                        } ?: defaultProfileId
-                                    deeprQueries.importDeepr(
-                                        link = link,
-                                        openedCount = openedCount,
-                                        name = name,
-                                        notes = notes,
-                                        thumbnail = thumbnail,
-                                        isFavourite = isFavourite,
-                                        createdAt = createdAt,
-                                        profileId = profileID,
-                                    )
-                                    val linkId = deeprQueries.lastInsertRowId().executeAsOne()
+                    deeprQueries.transaction {
+                        allRows.forEach { row ->
+                            if (row.size >= 2 && row[0] == "SECTION") {
+                                currentSection = row[1]
+                                return@forEach
+                            }
 
-                                    // Import tags if present
-                                    if (tagsString.isNotBlank()) {
-                                        val tagNames =
-                                            tagsString
-                                                .split(",")
-                                                .map { it.trim() }
-                                                .filter { it.isNotEmpty() }
-                                        tagNames.forEach { tagName ->
-                                            // Insert tag if it doesn't exist
-                                            deeprQueries.insertTag(tagName)
-                                            // Get tag ID and link it
-                                            val tag =
-                                                deeprQueries
-                                                    .getTagByName(tagName)
-                                                    .executeAsOneOrNull()
-                                            if (tag != null) {
-                                                deeprQueries.addTagToLink(linkId, tag.id)
-                                            }
+                            when (currentSection) {
+                                "PROFILES" -> {
+                                    if (row.size >= 2 && row[0] != "ProfileName") {
+                                        val profileName = row[0]
+                                        val priority = row[1].toLongOrNull() ?: 0L
+                                        val themeMode = row.getOrNull(2) ?: "system"
+                                        val colorTheme = row.getOrNull(3) ?: "dynamic"
+
+                                        val existing = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
+                                        if (existing == null) {
+                                            deeprQueries.insertProfileWithPriority(profileName, priority)
+                                            val profileId = deeprQueries.lastInsertRowId().executeAsOne()
+                                            deeprQueries.updateProfile(profileName, themeMode, colorTheme, profileId)
                                         }
                                     }
                                 }
-                            } else {
-                                skippedCount++
+
+                                "LINKS" -> {
+                                    if (row.size >= 3 && row[0] != Constants.Header.LINK) {
+                                        val link = row[0]
+                                        val createdAt = row[1]
+                                        val openedCount = row[2].toLongOrNull() ?: 0L
+                                        val name = row.getOrNull(3) ?: ""
+                                        val notes = row.getOrNull(4) ?: ""
+                                        val tagsString = row.getOrNull(5) ?: ""
+                                        val thumbnail = row.getOrNull(6) ?: ""
+                                        val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
+                                        val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
+
+                                        val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+                                        if (link.isNotBlank() && existing == null) {
+                                            updatedCount++
+                                            val profileID =
+                                                profileName?.let {
+                                                    val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
+                                                    if (profile == null) {
+                                                        deeprQueries.insertProfileAutoPriority(it)
+                                                        deeprQueries.lastInsertRowId().executeAsOneOrNull()
+                                                    } else {
+                                                        profile.id
+                                                    }
+                                                } ?: defaultProfileId
+                                            deeprQueries.importDeepr(
+                                                link = link,
+                                                openedCount = openedCount,
+                                                name = name,
+                                                notes = notes,
+                                                thumbnail = thumbnail,
+                                                isFavourite = isFavourite,
+                                                createdAt = createdAt,
+                                                profileId = profileID,
+                                            )
+                                            val linkId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                                            // Import tags if present
+                                            if (tagsString.isNotBlank()) {
+                                                val tagNames =
+                                                    tagsString
+                                                        .split(",")
+                                                        .map { it.trim() }
+                                                        .filter { it.isNotEmpty() }
+                                                tagNames.forEach { tagName ->
+                                                    // Insert tag if it doesn't exist
+                                                    deeprQueries.insertTag(tagName)
+                                                    // Get tag ID and link it
+                                                    val tag =
+                                                        deeprQueries
+                                                            .getTagByName(tagName)
+                                                            .executeAsOneOrNull()
+                                                    if (tag != null) {
+                                                        deeprQueries.addTagToLink(linkId, tag.id)
+                                                    }
+                                                }
+                                            }
+                                        } else if (link.isNotBlank()) {
+                                            skippedCount++
+                                        }
+                                    }
+                                }
+                                // Fallback for old format (without SECTION)
+                                "" -> {
+                                    if (row.size >= 3 && row[0] != Constants.Header.LINK) {
+                                        val link = row[0]
+                                        val createdAt = row[1]
+                                        val openedCount = row[2].toLongOrNull() ?: 0L
+                                        val name = row.getOrNull(3) ?: ""
+                                        val notes = row.getOrNull(4) ?: ""
+                                        val tagsString = row.getOrNull(5) ?: ""
+                                        val thumbnail = row.getOrNull(6) ?: ""
+                                        val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
+                                        val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
+                                        val profilePriority = row.getOrNull(9)?.toLongOrNull()
+
+                                        val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+                                        if (link.isNotBlank() && existing == null) {
+                                            updatedCount++
+                                            val profileID =
+                                                profileName?.let {
+                                                    val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
+                                                    if (profile == null) {
+                                                        if (profilePriority != null) {
+                                                            deeprQueries.insertProfileWithPriority(it, profilePriority)
+                                                        } else {
+                                                            deeprQueries.insertProfileAutoPriority(it)
+                                                        }
+                                                        deeprQueries.lastInsertRowId().executeAsOneOrNull()
+                                                    } else {
+                                                        profile.id
+                                                    }
+                                                } ?: defaultProfileId
+                                            deeprQueries.importDeepr(
+                                                link = link,
+                                                openedCount = openedCount,
+                                                name = name,
+                                                notes = notes,
+                                                thumbnail = thumbnail,
+                                                isFavourite = isFavourite,
+                                                createdAt = createdAt,
+                                                profileId = profileID,
+                                            )
+                                            val linkId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                                            // Import tags if present
+                                            if (tagsString.isNotBlank()) {
+                                                val tagNames =
+                                                    tagsString
+                                                        .split(",")
+                                                        .map { it.trim() }
+                                                        .filter { it.isNotEmpty() }
+                                                tagNames.forEach { tagName ->
+                                                    deeprQueries.insertTag(tagName)
+                                                    val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                                    if (tag != null) {
+                                                        deeprQueries.addTagToLink(linkId, tag.id)
+                                                    }
+                                                }
+                                            }
+                                        } else if (link.isNotBlank()) {
+                                            skippedCount++
+                                        }
+                                    }
+                                }
                             }
-                        } else {
-                            skippedCount++
                         }
                     }
                 }
