@@ -15,6 +15,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,6 +93,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -559,20 +561,71 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                shape = RoundedCornerShape(16.dp),
-                onClick = {
-                    if (showProfilesGrid) {
-                        showCreateProfileDialog = true
-                    } else {
-                        localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+            if (!showProfilesGrid) {
+                FloatingActionButton(
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {},
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(56.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
+                                        },
+                                        onLongPress = {
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            var linkToPass = ""
+
+                                            val clipboard =
+                                                context.getSystemService(
+                                                    android.content.Context.CLIPBOARD_SERVICE,
+                                                ) as android.content.ClipboardManager
+                                            val clipData = clipboard.primaryClip
+                                            if (clipData != null && clipData.itemCount > 0) {
+                                                val text = clipData.getItemAt(0).text?.toString()
+                                                if (!text.isNullOrBlank()) {
+                                                    val normalized = normalizeLink(text)
+                                                    if (isValidDeeplink(normalized)) {
+                                                        linkToPass = normalized
+                                                    }
+                                                }
+                                            }
+
+                                            localNavigator.add(
+                                                AddLinkScreen(
+                                                    createDeeprObject(
+                                                        link = linkToPass,
+                                                        profileId =
+                                                            currentProfile?.id ?: 1L,
+                                                    ),
+                                                ),
+                                            )
+                                        },
+                                    )
+                                },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            TablerIcons.Plus,
+                            contentDescription = stringResource(R.string.add_link),
+                        )
                     }
-                },
-            ) {
-                Icon(
-                    TablerIcons.Plus,
-                    contentDescription = stringResource(if (showProfilesGrid) R.string.create_profile else R.string.add_link),
-                )
+                }
+            } else {
+                FloatingActionButton(
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                        showCreateProfileDialog = true
+                    },
+                ) {
+                    Icon(
+                        TablerIcons.Plus,
+                        contentDescription = stringResource(R.string.create_profile),
+                    )
+                }
             }
         },
     ) { contentPadding ->
