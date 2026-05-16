@@ -92,6 +92,7 @@
     <string name="tag_name_exists">Tag with this name already exists</string>
     <string name="failed_to_edit_tag">Failed to edit tag</string>
     <string name="tag_edited_successfully">Tag edited successfully</string>
+    <string name="tag_created_successfully">Tag created successfully</string>
     <string name="failed_to_delete_tag">Failed to delete tag: %s</string>
     <string name="tag_deleted_successfully">Tag deleted successfully</string>
     <string name="edit_tag_description">Edit Tag</string>
