@@ -187,7 +187,7 @@ fun SettingsScreen(
             SettingsSection("Links Preferences") {
                 SettingsItem(
                     TablerIcons.User,
-                    title = stringResource(R.string.default_profile),
+                    title = stringResource(R.string.main_profile),
                     description =
                         allProfiles.find { it.id == defaultProfileId }?.name
                             ?: stringResource(R.string.default_page_all),
@@ -473,7 +473,7 @@ fun SettingsScreen(
                     showDefaultProfileDialog = false
                 },
                 onDismiss = { showDefaultProfileDialog = false },
-                title = stringResource(R.string.default_profile),
+                title = stringResource(R.string.main_profile),
             )
         }
     }
