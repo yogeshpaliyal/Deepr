@@ -56,16 +56,17 @@ import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
-import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
+import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
+import compose.icons.tablericons.User
 import org.koin.androidx.compose.koinViewModel
 
 object Settings : TopLevelRoute {
@@ -191,9 +192,9 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(stringResource(R.string.links_preferences)) {
+            SettingsSection(stringResource(R.string.app_preferences)) {
                 SettingsItem(
-                    TablerIcons.Settings,
+                    TablerIcons.SettingsIcon,
                     title = stringResource(R.string.shortcut_icon),
                     description =
                         if (useLinkBasedIcons) {
@@ -245,7 +246,7 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.UserStar,
+                    TablerIcons.User,
                     title = stringResource(R.string.default_profile),
                     description =
                         if (defaultPageFavourites) {
@@ -280,8 +281,8 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.ExternalLink,
-                    title = stringResource(R.string.show_open_counter),
+                    TablerIcons.Note,
+                    title = stringResource(R.string.switch_open_counter),
                     description = stringResource(R.string.show_open_counter_description),
                     onClick = {
                         viewModel.setShowOpenCounter(!showOpenCounter)
