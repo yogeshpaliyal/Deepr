@@ -31,6 +31,13 @@ object LanguageUtil {
             Language(FRENCH, "French", "Français"),
             Language(GERMAN, "German", "Deutsch"),
             Language(URDU, "Urdu", "اردو"),
+            Language("it", "Italian", "Italiano"),
+            Language("pt", "Portuguese", "Português"),
+            Language("ja", "Japanese", "日本語"),
+            Language("zh", "Chinese", "中文"),
+            Language("ru", "Russian", "Русский"),
+            Language("ar", "Arabic", "العربية"),
+            Language("ko", "Korean", "한국어"),
         )
 
     /**

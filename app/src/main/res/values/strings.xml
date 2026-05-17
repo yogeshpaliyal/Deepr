@@ -286,7 +286,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_amoled">AMOLED</string>
-    <string name="default_profile">Default profile</string>
+    <string name="main_profile">Main profile</string>
     <string name="switch_open_counter">Switch open counter with note</string>
     <string name="links_preferences">Links preferences</string>
     <string name="app_preferences">App preferences</string>

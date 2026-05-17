@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -71,7 +70,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                         Icon(
                             TablerIcons.ArrowLeft,
                             contentDescription = stringResource(R.string.back),
-                            modifier = if (isRtl) Modifier.scale(-1f, 1f) else Modifier,
+                            modifier = if (isRtl) Modifier.graphicsLayer(scaleX = -1f) else Modifier,
                         )
                     }
                 },
@@ -87,127 +86,122 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                     .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Image(
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = stringResource(R.string.app_logo),
                 modifier =
                     Modifier
-                        .size(100.dp)
+                        .size(120.dp)
                         .clip(CircleShape),
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
             )
             Text(
                 text = stringResource(R.string.version_format, BuildConfig.VERSION_NAME),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.app_description),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier =
                         Modifier
-                            .padding(12.dp)
+                            .padding(16.dp)
                             .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = stringResource(R.string.author),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.author_name),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         val uriHandler = LocalUriHandler.current
 
                         IconButton(onClick = { uriHandler.openUri("https://twitter.com/yogeshpaliyal") }) {
                             Icon(
                                 TablerIcons.BrandTwitter,
                                 contentDescription = stringResource(R.string.twitter),
-                                modifier = Modifier.size(20.dp),
                             )
                         }
                         IconButton(onClick = { uriHandler.openUri("https://www.linkedin.com/in/yogeshpaliyal/") }) {
                             Icon(
                                 TablerIcons.BrandLinkedin,
                                 contentDescription = stringResource(R.string.linkedin),
-                                modifier = Modifier.size(20.dp),
                             )
                         }
                         IconButton(onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal") }) {
                             Icon(
                                 TablerIcons.BrandGithub,
                                 contentDescription = stringResource(R.string.github),
-                                modifier = Modifier.size(20.dp),
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier =
                         Modifier
-                            .padding(12.dp)
+                            .padding(16.dp)
                             .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = stringResource(R.string.contributors),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(
-                        text = stringResource(R.string.contributors_thank_you),
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.contributors_thank_you),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
                     val uriHandler = LocalUriHandler.current
                     OutlinedButton(
                         onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal/Deepr/graphs/contributors") },
-                        modifier = Modifier.height(36.dp),
                     ) {
                         Icon(
                             TablerIcons.BrandGithub,
                             contentDescription = stringResource(R.string.contributors),
-                            modifier = Modifier.padding(end = 4.dp).size(16.dp),
+                            modifier = Modifier.padding(end = 8.dp),
                         )
-                        Text(stringResource(R.string.view_contributors), style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.view_contributors))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             val uriHandler = LocalUriHandler.current
-            Button(
-                onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal/Deepr") },
-                modifier = Modifier.height(36.dp),
-            ) {
+            Button(onClick = { uriHandler.openUri("https://github.com/yogeshpaliyal/Deepr") }) {
                 Icon(
                     TablerIcons.BrandGithub,
                     contentDescription = stringResource(R.string.github),
-                    modifier = Modifier.padding(end = 4.dp).size(16.dp),
+                    modifier = Modifier.padding(end = 8.dp),
                 )
-                Text(stringResource(R.string.view_on_github), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.view_on_github))
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
