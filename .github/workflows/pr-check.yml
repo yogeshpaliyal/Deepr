@@ -2,7 +2,7 @@ name: PR Check
 
 on:
   pull_request:
-    branches: [ master, yogesh ]
+    branches: [ master ]
     paths-ignore:
       - 'fastlane/**'
       - '.github/**'
