@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
@@ -78,35 +76,27 @@ object Settings : TopLevelRoute {
 
     @Composable
     override fun Content(windowInsets: WindowInsets) {
-        SettingsScreen(windowInsets)
+        SettingsScreen(windowInsets = windowInsets)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    windowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
 ) {
     val context = LocalContext.current
     val navigatorContext = LocalNavigator.current
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
-    // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
-
-    // Collect language preference state
-    val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
-    var showLanguageDialog by remember { mutableStateOf(false) }
-
-    // Collect theme preference state
-    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
-    var showThemeDialog by remember { mutableStateOf(false) }
-
-    // Collect default page preference state
-    val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
+    val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val defaultPageFavourites by viewModel.defaultPageFavourites.collectAsStateWithLifecycle()
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Collect profiles and silent save profile preference
@@ -116,6 +106,9 @@ fun SettingsScreen(
 
     val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
     var showDefaultProfileDialog by remember { mutableStateOf(false) }
+
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = windowInsets,
@@ -127,26 +120,20 @@ fun SettingsScreen(
                         Text(stringResource(R.string.settings))
                     },
                     navigationIcon = {
-                        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-
                         IconButton(onClick = {
-                            navigatorContext.removeLast()
+                            navigatorContext.back()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
                                 contentDescription = stringResource(R.string.back),
-                                modifier =
-                                    if (isRtl) {
-                                        Modifier.graphicsLayer(scaleX = -1f)
-                                    } else {
-                                        Modifier
-                                    },
+                                modifier = if (isRtl) Modifier.graphicsLayer(scaleX = -1f) else Modifier,
                             )
                         }
                     },
                 )
+
                 ServerStatusBar(
-                    onServerStatusClick = {
+                    onClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
                         if (navigatorContext.getLast() !is LocalNetworkServer) {
                             navigatorContext.add(LocalNetworkServer)
@@ -196,70 +183,22 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(stringResource(R.string.app_preferences)) {
-                SettingsItem(
-                    TablerIcons.SettingsIcon,
-                    title = stringResource(R.string.shortcut_icon),
-                    description =
-                        if (useLinkBasedIcons) {
-                            stringResource(
-                                R.string.use_link_app_icon,
-                            )
-                        } else {
-                            stringResource(R.string.use_deepr_app_icon)
-                        },
-                    onClick = {
-                        viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = useLinkBasedIcons,
-                            onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
-                        )
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Language,
-                    title = stringResource(R.string.language),
-                    description =
-                        if (languageCode.isEmpty()) {
-                            stringResource(R.string.system_default)
-                        } else {
-                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
-                                stringResource(R.string.system_default)
-                            }
-                        },
-                    onClick = {
-                        showLanguageDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Moon,
-                    title = stringResource(R.string.theme),
-                    description =
-                        when (themeMode) {
-                            "light" -> stringResource(R.string.theme_light)
-                            "dark" -> stringResource(R.string.theme_dark)
-                            else -> stringResource(R.string.system_default)
-                        },
-                    onClick = {
-                        showThemeDialog = true
-                    },
-                )
-            }
-
-            SettingsSection(stringResource(R.string.links_preferences)) {
+            SettingsSection("Links Preferences") {
                 SettingsItem(
                     TablerIcons.User,
                     title = stringResource(R.string.default_profile),
                     description =
-                        if (defaultPageFavourites) {
-                            stringResource(R.string.default_page_favourites)
-                        } else {
-                            stringResource(R.string.default_page_all)
-                        },
+                        allProfiles.find { it.id == defaultProfileId }?.name
+                            ?: stringResource(R.string.default_page_all),
+                    onClick = {
+                        showDefaultProfileDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Star,
+                    title = stringResource(R.string.default_page_favourites),
+                    description = "Open the default profile on Favourites instead of All links",
                     onClick = {
                         viewModel.setDefaultPageFavourites(!defaultPageFavourites)
                     },
@@ -302,17 +241,6 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.Folders,
-                    title = stringResource(R.string.silent_save_profile),
-                    description =
-                        allProfiles.find { it.id == silentSaveProfileId }?.name
-                            ?: stringResource(R.string.silent_save_profile_description),
-                    onClick = {
-                        showSilentSaveProfileDialog = true
-                    },
-                )
-
-                SettingsItem(
                     TablerIcons.Clipboard,
                     title = stringResource(R.string.clipboard_link_detection),
                     description = stringResource(R.string.clipboard_link_detection_description),
@@ -324,6 +252,72 @@ fun SettingsScreen(
                             checked = clipboardLinkDetectionEnabled,
                             onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
                         )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Folders,
+                    title = stringResource(R.string.silent_save_profile),
+                    description =
+                        allProfiles.find { it.id == silentSaveProfileId }?.name
+                            ?: stringResource(R.string.silent_save_profile_description),
+                    onClick = {
+                        showSilentSaveProfileDialog = true
+                    },
+                )
+            }
+
+            SettingsSection("App Preferences") {
+                SettingsItem(
+                    TablerIcons.Moon,
+                    title = stringResource(R.string.theme),
+                    description =
+                        when (themeMode) {
+                            "light" -> stringResource(R.string.theme_light)
+                            "dark" -> stringResource(R.string.theme_dark)
+                            "amoled" -> stringResource(R.string.theme_amoled)
+                            else -> stringResource(R.string.system_default)
+                        },
+                    onClick = {
+                        showThemeDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.SettingsIcon,
+                    title = stringResource(R.string.shortcut_icon),
+                    description =
+                        if (useLinkBasedIcons) {
+                            stringResource(
+                                R.string.use_link_app_icon,
+                            )
+                        } else {
+                            stringResource(R.string.use_deepr_app_icon)
+                        },
+                    onClick = {
+                        viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = useLinkBasedIcons,
+                            onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Language,
+                    title = stringResource(R.string.language),
+                    description =
+                        if (languageCode.isEmpty()) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
+                                stringResource(R.string.system_default)
+                            }
+                        },
+                    onClick = {
+                        showLanguageDialog = true
                     },
                 )
             }
