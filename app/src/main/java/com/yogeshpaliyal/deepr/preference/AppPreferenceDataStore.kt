@@ -38,6 +38,7 @@ class AppPreferenceDataStore(
         private val THEME_MODE = stringPreferencesKey("theme_mode")
         private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
         private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
+        private val DEFAULT_PROFILE_ID = longPreferencesKey("default_profile_id")
         private val SILENT_SAVE_PROFILE_ID = longPreferencesKey("silent_save_profile_id")
         private val GOOGLE_DRIVE_AUTO_BACKUP_ENABLED =
             booleanPreferencesKey("google_drive_auto_backup_enabled")
