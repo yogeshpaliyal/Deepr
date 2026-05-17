@@ -897,6 +897,21 @@ fun Content(
                     }
                 }
 
+                if (showOpenCounter) {
+                    item {
+                        MenuListItem(
+                            text = stringResource(R.string.opened_count, account.openedCount),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            onClick = { },
+                            icon = null,
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
+                        )
+                    }
+                }
+
                 item {
                     Column(modifier = Modifier.padding(horizontal = 12.dp)) {
                         // Determine max tags to show based on expanded state

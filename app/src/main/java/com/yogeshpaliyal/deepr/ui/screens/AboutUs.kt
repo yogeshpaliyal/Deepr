@@ -87,7 +87,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                     .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Image(
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = stringResource(R.string.app_logo),
@@ -96,7 +96,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                         .size(120.dp)
                         .clip(CircleShape),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,

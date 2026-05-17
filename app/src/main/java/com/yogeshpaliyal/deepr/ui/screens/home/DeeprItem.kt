@@ -240,12 +240,20 @@ fun DeeprItem(
                             }
                         }
 
-                        if (showOpenCounter) {
+                        if (!showOpenCounter) {
                             Text(
                                 text = stringResource(R.string.opened_count, account.openedCount),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = getDeeprItemTextColor(account.isFavourite),
                             )
+                        } else if (account.notes.isNotBlank()) {
+                            IconButton(onClick = { onItemClick(MenuItem.ViewNote(account)) }) {
+                                Icon(
+                                    TablerIcons.Note,
+                                    contentDescription = stringResource(R.string.note),
+                                    tint = getDeeprItemTextColor(account.isFavourite),
+                                )
+                            }
                         }
                     }
                 }

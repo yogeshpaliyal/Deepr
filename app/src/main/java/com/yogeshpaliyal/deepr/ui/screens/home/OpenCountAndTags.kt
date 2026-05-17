@@ -15,6 +15,7 @@ import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ExternalLink
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Tag
 
 @Composable
@@ -24,7 +25,7 @@ fun OpenCountAndTags(
     showOpenCounter: Boolean = true,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        if (showOpenCounter) {
+        if (!showOpenCounter) {
             Row {
                 Icon(
                     TablerIcons.ExternalLink,
@@ -38,10 +39,18 @@ fun OpenCountAndTags(
                     color = getDeeprItemTextColor(account.isFavourite),
                 )
             }
+        } else if (account.notes.isNotBlank()) {
+            Row {
+                Icon(
+                    TablerIcons.Note,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
         }
         account.tagsIds?.split(",")?.size?.let { tagsCount ->
             if (tagsCount > 0) {
-                if (showOpenCounter) {
+                if (!showOpenCounter || (showOpenCounter && account.notes.isNotBlank())) {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(

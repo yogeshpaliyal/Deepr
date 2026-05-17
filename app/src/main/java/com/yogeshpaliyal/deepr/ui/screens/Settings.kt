@@ -180,11 +180,9 @@ fun SettingsScreen(
                         navigatorContext.add(RestoreScreen)
                     },
                 )
-            }
 
-            DriveSettingsItem()
+                DriveSettingsItem()
 
-            SettingsSection("Others") {
                 SettingsItem(
                     TablerIcons.Server,
                     title = stringResource(R.string.local_network_server),
@@ -192,7 +190,9 @@ fun SettingsScreen(
                         navigatorContext.add(LocalNetworkServer)
                     },
                 )
+            }
 
+            SettingsSection(stringResource(R.string.links_preferences)) {
                 SettingsItem(
                     TablerIcons.Settings,
                     title = stringResource(R.string.shortcut_icon),
@@ -246,8 +246,8 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.Star,
-                    title = stringResource(R.string.default_page),
+                    TablerIcons.UserStar,
+                    title = stringResource(R.string.default_profile),
                     description =
                         if (defaultPageFavourites) {
                             stringResource(R.string.default_page_favourites)
@@ -376,7 +376,8 @@ fun SettingsScreen(
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "Check out $appName - Your link organizer and Read Later App! Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                    "Check out $appName - Your link organizer and Read Later App!\n" +
+                                        "Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
                                 )
                                 type = "text/plain"
                             }

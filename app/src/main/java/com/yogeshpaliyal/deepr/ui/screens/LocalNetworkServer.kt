@@ -702,7 +702,11 @@ private fun PortConfigurationCard(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp),
             )
-            Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
                 Text(
                     text = stringResource(R.string.server_port),
                     style = MaterialTheme.typography.titleLarge,
