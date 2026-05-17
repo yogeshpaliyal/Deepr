@@ -60,6 +60,7 @@ import compose.icons.tablericons.Folders
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Share
@@ -67,6 +68,7 @@ import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import compose.icons.tablericons.User
 import org.koin.androidx.compose.koinViewModel
+import compose.icons.tablericons.Settings as SettingsIcon
 
 object Settings : TopLevelRoute {
     override val icon: ImageVector
