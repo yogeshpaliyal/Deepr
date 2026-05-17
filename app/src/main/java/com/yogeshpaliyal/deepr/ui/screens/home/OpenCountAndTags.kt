@@ -22,10 +22,10 @@ import compose.icons.tablericons.Tag
 fun OpenCountAndTags(
     account: GetLinksAndTags,
     modifier: Modifier = Modifier,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        if (!showOpenCounter) {
+        if (!showNotesInsteadOfCounter) {
             Row {
                 Icon(
                     TablerIcons.ExternalLink,
@@ -50,7 +50,7 @@ fun OpenCountAndTags(
         }
         account.tagsIds?.split(",")?.size?.let { tagsCount ->
             if (tagsCount > 0) {
-                if (!showOpenCounter || (showOpenCounter && account.notes.isNotBlank())) {
+                if (!showNotesInsteadOfCounter || account.notes.isNotBlank()) {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(

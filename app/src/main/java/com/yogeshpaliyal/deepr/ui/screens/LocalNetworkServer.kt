@@ -42,7 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -142,7 +142,7 @@ fun LocalNetworkServerScreen(
                         Icon(
                             TablerIcons.ArrowLeft,
                             contentDescription = stringResource(R.string.back),
-                            modifier = if (isRtl) Modifier.scale(-1f, 1f) else Modifier,
+                            modifier = if (isRtl) Modifier.graphicsLayer(scaleX = -1f) else Modifier,
                         )
                     }
                 },

@@ -118,7 +118,7 @@ fun DeeprItem(
     selectedTag: List<Tags>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
     analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
@@ -241,7 +241,7 @@ fun DeeprItem(
                             }
                         }
 
-                        if (!showOpenCounter) {
+                        if (!showNotesInsteadOfCounter) {
                             Text(
                                 text = stringResource(R.string.opened_count, account.openedCount),
                                 style = MaterialTheme.typography.bodySmall,

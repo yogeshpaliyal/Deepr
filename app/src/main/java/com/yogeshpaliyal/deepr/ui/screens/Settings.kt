@@ -154,7 +154,7 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("Data Management") {
+            SettingsSection(stringResource(R.string.data_management)) {
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.backup),
@@ -184,7 +184,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection("Links Preferences") {
+            SettingsSection(stringResource(R.string.links_preferences)) {
                 SettingsItem(
                     TablerIcons.User,
                     title = stringResource(R.string.main_profile),
@@ -231,12 +231,12 @@ fun SettingsScreen(
                     title = stringResource(R.string.switch_open_counter),
                     description = stringResource(R.string.show_open_counter_description),
                     onClick = {
-                        viewModel.setShowOpenCounter(!showOpenCounter)
+                        viewModel.setShowNotesInsteadOfCounter(!showNotesInsteadOfCounter)
                     },
                     trailing = {
                         Switch(
-                            checked = showOpenCounter,
-                            onCheckedChange = { viewModel.setShowOpenCounter(it) },
+                            checked = showNotesInsteadOfCounter,
+                            onCheckedChange = { viewModel.setShowNotesInsteadOfCounter(it) },
                         )
                     },
                 )
@@ -268,7 +268,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection("App Preferences") {
+            SettingsSection(stringResource(R.string.app_preferences)) {
                 SettingsItem(
                     TablerIcons.Moon,
                     title = stringResource(R.string.theme),

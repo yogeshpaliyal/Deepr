@@ -40,7 +40,7 @@ fun DeeprItemGrid(
     onItemClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier,
     isThumbnailEnable: Boolean = true,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     DeeprItemSwipable(account, onItemClick, modifier) {
         Card(
@@ -110,7 +110,7 @@ fun DeeprItemGrid(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        OpenCountAndTags(account, Modifier.weight(1f), showOpenCounter)
+                        OpenCountAndTags(account, Modifier.weight(1f), showNotesInsteadOfCounter)
                         IconButton(onClick = {
                             onItemClick(MenuItem.MoreOptionsBottomSheet(account))
                         }) {

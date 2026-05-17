@@ -653,14 +653,14 @@ class AccountViewModel(
         }
     }
 
-    // Show open counter preference methods
-    val showOpenCounter =
-        preferenceDataStore.getShowOpenCounter
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    // Show notes instead of counter preference methods
+    val showNotesInsteadOfCounter =
+        preferenceDataStore.getShowNotesInsteadOfCounter
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    fun setShowOpenCounter(show: Boolean) {
+    fun setShowNotesInsteadOfCounter(show: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            preferenceDataStore.setShowOpenCounter(show)
+            preferenceDataStore.setShowNotesInsteadOfCounter(show)
         }
     }
 
@@ -870,6 +870,12 @@ class AccountViewModel(
                 if (nextProfile != null) {
                     setSelectedProfile(nextProfile.id)
                 }
+            }
+
+            // If deleting the main profile, reset it
+            val currentDefaultProfileId = preferenceDataStore.getDefaultProfileId.first()
+            if (currentDefaultProfileId == id) {
+                preferenceDataStore.setDefaultProfileId(null)
             }
 
             linkRepository.deleteProfile(id)

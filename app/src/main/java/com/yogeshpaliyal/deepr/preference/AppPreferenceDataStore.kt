@@ -36,7 +36,7 @@ class AppPreferenceDataStore(
         private val SERVER_PORT = stringPreferencesKey("server_port")
         private val VIEW_TYPE = intPreferencesKey("view_type")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
-        private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
+        private val SHOW_NOTES_INSTEAD_OF_COUNTER = booleanPreferencesKey("show_notes_instead_of_counter")
         private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
         private val DEFAULT_PROFILE_ID = longPreferencesKey("default_profile_id")
         private val SILENT_SAVE_PROFILE_ID = longPreferencesKey("silent_save_profile_id")
@@ -116,9 +116,9 @@ class AppPreferenceDataStore(
             preferences[THEME_MODE] ?: "system" // Default to system theme
         }
 
-    val getShowOpenCounter: Flow<Boolean> =
+    val getShowNotesInsteadOfCounter: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
-            preferences[SHOW_OPEN_COUNTER] ?: true // Default to showing counter
+            preferences[SHOW_NOTES_INSTEAD_OF_COUNTER] ?: false // Default to showing counter
         }
 
     val getSelectedProfileId: Flow<Long> =
@@ -236,9 +236,9 @@ class AppPreferenceDataStore(
         }
     }
 
-    suspend fun setShowOpenCounter(show: Boolean) {
+    suspend fun setShowNotesInsteadOfCounter(show: Boolean) {
         context.appDataStore.edit { prefs ->
-            prefs[SHOW_OPEN_COUNTER] = show
+            prefs[SHOW_NOTES_INSTEAD_OF_COUNTER] = show
         }
     }
 

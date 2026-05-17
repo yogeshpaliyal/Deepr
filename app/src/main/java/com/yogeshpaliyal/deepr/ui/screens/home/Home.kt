@@ -566,7 +566,7 @@ fun Content(
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val showNotesInsteadOfCounter by viewModel.showNotesInsteadOfCounter.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val analyticsManager = koinInject<AnalyticsManager>()
@@ -720,7 +720,7 @@ fun Content(
             favouriteFilter = favouriteFilter,
             viewType = currentViewType,
             onItemClick = onItemClick,
-            showOpenCounter = showOpenCounter,
+            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
         )
     }
     showMoreSelectedItem?.let { account ->
@@ -897,7 +897,7 @@ fun Content(
                     }
                 }
 
-                if (showOpenCounter) {
+                if (showNotesInsteadOfCounter) {
                     item {
                         MenuListItem(
                             text = stringResource(R.string.opened_count, account.openedCount),
@@ -1020,7 +1020,7 @@ fun DeeprList(
     favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewType: @ViewType Int = ViewType.LIST,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     // Determine which empty state to show
     val isSearchActive = searchQuery.isNotBlank()
@@ -1130,7 +1130,7 @@ fun DeeprList(
                             onItemClick = onItemClick,
                             onTagClick = onTagClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }
@@ -1158,7 +1158,7 @@ fun DeeprList(
                             account = account,
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }
@@ -1182,7 +1182,7 @@ fun DeeprList(
                             account = account,
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }

@@ -127,9 +127,10 @@ class MainActivity : ComponentActivity() {
 
             // Set main profile on launch
             val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
+            val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
             LaunchedEffect(defaultProfileId) {
-                defaultProfileId?.let { id ->
-                    viewModel.setSelectedProfile(id)
+                if (defaultProfileId != null && defaultProfileId != currentProfile?.id) {
+                    viewModel.setSelectedProfile(defaultProfileId!!)
                 }
             }
 
