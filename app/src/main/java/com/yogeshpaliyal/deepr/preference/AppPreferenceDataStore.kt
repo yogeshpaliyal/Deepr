@@ -126,6 +126,11 @@ class AppPreferenceDataStore(
             preferences[SELECTED_PROFILE_ID] ?: 1L // Default to profile ID 1
         }
 
+    val getDefaultProfileId: Flow<Long?> =
+        context.appDataStore.data.map { preferences ->
+            preferences[DEFAULT_PROFILE_ID]
+        }
+
     val getSilentSaveProfileId: Flow<Long> =
         context.appDataStore.data.map { preferences ->
             preferences[SILENT_SAVE_PROFILE_ID] ?: getSelectedProfileId.firstOrNull() ?: 1L // Default to profile ID 1
