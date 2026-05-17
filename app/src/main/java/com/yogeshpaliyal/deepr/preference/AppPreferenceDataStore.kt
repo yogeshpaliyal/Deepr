@@ -236,9 +236,19 @@ class AppPreferenceDataStore(
         }
     }
 
-    suspend fun setSelectedProfileId(profileId: Long) {
+    suspend fun setSelectedProfileId(id: Long) {
         context.appDataStore.edit { prefs ->
-            prefs[SELECTED_PROFILE_ID] = profileId
+            prefs[SELECTED_PROFILE_ID] = id
+        }
+    }
+
+    suspend fun setDefaultProfileId(id: Long?) {
+        context.appDataStore.edit { prefs ->
+            if (id != null) {
+                prefs[DEFAULT_PROFILE_ID] = id
+            } else {
+                prefs.remove(DEFAULT_PROFILE_ID)
+            }
         }
     }
 

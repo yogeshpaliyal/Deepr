@@ -819,6 +819,16 @@ class AccountViewModel(
         preferenceDataStore.getSilentSaveProfileId
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1L)
 
+    fun setDefaultProfileId(profileId: Long?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceDataStore.setDefaultProfileId(profileId)
+        }
+    }
+
+    val defaultProfileId =
+        preferenceDataStore.getDefaultProfileId
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     fun insertProfile(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.insertProfile(name)

@@ -258,10 +258,11 @@ fun DeeprTheme(
         when (themeMode) {
             "light" -> false
             "dark" -> true
+            "amoled" -> true
             else -> darkTheme // "system" or any other value defaults to system
         }
 
-    val colorScheme =
+    var colorScheme =
         when {
             colorTheme == "dynamic" && dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
                 val context = LocalContext.current
@@ -277,6 +278,20 @@ fun DeeprTheme(
             useDarkTheme -> DarkColorScheme
             else -> LightColorScheme
         }
+
+    if (themeMode == "amoled") {
+        colorScheme =
+            colorScheme.copy(
+                background = Color.Black,
+                surface = Color.Black,
+                surfaceVariant = Color.Black,
+                surfaceContainer = Color.Black,
+                surfaceContainerHigh = Color.Black,
+                surfaceContainerHighest = Color.Black,
+                surfaceContainerLow = Color.Black,
+                surfaceContainerLowest = Color.Black,
+            )
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {

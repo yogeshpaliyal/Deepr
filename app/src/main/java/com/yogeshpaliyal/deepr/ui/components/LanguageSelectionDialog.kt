@@ -1,7 +1,6 @@
 package com.yogeshpaliyal.deepr.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,8 +37,8 @@ fun LanguageSelectionDialog(
             )
         },
         text = {
-            Column {
-                LanguageUtil.availableLanguages.forEach { language ->
+            LazyColumn {
+                items(LanguageUtil.availableLanguages) { language ->
                     val displayName =
                         if (language.code == LanguageUtil.SYSTEM_DEFAULT) {
                             stringResource(R.string.system_default)

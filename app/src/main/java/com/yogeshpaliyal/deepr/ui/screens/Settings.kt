@@ -114,6 +114,9 @@ fun SettingsScreen(
     val silentSaveProfileId by viewModel.silentSaveProfileId.collectAsStateWithLifecycle()
     var showSilentSaveProfileDialog by remember { mutableStateOf(false) }
 
+    val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
+    var showDefaultProfileDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
@@ -245,7 +248,9 @@ fun SettingsScreen(
                         showThemeDialog = true
                     },
                 )
+            }
 
+            SettingsSection(stringResource(R.string.links_preferences)) {
                 SettingsItem(
                     TablerIcons.User,
                     title = stringResource(R.string.default_profile),
@@ -460,6 +465,20 @@ fun SettingsScreen(
                 },
                 onDismiss = { showSilentSaveProfileDialog = false },
                 title = stringResource(R.string.silent_save_profile),
+            )
+        }
+
+        // Default Profile Selection Dialog
+        if (showDefaultProfileDialog) {
+            ProfileSelectionDialog(
+                profiles = allProfiles,
+                currentProfileId = defaultProfileId ?: -1L,
+                onProfileSelect = { selectedProfileId ->
+                    viewModel.setDefaultProfileId(selectedProfileId)
+                    showDefaultProfileDialog = false
+                },
+                onDismiss = { showDefaultProfileDialog = false },
+                title = stringResource(R.string.default_profile),
             )
         }
     }

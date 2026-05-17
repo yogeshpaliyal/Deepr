@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.gdrive.BackupStatus
 import com.yogeshpaliyal.deepr.gdrive.DriveSyncManager
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
-import com.yogeshpaliyal.deepr.ui.components.SettingsSection
 import com.yogeshpaliyal.deepr.util.formatDateTime
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
@@ -89,78 +88,75 @@ fun DriveSettingsItem() {
 
     // Google Drive section - show for all users
     // Pro users get full functionality, free users see upgrade prompt
-    SettingsSection("Google Drive") {
-        // Pro/PlayStore build - full functionality
-        if (isDriveAuthenticated) {
-            GoogleDriveBackupItem(
-                backupStatus = backupStatus,
-                isBackingUp = isBackingUp,
-                onClick = {
-                    coroutineScope.launch {
-                        isBackingUp = true
-                        val success = syncManager.backupToDrive()
-                        updateBackupStatus()
-                        isBackingUp = false
-                        if (success) {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Backup successful",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        } else {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Backup failed. Please try again.",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        }
-                    }
-                },
-            )
-            GoogleDriveRestoreItem(
-                isRestoring = isRestoring,
-                onClick = {
-                    // Check if backup exists before showing dialog
-                    if (backupStatus?.hasBackup == true) {
-                        showRestoreConfirmDialog = true
-                    } else {
-                        // No backup found
+    if (isDriveAuthenticated) {
+        GoogleDriveBackupItem(
+            backupStatus = backupStatus,
+            isBackingUp = isBackingUp,
+            onClick = {
+                coroutineScope.launch {
+                    isBackingUp = true
+                    val success = syncManager.backupToDrive()
+                    updateBackupStatus()
+                    isBackingUp = false
+                    if (success) {
                         Toast
                             .makeText(
                                 context,
-                                "No backup found on Google Drive",
+                                "Backup successful",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                    } else {
+                        Toast
+                            .makeText(
+                                context,
+                                "Backup failed. Please try again.",
                                 Toast.LENGTH_SHORT,
                             ).show()
                     }
-                },
-            )
-            GoogleDriveAutoBackupItem(
-                isEnabled = googleDriveAutoBackupEnabled,
-                onToggle = { enabled ->
-                    viewModel.setGoogleDriveAutoBackupEnabled(enabled)
-                },
-            )
-            SettingsItem(
-                TablerIcons.Cloud,
-                title = "Logout",
-                onClick = {
-                    syncManager.signOut()
-                    isDriveAuthenticated = false
-                },
-            )
-        } else {
-            SettingsItem(
-                TablerIcons.Cloud,
-                title = "Login to Google Drive",
-                onClick = {
-                    syncManager.getSignInIntent()?.let { intent ->
-                        googleSignInLauncher.launch(intent)
-                    }
-                },
-            )
-        }
+                }
+            },
+        )
+        GoogleDriveRestoreItem(
+            isRestoring = isRestoring,
+            onClick = {
+                // Check if backup exists before showing dialog
+                if (backupStatus?.hasBackup == true) {
+                    showRestoreConfirmDialog = true
+                } else {
+                    // No backup found
+                    Toast
+                        .makeText(
+                            context,
+                            "No backup found on Google Drive",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                }
+            },
+        )
+        GoogleDriveAutoBackupItem(
+            isEnabled = googleDriveAutoBackupEnabled,
+            onToggle = { enabled ->
+                viewModel.setGoogleDriveAutoBackupEnabled(enabled)
+            },
+        )
+        SettingsItem(
+            TablerIcons.Cloud,
+            title = "Logout",
+            onClick = {
+                syncManager.signOut()
+                isDriveAuthenticated = false
+            },
+        )
+    } else {
+        SettingsItem(
+            TablerIcons.Cloud,
+            title = "Login to Google Drive",
+            onClick = {
+                syncManager.getSignInIntent()?.let { intent ->
+                    googleSignInLauncher.launch(intent)
+                }
+            },
+        )
     }
 
     // Restore Confirmation Dialog

@@ -112,7 +112,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier =
