@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -66,11 +67,11 @@ import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
 import compose.icons.tablericons.User
 import org.koin.androidx.compose.koinViewModel
-import compose.icons.tablericons.Settings as SettingsIcon
+import compose.icons.tablericons.Settings as TablerSettingsIcon
 
 object Settings : TopLevelRoute {
     override val icon: ImageVector
-        get() = TablerIcons.SettingsIcon
+        get() = TablerIcons.TablerSettingsIcon
     override val label: Int
         get() = R.string.settings
 
@@ -96,7 +97,7 @@ fun SettingsScreen(
     val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
-    val defaultPageFavourites by viewModel.defaultPageFavourites.collectAsStateWithLifecycle()
+    val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
     // Collect profiles and silent save profile preference
@@ -121,7 +122,7 @@ fun SettingsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = {
-                            navigatorContext.back()
+                            navigatorContext.removeLast()
                         }) {
                             Icon(
                                 TablerIcons.ArrowLeft,
@@ -133,7 +134,7 @@ fun SettingsScreen(
                 )
 
                 ServerStatusBar(
-                    onClick = {
+                    onServerStatusClick = {
                         // Navigate to LocalNetworkServer screen when status bar is clicked
                         if (navigatorContext.getLast() !is LocalNetworkServer) {
                             navigatorContext.add(LocalNetworkServer)
@@ -284,7 +285,7 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.SettingsIcon,
+                    TablerIcons.TablerSettingsIcon,
                     title = stringResource(R.string.shortcut_icon),
                     description =
                         if (useLinkBasedIcons) {

@@ -40,7 +40,7 @@ fun LanguageSelectionDialog(
         },
         text = {
             LazyColumn {
-                items(LanguageUtil.availableLanguages) { language ->
+                items(LanguageUtil.availableLanguages) { language: LanguageUtil.Language ->
                     val displayName =
                         if (language.code == LanguageUtil.SYSTEM_DEFAULT) {
                             stringResource(R.string.system_default)
