@@ -176,12 +176,9 @@ fun DeeprItem(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Center,
-                    ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         if (account.name.isNotEmpty()) {
                             Text(
                                 text = account.name,

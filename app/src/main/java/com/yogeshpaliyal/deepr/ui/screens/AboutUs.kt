@@ -96,7 +96,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                         .size(120.dp)
                         .clip(CircleShape),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
@@ -105,14 +105,14 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.version_format, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.app_description),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier =
@@ -125,7 +125,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                         text = stringResource(R.string.author),
                         style = MaterialTheme.typography.titleLarge,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.author_name),
                         style = MaterialTheme.typography.bodyLarge,
@@ -156,7 +156,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -170,7 +170,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier) {
                         text = stringResource(R.string.contributors),
                         style = MaterialTheme.typography.titleLarge,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.contributors_thank_you),
                         style = MaterialTheme.typography.bodyMedium,
