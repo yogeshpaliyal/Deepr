@@ -51,6 +51,7 @@ import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Note
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale

@@ -63,7 +63,6 @@ import compose.icons.tablericons.Language
 import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
-import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
