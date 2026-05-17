@@ -96,7 +96,7 @@ fun SettingsScreen(
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
-    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val showNotesInsteadOfCounter by viewModel.showNotesInsteadOfCounter.collectAsStateWithLifecycle()
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
