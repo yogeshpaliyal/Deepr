@@ -40,6 +40,9 @@ class AppPreferenceDataStore(
         private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
         private val DEFAULT_PROFILE_ID = longPreferencesKey("default_profile_id")
         private val SILENT_SAVE_PROFILE_ID = longPreferencesKey("silent_save_profile_id")
+
+        // Legacy keys for migration
+        private val LEGACY_SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
         private val GOOGLE_DRIVE_AUTO_BACKUP_ENABLED =
             booleanPreferencesKey("google_drive_auto_backup_enabled")
         private val CLIPBOARD_LINK_DETECTION_ENABLED =
@@ -118,7 +121,14 @@ class AppPreferenceDataStore(
 
     val getShowNotesInsteadOfCounter: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
-            preferences[SHOW_NOTES_INSTEAD_OF_COUNTER] ?: false // Default to showing counter
+            if (preferences.contains(SHOW_NOTES_INSTEAD_OF_COUNTER)) {
+                preferences[SHOW_NOTES_INSTEAD_OF_COUNTER] ?: false
+            } else if (preferences.contains(LEGACY_SHOW_OPEN_COUNTER)) {
+                // Migrate: legacy true (show counter) -> new false (don't show notes instead of counter)
+                !(preferences[LEGACY_SHOW_OPEN_COUNTER] ?: true)
+            } else {
+                false // Default to showing counter
+            }
         }
 
     val getSelectedProfileId: Flow<Long> =
@@ -239,6 +249,7 @@ class AppPreferenceDataStore(
     suspend fun setShowNotesInsteadOfCounter(show: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[SHOW_NOTES_INSTEAD_OF_COUNTER] = show
+            prefs.remove(LEGACY_SHOW_OPEN_COUNTER)
         }
     }
 

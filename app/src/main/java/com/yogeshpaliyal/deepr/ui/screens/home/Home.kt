@@ -902,7 +902,7 @@ fun Content(
                         MenuListItem(
                             text = stringResource(R.string.opened_count, account.openedCount),
                             textStyle = MaterialTheme.typography.bodySmall,
-                            onClick = { },
+                            onClick = null,
                             icon = null,
                             colors =
                                 ListItemDefaults.colors(

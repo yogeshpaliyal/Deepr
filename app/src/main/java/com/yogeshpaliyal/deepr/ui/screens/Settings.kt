@@ -158,7 +158,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.backup),
-                    description = "Export to CSV, Local file sync, Auto backup",
+                    description = stringResource(R.string.backup_description),
                     onClick = {
                         navigatorContext.add(BackupScreen)
                     },
@@ -167,7 +167,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Download,
                     title = stringResource(R.string.restore),
-                    description = "Import from CSV, Bookmarks, and other formats",
+                    description = stringResource(R.string.restore_description),
                     onClick = {
                         navigatorContext.add(RestoreScreen)
                     },
@@ -199,7 +199,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Star,
                     title = stringResource(R.string.default_page_favourites),
-                    description = "Open the default profile on Favourites instead of All links",
+                    description = stringResource(R.string.main_profile_favourites_description),
                     onClick = {
                         viewModel.setDefaultPageFavourites(!defaultPageFavourites)
                     },
@@ -213,8 +213,8 @@ fun SettingsScreen(
 
                 SettingsItem(
                     TablerIcons.Photo,
-                    title = "Show thumbnails for links",
-                    description = "If enabled, thumbnails will be displayed for saved links where available",
+                    title = stringResource(R.string.show_thumbnails),
+                    description = stringResource(R.string.show_thumbnails_description),
                     onClick = {
                         viewModel.setIsThumbnailEnable(!isThumbnailEnable)
                     },
@@ -323,14 +323,14 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection("About") {
+            SettingsSection(stringResource(R.string.about)) {
                 val appName = stringResource(R.string.app_name)
                 // Report a problem or feedback via email on yogeshpaliyal.foss+shelfy@gmail.com
                 SettingsItem(
                     icon = TablerIcons.AlertTriangle,
-                    title = "Report a Problem / Feedback",
+                    title = stringResource(R.string.report_problem),
                     shouldShowLoading = false,
-                    description = "Help us improve by reporting issues or sharing feedback",
+                    description = stringResource(R.string.report_problem_description),
                     onClick = {
                         val emailIntent =
                             Intent(Intent.ACTION_SENDTO).apply {
@@ -377,8 +377,11 @@ fun SettingsScreen(
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "Check out $appName - Your link organizer and Read Later App!\n" +
-                                        "Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                    stringResource(
+                                        R.string.share_app_message,
+                                        appName,
+                                        BuildConfig.APPLICATION_ID,
+                                    ),
                                 )
                                 type = "text/plain"
                             }
