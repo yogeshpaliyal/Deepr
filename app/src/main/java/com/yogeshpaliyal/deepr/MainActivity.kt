@@ -125,6 +125,14 @@ class MainActivity : ComponentActivity() {
                     "dynamic"
                 }
 
+            // Set main profile on launch
+            val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
+            LaunchedEffect(defaultProfileId) {
+                defaultProfileId?.let { id ->
+                    viewModel.setSelectedProfile(id)
+                }
+            }
+
             DeeprTheme(themeMode = themeMode, colorTheme = colorTheme) {
                 Surface {
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
