@@ -357,8 +357,8 @@ fun SettingsScreen(
                 // Rate and review open playstore link
                 SettingsItem(
                     icon = TablerIcons.Star,
-                    title = "Rate & Review",
-                    description = "Rate us on the Play Store",
+                    title = stringResource(R.string.rate_review),
+                    description = stringResource(R.string.rate_review_description),
                     shouldShowLoading = false,
                     onClick = {
                         viewModel.requestReview(context as MainActivity)
@@ -368,16 +368,16 @@ fun SettingsScreen(
                 // Create share app item
                 SettingsItem(
                     icon = TablerIcons.Share,
-                    title = "Share $appName",
+                    title = stringResource(R.string.share_app, appName),
                     shouldShowLoading = false,
-                    description = "Share $appName with your friends",
+                    description = stringResource(R.string.share_app_description, appName),
                     onClick = {
                         val shareIntent =
                             Intent().apply {
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    stringResource(
+                                    context.getString(
                                         R.string.share_app_message,
                                         appName,
                                         BuildConfig.APPLICATION_ID,
