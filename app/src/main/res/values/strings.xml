@@ -303,6 +303,7 @@
     <string name="share_app_description">Share %s with your friends</string>
     <string name="rate_review">Rate &amp; Review</string>
     <string name="rate_review_description">Rate us on the Play Store</string>
+    <string name="switch_open_counter_description">Show note action instead of opened count on links</string>
     <string name="about">About</string>
     <string name="close">Close</string>
 </resources>

@@ -229,7 +229,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Note,
                     title = stringResource(R.string.switch_open_counter),
-                    description = stringResource(R.string.show_open_counter_description),
+                    description = stringResource(R.string.switch_open_counter_description),
                     onClick = {
                         viewModel.setShowNotesInsteadOfCounter(!showNotesInsteadOfCounter)
                     },
