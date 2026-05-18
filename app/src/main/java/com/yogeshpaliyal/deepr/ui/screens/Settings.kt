@@ -100,7 +100,7 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
 
-    // Collect profiles and silent save profile preference
+    // Collect profiles and silent save profile preference.
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
     val silentSaveProfileId by viewModel.silentSaveProfileId.collectAsStateWithLifecycle()
     var showSilentSaveProfileDialog by remember { mutableStateOf(false) }
