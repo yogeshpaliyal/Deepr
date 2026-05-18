@@ -28,6 +28,7 @@ fun ThemeSelectionDialog(
             "system" to stringResource(R.string.system_default),
             "light" to stringResource(R.string.theme_light),
             "dark" to stringResource(R.string.theme_dark),
+            "amoled" to stringResource(R.string.theme_amoled),
         )
 
     AlertDialog(

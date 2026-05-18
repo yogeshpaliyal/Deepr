@@ -296,6 +296,26 @@
     <string name="theme_dialog_title">Select Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="theme_amoled">AMOLED</string>
+    <string name="main_profile">Main profile</string>
+    <string name="switch_open_counter">Switch open counter with note</string>
+    <string name="main_profile_favourites_description">Open the main profile on Favourites instead of All links</string>
+    <string name="share_app_message">Check out %1$s - Your link organizer and Read Later App!\nDownload it from https://play.google.com/store/apps/details?id=%2$s</string>
+    <string name="backup_description">Export to CSV, Local file sync, Auto backup</string>
+    <string name="restore_description">Import from CSV, Bookmarks, and other formats</string>
+    <string name="show_thumbnails">Show thumbnails for links</string>
+    <string name="show_thumbnails_description">If enabled, thumbnails will be displayed for saved links where available</string>
+    <string name="report_problem">Report a Problem / Feedback</string>
+    <string name="report_problem_description">Help us improve by reporting issues or sharing feedback</string>
+    <string name="data_management">Data management</string>
+    <string name="links_preferences">Links Preferences</string>
+    <string name="app_preferences">App Preferences</string>
+    <string name="share_app">Share %s</string>
+    <string name="share_app_description">Share %s with your friends</string>
+    <string name="rate_review">Rate &amp; Review</string>
+    <string name="rate_review_description">Rate us on the Play Store</string>
+    <string name="switch_open_counter_description">Show note action instead of opened count on links</string>
+    <string name="about">About</string>
     <string name="close">Close</string>
 
     

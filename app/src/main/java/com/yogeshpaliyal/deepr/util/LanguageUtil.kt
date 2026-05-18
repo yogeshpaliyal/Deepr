@@ -31,6 +31,21 @@ object LanguageUtil {
             Language(FRENCH, "French", "Français"),
             Language(GERMAN, "German", "Deutsch"),
             Language(URDU, "Urdu", "اردو"),
+            Language("it", "Italian", "Italiano"),
+            Language("pt", "Portuguese", "Português"),
+            Language("ja", "Japanese", "日本語"),
+            Language("zh", "Chinese", "中文"),
+            Language("ru", "Russian", "Русский"),
+            Language("ar", "Arabic", "العربية"),
+            Language("ko", "Korean", "한국어"),
+            Language("tr", "Turkish", "Türkçe"),
+            Language("vi", "Vietnamese", "Tiếng Việt"),
+            Language("pl", "Polish", "Polski"),
+            Language("nl", "Dutch", "Nederlands"),
+            Language("th", "Thai", "ไทย"),
+            Language("he", "Hebrew", "עברית"),
+            Language("id", "Indonesian", "Bahasa Indonesia"),
+            Language("el", "Greek", "Ελληνικά"),
         )
 
     /**
