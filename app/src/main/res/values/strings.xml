@@ -317,10 +317,6 @@
     <string name="switch_open_counter_description">Show note action instead of opened count on links</string>
     <string name="about">About</string>
     <string name="configuration">Configuration</string>
-    <string name="server_running">Server is running</string>
-    <string name="server_stopped">Server is stopped</string>
-    <string name="server_port">Server port</string>
-    <string name="server_url">Server URL</string>
     <string name="close">Close</string>
 
     
