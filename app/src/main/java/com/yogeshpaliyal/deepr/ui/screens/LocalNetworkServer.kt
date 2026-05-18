@@ -1,12 +1,15 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
-import android.content.Intent
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,12 +20,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -38,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -45,20 +51,18 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.lightspark.composeqr.QrCodeView
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.server.LocalServerService
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.Screen
-import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -69,8 +73,6 @@ import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Server
 import compose.icons.tablericons.Wifi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 object LocalNetworkServer : Screen {
@@ -137,12 +139,12 @@ fun LocalNetworkServerScreen() {
                 onToggle = {
                     if (it) {
                         if (notificationPermissionState.status.isGranted) {
-                            viewModel.startServer(context)
+                            LocalServerService.startService(context, serverPort)
                         } else {
                             notificationPermissionState.launchPermissionRequest()
                         }
                     } else {
-                        viewModel.stopServer(context)
+                        LocalServerService.stopService(context)
                     }
                 },
                 onQrClick = { showQrDialog = true },
@@ -162,7 +164,7 @@ fun LocalNetworkServerScreen() {
             )
 
             PortConfigurationCard(
-                port = serverPort,
+                port = serverPort.toString(),
                 isRunning = isRunning,
             )
 
@@ -174,11 +176,52 @@ fun LocalNetworkServerScreen() {
     }
 
     if (showQrDialog && serverUrl != null) {
-        QrCodeDialog(
+        LocalQrCodeDialog(
             url = serverUrl!!,
             onDismiss = { showQrDialog = false },
         )
     }
+}
+
+@Composable
+fun LocalQrCodeDialog(
+    url: String,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.scan_qr_code)) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(12.dp),
+                            ).padding(16.dp),
+                ) {
+                    QrCodeView(
+                        data = url,
+                        modifier = Modifier.size(200.dp),
+                        colors =
+                            com.lightspark.composeqr.QrCodeColors(
+                                background = Color.White,
+                                foreground = Color.Black,
+                            ),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
+            }
+        },
+    )
 }
 
 @Composable
@@ -242,13 +285,10 @@ fun StatusCard(
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            val sendIntent: Intent =
-                                Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, serverUrl)
-                                    type = "text/plain"
-                                }
-                            context.startActivity(Intent.createChooser(sendIntent, null))
+                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = ClipData.newPlainText("Server Info", serverUrl)
+                            clipboard.setPrimaryClip(clip)
+                            Toast.makeText(context, context.getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
                         },
                         colors = IconButtonDefaults.filledTonalIconButtonColors(),
                     ) {
