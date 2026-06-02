@@ -230,15 +230,38 @@ open class LocalServerRepositoryImpl(
                         post("/api/links") {
                             try {
                                 val request = call.receive<AddLinkRequest>()
+
+                                var finalProfileId = request.profileId
+                                if (!request.profileName.isNullOrBlank()) {
+                                    val dbProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
+                                    if (dbProfile != null) {
+                                        finalProfileId = dbProfile.id
+                                    } else {
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
+                                        if (newProfile != null) {
+                                            finalProfileId = newProfile.id
+                                        }
+                                    }
+                                }
+
+                                val mergedTags = mutableListOf<TagData>()
+                                mergedTags.addAll(request.tags)
+                                request.tagNames?.forEach { name ->
+                                    if (name.isNotBlank()) {
+                                        mergedTags.add(TagData(0L, name.trim()))
+                                    }
+                                }
+
                                 // Insert the link without tags first
                                 accountViewModel.insertAccount(
                                     link = request.link,
                                     name = request.name,
                                     executed = false,
-                                    tagsList = request.tags.map { it.toDbTag() },
+                                    tagsList = mergedTags.map { it.toDbTag() },
                                     notes = request.notes,
                                     thumbnail = "",
-                                    profileId = request.profileId,
+                                    profileId = finalProfileId,
                                 )
                                 call.respond(
                                     HttpStatusCode.Created,
@@ -529,7 +552,9 @@ data class AddLinkRequest(
     val name: String,
     val notes: String = "",
     val tags: List<TagData> = emptyList(),
+    val tagNames: List<String>? = null,
     val profileId: Long = 1L,
+    val profileName: String? = null,
 )
 
 @Serializable
