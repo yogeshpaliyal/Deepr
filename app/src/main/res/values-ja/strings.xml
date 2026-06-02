@@ -99,4 +99,7 @@
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
+
+    <string name="api_get_profiles">利用可能なすべてのプロファイルを取得する</string>
+    <string name="api_add_profile">新しいプロファイルを追加する (JSON: {\"name\": \"名前\"})</string>
 </resources>

@@ -169,4 +169,7 @@
     <string name="sync_status_valid">✓ Il formato del file è valido</string>
     <string name="sync_status_invalid">⚠ Il formato del file non è valido</string>
     <string name="sync_status_no_file">Nessun file di sincronizzazione selezionato</string>
+
+    <string name="api_get_profiles">Ottieni tutti i profili disponibili</string>
+    <string name="api_add_profile">Aggiungi un nuovo profilo (JSON: {\"name\": \"nome\"})</string>
 </resources>

@@ -335,6 +335,16 @@ fun LocalNetworkServerScreen(
                         )
                         ApiEndpointItem(
                             "GET",
+                            "/api/profiles",
+                            stringResource(R.string.api_get_profiles),
+                        )
+                        ApiEndpointItem(
+                            "POST",
+                            "/api/profiles",
+                            stringResource(R.string.api_add_profile),
+                        )
+                        ApiEndpointItem(
+                            "GET",
                             "/api/tags",
                             stringResource(R.string.api_get_tags),
                         )

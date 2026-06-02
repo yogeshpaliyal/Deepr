@@ -142,4 +142,7 @@
     <string name="no_links_with_tags_description">Prueba a seleccionar diferentes etiquetas o reestablecer los filtros.</string>
     <string name="no_favourites_with_tags">Sin favoritos en las etiquetas seleccionadas</string>
     <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos o pruebe diferentes etiquetas.</string>
+
+    <string name="api_get_profiles">Obtener todos los perfiles disponibles</string>
+    <string name="api_add_profile">Agregar un nuevo perfil (JSON: {\"name\": \"nombre\"})</string>
 </resources>

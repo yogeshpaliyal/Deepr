@@ -286,4 +286,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="close">Close</string>
+
+    <string name="api_get_profiles">Get all available profiles</string>
+    <string name="api_add_profile">Add a new profile (JSON: {\"name\": \"name\"})</string>
 </resources>

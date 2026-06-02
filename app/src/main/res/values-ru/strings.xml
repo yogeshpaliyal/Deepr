@@ -209,4 +209,7 @@
     <string name="import_deeplinks_description">Импортировать ссылки из файла CSV</string>
     <string name="import_deeplinks">Импортировать ссылки</string>
     <string name="copy_link">Копировать ссылку</string>
+
+    <string name="api_get_profiles">Получить все доступные профили</string>
+    <string name="api_add_profile">Добавить новый профиль (JSON: {\"name\": \"имя\"})</string>
 </resources>

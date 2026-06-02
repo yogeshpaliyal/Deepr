@@ -129,4 +129,7 @@
     <string name="sync_now_description">Deeplinks manuell mit ausgewählter Datei synchronisieren</string>
     <string name="favourites">Favoriten</string>
     <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
+
+    <string name="api_get_profiles">Rufen Sie alle verfügbaren Profile ab</string>
+    <string name="api_add_profile">Fügen Sie ein neues Profil hinzu (JSON: {\"name\": \"name\"})</string>
 </resources>
