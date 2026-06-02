@@ -346,6 +346,81 @@ open class LocalServerRepositoryImpl(
                                 )
                             }
                         }
+
+                        get("/api/server-info") {
+                            try {
+                                val response =
+                                    ServerInfoResponse(
+                                        appVersion = BuildConfig.VERSION_NAME,
+                                        endpoints =
+                                            listOf(
+                                                EndpointInfo(
+                                                    method = "GET",
+                                                    path = "/api/links",
+                                                    description = "Get all saved links. Optional query param: profileId (Long).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "POST",
+                                                    path = "/api/links",
+                                                    description = "Add a new link.",
+                                                    bodyFormat =
+                                                        """
+                                                        {
+                                                          "link": "https://example.com",
+                                                          "name": "Example Name",
+                                                          "notes": "Optional notes",
+                                                          "tags": [{"id": 0, "name": "tag"}],
+                                                          "profileId": 1
+                                                        }
+                                                        """.trimIndent(),
+                                                ),
+                                                EndpointInfo(
+                                                    method = "GET",
+                                                    path = "/api/profiles",
+                                                    description = "Get all available profiles.",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "POST",
+                                                    path = "/api/profiles",
+                                                    description = "Create a new profile.",
+                                                    bodyFormat =
+                                                        """
+                                                        {
+                                                          "name": "New Profile Name"
+                                                        }
+                                                        """.trimIndent(),
+                                                ),
+                                                EndpointInfo(
+                                                    method = "GET",
+                                                    path = "/api/tags",
+                                                    description = "Get all available tags. Optional query param: profileId (Long).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "GET",
+                                                    path = "/api/link-info",
+                                                    description = "Get metadata for a URL. Required query param: url (String).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "POST",
+                                                    path = "/api/links/increment-count",
+                                                    description = "Increment opened count for a link. Required query param: id (Long).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "GET",
+                                                    path = "/api/server-info",
+                                                    description = "Get server information and API documentation.",
+                                                ),
+                                            ),
+                                    )
+                                call.respond(HttpStatusCode.OK, response)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error getting server info", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error getting server info: ${e.message}"),
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -572,4 +647,26 @@ data class QRTransferInfo(
     val ip: String,
     val port: Int,
     val appVersion: String,
+)
+
+/**
+ * Data class representing endpoint details in ServerInfoResponse.
+ */
+@Serializable
+data class EndpointInfo(
+    val method: String,
+    val path: String,
+    val description: String,
+    val bodyFormat: String? = null,
+)
+
+/**
+ * Data class representing the response for the server-info API.
+ */
+@Serializable
+data class ServerInfoResponse(
+    val appName: String = "Deepr",
+    val appVersion: String,
+    val status: String = "running",
+    val endpoints: List<EndpointInfo>,
 )
