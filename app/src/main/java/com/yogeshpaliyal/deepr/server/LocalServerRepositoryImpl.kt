@@ -649,6 +649,26 @@ open class LocalServerRepositoryImpl(
                                                         """.trimIndent(),
                                                 ),
                                                 EndpointInfo(
+                                                    method = "PUT",
+                                                    path = "/api/links/{id}",
+                                                    description = "Update an existing link.",
+                                                    bodyFormat =
+                                                        """
+                                                        {
+                                                          "link": "https://example.com",
+                                                          "name": "Updated Name",
+                                                          "notes": "Updated notes",
+                                                          "tags": [{"id": 1, "name": "tag"}],
+                                                          "profileId": 1
+                                                        }
+                                                        """.trimIndent(),
+                                                ),
+                                                EndpointInfo(
+                                                    method = "DELETE",
+                                                    path = "/api/links/{id}",
+                                                    description = "Delete a link by ID.",
+                                                ),
+                                                EndpointInfo(
                                                     method = "GET",
                                                     path = "/api/profiles",
                                                     description = "Get all available profiles.",
@@ -665,9 +685,19 @@ open class LocalServerRepositoryImpl(
                                                         """.trimIndent(),
                                                 ),
                                                 EndpointInfo(
+                                                    method = "DELETE",
+                                                    path = "/api/profiles/{id}",
+                                                    description = "Delete a profile by ID.",
+                                                ),
+                                                EndpointInfo(
                                                     method = "GET",
                                                     path = "/api/tags",
                                                     description = "Get all available tags. Optional query param: profileId (Long).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "DELETE",
+                                                    path = "/api/tags/{id}",
+                                                    description = "Delete a tag by ID.",
                                                 ),
                                                 EndpointInfo(
                                                     method = "GET",
