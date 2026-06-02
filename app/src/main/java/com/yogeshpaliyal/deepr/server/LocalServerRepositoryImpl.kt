@@ -30,8 +30,10 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -180,6 +182,24 @@ open class LocalServerRepositoryImpl(
                             }
                         }
 
+                        delete("/api/profiles/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
+                                    return@delete
+                                }
+                                deeprQueries.deleteProfile(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Profile deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting profile: ${e.message}"),
+                                )
+                            }
+                        }
+
                         get("/api/links") {
                             try {
                                 val profileId =
@@ -253,6 +273,92 @@ open class LocalServerRepositoryImpl(
                             }
                         }
 
+                        put("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@put
+                                }
+                                val request = call.receive<AddLinkRequest>()
+                                val existingLink =
+                                    deeprQueries
+                                        .getLinksAndTags(
+                                            profileId = request.profileId,
+                                            searchQuery1 = "",
+                                            searchQuery2 = "",
+                                            searchQuery3 = "",
+                                            favouriteFilter1 = -1L,
+                                            favouriteFilter2 = -1L,
+                                            tagIdsString1 = "",
+                                            tagIdsString2 = "",
+                                            sortType1 = "DESC",
+                                            sortField1 = "createdAt",
+                                            sortType2 = "DESC",
+                                            sortField2 = "createdAt",
+                                        ).executeAsList()
+                                        .firstOrNull { it.id == id }
+
+                                val thumbnail = existingLink?.thumbnail ?: ""
+
+                                deeprQueries.transaction {
+                                    deeprQueries.updateDeeplink(
+                                        link = request.link,
+                                        name = request.name,
+                                        notes = request.notes,
+                                        thumbnail = thumbnail,
+                                        profileId = request.profileId,
+                                        id = id,
+                                    )
+                                    deeprQueries.deleteLinkRelations(id)
+                                    request.tags.forEach { tagData ->
+                                        deeprQueries.insertTag(tagData.name)
+                                        val tag = deeprQueries.getTagByName(tagData.name).executeAsOne()
+                                        deeprQueries.addTagToLink(linkId = id, tagId = tag.id)
+                                    }
+                                }
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating link: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@delete
+                                }
+                                val tagsToDelete = mutableListOf<Long>()
+                                deeprQueries.getTagsForLink(id).executeAsList().forEach { tag ->
+                                    val linkCount = deeprQueries.hasTagLinks(tag.id).executeAsOne()
+                                    if (linkCount == 1L) {
+                                        tagsToDelete.add(tag.id)
+                                    }
+                                }
+
+                                deeprQueries.transaction {
+                                    deeprQueries.deleteDeeprById(id)
+                                    deeprQueries.deleteLinkRelations(id)
+                                    tagsToDelete.forEach { tagId ->
+                                        deeprQueries.deleteTag(tagId)
+                                    }
+                                }
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting link: ${e.message}"),
+                                )
+                            }
+                        }
+
                         get("/api/tags") {
                             try {
                                 // Get all tags from the database with their IDs
@@ -289,6 +395,27 @@ open class LocalServerRepositoryImpl(
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
                                     ErrorResponse("Error getting tags: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/tags/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
+                                    return@delete
+                                }
+                                deeprQueries.transaction {
+                                    deeprQueries.deleteTag(id)
+                                    deeprQueries.deleteTagRelations(id)
+                                }
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Tag deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting tag: ${e.message}"),
                                 )
                             }
                         }

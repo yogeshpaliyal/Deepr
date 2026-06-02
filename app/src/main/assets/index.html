@@ -80,6 +80,16 @@
                         <option value="1">Default</option>
                     </select>
                     <button
+                        id="deleteProfileBtn"
+                        onclick="handleDeleteProfile()"
+                        class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center"
+                        title="Delete Current Profile"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                    <button
                         id="addProfileBtn"
                         class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1"
                         title="Add New Profile"
@@ -220,13 +230,23 @@
                     <!-- Filter Controls -->
                     <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                         <!-- Tag Filter -->
-                        <div class="flex-1 w-full sm:w-auto">
+                        <div class="flex-1 w-full sm:w-auto flex gap-2 items-center">
                             <select
                                 id="tagFilter"
                                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                             >
                                 <option value="">All Tags</option>
                             </select>
+                            <button
+                                id="deleteTagBtn"
+                                onclick="handleDeleteTag()"
+                                class="hidden bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center"
+                                title="Delete Selected Tag"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
                         </div>
 
                         <!-- Sort Controls -->
@@ -318,6 +338,79 @@
                         class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
                     >
                         Create Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Link Modal -->
+    <div id="editLinkModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeEditLinkModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Edit Link</h3>
+            <form id="editLinkForm" class="space-y-4">
+                <input type="hidden" id="editLinkId">
+                <div>
+                    <label for="editLinkUrl" class="block text-sm font-medium text-gray-700 mb-2">
+                        Link URL
+                    </label>
+                    <input
+                        type="url"
+                        id="editLinkUrl"
+                        required
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div>
+                    <label for="editLinkName" class="block text-sm font-medium text-gray-700 mb-2">
+                        Link Name (Optional)
+                    </label>
+                    <input
+                        type="text"
+                        id="editLinkName"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div>
+                    <label for="editLinkNotes" class="block text-sm font-medium text-gray-700 mb-2">
+                        Notes (Optional)
+                    </label>
+                    <input
+                        type="text"
+                        id="editLinkNotes"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div>
+                    <label for="editLinkTags" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tags (Optional)
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="editLinkTags"
+                            placeholder="Type to add tags..."
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                        >
+                        <div id="editTagSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-40 overflow-y-auto"></div>
+                    </div>
+                    <div id="editSelectedTags" class="flex flex-wrap gap-2 mt-2"></div>
+                </div>
+                <div class="flex gap-3 justify-end pt-4 border-t border-gray-100">
+                    <button
+                        type="button"
+                        onclick="closeEditLinkModal()"
+                        class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        id="saveEditBtn"
+                        class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
+                    >
+                        Save Changes
                     </button>
                 </div>
             </form>
@@ -676,14 +769,30 @@
                                     </div>
                                 ` : ''}
 
-                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                                     <button
                                        onclick="handleOpenLink(${link.id}, '${escapeHtml(link.link)}')"
-                                       class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
+                                       class="flex-1 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                         </svg>
-                                        Open Link
+                                        Open
+                                    </button>
+                                    <button
+                                       onclick="openEditLinkModal(${link.id})"
+                                       class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center"
+                                       title="Edit Link">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                        </svg>
+                                    </button>
+                                    <button
+                                       onclick="handleDeleteLink(${link.id})"
+                                       class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center"
+                                       title="Delete Link">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -893,6 +1002,271 @@
             return div.innerHTML;
         }
 
+        // Edit Link and deleting features
+        let editSelectedTags = [];
+
+        function openEditLinkModal(linkId) {
+            const link = allLinks.find(l => l.id === linkId);
+            if (!link) return;
+
+            document.getElementById('editLinkId').value = link.id;
+            document.getElementById('editLinkUrl').value = link.link;
+            document.getElementById('editLinkName').value = link.name;
+            document.getElementById('editLinkNotes').value = link.notes || '';
+            document.getElementById('editLinkTags').value = '';
+            
+            editSelectedTags = link.tags.map(tagName => {
+                const existing = availableTags.find(t => t.name === tagName);
+                return {
+                    id: existing ? existing.id : 0,
+                    name: tagName
+                };
+            });
+            updateEditSelectedTagsDisplay();
+
+            document.getElementById('editLinkModal').classList.remove('hidden');
+        }
+
+        function closeEditLinkModal() {
+            document.getElementById('editLinkModal').classList.add('hidden');
+        }
+
+        function addEditSelectedTag(tagName) {
+            if (editSelectedTags.some(tag => tag.name === tagName)) {
+                return;
+            }
+            const existingTag = availableTags.find(tag => tag.name === tagName);
+            const newTag = {
+                id: existingTag ? existingTag.id : 0,
+                name: tagName
+            };
+            editSelectedTags.push(newTag);
+            updateEditSelectedTagsDisplay();
+            document.getElementById('editLinkTags').value = '';
+            hideEditSuggestions();
+        }
+
+        function removeEditSelectedTag(tagName) {
+            editSelectedTags = editSelectedTags.filter(tag => tag.name !== tagName);
+            updateEditSelectedTagsDisplay();
+        }
+
+        function updateEditSelectedTagsDisplay() {
+            const container = document.getElementById('editSelectedTags');
+            container.innerHTML = editSelectedTags.map(tag => `
+                <span class="inline-flex items-center gap-1 bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ${escapeHtml(tag.name)}
+                    <button
+                        type="button"
+                        onclick="removeEditSelectedTag('${escapeHtml(tag.name)}')"
+                        class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                    >
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        function showEditSuggestions(input) {
+            const suggestions = document.getElementById('editTagSuggestions');
+            const inputValue = input.value.toLowerCase().trim();
+
+            if (!inputValue) {
+                hideEditSuggestions();
+                return;
+            }
+
+            const filteredTags = availableTags
+                .filter(tagObj =>
+                    tagObj.name.toLowerCase().includes(inputValue) &&
+                    !editSelectedTags.some(selected => selected.name === tagObj.name)
+                )
+                .slice(0, 5);
+
+            if (filteredTags.length === 0) {
+                suggestions.innerHTML = `
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addEditSelectedTag('${escapeHtml(inputValue)}')">
+                        <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                    </div>
+                `;
+            } else {
+                suggestions.innerHTML = filteredTags.map(tagObj => `
+                    <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addEditSelectedTag('${escapeHtml(tagObj.name)}')">
+                        <span>${escapeHtml(tagObj.name)}</span>
+                        <span class="text-xs text-gray-500">${tagObj.count} links</span>
+                    </div>
+                `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addEditSelectedTag('${escapeHtml(inputValue)}')">
+                        <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                    </div>
+                ` : '');
+            }
+
+            suggestions.classList.remove('hidden');
+        }
+
+        function hideEditSuggestions() {
+            document.getElementById('editTagSuggestions').classList.add('hidden');
+        }
+
+        async function saveEditLink(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('editLinkId').value;
+            const urlInput = document.getElementById('editLinkUrl');
+            const nameInput = document.getElementById('editLinkName');
+            const notesInput = document.getElementById('editLinkNotes');
+            const button = document.getElementById('saveEditBtn');
+
+            const originalText = button.textContent;
+            button.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+            `;
+            button.disabled = true;
+
+            try {
+                const response = await fetch(`/api/links/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        link: urlInput.value,
+                        name: nameInput.value,
+                        notes: notesInput.value,
+                        tags: editSelectedTags,
+                        profileId: selectedProfileId
+                    })
+                });
+
+                if (response.ok) {
+                    closeEditLinkModal();
+                    loadLinks();
+                    loadAvailableTags();
+                    showToast('Link updated successfully!', 'success');
+                } else {
+                    throw new Error('Failed to update link');
+                }
+            } catch (error) {
+                console.error('Error updating link:', error);
+                showToast('Failed to update link. Please try again.', 'error');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function handleDeleteLink(linkId) {
+            if (!confirm('Are you sure you want to delete this link?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/links/${linkId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadLinks();
+                    loadAvailableTags();
+                    showToast('Link deleted successfully!', 'success');
+                } else {
+                    throw new Error('Failed to delete link');
+                }
+            } catch (error) {
+                console.error('Error deleting link:', error);
+                showToast('Failed to delete link. Please try again.', 'error');
+            }
+        }
+
+        async function handleDeleteProfile() {
+            const profile = profiles.find(p => p.id === selectedProfileId);
+            if (!profile) return;
+
+            if (profiles.length <= 1) {
+                showToast('Cannot delete the last remaining profile.', 'error');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete the profile "${profile.name}" and all its links?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/profiles/${selectedProfileId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast(`Profile "${profile.name}" deleted successfully!`, 'success');
+                    await loadProfiles();
+                    if (profiles.length > 0) {
+                        selectedProfileId = profiles[0].id;
+                        populateProfileSelect();
+                        loadLinks();
+                    }
+                } else {
+                    throw new Error('Failed to delete profile');
+                }
+            } catch (error) {
+                console.error('Error deleting profile:', error);
+                showToast('Failed to delete profile. Please try again.', 'error');
+            }
+        }
+
+        async function handleDeleteTag() {
+            const tagName = document.getElementById('tagFilter').value;
+            if (!tagName) return;
+
+            const tagObj = availableTags.find(t => t.name === tagName);
+            if (!tagObj) return;
+
+            if (!confirm(`Are you sure you want to delete the tag "${tagName}"? This will remove the tag from all links.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tags/${tagObj.id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast(`Tag "${tagName}" deleted successfully!`, 'success');
+                    document.getElementById('tagFilter').value = '';
+                    updateTagFilterButtonVisibility();
+                    loadLinks();
+                    loadAvailableTags();
+                } else {
+                    throw new Error('Failed to delete tag');
+                }
+            } catch (error) {
+                console.error('Error deleting tag:', error);
+                showToast('Failed to delete tag. Please try again.', 'error');
+            }
+        }
+
+        function updateTagFilterButtonVisibility() {
+            const tagFilter = document.getElementById('tagFilter');
+            const deleteTagBtn = document.getElementById('deleteTagBtn');
+            if (tagFilter.value) {
+                deleteTagBtn.classList.remove('hidden');
+            } else {
+                deleteTagBtn.classList.add('hidden');
+            }
+        }
+
         // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Search input with debounce
@@ -907,13 +1281,22 @@
             document.getElementById('clearSearch').addEventListener('click', clearSearch);
 
             // Filter controls
-            document.getElementById('tagFilter').addEventListener('change', filterAndDisplayLinks);
+            document.getElementById('tagFilter').addEventListener('change', function() {
+                updateTagFilterButtonVisibility();
+                filterAndDisplayLinks();
+            });
             document.getElementById('sortBy').addEventListener('change', filterAndDisplayLinks);
             document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
-            document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+            document.getElementById('clearFilters').addEventListener('click', function() {
+                clearAllFilters();
+                updateTagFilterButtonVisibility();
+            });
 
             // Profile controls
-            document.getElementById('profileSelect').addEventListener('change', onProfileChange);
+            document.getElementById('profileSelect').addEventListener('change', function() {
+                onProfileChange();
+                updateTagFilterButtonVisibility();
+            });
             document.getElementById('addProfileBtn').addEventListener('click', openAddProfileModal);
             document.getElementById('addProfileForm').addEventListener('submit', createProfile);
 
@@ -941,8 +1324,33 @@
                 }
             });
 
-            // Form and refresh
+            // Edit Tag input functionality
+            const editTagInput = document.getElementById('editLinkTags');
+            const debouncedShowEditSuggestions = debounce((input) => showEditSuggestions(input), 200);
+
+            editTagInput.addEventListener('input', function() {
+                debouncedShowEditSuggestions(this);
+            });
+
+            editTagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    e.preventDefault();
+                    addEditSelectedTag(this.value.trim());
+                } else if (e.key === 'Escape') {
+                    hideEditSuggestions();
+                }
+            });
+
+            // Hide edit suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!editTagInput.contains(e.target) && !document.getElementById('editTagSuggestions').contains(e.target)) {
+                    hideEditSuggestions();
+                }
+            });
+
+            // Forms and refresh
             document.getElementById('addLinkForm').addEventListener('submit', addLink);
+            document.getElementById('editLinkForm').addEventListener('submit', saveEditLink);
             document.getElementById('refreshBtn').addEventListener('click', loadLinks);
 
             // Initialize
@@ -951,6 +1359,7 @@
                 loadLinks();
             });
             loadAvailableTags();
+            updateTagFilterButtonVisibility();
         });
     </script>
 </body>

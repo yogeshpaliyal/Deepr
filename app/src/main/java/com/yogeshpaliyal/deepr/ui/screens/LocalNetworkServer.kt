@@ -334,9 +334,29 @@ fun LocalNetworkServerScreen(
                             stringResource(R.string.api_add_link),
                         )
                         ApiEndpointItem(
+                            "PUT",
+                            "/api/links/{id}",
+                            stringResource(R.string.api_edit_link),
+                        )
+                        ApiEndpointItem(
+                            "DELETE",
+                            "/api/links/{id}",
+                            stringResource(R.string.api_delete_link),
+                        )
+                        ApiEndpointItem(
                             "GET",
                             "/api/tags",
                             stringResource(R.string.api_get_tags),
+                        )
+                        ApiEndpointItem(
+                            "DELETE",
+                            "/api/tags/{id}",
+                            stringResource(R.string.api_delete_tag),
+                        )
+                        ApiEndpointItem(
+                            "DELETE",
+                            "/api/profiles/{id}",
+                            stringResource(R.string.api_delete_profile),
                         )
                         ApiEndpointItem(
                             "GET",
