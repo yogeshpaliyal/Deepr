@@ -176,4 +176,7 @@
     <string name="web_msg_filtered">ٹیگ کے ذریعے فلٹر کیا گیا: </string>
     <string name="web_msg_filters_cleared">فلٹرز صاف کر دیے گئے</string>
     <string name="web_open_link">لنک کھولیں</string>
+
+    <string name="api_get_profiles">تمام دستیاب پروفائلز حاصل کریں</string>
+    <string name="api_add_profile">ایک نیا پروفائل شامل کریں (JSON: {\"name\": \"نام\"})</string>
 </resources>

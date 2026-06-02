@@ -143,4 +143,7 @@
     <string name="web_msg_filtered">タグでフィルタリングしました: </string>
     <string name="web_msg_filters_cleared">フィルターをクリアしました</string>
     <string name="web_open_link">リンクを開く</string>
+
+    <string name="api_get_profiles">利用可能なすべてのプロファイルを取得する</string>
+    <string name="api_add_profile">新しいプロファイルを追加する (JSON: {\"name\": \"名前\"})</string>
 </resources>

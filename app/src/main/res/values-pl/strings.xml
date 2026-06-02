@@ -112,4 +112,7 @@
     <string name="web_msg_filtered">Przefiltrowano według tagu: </string>
     <string name="web_msg_filters_cleared">Filtry wyczyszczone</string>
     <string name="web_open_link">Otwórz link</string>
+
+    <string name="api_get_profiles">Pobierz wszystkie dostępne profile</string>
+    <string name="api_add_profile">Dodaj nowy profil (JSON: {\"name\": \"nazwa\"})</string>
 </resources>

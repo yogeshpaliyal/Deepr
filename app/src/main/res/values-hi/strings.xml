@@ -296,4 +296,7 @@
     <string name="web_msg_filtered">टैग द्वारा फ़िल्टर किया गया: </string>
     <string name="web_msg_filters_cleared">फ़िल्टर साफ़ किए गए</string>
     <string name="web_open_link">लिंक खोलें</string>
+
+    <string name="api_get_profiles">सभी उपलब्ध प्रोफ़ाइल प्राप्त करें</string>
+    <string name="api_add_profile">एक नई प्रोफ़ाइल जोड़ें (JSON: {\"name\": \"नाम\"})</string>
 </resources>

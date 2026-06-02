@@ -258,4 +258,7 @@
     <string name="web_msg_filtered">Отфильтровано по тегу: </string>
     <string name="web_msg_filters_cleared">Фильтры очищены</string>
     <string name="web_open_link">Открыть ссылку</string>
+
+    <string name="api_get_profiles">Получить все доступные профили</string>
+    <string name="api_add_profile">Добавить новый профиль (JSON: {\"name\": \"имя\"})</string>
 </resources>

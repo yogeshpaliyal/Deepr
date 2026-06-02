@@ -149,4 +149,7 @@
     <string name="manage_profiles">Profile verwalten</string>
     <string name="no_profiles_yet">Noch keine Profile</string>
     <string name="create_first_profile">Erstellen Sie Ihr erstes Profil, um Ihre Links zu organisieren</string>
+
+    <string name="api_get_profiles">Rufen Sie alle verfügbaren Profile ab</string>
+    <string name="api_add_profile">Fügen Sie ein neues Profil hinzu (JSON: {\"name\": \"name\"})</string>
 </resources>

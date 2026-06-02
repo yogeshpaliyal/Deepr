@@ -162,4 +162,7 @@
     <string name="manage_profiles">Gestionar perfiles</string>
     <string name="no_profiles_yet">Aún no hay perfiles</string>
     <string name="create_first_profile">Crea tu primer perfil para organizar tus enlaces</string>
+
+    <string name="api_get_profiles">Obtener todos los perfiles disponibles</string>
+    <string name="api_add_profile">Agregar un nuevo perfil (JSON: {\"name\": \"nombre\"})</string>
 </resources>
