@@ -238,7 +238,11 @@
     <string name="api_endpoints_description">Available REST API endpoints for programmatic access</string>
     <string name="api_get_links">Get all saved links</string>
     <string name="api_add_link">Add a new link (JSON: {"link": "url", "name": "name"})</string>
+    <string name="api_edit_link">Edit an existing link (JSON: {"link": "url", "name": "name"})</string>
+    <string name="api_delete_link">Delete a link by ID</string>
     <string name="api_get_tags">Get all available tags</string>
+    <string name="api_delete_tag">Delete a tag by ID</string>
+    <string name="api_delete_profile">Delete a profile by ID</string>
     <string name="api_get_link_info">Get metadata for a URL</string>
     <string name="api_get_server_info">Get server information and API documentation</string>
     <string name="local_server_notification_channel_name">Local Server</string>
