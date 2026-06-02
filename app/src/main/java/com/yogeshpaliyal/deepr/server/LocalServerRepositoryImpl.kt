@@ -284,18 +284,18 @@ open class LocalServerRepositoryImpl(
                                 val existingLink =
                                     deeprQueries
                                         .getLinksAndTags(
-                                            profileId = request.profileId,
-                                            searchQuery1 = "",
-                                            searchQuery2 = "",
-                                            searchQuery3 = "",
-                                            favouriteFilter1 = -1L,
-                                            favouriteFilter2 = -1L,
-                                            tagIdsString1 = "",
-                                            tagIdsString2 = "",
-                                            sortType1 = "DESC",
-                                            sortField1 = "createdAt",
-                                            sortType2 = "DESC",
-                                            sortField2 = "createdAt",
+                                            request.profileId,
+                                            "",
+                                            "",
+                                            "",
+                                            -1L,
+                                            -1L,
+                                            "",
+                                            "",
+                                            "DESC",
+                                            "createdAt",
+                                            "DESC",
+                                            "createdAt",
                                         ).executeAsList()
                                         .firstOrNull { it.id == id }
 
@@ -303,12 +303,12 @@ open class LocalServerRepositoryImpl(
 
                                 deeprQueries.transaction {
                                     deeprQueries.updateDeeplink(
-                                        link = request.link,
-                                        name = request.name,
-                                        notes = request.notes,
-                                        thumbnail = thumbnail,
-                                        profileId = request.profileId,
-                                        id = id,
+                                        request.link,
+                                        request.name,
+                                        request.notes,
+                                        thumbnail,
+                                        request.profileId,
+                                        id,
                                     )
                                     deeprQueries.deleteLinkRelations(id)
                                     request.tags.forEach { tagData ->
