@@ -380,6 +380,11 @@ fun LocalNetworkServerScreen(
                             stringResource(R.string.api_get_link_info),
                         )
                         ApiEndpointItem(
+                            "POST",
+                            "/api/links/toggle-favourite",
+                            stringResource(R.string.api_toggle_favourite),
+                        )
+                        ApiEndpointItem(
                             "GET",
                             "/api/server-info",
                             stringResource(R.string.api_get_server_info),

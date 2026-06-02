@@ -167,6 +167,22 @@
                         <div id="selectedTags" class="flex flex-wrap gap-2 mt-2"></div>
                     </div>
 
+                    <div class="flex-1">
+                        <label for="linkProfileName" class="block text-sm font-medium text-gray-700 mb-2">
+                            Custom Profile
+                        </label>
+                        <input
+                            type="text"
+                            id="linkProfileName"
+                            placeholder="Overrides profile select"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                        >
+                        <label class="flex items-center mt-3 cursor-pointer text-sm font-medium text-gray-700">
+                            <input type="checkbox" id="linkFavourite" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-2">
+                            Add as Favourite
+                        </label>
+                    </div>
+
                     <button
                         type="submit"
                         id="addBtn"
@@ -320,6 +336,19 @@
                         required
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                     >
+                </div>
+                <div class="mb-4">
+                    <label for="newProfilePriority" class="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Order / Priority (Optional)
+                    </label>
+                    <input
+                        type="number"
+                        id="newProfilePriority"
+                        placeholder="e.g. 5"
+                        min="1"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">If specified, the profile will be placed at this order, shifting subsequent profiles down by 1. Otherwise, it will be placed at the end.</p>
                 </div>
                 <div class="flex gap-3 justify-end">
                     <button
@@ -530,8 +559,10 @@
             event.preventDefault();
 
             const nameInput = document.getElementById('newProfileName');
+            const priorityInput = document.getElementById('newProfilePriority');
             const button = document.getElementById('createProfileBtn');
             const name = nameInput.value.trim();
+            const priority = priorityInput.value ? parseInt(priorityInput.value, 10) : null;
 
             if (!name) {
                 showToast('Please enter a profile name', 'error');
@@ -549,12 +580,17 @@
             button.disabled = true;
 
             try {
+                const payload = { name };
+                if (priority) {
+                    payload.priority = priority;
+                }
+
                 const response = await fetch('/api/profiles', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
@@ -736,6 +772,11 @@
                                     <h3 class="text-lg font-semibold text-gray-800 line-clamp-2 flex-1">
                                         ${escapeHtml(link.name)}
                                     </h3>
+                                    <button onclick="handleToggleFavourite(${link.id})" class="ml-2 focus:outline-none transition-transform hover:scale-110" title="Toggle Favourite">
+                                        <svg class="w-6 h-6 ${link.isFavourite ? 'text-yellow-400 fill-current' : 'text-gray-300 hover:text-yellow-300'}" viewBox="0 0 24 24" stroke="currentColor" fill="${link.isFavourite ? 'currentColor' : 'none'}">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                        </svg>
+                                    </button>
                                     <div class="ml-2 bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
                                         ${link.openedCount} {{WEB_OPENS}}
                                     </div>
@@ -821,6 +862,22 @@
                 loadLinks(); // Refresh count in UI
             } catch (error) {
                 console.error('{{WEB_STATUS_ERROR}} tracking link open:', error);
+            }
+        }
+
+        // Toggle favourite status
+        async function handleToggleFavourite(id) {
+            try {
+                await fetch(`/api/links/toggle-favourite?id=${id}`, { method: 'POST' });
+                // Update local state and UI
+                const linkIndex = allLinks.findIndex(l => l.id === id);
+                if (linkIndex !== -1) {
+                    allLinks[linkIndex].isFavourite = !allLinks[linkIndex].isFavourite;
+                    filterAndDisplayLinks();
+                }
+            } catch (error) {
+                console.error('Error toggling favourite:', error);
+                showToast('Failed to toggle favourite', 'error');
             }
         }
 
@@ -932,6 +989,8 @@
             const nameInput = document.getElementById('linkName');
             const notesInput = document.getElementById('linkNotes');
             const tagsInput = document.getElementById('linkTags');
+            const profileNameInput = document.getElementById('linkProfileName');
+            const isFavouriteInput = document.getElementById('linkFavourite');
             const button = document.getElementById('addBtn');
 
             const originalText = button.textContent;
@@ -945,18 +1004,24 @@
             button.disabled = true;
 
             try {
+                const payload = {
+                    link: urlInput.value,
+                    name: nameInput.value,
+                    notes: notesInput.value,
+                    tags: selectedTags,
+                    profileId: selectedProfileId,
+                    isFavourite: isFavouriteInput.checked
+                };
+                if (profileNameInput.value.trim()) {
+                    payload.profileName = profileNameInput.value.trim();
+                }
+
                 const response = await fetch('/api/links', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        link: urlInput.value,
-                        name: nameInput.value,
-                        notes: notesInput.value,
-                        tags: selectedTags, // Send tags in {id, name} format
-                        profileId: selectedProfileId
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
@@ -964,6 +1029,8 @@
                     nameInput.value = '';
                     notesInput.value = '';
                     tagsInput.value = '';
+                    profileNameInput.value = '';
+                    isFavouriteInput.checked = false;
                     selectedTags = [];
                     updateSelectedTagsDisplay();
                     loadLinks();

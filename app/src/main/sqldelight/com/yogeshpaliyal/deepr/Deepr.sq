@@ -47,7 +47,7 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 insertDeepr:
-INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, profileId) VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, profileId) VALUES (?, ?, ?, ?, ?, ?, ?);
 
 importDeepr:
 INSERT INTO Deepr (link, name, openedCount, notes, thumbnail, isFavourite, createdAt, profileId) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
@@ -195,7 +195,7 @@ resetOpenedCount:
 UPDATE Deepr SET openedCount = 0 WHERE id = ?;
 
 updateDeeplink:
-UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ?, profileId = ? WHERE id = ?;
+UPDATE Deepr SET link = ? , name = ?, notes = ?, thumbnail = ?, isFavourite = ?, profileId = ? WHERE id = ?;
 
 countDeepr:
 SELECT COUNT(*) FROM Deepr;
@@ -282,6 +282,9 @@ INSERT OR IGNORE INTO Profile (name, priority) VALUES (?, ?);
 insertProfileAutoPriority:
 INSERT OR IGNORE INTO Profile (name, priority)
 VALUES (?, (SELECT COALESCE(MAX(priority), 0) + 1 FROM Profile));
+
+shiftProfilePriorities:
+UPDATE Profile SET priority = priority + 1 WHERE priority >= ?;
 
 getAllProfiles:
 SELECT * FROM Profile ORDER BY priority ASC, createdAt ASC;

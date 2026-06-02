@@ -233,13 +233,14 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="scan_qr_code_description">Scan this QR code from another device to access the server</string>
     <string name="how_to_use">How to Use</string>
-    <string name="local_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Use the URL or scan the QR code from another device\n4. Access the web interface or use the API endpoints to manage your links</string>
+    <string name="local_server_instructions">1. Toggle the switch above to start the server\n2. Make sure both devices are on the same Wi-Fi network\n3. Use the URL or scan the QR code from another device\n4. Access the web interface or use the API endpoints to manage your links.\nNote: Creating a link with a new profile name automatically creates the profile. Profiles can be prioritized during creation.</string>
     <string name="api_endpoints">API Endpoints</string>
     <string name="api_endpoints_description">Available REST API endpoints for programmatic access</string>
     <string name="api_get_links">Get all saved links</string>
-    <string name="api_add_link">Add a new link (JSON: {"link": "url", "name": "name"})</string>
-    <string name="api_edit_link">Edit an existing link (JSON: {"link": "url", "name": "name"})</string>
+    <string name="api_add_link">Add a new link (JSON supports isFavourite and profileName auto-creation)</string>
+    <string name="api_edit_link">Edit an existing link (JSON supports isFavourite)</string>
     <string name="api_delete_link">Delete a link by ID</string>
+    <string name="api_toggle_favourite">Toggle favourite status for a link</string>
     <string name="api_get_tags">Get all available tags</string>
     <string name="api_delete_tag">Delete a tag by ID</string>
     <string name="api_delete_profile">Delete a profile by ID</string>
@@ -386,5 +387,5 @@
     <string name="clipboard_link_detection">Clipboard link detection</string>
     <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
     <string name="api_get_profiles">Get all available profiles</string>
-    <string name="api_add_profile">Add a new profile (JSON: {\"name\": \"name\"})</string>
+    <string name="api_add_profile">Add a new profile (JSON supports priority shifting)</string>
 </resources>

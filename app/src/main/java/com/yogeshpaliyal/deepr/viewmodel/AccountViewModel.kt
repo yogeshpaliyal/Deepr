@@ -451,11 +451,12 @@ class AccountViewModel(
         tagsList: List<Tags>,
         notes: String = "",
         thumbnail: String = "",
+        isFavourite: Boolean = false,
         profileId: Long? = null,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val targetProfileId = profileId ?: selectedProfileId.first()
-            linkRepository.insertDeepr(link = link, name, if (executed) 1 else 0, notes, thumbnail, targetProfileId)
+            linkRepository.insertDeepr(link, name, if (executed) 1L else 0L, notes, thumbnail, if (isFavourite) 1L else 0L, targetProfileId)
             linkRepository.lastInsertRowId()?.let {
                 modifyTagsForLink(it, tagsList)
                 analyticsManager.logEvent(
@@ -559,11 +560,12 @@ class AccountViewModel(
         tagsList: List<Tags>,
         notes: String = "",
         thumbnail: String = "",
+        isFavourite: Boolean = false,
         profileId: Long? = null,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val targetProfileId = profileId ?: selectedProfileId.first()
-            linkRepository.updateDeeplink(newLink, newName, notes, thumbnail, targetProfileId, id)
+            linkRepository.updateDeeplink(newLink, newName, notes, thumbnail, if (isFavourite) 1L else 0L, targetProfileId, id)
             modifyTagsForLink(id, tagsList)
             syncToMarkdown()
             analyticsManager.logEvent(

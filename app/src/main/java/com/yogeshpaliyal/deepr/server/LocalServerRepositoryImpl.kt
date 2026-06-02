@@ -281,7 +281,14 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                deeprQueries.insertProfile(request.name)
+                                deeprQueries.transaction {
+                                    if (request.priority != null) {
+                                        deeprQueries.shiftProfilePriorities(request.priority)
+                                        deeprQueries.insertProfileWithPriority(request.name, request.priority)
+                                    } else {
+                                        deeprQueries.insertProfileAutoPriority(request.name)
+                                    }
+                                }
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),
@@ -408,6 +415,7 @@ open class LocalServerRepositoryImpl(
                                     tagsList = mergedTags.map { it.toDbTag() },
                                     notes = request.notes,
                                     thumbnail = "",
+                                    isFavourite = request.isFavourite,
                                     profileId = finalProfileId,
                                 )
                                 call.respond(
@@ -452,13 +460,28 @@ open class LocalServerRepositoryImpl(
 
                                 val thumbnail = existingLink?.thumbnail ?: ""
 
+                                var finalProfileId = request.profileId
+                                if (!request.profileName.isNullOrBlank()) {
+                                    val dbProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
+                                    if (dbProfile != null) {
+                                        finalProfileId = dbProfile.id
+                                    } else {
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
+                                        if (newProfile != null) {
+                                            finalProfileId = newProfile.id
+                                        }
+                                    }
+                                }
+
                                 deeprQueries.transaction {
                                     deeprQueries.updateDeeplink(
                                         request.link,
                                         request.name,
                                         request.notes,
                                         thumbnail,
-                                        request.profileId,
+                                        if (request.isFavourite) 1L else 0L,
+                                        finalProfileId,
                                         id,
                                     )
                                     deeprQueries.deleteLinkRelations(id)
@@ -621,6 +644,24 @@ open class LocalServerRepositoryImpl(
                             }
                         }
 
+                        post("/api/links/toggle-favourite") {
+                            try {
+                                val id = call.request.queryParameters["id"]?.toLongOrNull()
+                                if (id != null) {
+                                    accountViewModel.toggleFavourite(id)
+                                    call.respond(HttpStatusCode.OK, SuccessResponse("Favourite toggled"))
+                                } else {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error toggling favourite", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error toggling favourite: ${e.message}"),
+                                )
+                            }
+                        }
+
                         get("/api/server-info") {
                             try {
                                 val response =
@@ -644,7 +685,9 @@ open class LocalServerRepositoryImpl(
                                                           "name": "Example Name",
                                                           "notes": "Optional notes",
                                                           "tags": [{"id": 0, "name": "tag"}],
-                                                          "profileId": 1
+                                                          "profileId": 1,
+                                                          "profileName": "Optional Profile (creates if missing)",
+                                                          "isFavourite": false
                                                         }
                                                         """.trimIndent(),
                                                 ),
@@ -659,7 +702,9 @@ open class LocalServerRepositoryImpl(
                                                           "name": "Updated Name",
                                                           "notes": "Updated notes",
                                                           "tags": [{"id": 1, "name": "tag"}],
-                                                          "profileId": 1
+                                                          "profileId": 1,
+                                                          "profileName": "Optional Profile (creates if missing)",
+                                                          "isFavourite": true
                                                         }
                                                         """.trimIndent(),
                                                 ),
@@ -680,7 +725,8 @@ open class LocalServerRepositoryImpl(
                                                     bodyFormat =
                                                         """
                                                         {
-                                                          "name": "New Profile Name"
+                                                          "name": "New Profile Name",
+                                                          "priority": 5
                                                         }
                                                         """.trimIndent(),
                                                 ),
@@ -708,6 +754,11 @@ open class LocalServerRepositoryImpl(
                                                     method = "POST",
                                                     path = "/api/links/increment-count",
                                                     description = "Increment opened count for a link. Required query param: id (Long).",
+                                                ),
+                                                EndpointInfo(
+                                                    method = "POST",
+                                                    path = "/api/links/toggle-favourite",
+                                                    description = "Toggle favourite status for a link. Required query param: id (Long).",
                                                 ),
                                                 EndpointInfo(
                                                     method = "GET",
@@ -945,6 +996,7 @@ data class AddLinkRequest(
     val tagNames: List<String>? = null,
     val profileId: Long = 1L,
     val profileName: String? = null,
+    val isFavourite: Boolean = false,
 )
 
 /**
@@ -963,6 +1015,7 @@ data class ProfileResponse(
 @Serializable
 data class AddProfileRequest(
     val name: String,
+    val priority: Long? = null,
 )
 
 /**

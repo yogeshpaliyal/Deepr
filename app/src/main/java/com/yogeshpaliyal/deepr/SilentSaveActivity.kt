@@ -113,6 +113,7 @@ class SilentSaveActivity : ComponentActivity() {
                     openedCount = 0,
                     notes = "",
                     thumbnail = finalThumbnail,
+                    isFavourite = 0L,
                     profileId = profileId,
                 )
 

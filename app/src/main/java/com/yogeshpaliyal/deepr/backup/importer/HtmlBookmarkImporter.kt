@@ -42,6 +42,7 @@ abstract class HtmlBookmarkImporter(
                                     name = bookmark.title,
                                     notes = bookmark.folder ?: "",
                                     thumbnail = "",
+                                    isFavourite = 0L,
                                     profileId = profileId,
                                 )
 

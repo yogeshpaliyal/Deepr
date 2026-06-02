@@ -220,10 +220,11 @@ class LinkRepositoryImpl(
         openedCount: Long,
         notes: String,
         thumbnail: String,
+        isFavourite: Long,
         profileId: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.insertDeepr(link, name, openedCount, notes, thumbnail, profileId)
+            deeprQueries.insertDeepr(link, name, openedCount, notes, thumbnail, isFavourite, profileId)
         }
         scheduleAutoBackup()
     }
@@ -238,11 +239,12 @@ class LinkRepositoryImpl(
         newName: String,
         notes: String,
         thumbnail: String,
+        isFavourite: Long,
         profileId: Long,
         id: Long,
     ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, profileId, id)
+            deeprQueries.updateDeeplink(newLink, newName, notes, thumbnail, isFavourite, profileId, id)
         }
         scheduleAutoBackup()
     }

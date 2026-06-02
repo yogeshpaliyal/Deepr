@@ -233,24 +233,24 @@ fun AddLinkScreen(
         if (deeprInfo.id == 0L) {
             // New Account
             viewModel.insertAccount(
-                normalizedLink,
-                deeprInfo.name,
-                executeAfterSave,
-                selectedTags,
-                deeprInfo.notes,
-                deeprInfo.thumbnail,
-                selectedProfileId,
+                link = normalizedLink,
+                name = deeprInfo.name,
+                executed = executeAfterSave,
+                tagsList = selectedTags,
+                notes = deeprInfo.notes,
+                thumbnail = deeprInfo.thumbnail,
+                profileId = selectedProfileId,
             )
         } else {
             // Edit
             viewModel.updateDeeplink(
-                deeprInfo.id,
-                normalizedLink,
-                deeprInfo.name,
-                selectedTags,
-                deeprInfo.notes,
-                deeprInfo.thumbnail,
-                selectedProfileId,
+                id = deeprInfo.id,
+                newLink = normalizedLink,
+                newName = deeprInfo.name,
+                tagsList = selectedTags,
+                notes = deeprInfo.notes,
+                thumbnail = deeprInfo.thumbnail,
+                profileId = selectedProfileId,
             )
         }
         if (executeAfterSave) {

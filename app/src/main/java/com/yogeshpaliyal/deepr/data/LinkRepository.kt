@@ -115,6 +115,7 @@ interface LinkRepository {
         openedCount: Long,
         notes: String,
         thumbnail: String,
+        isFavourite: Long,
         profileId: Long,
     )
 
@@ -125,6 +126,7 @@ interface LinkRepository {
         newName: String,
         notes: String,
         thumbnail: String,
+        isFavourite: Long,
         profileId: Long,
         id: Long,
     )
