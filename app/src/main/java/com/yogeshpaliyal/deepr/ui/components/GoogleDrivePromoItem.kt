@@ -38,7 +38,7 @@ fun GoogleDrivePromoItem(
         Icon(
             imageVector = TablerIcons.Cloud,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(24.dp),
         )
 
