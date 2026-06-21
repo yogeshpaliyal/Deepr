@@ -21,7 +21,7 @@
     <string name="create_tag">Agregar etiqueta</string>
     <string name="new_tag">Nueva etiqueta</string>
     <string name="no_links_saved_yet">Aún no hay enlaces guardados</string>
-    <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde.</string>
+    <string name="save_your_link_below">Guarda tu enlace abajo para acceder rápidamente más tarde</string>
     <!-- Menu and Dialog Items -->
     <string name="more_options">Más opciones</string>
     <string name="copy_link">Copiar enlace</string>
@@ -82,7 +82,7 @@
     <!-- About Us Screen -->
     <string name="app_logo">Logo de la aplicación</string>
     <string name="version_format">Versión %s</string>
-    <string name="app_description">Una aplicación simple para guardar, organizar y lanzar enlaces profundos.</string>
+    <string name="app_description">Una aplicación simple para guardar, organizar y lanzar enlaces profundos</string>
     <string name="author">Autor</string>
     <string name="author_name">Yogesh Choudhary</string>
     <string name="twitter">Twitter</string>
@@ -93,17 +93,17 @@
     <string name="save_deeplink">Guardar enlace profundo</string>
     <string name="save_deeplink_message">¿Guardar el enlace profundo: %s?</string>
     <string name="enter_link_name">Por favor, ingresa el nombre del enlace</string>
-    <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace.</string>
+    <string name="enter_link_name_error">Por favor, ingresa el nombre del enlace</string>
     <string name="save_and_execute">Guardar y ejecutar</string>
     <!-- Home Screen -->
     <string name="enter_deeplink_command">Introducir enlace</string>
-    <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío.</string>
+    <string name="invalid_empty_deeplink">Enlace profundo inválido o vacío</string>
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">Enlace profundo inválido: %s</string>
-    <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar.</string>
-    <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo.</string>
+    <string name="no_data_to_export">No se encontraron datos en la base de datos para exportar</string>
+    <string name="no_data_available_export">No hay datos disponibles para exportar después del mapeo</string>
     <string name="export_success">Exportado exitosamente a %s</string>
-    <string name="export_failed">Error al crear archivo CSV.</string>
+    <string name="export_failed">Error al crear archivo CSV</string>
     <!-- Sync Settings -->
     <string name="select_sync_file">Seleccionar archivo de sincronización</string>
     <string name="sync_now">Sincronizar ahora</string>
@@ -135,11 +135,11 @@
     <string name="clipboard_link_detected">Enlace detectado en el portapapeles</string>
     <string name="add_tag">Añadir etiqueta</string>
     <string name="no_favourites_found">Sin favoritos todavía</string>
-    <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí.</string>
+    <string name="no_favourites_description">Marca enlaces como favoritos para verlos aquí</string>
     <string name="no_search_results">Sin resutados</string>
-    <string name="no_search_results_description">Pruebe a buscar diferentes palabras clave.</string>
+    <string name="no_search_results_description">Pruebe a buscar diferentes palabras clave</string>
     <string name="no_links_with_tags">No hay enlaces con las etiquetas seleccionadas</string>
-    <string name="no_links_with_tags_description">Prueba a seleccionar diferentes etiquetas o reestablecer los filtros.</string>
+    <string name="no_links_with_tags_description">Prueba a seleccionar diferentes etiquetas o reestablecer los filtros</string>
     <string name="no_favourites_with_tags">Sin favoritos en las etiquetas seleccionadas</string>
-    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos o pruebe diferentes etiquetas.</string>
+    <string name="no_favourites_with_tags_description">Marca enlaces con estas etiquetas como favoritos o pruebe diferentes etiquetas</string>
 </resources>
