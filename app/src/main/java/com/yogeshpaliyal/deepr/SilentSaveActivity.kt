@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
@@ -24,6 +25,7 @@ import org.koin.android.ext.android.inject
  */
 class SilentSaveActivity : ComponentActivity() {
     private val linkRepository: LinkRepository by inject()
+    private val networkRepository: NetworkRepository by inject()
     private val preferenceDataStore: AppPreferenceDataStore by inject()
     private val deeprQueries: DeeprQueries by inject()
 
@@ -43,6 +45,9 @@ class SilentSaveActivity : ComponentActivity() {
         handleSharedLink(intent, appContext)
     }
 
+    /**
+     * Processes the incoming share intent.
+     */
     private fun handleSharedLink(
         intent: Intent,
         appContext: Context,
@@ -64,6 +69,9 @@ class SilentSaveActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Saves the link to the database, fetching metadata if title or thumbnail is missing.
+     */
     private fun saveLinkSilently(
         link: String,
         title: String,
@@ -84,12 +92,27 @@ class SilentSaveActivity : ComponentActivity() {
                     return@launch
                 }
 
+                var finalTitle = title
+                var finalThumbnail = ""
+
+                // If title or thumbnail is blank, try to fetch it
+                if (finalTitle.isBlank() || finalThumbnail.isBlank()) {
+                    networkRepository.getLinkInfo(link).onSuccess { linkInfo ->
+                        if (finalTitle.isBlank()) {
+                            finalTitle = linkInfo.title ?: ""
+                        }
+                        if (finalThumbnail.isBlank()) {
+                            finalThumbnail = linkInfo.image ?: ""
+                        }
+                    }
+                }
+
                 linkRepository.insertDeepr(
                     link = link,
-                    name = title,
+                    name = finalTitle,
                     openedCount = 0,
                     notes = "",
-                    thumbnail = "",
+                    thumbnail = finalThumbnail,
                     profileId = profileId,
                 )
 
@@ -101,6 +124,9 @@ class SilentSaveActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Helper to show toast messages and finish the activity.
+     */
     private fun showToast(
         context: Context,
         message: String,

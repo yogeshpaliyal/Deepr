@@ -3,7 +3,6 @@ package com.yogeshpaliyal.deepr.data
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.UserAgent
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
@@ -46,7 +45,7 @@ class NetworkRepositoryTest {
 
             val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             // Test with URL without https://
             val result = repository.getLinkInfo("example.com")
@@ -72,7 +71,7 @@ class NetworkRepositoryTest {
 
             val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             // Test with URL that already has https://
             val result = repository.getLinkInfo("https://example.com")
@@ -98,7 +97,7 @@ class NetworkRepositoryTest {
 
             val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             // Test with URL without https:// but with path
             val result = repository.getLinkInfo("example.com/path")
@@ -122,7 +121,7 @@ class NetworkRepositoryTest {
 
             val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             val result = repository.getLinkInfo("example.com")
 
@@ -144,7 +143,7 @@ class NetworkRepositoryTest {
 
             val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             val result = repository.getLinkInfo("example.com")
 
@@ -169,22 +168,16 @@ class NetworkRepositoryTest {
                     )
                 }
 
-            val httpClient =
-                HttpClient(mockEngine) {
-                    install(UserAgent) {
-                        agent =
-                            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-                    }
-                }
+            val httpClient = HttpClient(mockEngine)
             val htmlParser = HtmlParser()
-            val repository = NetworkRepository(httpClient, htmlParser)
+            val repository = NetworkRepository(htmlParser, httpClient)
 
             val result = repository.getLinkInfo("example.com")
 
             // Verify the User-Agent header was sent
             assertTrue(result.isSuccess)
             assertEquals(
-                "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "facebookexternalhit/1.1",
                 receivedUserAgent,
             )
         }
