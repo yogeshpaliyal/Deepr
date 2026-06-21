@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -228,13 +229,18 @@ fun LocalNetworkServerScreen(
                                 modifier =
                                     Modifier
                                         .background(
-                                            MaterialTheme.colorScheme.surface,
+                                            Color.White,
                                             RoundedCornerShape(12.dp),
                                         ).padding(16.dp),
                             ) {
                                 QrCodeView(
                                     data = serverUrl ?: "",
                                     modifier = Modifier.size(180.dp),
+                                    colors =
+                                        com.lightspark.composeqr.QrCodeColors(
+                                            background = Color.White,
+                                            foreground = Color.Black,
+                                        ),
                                 )
                             }
                         }
