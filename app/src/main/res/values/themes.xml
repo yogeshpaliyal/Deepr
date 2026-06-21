@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Deepr" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Deepr.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_light</item>
+        <item name="postSplashScreenTheme">@style/Theme.Deepr</item>
+    </style>
 </resources>

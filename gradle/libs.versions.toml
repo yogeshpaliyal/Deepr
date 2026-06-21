@@ -33,6 +33,7 @@ googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 playCore = "2.0.2"
 orchestrator = "1.4.2"
+splashscreen = "1.0.1"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
@@ -87,6 +88,7 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 play-review = { module = "com.google.android.play:review", version.ref = "playCore" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 orchestrator = { group = "androidx.test", name = "orchestrator", version.ref = "orchestrator" }

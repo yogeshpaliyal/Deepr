@@ -32,11 +32,11 @@
 
 ### Build Variant specific features
 
-| Feature                           | GitHub Release | F-droid | Play Store | Pro Version on Play Store |
+| Feature                           | GitHub Release | F-Droid | Play Store | Pro Version on Play Store |
 |-----------------------------------|----------------|---------|------------|-----------|
 | Firebase Analytics                | ❌              | ❌       | ✅          | ✅  |
 | Google Drive Backup | ❌              | ❌       | ❌         | ✅  |
-| Profile specific themes | ❌              | ❌       | ❌          | ✅  |
+| Profile-specific themes | ❌              | ❌       | ❌          | ✅  |
 
 
 
@@ -55,7 +55,7 @@ The application is built using modern Android development practices and librarie
 ## 📲 Download
 
 You can download from any of the sources mentioned below.  
-All these sources supports cross platform app updates. for eg: if you've installed app from F-Droid
+All these sources support cross platform app updates. for eg: if you've installed app from F-Droid
 then you can update the app from any of the sources.
 
 - GitHub Release : [Download](https://github.com/yogeshpaliyal/Deepr/releases/latest)
