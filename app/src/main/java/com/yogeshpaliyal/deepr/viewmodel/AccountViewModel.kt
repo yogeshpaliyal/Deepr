@@ -79,6 +79,11 @@ class AccountViewModel(
     private val analyticsManager: AnalyticsManager,
 ) : ViewModel(),
     KoinComponent {
+    
+    companion object {
+        private val SEARCH_TERMS_REGEX = "\\s+".toRegex()
+    }
+    
     private val preferenceDataStore: AppPreferenceDataStore = get()
     private val reviewManager: com.yogeshpaliyal.deepr.review.ReviewManager = get()
     private val searchQuery = MutableStateFlow("")
@@ -366,12 +371,19 @@ class AccountViewModel(
                 if (tags.isEmpty()) "" else tags.joinToString(",") { it.id.toString() }
             val tagCount = tags.size.toLong()
 
+            // Split search query by spaces to support AND logic
+            val searchTerms = query.trim().split(SEARCH_TERMS_REGEX).filter { it.isNotEmpty() }
+            
+            // Use the first term for SQL filtering (to reduce initial result set)
+            // or empty string if no search terms
+            val sqlSearchQuery = searchTerms.firstOrNull() ?: ""
+
             linkRepository
                 .getLinksAndTags(
                     profileId,
-                    query,
-                    query,
-                    query,
+                    sqlSearchQuery,
+                    sqlSearchQuery,
+                    sqlSearchQuery,
                     favourite.toLong(),
                     favourite.toLong(),
                     tagIdsString,
@@ -382,6 +394,25 @@ class AccountViewModel(
                     sortField,
                 ).asFlow()
                 .mapToList(viewModelScope.coroutineContext)
+                .map { results ->
+                    // Apply AND logic for multiple search terms
+                    if (searchTerms.size <= 1) {
+                        // If 0 or 1 search term, SQL already filtered correctly
+                        results
+                    } else {
+                        // Convert search terms to lowercase once for performance
+                        val lowerSearchTerms = searchTerms.map { it.lowercase() }
+                        
+                        // Filter results to match ALL search terms (AND logic)
+                        results.filter { link ->
+                            lowerSearchTerms.all { lowerTerm ->
+                                (link.link?.lowercase()?.contains(lowerTerm) == true) ||
+                                (link.name?.lowercase()?.contains(lowerTerm) == true) ||
+                                (link.notes?.lowercase()?.contains(lowerTerm) == true)
+                            }
+                        }
+                    }
+                }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun search(query: String) {
