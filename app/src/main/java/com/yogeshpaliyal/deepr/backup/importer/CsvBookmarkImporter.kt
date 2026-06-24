@@ -24,6 +24,7 @@ class CsvBookmarkImporter(
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
         var updatedCount = 0
         var skippedCount = 0
+        val settingsMap = mutableMapOf<String, String>()
 
         try {
             val defaultProfileId = appPreferenceDataStore.getSelectedProfileId.first()
@@ -50,6 +51,19 @@ class CsvBookmarkImporter(
                     }
 
                     csvReader.forEach { row ->
+                        // Detect settings rows: blank link column with marker
+                        if (row.size >= 4 &&
+                            row[0].isBlank() &&
+                            row[1] == Constants.Settings.MARKER
+                        ) {
+                            val key = row[2]
+                            val value = row[3]
+                            if (key.isNotBlank()) {
+                                settingsMap[key] = value
+                            }
+                            return@forEach
+                        }
+
                         if (row.size >= 3) {
                             val link = row[0]
                             val createdAt = row[1]
@@ -117,6 +131,9 @@ class CsvBookmarkImporter(
                 }
             }
 
+            // Apply imported settings
+            applySettings(settingsMap)
+
             return RequestResult.Success(ImportResult(updatedCount, skippedCount))
         } catch (e: IOException) {
             return RequestResult.Error("Error reading file: ${e.message}")
@@ -124,6 +141,33 @@ class CsvBookmarkImporter(
             return RequestResult.Error("Error parsing CSV file: ${e.message}")
         } catch (e: Exception) {
             return RequestResult.Error("An unexpected error occurred: ${e.message}")
+        }
+    }
+
+    private suspend fun applySettings(settings: Map<String, String>) {
+        settings[Constants.Settings.SORTING_ORDER]?.let {
+            appPreferenceDataStore.setSortingOrder(it)
+        }
+        settings[Constants.Settings.VIEW_TYPE]?.toIntOrNull()?.let {
+            appPreferenceDataStore.setViewType(it)
+        }
+        settings[Constants.Settings.USE_LINK_BASED_ICONS]?.toBooleanStrictOrNull()?.let {
+            appPreferenceDataStore.setUseLinkBasedIcons(it)
+        }
+        settings[Constants.Settings.DEFAULT_PAGE_FAVOURITES]?.toBooleanStrictOrNull()?.let {
+            appPreferenceDataStore.setDefaultPageFavourites(it)
+        }
+        settings[Constants.Settings.IS_THUMBNAIL_ENABLE]?.toBooleanStrictOrNull()?.let {
+            appPreferenceDataStore.setThumbnailEnable(it)
+        }
+        settings[Constants.Settings.THEME_MODE]?.let {
+            appPreferenceDataStore.setThemeMode(it)
+        }
+        settings[Constants.Settings.SHOW_OPEN_COUNTER]?.toBooleanStrictOrNull()?.let {
+            appPreferenceDataStore.setShowOpenCounter(it)
+        }
+        settings[Constants.Settings.CLIPBOARD_LINK_DETECTION_ENABLED]?.toBooleanStrictOrNull()?.let {
+            appPreferenceDataStore.setClipboardLinkDetectionEnabled(it)
         }
     }
 

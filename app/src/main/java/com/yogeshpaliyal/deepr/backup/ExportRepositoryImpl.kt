@@ -8,6 +8,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,6 +21,7 @@ import java.util.Locale
 class ExportRepositoryImpl(
     private val context: Context,
     private val deeprQueries: DeeprQueries,
+    private val preferenceDataStore: AppPreferenceDataStore,
 ) : ExportRepository {
     private val csvWriter by lazy {
         CsvWriter()
@@ -37,13 +39,14 @@ class ExportRepositoryImpl(
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val fileName = "deepr_export_$timeStamp.csv"
+        val settings = preferenceDataStore.collectExportableSettings()
 
         return withContext(Dispatchers.IO) {
             // If URI is provided, export to that location
             if (uri != null) {
                 return@withContext try {
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -74,7 +77,7 @@ class ExportRepositoryImpl(
 
                 if (defaultUri != null) {
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -96,7 +99,7 @@ class ExportRepositoryImpl(
                 val file = File(downloadsDir, fileName)
 
                 FileOutputStream(file).use { outputStream ->
-                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat, settings)
                 }
                 RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
             }
