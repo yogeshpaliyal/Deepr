@@ -77,6 +77,16 @@ fun BackupScreenContent(
             }
         }
 
+    // Launcher for picking HTML export location
+    val htmlExportLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("text/html"),
+        ) { uri ->
+            uri?.let {
+                viewModel.exportHtmlData(it)
+            }
+        }
+
     // Collect sync preference states
     val syncEnabled by viewModel.syncEnabled.collectAsStateWithLifecycle()
     val syncFilePath by viewModel.syncFilePath.collectAsStateWithLifecycle()
@@ -190,6 +200,20 @@ fun BackupScreenContent(
                                 Locale.US,
                             ).format(Date())
                         csvExportLauncher.launch("deepr_export_$timeStamp.csv")
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Upload,
+                    title = stringResource(R.string.export_to_html),
+                    description = stringResource(R.string.export_to_html_description),
+                    onClick = {
+                        val timeStamp =
+                            SimpleDateFormat(
+                                "yyyyMMdd_HHmmss",
+                                Locale.US,
+                            ).format(Date())
+                        htmlExportLauncher.launch("deepr_export_$timeStamp.html")
                     },
                 )
             }
