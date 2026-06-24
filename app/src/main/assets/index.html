@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepr - Link Manager</title>
+    <title>{{WEB_TITLE}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -68,11 +68,11 @@
                 <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
                     Deepr
                 </h1>
-                <p class="text-gray-600 text-lg mb-4">Your Personal Link Manager</p>
+                <p class="text-gray-600 text-lg mb-4">{{WEB_SUBTITLE}}</p>
 
                 <!-- Profile Selector -->
                 <div class="flex items-center justify-center gap-3">
-                    <label for="profileSelect" class="text-sm font-medium text-gray-700">Profile:</label>
+                    <label for="profileSelect" class="text-sm font-medium text-gray-700">{{WEB_PROFILE_LABEL}}</label>
                     <select
                         id="profileSelect"
                         class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
@@ -82,12 +82,12 @@
                     <button
                         id="addProfileBtn"
                         class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1"
-                        title="Add New Profile"
+                        title="Add {{WEB_NEW_PROFILE}}"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        New Profile
+                        {{WEB_NEW_PROFILE}}
                     </button>
                 </div>
             </div>
@@ -100,18 +100,17 @@
                     <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    Add New Link
-                </h2>
+                    {{WEB_ADD_NEW_LINK}}</h2>
 
                 <form id="addLinkForm" class="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:items-end">
                     <div class="flex-1">
                         <label for="linkUrl" class="block text-sm font-medium text-gray-700 mb-2">
-                            Link URL
+                            {{WEB_LINK_URL}}
                         </label>
                         <input
                             type="url"
                             id="linkUrl"
-                            placeholder="https://example.com"
+                            placeholder="{{WEB_LINK_URL_PLACEHOLDER}}"
                             required
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
@@ -119,38 +118,38 @@
 
                     <div class="flex-1">
                         <label for="linkName" class="block text-sm font-medium text-gray-700 mb-2">
-                            Link Name (Optional)
+                            {{WEB_LINK_NAME}}
                         </label>
                         <input
                             type="text"
                             id="linkName"
-                            placeholder="My Awesome Link (Optional)"
-                            
+                            placeholder="{{WEB_LINK_NAME_PLACEHOLDER}}"
+                            required
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
                     </div>
 
                     <div class="flex-1">
                         <label for="linkNotes" class="block text-sm font-medium text-gray-700 mb-2">
-                            Notes (Optional)
+                            {{WEB_NOTES_OPTIONAL}}
                         </label>
                         <input
                             type="text"
                             id="linkNotes"
-                            placeholder="Add notes..."
+                            placeholder="{{WEB_NOTES_PLACEHOLDER}}"
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
                     </div>
 
                     <div class="flex-1">
                         <label for="linkTags" class="block text-sm font-medium text-gray-700 mb-2">
-                            Tags (Optional)
+                            {{WEB_TAGS_OPTIONAL}}
                         </label>
                         <div class="relative">
                             <input
                                 type="text"
                                 id="linkTags"
-                                placeholder="Type to add tags..."
+                                placeholder="{{WEB_TAGS_PLACEHOLDER}}"
                                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                             >
                             <div id="tagSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden max-h-40 overflow-y-auto"></div>
@@ -163,7 +162,7 @@
                         id="addBtn"
                         class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-300"
                     >
-                        Add Link
+                        {{WEB_ADD_LINK_BUTTON}}
                     </button>
                 </form>
             </div>
@@ -177,8 +176,7 @@
                         <svg class="w-6 h-6 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                         </svg>
-                        Your Links
-                        <span id="linkCount" class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm font-normal"></span>
+                        {{WEB_YOUR_LINKS}}<span id="linkCount" class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm font-normal"></span>
                     </h2>
 
                     <button
@@ -188,8 +186,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        Refresh
-                    </button>
+                        {{WEB_REFRESH}}</button>
                 </div>
 
                 <!-- Search and Filter Section -->
@@ -204,7 +201,7 @@
                         <input
                             type="text"
                             id="searchInput"
-                            placeholder="Search links by name or URL..."
+                            placeholder="{{WEB_SEARCH_PLACEHOLDER}}"
                             class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
                         <button
@@ -235,9 +232,9 @@
                                 id="sortBy"
                                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                             >
-                                <option value="createdAt">Date Added</option>
-                                <option value="name">Name</option>
-                                <option value="openedCount">Opens</option>
+                                <option value="createdAt">{{WEB_SORT_DATE}}</option>
+                                <option value="name">{{WEB_SORT_NAME}}</option>
+                                <option value="openedCount">{{WEB_SORT_OPENS}}</option>
                             </select>
                             <button
                                 id="sortOrder"
@@ -266,8 +263,8 @@
                 <div id="linksContainer">
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Loading links...</h3>
-                        <p class="text-gray-500">Please wait while we fetch your saved links.</p>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">{{WEB_LOADING_LINKS}}</h3>
+                        <p class="text-gray-500">{{WEB_LOADING_DESCRIPTION}}</p>
                     </div>
                 </div>
             </div>
@@ -290,16 +287,16 @@
     <div id="addProfileModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeAddProfileModal()"></div>
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Create New Profile</h3>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">{{WEB_CREATE_PROFILE_TITLE}}</h3>
             <form id="addProfileForm">
                 <div class="mb-4">
                     <label for="newProfileName" class="block text-sm font-medium text-gray-700 mb-2">
-                        Profile Name
+                        {{WEB_PROFILE_NAME_LABEL}}
                     </label>
                     <input
                         type="text"
                         id="newProfileName"
-                        placeholder="Enter profile name..."
+                        placeholder="{{WEB_PROFILE_PLACEHOLDER}}"
                         required
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                     >
@@ -310,14 +307,14 @@
                         onclick="closeAddProfileModal()"
                         class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
                     >
-                        Cancel
+                        {{WEB_CANCEL}}
                     </button>
                     <button
                         type="submit"
                         id="createProfileBtn"
                         class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
                     >
-                        Create Profile
+                        {{WEB_CREATE_PROFILE_BUTTON}}
                     </button>
                 </div>
             </form>
@@ -325,7 +322,7 @@
     </div>
 
     <script>
-        // Global variables to store all links and available tags
+        // Global variables to store all {{WEB_OPENS}} and available tags
         let allLinks = [];
         let availableTags = []; // Now contains {id, name, count} objects
         let selectedTags = []; // Now contains {id, name} objects
@@ -372,11 +369,14 @@
         // Load available tags from API
         async function loadAvailableTags() {
             try {
-                const response = await fetch('/api/tags');
+                const response = await fetch(`/api/tags?profileId=${selectedProfileId}`);
                 const tags = await response.json();
-                availableTags = tags; // tags now have {id, name, count} format
+                if (!response.ok) {
+                    throw new Error(tags.error || 'Failed to load tags');
+                }
+                availableTags = Array.isArray(tags) ? tags : [];
             } catch (error) {
-                console.error('Error loading tags:', error);
+                console.error(`{{WEB_STATUS_ERROR}} loading tags:`, error);
                 availableTags = [];
             }
         }
@@ -385,10 +385,14 @@
         async function loadProfiles() {
             try {
                 const response = await fetch('/api/profiles');
-                profiles = await response.json();
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load profiles');
+                }
+                profiles = data;
                 populateProfileSelect();
             } catch (error) {
-                console.error('Error loading profiles:', error);
+                console.error('{{WEB_STATUS_ERROR}} loading profiles:', error);
                 profiles = [];
             }
         }
@@ -396,6 +400,10 @@
         // Populate profile dropdown
         function populateProfileSelect() {
             const profileSelect = document.getElementById('profileSelect');
+            if (!Array.isArray(profiles) || profiles.length === 0) {
+                profileSelect.innerHTML = '<option value="1">Default</option>';
+                return;
+            }
             profileSelect.innerHTML = profiles.map(profile => `
                 <option value="${profile.id}" ${profile.id === selectedProfileId ? 'selected' : ''}>
                     ${escapeHtml(profile.name)}
@@ -408,7 +416,8 @@
             const profileSelect = document.getElementById('profileSelect');
             selectedProfileId = parseInt(profileSelect.value, 10);
             loadLinks();
-            showToast(`Switched to profile: ${profiles.find(p => p.id === selectedProfileId)?.name || 'Unknown'}`, 'info');
+            loadAvailableTags();
+            showToast(`{{WEB_MSG_SWITCHED}}${profiles.find(p => p.id === selectedProfileId)?.name || `{{WEB_UNKNOWN}}`}`, 'info');
         }
 
         // Open add profile modal
@@ -442,7 +451,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Creating...
+                {{WEB_STATUS_CREATING}}
             `;
             button.disabled = true;
 
@@ -470,7 +479,7 @@
                     throw new Error('Failed to create profile');
                 }
             } catch (error) {
-                console.error('Error creating profile:', error);
+                console.error('{{WEB_STATUS_ERROR}} creating profile:', error);
                 showToast('Failed to create profile. Please try again.', 'error');
             } finally {
                 button.textContent = originalText;
@@ -510,7 +519,7 @@
                     ${escapeHtml(tag.name)}
                     <button
                         type="button"
-                        onclick="removeSelectedTag('${escapeHtml(tag.name)}')"
+                        onclick="removeSelectedTag(decodeURIComponent('${encodeURIComponent(tag.name)}'))"
                         class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
                     >
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -541,7 +550,7 @@
             if (filteredTags.length === 0) {
                 // Show option to create new tag
                 suggestions.innerHTML = `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -552,10 +561,10 @@
                 suggestions.innerHTML = filteredTags.map(tagObj => `
                     <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addSelectedTag('${escapeHtml(tagObj.name)}')">
                         <span>${escapeHtml(tagObj.name)}</span>
-                        <span class="text-xs text-gray-500">${tagObj.count} links</span>
+                        <span class="text-xs text-gray-500">${tagObj.count} {{WEB_OPENS}}</span>
                     </div>
                 `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag(decodeURIComponent('${encodeURIComponent(inputValue)}'))">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -571,7 +580,7 @@
             document.getElementById('tagSuggestions').classList.add('hidden');
         }
 
-        // Filter and display links
+        // Filter and display {{WEB_OPENS}}
         function filterAndDisplayLinks() {
             const searchInput = document.getElementById('searchInput');
             const tagFilter = document.getElementById('tagFilter');
@@ -615,7 +624,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">
-                            ${isEmpty ? 'No links yet!' : 'No matching links found!'}
+                            ${isEmpty ? `No {{WEB_OPENS}} yet!` : `No matching {{WEB_OPENS}} found!`}
                         </h3>
                         <p class="text-gray-500 text-center">
                             ${isEmpty ? 'Add your first link using the form above to get started.' : 'Try adjusting your search terms or filters.'}
@@ -635,7 +644,7 @@
                                         ${escapeHtml(link.name)}
                                     </h3>
                                     <div class="ml-2 bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
-                                        ${link.openedCount} opens
+                                        ${link.openedCount} {{WEB_OPENS}}
                                     </div>
                                 </div>
 
@@ -677,14 +686,15 @@
                                 ` : ''}
 
                                 <div class="mt-4 pt-4 border-t border-gray-100">
-                                    <button
-                                       onclick="handleOpenLink(${link.id}, '${escapeHtml(link.link)}')"
+                                    <a href="${escapeHtml(link.link)}"
+                                       target="_blank"
+                                       onclick="handleOpenLink(${link.id})"
                                        class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                         </svg>
-                                        Open Link
-                                    </button>
+                                        {{WEB_OPEN_LINK}}
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -693,18 +703,17 @@
             `;
         }
 
-        // Handle opening a link and incrementing count
-        async function handleOpenLink(id, url) {
-            // Open link in new tab
-            window.open(url, '_blank');
-
-            // Increment count in background
+        // Update statistics when opening a link
+        async function handleOpenLink(linkId) {
             try {
-                await fetch(`/api/links/increment-count?id=${id}`, { method: 'POST' });
-                // Optional: refresh links to see updated count
-                setTimeout(loadLinks, 1000);
+                await fetch('/api/links/increment-count', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: linkId })
+                });
+                loadLinks(); // Refresh count in UI
             } catch (error) {
-                console.error('Error incrementing count:', error);
+                console.error('{{WEB_STATUS_ERROR}} tracking link open:', error);
             }
         }
 
@@ -714,7 +723,7 @@
             const allTags = [...new Set(allLinks.flatMap(link => link.tags))].sort();
 
             tagFilter.innerHTML = `
-                <option value="">All Tags (${allTags.length})</option>
+                <option value="">{{WEB_ALL_TAGS}} (${allTags.length})</option>
                 ${allTags.map(tag => {
                     const count = allLinks.filter(link => link.tags.includes(tag)).length;
                     return `<option value="${escapeHtml(tag)}">${escapeHtml(tag)} (${count})</option>`;
@@ -727,7 +736,7 @@
             const tagFilter = document.getElementById('tagFilter');
             tagFilter.value = tag;
             filterAndDisplayLinks();
-            showToast(`Filtered by tag: ${tag}`, 'info');
+            showToast(`{{WEB_MSG_FILTERED}}${tag}`, 'info');
         }
 
         // Clear all filters
@@ -739,7 +748,7 @@
             updateSortOrderIcon();
             updateClearSearchButton();
             filterAndDisplayLinks();
-            showToast('Filters cleared', 'info');
+            showToast(`{{WEB_MSG_FILTERS_CLEARED}}`, 'info');
         }
 
         // Toggle sort order
@@ -793,7 +802,7 @@
                 filterAndDisplayLinks();
 
             } catch (error) {
-                console.error('Error loading links:', error);
+                console.error('{{WEB_STATUS_ERROR}} loading links:', error);
                 document.getElementById('linksContainer').innerHTML = `
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -801,11 +810,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.635 0L4.179 16.5c-.77.833.192 2.5 1.731 2.5z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Error loading links</h3>
-                        <p class="text-gray-500 text-center">Please try refreshing the page.</p>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">{{WEB_ERROR_LOADING}}</h3>
+                        <p class="text-gray-500 text-center">{{WEB_ERROR_REFRESH}}</p>
                     </div>
                 `;
-                showToast('Failed to load links. Please try again.', 'error');
+                showToast(`{{WEB_ERROR_FETCH}}`, 'error');
             }
         }
 
@@ -824,7 +833,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Adding...
+                {{WEB_STATUS_CREATING}}
             `;
             button.disabled = true;
 
@@ -857,27 +866,27 @@
                         <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        Added!
+                        {{WEB_STATUS_ADDED}}
                     `;
 
-                    showToast('Link added successfully!', 'success');
+                    showToast(`{{WEB_SUCCESS_LINK_ADDED}}`, 'success');
 
                     setTimeout(() => {
                         button.textContent = originalText;
                     }, 2000);
                 } else {
-                    throw new Error('Failed to add link');
+                    throw new Error(`{{WEB_ERROR_ADD_LINK}}`);
                 }
             } catch (error) {
-                console.error('Error adding link:', error);
+                console.error(`{{WEB_STATUS_ERROR}} adding link:`, error);
                 button.innerHTML = `
                     <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                     </svg>
-                    Error
+                    {{WEB_STATUS_ERROR}}
                 `;
 
-                showToast('Failed to add link. Please try again.', 'error');
+                showToast(`{{WEB_ERROR_ADD_LINK}}. Please try again.`, 'error');
 
                 setTimeout(() => {
                     button.textContent = originalText;
