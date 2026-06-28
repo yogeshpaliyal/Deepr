@@ -92,6 +92,7 @@ import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -99,7 +100,7 @@ fun AddLinkScreen(
     selectedLink: GetLinksAndTags,
     modifier: Modifier = Modifier,
     deeprQueries: DeeprQueries = koinInject(),
-    viewModel: AccountViewModel = koinInject(),
+    viewModel: AccountViewModel = koinActivityViewModel(),
 ) {
     val context = LocalContext.current
     val navigator = LocalNavigator.current
