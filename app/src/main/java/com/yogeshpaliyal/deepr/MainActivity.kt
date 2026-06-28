@@ -272,7 +272,7 @@ fun Dashboard(
                                             backStack.addTopLevel(topLevelRoute)
                                         } else {
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                            if (!showProfilesGrid) {
+                                            if (!isPrivateMode && !showProfilesGrid) {
                                                 viewModel.setShowProfilesGrid(true)
                                             }
                                             backStack.addTopLevel(topLevelRoute)
@@ -288,7 +288,7 @@ fun Dashboard(
                                                 Modifier.combinedClickable(
                                                     onClick = {
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                                        if (!showProfilesGrid) {
+                                                        if (!isPrivateMode && !showProfilesGrid) {
                                                             viewModel.setShowProfilesGrid(true)
                                                         }
                                                         backStack.addTopLevel(topLevelRoute)

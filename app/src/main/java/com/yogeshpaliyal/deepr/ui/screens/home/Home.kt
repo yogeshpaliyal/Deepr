@@ -229,6 +229,7 @@ fun HomeScreen(
     val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     val showProfilesGrid by viewModel.showProfilesGrid.collectAsStateWithLifecycle()
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val isPrivateMode by viewModel.isPrivateMode.collectAsStateWithLifecycle()
 
     var selectedLink by remember { mutableStateOf<GetLinksAndTags?>(mSelectedLink) }
     val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
@@ -441,7 +442,7 @@ fun HomeScreen(
         contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            if (showProfilesGrid) {
+            if (showProfilesGrid && !isPrivateMode) {
                 TopAppBar(
                     title = {
                         Row(
@@ -561,7 +562,7 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            if (!showProfilesGrid) {
+            if (!showProfilesGrid || isPrivateMode) {
                 FloatingActionButton(
                     shape = RoundedCornerShape(16.dp),
                     onClick = {},
@@ -635,7 +636,7 @@ fun HomeScreen(
                     .fillMaxSize(),
         ) {
             val layoutDirection = LocalLayoutDirection.current
-            if (showProfilesGrid) {
+            if (showProfilesGrid && !isPrivateMode) {
                 ProfilesGrid(
                     profiles = allProfiles,
                     isReordering = isReordering,

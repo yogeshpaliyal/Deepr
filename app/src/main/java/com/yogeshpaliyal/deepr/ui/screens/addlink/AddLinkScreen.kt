@@ -525,14 +525,21 @@ fun AddLinkScreen(
                                     },
                                 )
                             }
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.create_profile), color = MaterialTheme.colorScheme.primary) },
-                                onClick = {
-                                    profileExpanded = false
-                                    showCreateProfileDialog = true
-                                },
-                            )
+                            if (!isPrivateMode) {
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(R.string.create_profile),
+                                            color = MaterialTheme.colorScheme.primary,
+                                        )
+                                    },
+                                    onClick = {
+                                        profileExpanded = false
+                                        showCreateProfileDialog = true
+                                    },
+                                )
+                            }
                         }
                     }
 

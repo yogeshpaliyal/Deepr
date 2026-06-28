@@ -100,6 +100,7 @@ class AccountViewModel(
 
     fun setPrivateMode(enabled: Boolean) {
         _isPrivateMode.value = enabled
+        _showProfilesGrid.value = !enabled
         viewModelScope.launch(Dispatchers.IO) {
             val profilesList = rawProfiles.value
             if (enabled) {
