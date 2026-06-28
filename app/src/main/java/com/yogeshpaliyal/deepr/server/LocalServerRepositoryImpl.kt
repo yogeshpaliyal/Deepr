@@ -284,9 +284,9 @@ open class LocalServerRepositoryImpl(
                                 deeprQueries.transaction {
                                     if (request.priority != null) {
                                         deeprQueries.shiftProfilePriorities(request.priority)
-                                        deeprQueries.insertProfileWithPriority(request.name, request.priority)
+                                        deeprQueries.insertProfileWithPriority(request.name, request.priority, 0L)
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.name)
+                                        deeprQueries.insertProfileAutoPriority(request.name, 0L)
                                     }
                                 }
                                 call.respond(
@@ -391,7 +391,7 @@ open class LocalServerRepositoryImpl(
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
                                         val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
@@ -466,7 +466,7 @@ open class LocalServerRepositoryImpl(
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
                                         val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
