@@ -278,44 +278,47 @@ fun Dashboard(
                                             backStack.addTopLevel(topLevelRoute)
                                         }
                                     },
-                                    modifier =
-                                        if (isProfilesTab) {
-                                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-                                            Modifier.combinedClickable(
-                                                onClick = {
-                                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                                    if (!showProfilesGrid) {
-                                                        viewModel.setShowProfilesGrid(true)
-                                                    }
-                                                    backStack.addTopLevel(topLevelRoute)
-                                                },
-                                                onLongClick = {
-                                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                    if (isPrivateMode) {
-                                                        viewModel.setPrivateMode(false)
-                                                    } else {
-                                                        val mainActivity = context as? MainActivity
-                                                        mainActivity?.showBiometricPrompt(
-                                                            title = mainActivity.getString(R.string.unlock_private_links),
-                                                            subtitle = mainActivity.getString(R.string.unlock_private_links_desc),
-                                                            onSuccess = {
-                                                                viewModel.setPrivateMode(true)
-                                                            },
-                                                        )
-                                                    }
-                                                },
-                                            )
-                                        } else {
-                                            Modifier
-                                        },
                                     label = {
                                         Text(stringResource(topLevelRoute.label))
                                     },
                                     icon = {
-                                        Icon(
-                                            imageVector = topLevelRoute.icon,
-                                            contentDescription = null,
-                                        )
+                                        val boxModifier =
+                                            if (isProfilesTab) {
+                                                @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+                                                Modifier.combinedClickable(
+                                                    onClick = {
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                                        if (!showProfilesGrid) {
+                                                            viewModel.setShowProfilesGrid(true)
+                                                        }
+                                                        backStack.addTopLevel(topLevelRoute)
+                                                    },
+                                                    onLongClick = {
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                        if (isPrivateMode) {
+                                                            viewModel.setPrivateMode(false)
+                                                        } else {
+                                                            val mainActivity = context as? MainActivity
+                                                            mainActivity?.showBiometricPrompt(
+                                                                title = mainActivity.getString(R.string.unlock_private_links),
+                                                                subtitle = mainActivity.getString(R.string.unlock_private_links_desc),
+                                                                onSuccess = {
+                                                                    viewModel.setPrivateMode(true)
+                                                                },
+                                                            )
+                                                        }
+                                                    },
+                                                )
+                                            } else {
+                                                Modifier
+                                            }
+
+                                        androidx.compose.foundation.layout.Box(modifier = boxModifier) {
+                                            Icon(
+                                                imageVector = topLevelRoute.icon,
+                                                contentDescription = null,
+                                            )
+                                        }
                                     },
                                 )
                             }
