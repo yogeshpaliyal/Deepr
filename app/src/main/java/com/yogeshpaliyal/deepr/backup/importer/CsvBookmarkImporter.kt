@@ -115,11 +115,11 @@ class CsvBookmarkImporter(
                                                         .filter { it.isNotEmpty() }
                                                 tagNames.forEach { tagName ->
                                                     // Insert tag if it doesn't exist
-                                                    deeprQueries.insertTag(tagName)
+                                                    deeprQueries.insertTag(tagName, 0L)
                                                     // Get tag ID and link it
                                                     val tag =
                                                         deeprQueries
-                                                            .getTagByName(tagName)
+                                                            .getTagByName(tagName, 0L)
                                                             .executeAsOneOrNull()
                                                     if (tag != null) {
                                                         deeprQueries.addTagToLink(linkId, tag.id)
@@ -182,8 +182,8 @@ class CsvBookmarkImporter(
                                                         .map { it.trim() }
                                                         .filter { it.isNotEmpty() }
                                                 tagNames.forEach { tagName ->
-                                                    deeprQueries.insertTag(tagName)
-                                                    val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                                    deeprQueries.insertTag(tagName, 0L)
+                                                    val tag = deeprQueries.getTagByName(tagName, 0L).executeAsOneOrNull()
                                                     if (tag != null) {
                                                         deeprQueries.addTagToLink(linkId, tag.id)
                                                     }

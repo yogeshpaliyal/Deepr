@@ -127,8 +127,8 @@ class DriveSyncManagerImpl(
                             val linkId = deeprQueries.lastInsertRowId().executeAsOne()
 
                             linkBackup.tags.forEach { tagName ->
-                                deeprQueries.insertTag(tagName)
-                                val tagId = deeprQueries.getTagByName(tagName).executeAsOneOrNull()?.id
+                                deeprQueries.insertTag(tagName, 0L)
+                                val tagId = deeprQueries.getTagByName(tagName, 0L).executeAsOneOrNull()?.id
                                 if (tagId != null) {
                                     deeprQueries.addTagToLink(linkId, tagId)
                                 }

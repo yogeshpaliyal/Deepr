@@ -486,8 +486,8 @@ open class LocalServerRepositoryImpl(
                                     )
                                     deeprQueries.deleteLinkRelations(id)
                                     request.tags.forEach { tagData ->
-                                        deeprQueries.insertTag(tagData.name)
-                                        val tag = deeprQueries.getTagByName(tagData.name).executeAsOne()
+                                        deeprQueries.insertTag(tagData.name, 0L)
+                                        val tag = deeprQueries.getTagByName(tagData.name, 0L).executeAsOne()
                                         deeprQueries.addTagToLink(linkId = id, tagId = tag.id)
                                     }
                                 }
@@ -877,8 +877,8 @@ open class LocalServerRepositoryImpl(
                     val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
 
                     deeplink.tags.forEach { tagName ->
-                        deeprQueries.insertTag(name = tagName)
-                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
+                        deeprQueries.insertTag(name = tagName, isPrivate = 0L)
+                        val tag = deeprQueries.getTagByName(tagName, 0L).executeAsOne()
                         deeprQueries.addTagToLink(
                             linkId = insertedId,
                             tagId = tag.id,

@@ -50,9 +50,9 @@ abstract class HtmlBookmarkImporter(
                                 if (!bookmark.tags.isNullOrEmpty()) {
                                     val linkId = deeprQueries.lastInsertRowId().executeAsOne()
                                     bookmark.tags.forEach { tagName ->
-                                        deeprQueries.insertTag(tagName)
+                                        deeprQueries.insertTag(tagName, 0L)
                                         val tag =
-                                            deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                            deeprQueries.getTagByName(tagName, 0L).executeAsOneOrNull()
                                         if (tag != null) {
                                             deeprQueries.addTagToLink(linkId, tag.id)
                                         }

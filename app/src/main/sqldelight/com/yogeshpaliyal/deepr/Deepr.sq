@@ -4,7 +4,8 @@ name TEXT NOT NULL UNIQUE,
 createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 themeMode TEXT NOT NULL DEFAULT 'system',
 colorTheme TEXT NOT NULL DEFAULT 'dynamic',
-priority INTEGER NOT NULL DEFAULT 0
+priority INTEGER NOT NULL DEFAULT 0,
+isPrivate INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS idx_profile_priority_createdAt
@@ -25,7 +26,9 @@ FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
 
 CREATE TABLE Tags (
 id INTEGER PRIMARY KEY NOT NULL,
-name TEXT NOT NULL UNIQUE
+name TEXT NOT NULL,
+isPrivate INTEGER NOT NULL DEFAULT 0,
+UNIQUE(name, isPrivate)
 );
 
 CREATE TABLE LinkTags (
@@ -117,7 +120,7 @@ ORDER BY
     END DESC;
 
 getProfilesForBackup:
-SELECT * FROM Profile ORDER BY priority ASC, createdAt ASC;
+SELECT * FROM Profile WHERE isPrivate = 0 ORDER BY priority ASC, createdAt ASC;
 
 getLinksForBackup:
 SELECT
@@ -147,6 +150,7 @@ LEFT JOIN (
     ) AS DOL_Max ON D.id = DOL_Max.deeplinkId
 LEFT JOIN LinkTags AS LT ON D.id = LT.linkId
 LEFT JOIN Tags AS T ON LT.tagId = T.id
+WHERE P.isPrivate = 0
 GROUP BY
   D.id;
 
@@ -168,6 +172,7 @@ SELECT
   GROUP_CONCAT(Tags.name, ', ') AS tagsNames
 FROM
   Deepr
+  JOIN Profile ON Deepr.profileId = Profile.id
   LEFT JOIN (
       -- Subquery to find the single latest log entry per deeplink
       SELECT
@@ -180,6 +185,7 @@ FROM
     ) AS DOL_Max ON Deepr.id = DOL_Max.deeplinkId
   LEFT JOIN LinkTags ON Deepr.id = LinkTags.linkId
   LEFT JOIN Tags ON LinkTags.tagId = Tags.id
+WHERE Profile.isPrivate = 0
 GROUP BY
   Deepr.id
 ORDER BY
@@ -206,13 +212,13 @@ SELECT * FROM Deepr WHERE link = ?;
 
 -- Tag operations
 insertTag:
-INSERT OR IGNORE INTO Tags (name) VALUES (?);
+INSERT OR IGNORE INTO Tags (name, isPrivate) VALUES (?, ?);
 
 getTagByName:
-SELECT * FROM Tags WHERE name = ?;
+SELECT * FROM Tags WHERE name = ? AND isPrivate = ?;
 
 getAllTags:
-SELECT * FROM Tags ORDER BY name;
+SELECT * FROM Tags WHERE isPrivate = ? ORDER BY name;
 
 getAllTagsWithCount:
 SELECT 
@@ -222,8 +228,8 @@ SELECT
 FROM Tags
 LEFT JOIN LinkTags ON Tags.id = LinkTags.tagId
 LEFT JOIN Deepr ON LinkTags.linkId = Deepr.id
+WHERE Tags.isPrivate = ?
 GROUP BY Tags.id, Tags.name
-
 ORDER BY linkCount DESC, Tags.name;
 
 countOfLinks:
@@ -274,14 +280,14 @@ UPDATE Deepr SET isFavourite = ? WHERE id = ?;
 
 -- Profile operations
 insertProfile:
-INSERT OR IGNORE INTO Profile (name) VALUES (?);
+INSERT OR IGNORE INTO Profile (name, isPrivate) VALUES (?, ?);
 
 insertProfileWithPriority:
-INSERT OR IGNORE INTO Profile (name, priority) VALUES (?, ?);
+INSERT OR IGNORE INTO Profile (name, priority, isPrivate) VALUES (?, ?, ?);
 
 insertProfileAutoPriority:
-INSERT OR IGNORE INTO Profile (name, priority)
-VALUES (?, (SELECT COALESCE(MAX(priority), 0) + 1 FROM Profile));
+INSERT OR IGNORE INTO Profile (name, priority, isPrivate)
+VALUES (?, (SELECT COALESCE(MAX(priority), 0) + 1 FROM Profile), ?);
 
 shiftProfilePriorities:
 UPDATE Profile SET priority = priority + 1 WHERE priority >= ?;
