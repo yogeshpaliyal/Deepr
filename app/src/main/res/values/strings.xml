@@ -388,4 +388,6 @@
     <string name="clipboard_link_detection_description">Automatically detect links in clipboard and show a banner to add them</string>
     <string name="api_get_profiles">Get all available profiles</string>
     <string name="api_add_profile">Add a new profile (JSON supports priority shifting)</string>
+    <string name="unlock_private_links">Unlock Private Links</string>
+    <string name="unlock_private_links_desc">Use biometrics to access your private profile and links</string>
 </resources>

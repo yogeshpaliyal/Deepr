@@ -26,12 +26,13 @@ class LinkRepositoryImpl(
     override suspend fun insertProfile(
         name: String,
         priority: Long?,
+        isPrivate: Long,
     ) {
         withContext(Dispatchers.IO) {
             if (priority != null) {
-                deeprQueries.insertProfileWithPriority(name, priority)
+                deeprQueries.insertProfileWithPriority(name, priority, isPrivate)
             } else {
-                deeprQueries.insertProfileAutoPriority(name)
+                deeprQueries.insertProfileAutoPriority(name, isPrivate)
             }
         }
         scheduleAutoBackup()
@@ -100,18 +101,27 @@ class LinkRepositoryImpl(
     override fun countProfiles(): Query<Long> = deeprQueries.countProfiles()
 
     // Tag operations
-    override fun getAllTags(): Query<Tags> = deeprQueries.getAllTags()
+    override fun getAllTags(isPrivate: Long): Query<Tags> = deeprQueries.getAllTags(isPrivate)
 
-    override fun getAllTagsWithCount(profileId: Long): Query<GetAllTagsWithCount> = deeprQueries.getAllTagsWithCount(profileId)
+    override fun getAllTagsWithCount(
+        profileId: Long,
+        isPrivate: Long,
+    ): Query<GetAllTagsWithCount> = deeprQueries.getAllTagsWithCount(profileId, isPrivate)
 
-    override suspend fun getTagByName(tagName: String): Tags? =
+    override suspend fun getTagByName(
+        tagName: String,
+        isPrivate: Long,
+    ): Tags? =
         withContext(Dispatchers.IO) {
-            deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+            deeprQueries.getTagByName(tagName, isPrivate).executeAsOneOrNull()
         }
 
-    override suspend fun insertTag(tagName: String) {
+    override suspend fun insertTag(
+        tagName: String,
+        isPrivate: Long,
+    ) {
         withContext(Dispatchers.IO) {
-            deeprQueries.insertTag(tagName)
+            deeprQueries.insertTag(tagName, isPrivate)
         }
         scheduleAutoBackup()
     }

@@ -58,7 +58,7 @@ class CsvBookmarkImporter(
 
                                         val existing = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
                                         if (existing == null) {
-                                            deeprQueries.insertProfileWithPriority(profileName, priority)
+                                            deeprQueries.insertProfileWithPriority(profileName, priority, 0L)
                                             val profileId = deeprQueries.lastInsertRowId().executeAsOne()
                                             deeprQueries.updateProfile(profileName, themeMode, colorTheme, profileId)
                                         } else {
@@ -88,7 +88,7 @@ class CsvBookmarkImporter(
                                                 profileName?.let {
                                                     val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                                     if (profile == null) {
-                                                        deeprQueries.insertProfileAutoPriority(it)
+                                                        deeprQueries.insertProfileAutoPriority(it, 0L)
                                                         deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                                     } else {
                                                         profile.id
@@ -115,11 +115,11 @@ class CsvBookmarkImporter(
                                                         .filter { it.isNotEmpty() }
                                                 tagNames.forEach { tagName ->
                                                     // Insert tag if it doesn't exist
-                                                    deeprQueries.insertTag(tagName)
+                                                    deeprQueries.insertTag(tagName, 0L)
                                                     // Get tag ID and link it
                                                     val tag =
                                                         deeprQueries
-                                                            .getTagByName(tagName)
+                                                            .getTagByName(tagName, 0L)
                                                             .executeAsOneOrNull()
                                                     if (tag != null) {
                                                         deeprQueries.addTagToLink(linkId, tag.id)
@@ -153,9 +153,9 @@ class CsvBookmarkImporter(
                                                     val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                                     if (profile == null) {
                                                         if (profilePriority != null) {
-                                                            deeprQueries.insertProfileWithPriority(it, profilePriority)
+                                                            deeprQueries.insertProfileWithPriority(it, profilePriority, 0L)
                                                         } else {
-                                                            deeprQueries.insertProfileAutoPriority(it)
+                                                            deeprQueries.insertProfileAutoPriority(it, 0L)
                                                         }
                                                         deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                                     } else {
@@ -182,8 +182,8 @@ class CsvBookmarkImporter(
                                                         .map { it.trim() }
                                                         .filter { it.isNotEmpty() }
                                                 tagNames.forEach { tagName ->
-                                                    deeprQueries.insertTag(tagName)
-                                                    val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                                    deeprQueries.insertTag(tagName, 0L)
+                                                    val tag = deeprQueries.getTagByName(tagName, 0L).executeAsOneOrNull()
                                                     if (tag != null) {
                                                         deeprQueries.addTagToLink(linkId, tag.id)
                                                     }

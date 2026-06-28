@@ -95,14 +95,57 @@ class AccountViewModel(
         _showProfilesGrid.value = show
     }
 
+    private val _isPrivateMode = MutableStateFlow(false)
+    val isPrivateMode: StateFlow<Boolean> = _isPrivateMode.asStateFlow()
+
+    fun setPrivateMode(enabled: Boolean) {
+        _isPrivateMode.value = enabled
+        _showProfilesGrid.value = !enabled
+        viewModelScope.launch(Dispatchers.IO) {
+            val profilesList = rawProfiles.value
+            if (enabled) {
+                // Entering private mode
+                val firstPrivateProfile = profilesList.firstOrNull { it.isPrivate == 1L }
+                if (firstPrivateProfile != null) {
+                    setSelectedProfile(firstPrivateProfile.id)
+                } else {
+                    // Create a default private profile
+                    linkRepository.insertProfile("Private", isPrivate = 1L)
+                    var newPrivateProfile = linkRepository.getProfileByName("Private")
+                    if (newPrivateProfile == null) {
+                        kotlinx.coroutines.delay(100)
+                        newPrivateProfile = linkRepository.getProfileByName("Private")
+                    }
+                    newPrivateProfile?.let {
+                        setSelectedProfile(it.id)
+                    }
+                }
+            } else {
+                // Exiting private mode
+                val firstPublicProfile = profilesList.firstOrNull { it.isPrivate == 0L }
+                if (firstPublicProfile != null) {
+                    setSelectedProfile(firstPublicProfile.id)
+                } else {
+                    setSelectedProfile(1L)
+                }
+            }
+        }
+    }
+
     // Profile state
-    val allProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
+    val rawProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
         linkRepository
             .getAllProfiles()
             .asFlow()
             .mapToList(
                 viewModelScope.coroutineContext,
             ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    val allProfiles: StateFlow<List<com.yogeshpaliyal.deepr.Profile>> =
+        combine(rawProfiles, isPrivateMode) { profiles, privateMode ->
+            val targetPrivateVal = if (privateMode) 1L else 0L
+            profiles.filter { it.isPrivate == targetPrivateVal }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     private val selectedProfileId: Flow<Long> = preferenceDataStore.getSelectedProfileId
     val currentProfile: StateFlow<com.yogeshpaliyal.deepr.Profile?> =
@@ -160,26 +203,24 @@ class AccountViewModel(
         }
     }
 
-    // State for tags - now scoped to current profile
+    // State for tags - now scoped to current profile and private mode
+    @OptIn(ExperimentalCoroutinesApi::class)
     val allTags: StateFlow<List<Tags>> =
-        linkRepository
-            .getAllTags()
-            .asFlow()
-            .mapToList(
-                viewModelScope.coroutineContext,
-            ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+        combine(selectedProfileId, isPrivateMode) { _, privateMode ->
+            val isPriv = if (privateMode) 1L else 0L
+            linkRepository.getAllTags(isPriv)
+        }.flatMapLatest { query ->
+            query.asFlow().mapToList(viewModelScope.coroutineContext)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val allTagsWithCount: StateFlow<List<GetAllTagsWithCount>> =
-        selectedProfileId
-            .flatMapLatest { profileId ->
-                linkRepository
-                    .getAllTagsWithCount(profileId)
-                    .asFlow()
-                    .mapToList(
-                        viewModelScope.coroutineContext,
-                    )
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+        combine(selectedProfileId, isPrivateMode) { profileId, privateMode ->
+            val isPriv = if (privateMode) 1L else 0L
+            linkRepository.getAllTagsWithCount(profileId, isPriv)
+        }.flatMapLatest { query ->
+            query.asFlow().mapToList(viewModelScope.coroutineContext)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val countOfLinks: StateFlow<Long?> =
@@ -326,7 +367,8 @@ class AccountViewModel(
     // Insert a new tag
     fun insertTag(tagName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            linkRepository.insertTag(tagName)
+            val isPriv = if (_isPrivateMode.value) 1L else 0L
+            linkRepository.insertTag(tagName, isPrivate = isPriv)
         }
     }
 
@@ -346,11 +388,12 @@ class AccountViewModel(
         tagName: String,
     ) {
         withContext(Dispatchers.IO) {
+            val isPriv = if (_isPrivateMode.value) 1L else 0L
             // Create the tag if it doesn't exist
-            linkRepository.insertTag(tagName)
+            linkRepository.insertTag(tagName, isPrivate = isPriv)
 
             // Get the tag ID
-            val tag = linkRepository.getTagByName(tagName)
+            val tag = linkRepository.getTagByName(tagName, isPrivate = isPriv)
 
             if (tag != null) {
                 // Add the tag to the link
@@ -361,7 +404,8 @@ class AccountViewModel(
 
     fun setSelectedTagByName(tagName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val tag = linkRepository.getTagByName(tagName)
+            val isPriv = if (_isPrivateMode.value) 1L else 0L
+            val tag = linkRepository.getTagByName(tagName, isPrivate = isPriv)
             if (tag != null) {
                 setTagFilter(tag)
             }

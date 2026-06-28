@@ -3,12 +3,12 @@ package com.yogeshpaliyal.deepr
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -65,7 +66,7 @@ data class ClipboardLink(
     val url: String,
 )
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
 
     override fun attachBaseContext(newBase: Context?) {
@@ -174,6 +175,51 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         getLinkFromIntent(intent)
     }
+
+    fun showBiometricPrompt(
+        title: String,
+        subtitle: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit = {},
+    ) {
+        val executor =
+            androidx.core.content.ContextCompat
+                .getMainExecutor(this)
+        val biometricPrompt =
+            androidx.biometric.BiometricPrompt(
+                this,
+                executor,
+                object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(
+                        errorCode: Int,
+                        errString: CharSequence,
+                    ) {
+                        super.onAuthenticationError(errorCode, errString)
+                        onError(errString.toString())
+                    }
+
+                    override fun onAuthenticationSucceeded(result: androidx.biometric.BiometricPrompt.AuthenticationResult) {
+                        super.onAuthenticationSucceeded(result)
+                        onSuccess()
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        onError("Authentication failed")
+                    }
+                },
+            )
+
+        val promptInfo =
+            androidx.biometric.BiometricPrompt.PromptInfo
+                .Builder()
+                .setTitle(title)
+                .setSubtitle(subtitle)
+                .setNegativeButtonText(getString(android.R.string.cancel))
+                .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
 }
 
 private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
@@ -213,26 +259,66 @@ fun Dashboard(
                         exit = slideOutVertically(targetOffsetY = { it }),
                     ) {
                         BottomAppBar(scrollBehavior = scrollBehavior) {
+                            val isPrivateMode by viewModel.isPrivateMode.collectAsStateWithLifecycle()
                             TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
                                 val isSelected =
                                     topLevelRoute::class == backStack.topLevelKey::class
+                                val isProfilesTab = topLevelRoute is Dashboard2
                                 NavigationBarItem(
                                     selected = isSelected,
                                     onClick = {
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        if (topLevelRoute is Dashboard2 && !showProfilesGrid) {
-                                            viewModel.setShowProfilesGrid(true)
+                                        if (!isProfilesTab) {
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                            backStack.addTopLevel(topLevelRoute)
+                                        } else {
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                            if (!isPrivateMode && !showProfilesGrid) {
+                                                viewModel.setShowProfilesGrid(true)
+                                            }
+                                            backStack.addTopLevel(topLevelRoute)
                                         }
-                                        backStack.addTopLevel(topLevelRoute)
                                     },
                                     label = {
                                         Text(stringResource(topLevelRoute.label))
                                     },
                                     icon = {
-                                        Icon(
-                                            imageVector = topLevelRoute.icon,
-                                            contentDescription = null,
-                                        )
+                                        val boxModifier =
+                                            if (isProfilesTab) {
+                                                @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+                                                Modifier.combinedClickable(
+                                                    onClick = {
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                                        if (!isPrivateMode && !showProfilesGrid) {
+                                                            viewModel.setShowProfilesGrid(true)
+                                                        }
+                                                        backStack.addTopLevel(topLevelRoute)
+                                                    },
+                                                    onLongClick = {
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                        if (isPrivateMode) {
+                                                            viewModel.setPrivateMode(false)
+                                                        } else {
+                                                            val mainActivity = context as? MainActivity
+                                                            mainActivity?.showBiometricPrompt(
+                                                                title = mainActivity.getString(R.string.unlock_private_links),
+                                                                subtitle = mainActivity.getString(R.string.unlock_private_links_desc),
+                                                                onSuccess = {
+                                                                    viewModel.setPrivateMode(true)
+                                                                },
+                                                            )
+                                                        }
+                                                    },
+                                                )
+                                            } else {
+                                                Modifier
+                                            }
+
+                                        androidx.compose.foundation.layout.Box(modifier = boxModifier) {
+                                            Icon(
+                                                imageVector = topLevelRoute.icon,
+                                                contentDescription = null,
+                                            )
+                                        }
                                     },
                                 )
                             }

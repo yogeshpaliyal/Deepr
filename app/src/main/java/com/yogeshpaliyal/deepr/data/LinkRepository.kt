@@ -22,6 +22,7 @@ interface LinkRepository {
     suspend fun insertProfile(
         name: String,
         priority: Long? = null,
+        isPrivate: Long = 0L,
     )
 
     fun getAllProfiles(): Query<Profile>
@@ -54,13 +55,22 @@ interface LinkRepository {
     fun countProfiles(): Query<Long>
 
     // Tag operations
-    fun getAllTags(): Query<Tags>
+    fun getAllTags(isPrivate: Long): Query<Tags>
 
-    fun getAllTagsWithCount(profileId: Long): Query<GetAllTagsWithCount>
+    fun getAllTagsWithCount(
+        profileId: Long,
+        isPrivate: Long,
+    ): Query<GetAllTagsWithCount>
 
-    suspend fun getTagByName(tagName: String): Tags?
+    suspend fun getTagByName(
+        tagName: String,
+        isPrivate: Long,
+    ): Tags?
 
-    suspend fun insertTag(tagName: String)
+    suspend fun insertTag(
+        tagName: String,
+        isPrivate: Long,
+    )
 
     suspend fun updateTag(
         name: String,

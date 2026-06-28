@@ -284,9 +284,9 @@ open class LocalServerRepositoryImpl(
                                 deeprQueries.transaction {
                                     if (request.priority != null) {
                                         deeprQueries.shiftProfilePriorities(request.priority)
-                                        deeprQueries.insertProfileWithPriority(request.name, request.priority)
+                                        deeprQueries.insertProfileWithPriority(request.name, request.priority, 0L)
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.name)
+                                        deeprQueries.insertProfileAutoPriority(request.name, 0L)
                                     }
                                 }
                                 call.respond(
@@ -391,7 +391,7 @@ open class LocalServerRepositoryImpl(
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
                                         val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
@@ -466,7 +466,7 @@ open class LocalServerRepositoryImpl(
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim())
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
                                         val newProfile = deeprQueries.getProfileByName(request.profileName.trim()).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
@@ -486,8 +486,8 @@ open class LocalServerRepositoryImpl(
                                     )
                                     deeprQueries.deleteLinkRelations(id)
                                     request.tags.forEach { tagData ->
-                                        deeprQueries.insertTag(tagData.name)
-                                        val tag = deeprQueries.getTagByName(tagData.name).executeAsOne()
+                                        deeprQueries.insertTag(tagData.name, 0L)
+                                        val tag = deeprQueries.getTagByName(tagData.name, 0L).executeAsOne()
                                         deeprQueries.addTagToLink(linkId = id, tagId = tag.id)
                                     }
                                 }
@@ -550,7 +550,7 @@ open class LocalServerRepositoryImpl(
                                         }
                                         parsedId
                                     }
-                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId).executeAsList()
+                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId, isPrivate = 0L).executeAsList()
                                 val response =
                                     allTags.map { tag ->
                                         TagResponse(
@@ -877,8 +877,8 @@ open class LocalServerRepositoryImpl(
                     val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
 
                     deeplink.tags.forEach { tagName ->
-                        deeprQueries.insertTag(name = tagName)
-                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
+                        deeprQueries.insertTag(name = tagName, isPrivate = 0L)
+                        val tag = deeprQueries.getTagByName(tagName, 0L).executeAsOne()
                         deeprQueries.addTagToLink(
                             linkId = insertedId,
                             tagId = tag.id,
@@ -981,7 +981,7 @@ data class TagData(
     /**
      * Converts this [TagData] to a [Tags] database object.
      */
-    fun toDbTag() = Tags(id, name)
+    fun toDbTag() = Tags(id, name, 0L)
 }
 
 /**

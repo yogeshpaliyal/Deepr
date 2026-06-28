@@ -104,6 +104,7 @@ object TagSelectionScreen : TopLevelRoute {
     @Composable
     override fun Content(windowInsets: WindowInsets) {
         val viewModel: AccountViewModel = koinActivityViewModel()
+        val isPrivateMode by viewModel.isPrivateMode.collectAsStateWithLifecycle()
         val selectedTag by viewModel.selectedTagFilter.collectAsStateWithLifecycle()
         var newTagName by remember { mutableStateOf("") }
         var searchQuery by remember { mutableStateOf("") }
@@ -336,7 +337,7 @@ object TagSelectionScreen : TopLevelRoute {
                                                         Toast.LENGTH_SHORT,
                                                     ).show()
                                             } else {
-                                                deeprQueries.insertTag(trimmedTagName)
+                                                deeprQueries.insertTag(trimmedTagName, if (isPrivateMode) 1L else 0L)
                                                 newTagName = ""
                                                 Toast
                                                     .makeText(
@@ -537,7 +538,7 @@ object TagSelectionScreen : TopLevelRoute {
                         TagItem(
                             tag = tag,
                             isSelected = selectedTag.any { it.id == tag.id },
-                            onTagClick = { viewModel.setTagFilter(Tags(tag.id, tag.name)) },
+                            onTagClick = { viewModel.setTagFilter(Tags(tag.id, tag.name, if (isPrivateMode) 1L else 0L)) },
                             onEditClick = { isTagEditEnable = tag },
                             onDeleteClick = { isTagDeleteEnable = tag },
                         )
@@ -623,7 +624,7 @@ object TagSelectionScreen : TopLevelRoute {
                                 val result =
                                     runBlocking {
                                         try {
-                                            viewModel.updateTag(Tags(tag.id, trimmedName))
+                                            viewModel.updateTag(Tags(tag.id, trimmedName, if (isPrivateMode) 1L else 0L))
                                             Result.success(true)
                                         } catch (e: Exception) {
                                             return@runBlocking Result.failure(e)
