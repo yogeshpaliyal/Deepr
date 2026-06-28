@@ -190,7 +190,7 @@ fun AddLinkScreen(
     var pendingProfileNameToSelect by remember { mutableStateOf<String?>(null) }
 
     // Initialize selected tags
-    LaunchedEffect(selectedLink.id) {
+    LaunchedEffect(selectedLink.id, isPrivateMode) {
         if (!isCreate) {
             val existingTags =
                 selectedLink.tagsIds?.split(",")?.mapIndexed { index, tagId ->

@@ -56,7 +56,7 @@ class CsvBookmarkImporter(
                                         val themeMode = row.getOrNull(2) ?: "system"
                                         val colorTheme = row.getOrNull(3) ?: "dynamic"
 
-                                        val existing = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
+                                        val existing = deeprQueries.getProfileByName(profileName, 0L).executeAsOneOrNull()
                                         if (existing == null) {
                                             deeprQueries.insertProfileWithPriority(profileName, priority, 0L)
                                             val profileId = deeprQueries.lastInsertRowId().executeAsOne()
@@ -86,7 +86,7 @@ class CsvBookmarkImporter(
                                             updatedCount++
                                             val profileID =
                                                 profileName?.let {
-                                                    val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
+                                                    val profile = deeprQueries.getProfileByName(it, 0L).executeAsOneOrNull()
                                                     if (profile == null) {
                                                         deeprQueries.insertProfileAutoPriority(it, 0L)
                                                         deeprQueries.lastInsertRowId().executeAsOneOrNull()
@@ -150,7 +150,7 @@ class CsvBookmarkImporter(
                                             updatedCount++
                                             val profileID =
                                                 profileName?.let {
-                                                    val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
+                                                    val profile = deeprQueries.getProfileByName(it, 0L).executeAsOneOrNull()
                                                     if (profile == null) {
                                                         if (profilePriority != null) {
                                                             deeprQueries.insertProfileWithPriority(it, profilePriority, 0L)

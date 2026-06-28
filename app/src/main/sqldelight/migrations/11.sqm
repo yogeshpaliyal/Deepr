@@ -1,4 +1,23 @@
-ALTER TABLE Profile ADD COLUMN isPrivate INTEGER NOT NULL DEFAULT 0;
+DROP INDEX IF EXISTS idx_profile_priority_createdAt;
+
+CREATE TABLE Profile_temp (
+id INTEGER PRIMARY KEY NOT NULL,
+name TEXT NOT NULL,
+createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+themeMode TEXT NOT NULL DEFAULT 'system',
+colorTheme TEXT NOT NULL DEFAULT 'dynamic',
+priority INTEGER NOT NULL DEFAULT 0,
+isPrivate INTEGER NOT NULL DEFAULT 0,
+UNIQUE(name, isPrivate)
+);
+
+INSERT INTO Profile_temp(id, name, createdAt, themeMode, colorTheme, priority, isPrivate)
+SELECT id, name, createdAt, themeMode, colorTheme, priority, 0 FROM Profile;
+
+DROP TABLE Profile;
+ALTER TABLE Profile_temp RENAME TO Profile;
+
+CREATE INDEX IF NOT EXISTS idx_profile_priority_createdAt ON Profile(priority, createdAt);
 
 CREATE TABLE LinkTags_temp AS SELECT * FROM LinkTags;
 DROP TABLE LinkTags;

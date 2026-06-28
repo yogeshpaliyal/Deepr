@@ -337,7 +337,7 @@ object TagSelectionScreen : TopLevelRoute {
                                                         Toast.LENGTH_SHORT,
                                                     ).show()
                                             } else {
-                                                deeprQueries.insertTag(trimmedTagName, if (isPrivateMode) 1L else 0L)
+                                                viewModel.insertTag(trimmedTagName)
                                                 newTagName = ""
                                                 Toast
                                                     .makeText(

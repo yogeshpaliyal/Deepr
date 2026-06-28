@@ -45,9 +45,12 @@ class LinkRepositoryImpl(
             deeprQueries.getProfileById(id).executeAsOneOrNull()
         }
 
-    override suspend fun getProfileByName(name: String): Profile? =
+    override suspend fun getProfileByName(
+        name: String,
+        isPrivate: Long,
+    ): Profile? =
         withContext(Dispatchers.IO) {
-            deeprQueries.getProfileByName(name).executeAsOneOrNull()
+            deeprQueries.getProfileByName(name, isPrivate).executeAsOneOrNull()
         }
 
     override suspend fun updateProfile(

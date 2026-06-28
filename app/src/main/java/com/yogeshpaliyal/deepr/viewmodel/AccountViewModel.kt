@@ -111,10 +111,10 @@ class AccountViewModel(
                 } else {
                     // Create a default private profile
                     linkRepository.insertProfile("Private", isPrivate = 1L)
-                    var newPrivateProfile = linkRepository.getProfileByName("Private")
+                    var newPrivateProfile = linkRepository.getProfileByName("Private", 1L)
                     if (newPrivateProfile == null) {
                         kotlinx.coroutines.delay(100)
-                        newPrivateProfile = linkRepository.getProfileByName("Private")
+                        newPrivateProfile = linkRepository.getProfileByName("Private", 1L)
                     }
                     newPrivateProfile?.let {
                         setSelectedProfile(it.id)

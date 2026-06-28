@@ -29,7 +29,10 @@ interface LinkRepository {
 
     suspend fun getProfileById(id: Long): Profile?
 
-    suspend fun getProfileByName(name: String): Profile?
+    suspend fun getProfileByName(
+        name: String,
+        isPrivate: Long = 0L,
+    ): Profile?
 
     suspend fun updateProfile(
         name: String,
