@@ -167,6 +167,7 @@ fun AddLinkScreen(
     val initialSelectedTags = remember { mutableStateListOf<Tags>() }
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val isCreate = selectedLink.id == 0L
+    val isPrivateMode by viewModel.isPrivateMode.collectAsStateWithLifecycle()
 
     // Profile selection
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
@@ -198,6 +199,7 @@ fun AddLinkScreen(
                             ?.split(",")
                             ?.getOrNull(index)
                             ?.trim() ?: context.getString(R.string.unknown),
+                        if (isPrivateMode) 1L else 0L,
                     )
                 }
             selectedTags.clear()
@@ -886,7 +888,7 @@ fun AddLinkScreen(
                             viewModel.insertTag(trimmedTagName)
 
                             // Add to current selection (using ID 0 as placeholder until DB syncs)
-                            selectedTags.add(Tags(0, trimmedTagName))
+                            selectedTags.add(Tags(0, trimmedTagName, if (isPrivateMode) 1L else 0L))
 
                             showCreateTagDialog = false
                             Toast

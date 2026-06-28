@@ -103,7 +103,7 @@ class DriveSyncManagerImpl(
 
                     // Restore profiles
                     backedUpData.profiles.forEach { profileBackup ->
-                        deeprQueries.insertProfile(profileBackup.name)
+                        deeprQueries.insertProfile(profileBackup.name, 0L)
                     }
 
                     val profileNameToIdMap =

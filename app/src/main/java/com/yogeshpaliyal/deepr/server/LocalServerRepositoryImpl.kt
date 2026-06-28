@@ -550,7 +550,7 @@ open class LocalServerRepositoryImpl(
                                         }
                                         parsedId
                                     }
-                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId).executeAsList()
+                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId, isPrivate = 0L).executeAsList()
                                 val response =
                                     allTags.map { tag ->
                                         TagResponse(
@@ -981,7 +981,7 @@ data class TagData(
     /**
      * Converts this [TagData] to a [Tags] database object.
      */
-    fun toDbTag() = Tags(id, name)
+    fun toDbTag() = Tags(id, name, 0L)
 }
 
 /**

@@ -58,7 +58,7 @@ class CsvBookmarkImporter(
 
                                         val existing = deeprQueries.getProfileByName(profileName).executeAsOneOrNull()
                                         if (existing == null) {
-                                            deeprQueries.insertProfileWithPriority(profileName, priority)
+                                            deeprQueries.insertProfileWithPriority(profileName, priority, 0L)
                                             val profileId = deeprQueries.lastInsertRowId().executeAsOne()
                                             deeprQueries.updateProfile(profileName, themeMode, colorTheme, profileId)
                                         } else {
@@ -88,7 +88,7 @@ class CsvBookmarkImporter(
                                                 profileName?.let {
                                                     val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                                     if (profile == null) {
-                                                        deeprQueries.insertProfileAutoPriority(it)
+                                                        deeprQueries.insertProfileAutoPriority(it, 0L)
                                                         deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                                     } else {
                                                         profile.id
@@ -153,9 +153,9 @@ class CsvBookmarkImporter(
                                                     val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
                                                     if (profile == null) {
                                                         if (profilePriority != null) {
-                                                            deeprQueries.insertProfileWithPriority(it, profilePriority)
+                                                            deeprQueries.insertProfileWithPriority(it, profilePriority, 0L)
                                                         } else {
-                                                            deeprQueries.insertProfileAutoPriority(it)
+                                                            deeprQueries.insertProfileAutoPriority(it, 0L)
                                                         }
                                                         deeprQueries.lastInsertRowId().executeAsOneOrNull()
                                                     } else {
