@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -289,6 +290,8 @@ fun Dashboard(
                                             if (isProfilesTab) {
                                                 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                                                 Modifier.combinedClickable(
+                                                    interactionSource = remember { MutableInteractionSource() },
+                                                    indication = null,
                                                     onClick = {
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                                                         if (!isPrivateMode && !showProfilesGrid) {
