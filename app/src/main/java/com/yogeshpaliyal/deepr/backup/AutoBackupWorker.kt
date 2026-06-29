@@ -43,11 +43,13 @@ class AutoBackupWorker(
                     return@withContext
                 }
 
+                val settings = preferenceDataStore.collectExportableSettings()
                 val success =
                     saveToSelectedLocation(
                         location = location,
                         profiles = profilesToExport,
                         links = linksToExport,
+                        settings = settings,
                     )
 
                 if (success) {
@@ -64,6 +66,7 @@ class AutoBackupWorker(
         fileName: String = "deepr_backup.csv",
         profiles: List<com.yogeshpaliyal.deepr.Profile>,
         links: List<GetLinksForBackup>,
+        settings: Map<String, String> = emptyMap(),
     ): Boolean =
         try {
             // For content:// URIs from document picker, create a new document in that folder
@@ -82,7 +85,7 @@ class AutoBackupWorker(
                 context.contentResolver
                     .openOutputStream(docFile.uri, "wt")
                     ?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, profiles, links)
+                        csvWriter.writeToCsv(outputStream, profiles, links, settings)
                     }
                 true
             } else {

@@ -11,6 +11,7 @@ class CsvWriter {
         outputStream: OutputStream,
         profiles: List<Profile>,
         links: List<GetLinksForBackup>,
+        settings: Map<String, String> = emptyMap(),
     ) {
         outputStream.bufferedWriter().use { writer ->
             CSVWriter(writer).use { csvWriter ->
@@ -64,6 +65,25 @@ class CsvWriter {
                             item.profileName,
                         ),
                     )
+                }
+
+                // Section 3: Settings
+                if (settings.isNotEmpty()) {
+                    csvWriter.writeNext(arrayOf("SECTION", "SETTINGS"))
+                    csvWriter.writeNext(
+                        arrayOf(
+                            "SettingKey",
+                            "SettingValue",
+                        ),
+                    )
+                    settings.forEach { (key, value) ->
+                        csvWriter.writeNext(
+                            arrayOf(
+                                key,
+                                value,
+                            ),
+                        )
+                    }
                 }
             }
         }
