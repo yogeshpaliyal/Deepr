@@ -215,8 +215,11 @@ class MainActivity : FragmentActivity() {
                 .Builder()
                 .setTitle(title)
                 .setSubtitle(subtitle)
-                .setNegativeButtonText(getString(android.R.string.cancel))
-                .build()
+                .setAllowedAuthenticators(
+                    androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                        androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                        androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL,
+                ).build()
 
         biometricPrompt.authenticate(promptInfo)
     }
