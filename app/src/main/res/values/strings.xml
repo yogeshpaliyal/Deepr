@@ -390,4 +390,7 @@
     <string name="api_add_profile">Add a new profile (JSON supports priority shifting)</string>
     <string name="unlock_private_links">Unlock Private Links</string>
     <string name="unlock_private_links_desc">Use biometrics to access your private profile and links</string>
+    <string name="web_unlock_request_title">Web Browser Unlock Request</string>
+    <string name="web_unlock_request_desc">Tap to unlock the private links section on the web server.</string>
+    <string name="lock_private_links">Lock Private Links</string>
 </resources>

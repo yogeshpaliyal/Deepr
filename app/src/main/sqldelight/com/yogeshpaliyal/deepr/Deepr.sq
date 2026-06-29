@@ -210,6 +210,9 @@ SELECT COUNT(*) FROM Deepr;
 getDeeprByLink:
 SELECT * FROM Deepr WHERE link = ?;
 
+getDeeprById:
+SELECT * FROM Deepr WHERE id = ?;
+
 
 -- Tag operations
 insertTag:
@@ -218,8 +221,17 @@ INSERT OR IGNORE INTO Tags (name, isPrivate) VALUES (?, ?);
 getTagByName:
 SELECT * FROM Tags WHERE name = ? AND isPrivate = ?;
 
+getTagById:
+SELECT * FROM Tags WHERE id = ?;
+
 getAllTags:
 SELECT * FROM Tags WHERE isPrivate = ? ORDER BY name;
+
+listAllTagsAsc:
+SELECT * FROM Tags ORDER BY name ASC;
+
+listAllLinkTags:
+SELECT * FROM LinkTags;
 
 getAllTagsWithCount:
 SELECT 

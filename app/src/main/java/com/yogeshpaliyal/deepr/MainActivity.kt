@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 data class SharedLink(
@@ -69,6 +70,7 @@ data class ClipboardLink(
 
 class MainActivity : FragmentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
+    private val viewModel: AccountViewModel by inject()
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(
@@ -102,10 +104,11 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
 
         getLinkFromIntent(intent)
+        handlePrivateUnlockIntent(intent)
 
         setContent {
             val isProUser = BuildConfig.APPLICATION_ID.contains(".pro")
-            val viewModel: AccountViewModel = koinActivityViewModel()
+            val viewModel = this@MainActivity.viewModel
 
             // Pro users use per-profile theme, non-pro users use global theme
             val themeMode =
@@ -175,6 +178,20 @@ class MainActivity : FragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         getLinkFromIntent(intent)
+        handlePrivateUnlockIntent(intent)
+    }
+
+    private fun handlePrivateUnlockIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra("request_private_unlock", false) == true) {
+            intent.removeExtra("request_private_unlock")
+            showBiometricPrompt(
+                title = getString(R.string.unlock_private_links),
+                subtitle = getString(R.string.unlock_private_links_desc),
+                onSuccess = {
+                    viewModel.setPrivateMode(true)
+                },
+            )
+        }
     }
 
     fun showBiometricPrompt(

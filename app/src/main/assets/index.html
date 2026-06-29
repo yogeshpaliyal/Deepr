@@ -99,6 +99,14 @@
                         </svg>
                         {{WEB_NEW_PROFILE}}
                     </button>
+                    <button
+                        id="privateModeBtn"
+                        onclick="togglePrivateMode()"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1"
+                    >
+                        <span id="privateModeIcon">🔒</span>
+                        <span id="privateModeText">{{WEB_PRIVATE_UNLOCK}}</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -450,6 +458,90 @@
         let selectedTags = []; // Now contains {id, name} objects
         let profiles = []; // Contains {id, name, createdAt} objects
         let selectedProfileId = 1; // Default profile
+        let isPrivateUnlocked = false;
+
+        async function checkPrivateStatus() {
+            try {
+                const response = await fetch('/api/private/status');
+                const data = await response.json();
+                if (response.ok) {
+                    if (isPrivateUnlocked !== data.isUnlocked) {
+                        isPrivateUnlocked = data.isUnlocked;
+                        updatePrivateModeUI();
+                        // Reload all data to reflect private/public mode change
+                        loadProfiles().then(() => {
+                            loadLinks();
+                        });
+                        loadAvailableTags();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking private status:', error);
+            }
+        }
+
+        async function togglePrivateMode() {
+            try {
+                if (isPrivateUnlocked) {
+                    // Lock it
+                    const response = await fetch('/api/private/lock', { method: 'POST' });
+                    if (response.ok) {
+                        isPrivateUnlocked = false;
+                        updatePrivateModeUI();
+                        loadProfiles().then(() => {
+                            loadLinks();
+                        });
+                        loadAvailableTags();
+                    }
+                } else {
+                    // Request unlock
+                    const btn = document.getElementById('privateModeBtn');
+                    const textSpan = document.getElementById('privateModeText');
+                    textSpan.innerText = 'Controlla dispositivo...';
+                    btn.disabled = true;
+
+                    const response = await fetch('/api/private/request-unlock', { method: 'POST' });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (data.isUnlocked) {
+                            isPrivateUnlocked = true;
+                            updatePrivateModeUI();
+                            loadProfiles().then(() => {
+                                loadLinks();
+                            });
+                            loadAvailableTags();
+                        } else {
+                            // Prompted on device. Polling will pick up the change when the user unlocks on the phone.
+                            console.log('Prompted on device, waiting for user response...');
+                        }
+                    } else {
+                        alert('Errore nella richiesta di sblocco: ' + (data.error || 'Errore sconosciuto'));
+                        updatePrivateModeUI();
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling private mode:', error);
+                updatePrivateModeUI();
+            }
+        }
+
+        function updatePrivateModeUI() {
+            const btn = document.getElementById('privateModeBtn');
+            const iconSpan = document.getElementById('privateModeIcon');
+            const textSpan = document.getElementById('privateModeText');
+            if (!btn) return;
+            btn.disabled = false;
+
+            if (isPrivateUnlocked) {
+                iconSpan.innerText = '🔓';
+                textSpan.innerText = '{{WEB_PRIVATE_LOCK}}';
+                btn.className = "bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1";
+            } else {
+                iconSpan.innerText = '🔒';
+                textSpan.innerText = '{{WEB_PRIVATE_UNLOCK}}';
+                btn.className = "bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center gap-1";
+            }
+        }
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -1434,6 +1526,10 @@
             });
             loadAvailableTags();
             updateTagFilterButtonVisibility();
+
+            // Initialize private status polling
+            checkPrivateStatus();
+            setInterval(checkPrivateStatus, 2000);
         });
     </script>
 </body>

@@ -76,6 +76,7 @@ open class LocalServerRepositoryImpl(
         null
 
     private val _isRunning = MutableStateFlow(false)
+    private var serverSecret: String = ""
 
     /**
      * [StateFlow] indicating whether the server is currently running.
@@ -138,6 +139,10 @@ open class LocalServerRepositoryImpl(
             return
         }
 
+        serverSecret =
+            java.util.UUID
+                .randomUUID()
+                .toString()
         try {
             val ipAddress = getIpAddress()
             if (ipAddress == null) {
@@ -218,6 +223,8 @@ open class LocalServerRepositoryImpl(
                                             "{{WEB_ERROR_REFRESH}}" to R.string.web_error_refresh,
                                             "{{WEB_ERROR_FETCH}}" to R.string.web_error_fetch,
                                             "{{WEB_MSG_SWITCHED}}" to R.string.web_msg_switched,
+                                            "{{WEB_PRIVATE_UNLOCK}}" to R.string.unlock_private_links,
+                                            "{{WEB_PRIVATE_LOCK}}" to R.string.lock_private_links,
                                             "{{WEB_MSG_FILTERED}}" to R.string.web_msg_filtered,
                                             "{{WEB_MSG_FILTERS_CLEARED}}" to R.string.web_msg_filters_cleared,
                                             "{{WEB_NO_LINKS}}" to R.string.web_no_links,
@@ -260,8 +267,9 @@ open class LocalServerRepositoryImpl(
                         get("/api/profiles") {
                             try {
                                 val profiles = deeprQueries.getAllProfiles().executeAsList()
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
                                 val response =
-                                    profiles.map { profile ->
+                                    profiles.filter { (it.isPrivate == 1L) == isPrivateMode }.map { profile ->
                                         ProfileResponse(
                                             id = profile.id,
                                             name = profile.name,
@@ -337,6 +345,14 @@ open class LocalServerRepositoryImpl(
                                         }
                                         parsedId
                                     }
+
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val profile = deeprQueries.getProfileById(profileId).executeAsOneOrNull()
+                                if (profile != null && profile.isPrivate == 1L && !isPrivateMode) {
+                                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                    return@get
+                                }
+
                                 val links =
                                     deeprQueries
                                         .getLinksAndTags(
@@ -386,17 +402,35 @@ open class LocalServerRepositoryImpl(
                                 val request = call.receive<AddLinkRequest>()
 
                                 var finalProfileId = request.profileId
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val isPrivate = if (isPrivateMode) 1L else 0L
                                 if (!request.profileName.isNullOrBlank()) {
-                                    val dbProfile = deeprQueries.getProfileByName(request.profileName.trim(), 0L).executeAsOneOrNull()
+                                    val dbProfile =
+                                        deeprQueries
+                                            .getProfileByName(
+                                                request.profileName.trim(),
+                                                isPrivate,
+                                            ).executeAsOneOrNull()
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
-                                        val newProfile = deeprQueries.getProfileByName(request.profileName.trim(), 0L).executeAsOneOrNull()
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), isPrivate)
+                                        val newProfile =
+                                            deeprQueries
+                                                .getProfileByName(
+                                                    request.profileName.trim(),
+                                                    isPrivate,
+                                                ).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
                                         }
                                     }
+                                }
+
+                                val profile = deeprQueries.getProfileById(finalProfileId).executeAsOneOrNull()
+                                if (profile != null && profile.isPrivate == 1L && !isPrivateMode) {
+                                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                    return@post
                                 }
 
                                 val mergedTags = mutableListOf<TagData>()
@@ -458,20 +492,49 @@ open class LocalServerRepositoryImpl(
                                         ).executeAsList()
                                         .firstOrNull { it.id == id }
 
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val isPrivate = if (isPrivateMode) 1L else 0L
+
+                                // Verify that the link is accessible
+                                val targetLink = deeprQueries.getDeeprById(id).executeAsOneOrNull()
+                                if (targetLink != null) {
+                                    val linkProfile = deeprQueries.getProfileById(targetLink.profileId).executeAsOneOrNull()
+                                    if (linkProfile != null && linkProfile.isPrivate == 1L && !isPrivateMode) {
+                                        call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                        return@put
+                                    }
+                                }
+
                                 val thumbnail = existingLink?.thumbnail ?: ""
 
                                 var finalProfileId = request.profileId
                                 if (!request.profileName.isNullOrBlank()) {
-                                    val dbProfile = deeprQueries.getProfileByName(request.profileName.trim(), 0L).executeAsOneOrNull()
+                                    val dbProfile =
+                                        deeprQueries
+                                            .getProfileByName(
+                                                request.profileName.trim(),
+                                                isPrivate,
+                                            ).executeAsOneOrNull()
                                     if (dbProfile != null) {
                                         finalProfileId = dbProfile.id
                                     } else {
-                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), 0L)
-                                        val newProfile = deeprQueries.getProfileByName(request.profileName.trim(), 0L).executeAsOneOrNull()
+                                        deeprQueries.insertProfileAutoPriority(request.profileName.trim(), isPrivate)
+                                        val newProfile =
+                                            deeprQueries
+                                                .getProfileByName(
+                                                    request.profileName.trim(),
+                                                    isPrivate,
+                                                ).executeAsOneOrNull()
                                         if (newProfile != null) {
                                             finalProfileId = newProfile.id
                                         }
                                     }
+                                }
+
+                                val profile = deeprQueries.getProfileById(finalProfileId).executeAsOneOrNull()
+                                if (profile != null && profile.isPrivate == 1L && !isPrivateMode) {
+                                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                    return@put
                                 }
 
                                 deeprQueries.transaction {
@@ -486,8 +549,8 @@ open class LocalServerRepositoryImpl(
                                     )
                                     deeprQueries.deleteLinkRelations(id)
                                     request.tags.forEach { tagData ->
-                                        deeprQueries.insertTag(tagData.name, 0L)
-                                        val tag = deeprQueries.getTagByName(tagData.name, 0L).executeAsOne()
+                                        deeprQueries.insertTag(tagData.name, isPrivate)
+                                        val tag = deeprQueries.getTagByName(tagData.name, isPrivate).executeAsOne()
                                         deeprQueries.addTagToLink(linkId = id, tagId = tag.id)
                                     }
                                 }
@@ -508,6 +571,17 @@ open class LocalServerRepositoryImpl(
                                     call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
                                     return@delete
                                 }
+
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val targetLink = deeprQueries.getDeeprById(id).executeAsOneOrNull()
+                                if (targetLink != null) {
+                                    val linkProfile = deeprQueries.getProfileById(targetLink.profileId).executeAsOneOrNull()
+                                    if (linkProfile != null && linkProfile.isPrivate == 1L && !isPrivateMode) {
+                                        call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                        return@delete
+                                    }
+                                }
+
                                 val tagsToDelete = mutableListOf<Long>()
                                 deeprQueries.getTagsForLink(id).executeAsList().forEach { tag ->
                                     val linkCount = deeprQueries.hasTagLinks(tag.id).executeAsOne()
@@ -550,7 +624,9 @@ open class LocalServerRepositoryImpl(
                                         }
                                         parsedId
                                     }
-                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId, isPrivate = 0L).executeAsList()
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val isPrivate = if (isPrivateMode) 1L else 0L
+                                val allTags = deeprQueries.getAllTagsWithCount(profileId = profileId, isPrivate = isPrivate).executeAsList()
                                 val response =
                                     allTags.map { tag ->
                                         TagResponse(
@@ -576,6 +652,14 @@ open class LocalServerRepositoryImpl(
                                     call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
                                     return@delete
                                 }
+
+                                val isPrivateMode = accountViewModel.isPrivateMode.value
+                                val targetTag = deeprQueries.getTagById(id).executeAsOneOrNull()
+                                if (targetTag != null && targetTag.isPrivate == 1L && !isPrivateMode) {
+                                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                    return@delete
+                                }
+
                                 deeprQueries.transaction {
                                     deeprQueries.deleteTag(id)
                                     deeprQueries.deleteTagRelations(id)
@@ -630,6 +714,15 @@ open class LocalServerRepositoryImpl(
                             try {
                                 val id = call.request.queryParameters["id"]?.toLongOrNull()
                                 if (id != null) {
+                                    val isPrivateMode = accountViewModel.isPrivateMode.value
+                                    val targetLink = deeprQueries.getDeeprById(id).executeAsOneOrNull()
+                                    if (targetLink != null) {
+                                        val linkProfile = deeprQueries.getProfileById(targetLink.profileId).executeAsOneOrNull()
+                                        if (linkProfile != null && linkProfile.isPrivate == 1L && !isPrivateMode) {
+                                            call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                            return@post
+                                        }
+                                    }
                                     accountViewModel.incrementOpenedCount(id)
                                     call.respond(HttpStatusCode.OK, SuccessResponse("Count incremented"))
                                 } else {
@@ -648,6 +741,15 @@ open class LocalServerRepositoryImpl(
                             try {
                                 val id = call.request.queryParameters["id"]?.toLongOrNull()
                                 if (id != null) {
+                                    val isPrivateMode = accountViewModel.isPrivateMode.value
+                                    val targetLink = deeprQueries.getDeeprById(id).executeAsOneOrNull()
+                                    if (targetLink != null) {
+                                        val linkProfile = deeprQueries.getProfileById(targetLink.profileId).executeAsOneOrNull()
+                                        if (linkProfile != null && linkProfile.isPrivate == 1L && !isPrivateMode) {
+                                            call.respond(HttpStatusCode.Forbidden, ErrorResponse("Private mode is locked."))
+                                            return@post
+                                        }
+                                    }
                                     accountViewModel.toggleFavourite(id)
                                     call.respond(HttpStatusCode.OK, SuccessResponse("Favourite toggled"))
                                 } else {
@@ -659,6 +761,156 @@ open class LocalServerRepositoryImpl(
                                     HttpStatusCode.InternalServerError,
                                     ErrorResponse("Error toggling favourite: ${e.message}"),
                                 )
+                            }
+                        }
+
+                        get("/api/private/status") {
+                            try {
+                                val isUnlocked = accountViewModel.isPrivateMode.value
+                                call.respond(HttpStatusCode.OK, mapOf("isUnlocked" to isUnlocked))
+                            } catch (e: Exception) {
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "Unknown error"))
+                            }
+                        }
+
+                        post("/api/private/lock") {
+                            try {
+                                accountViewModel.setPrivateMode(false)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Locked successfully"))
+                            } catch (e: Exception) {
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "Unknown error"))
+                            }
+                        }
+
+                        post("/api/private/request-unlock") {
+                            try {
+                                if (accountViewModel.isPrivateMode.value) {
+                                    call.respond(HttpStatusCode.OK, mapOf("isUnlocked" to true))
+                                    return@post
+                                }
+
+                                val channelId = "web_server_unlock"
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                    val name = "Web Server Unlock"
+                                    val importance = android.app.NotificationManager.IMPORTANCE_HIGH
+                                    val channel = android.app.NotificationChannel(channelId, name, importance)
+                                    val manager =
+                                        context.getSystemService(Context.NOTIFICATION_SERVICE)
+                                            as android.app.NotificationManager
+                                    manager.createNotificationChannel(channel)
+                                }
+
+                                val intent =
+                                    android.content
+                                        .Intent(
+                                            context,
+                                            com.yogeshpaliyal.deepr.MainActivity::class.java,
+                                        ).apply {
+                                            flags =
+                                                android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                            putExtra("request_private_unlock", true)
+                                        }
+                                val pendingIntent =
+                                    android.app.PendingIntent.getActivity(
+                                        context,
+                                        1001,
+                                        intent,
+                                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE,
+                                    )
+
+                                val notification =
+                                    androidx.core.app.NotificationCompat
+                                        .Builder(context, channelId)
+                                        .setSmallIcon(com.yogeshpaliyal.deepr.R.mipmap.ic_launcher)
+                                        .setContentTitle(
+                                            context.getString(
+                                                com.yogeshpaliyal.deepr.R.string.web_unlock_request_title,
+                                            ),
+                                        ).setContentText(
+                                            context.getString(
+                                                com.yogeshpaliyal.deepr.R.string.web_unlock_request_desc,
+                                            ),
+                                        ).setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                                        .setContentIntent(pendingIntent)
+                                        .setAutoCancel(true)
+                                        .build()
+
+                                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                manager.notify(1001, notification)
+
+                                call.respond(HttpStatusCode.OK, mapOf("isUnlocked" to false, "status" to "Prompted on device"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error requesting private unlock", e)
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "Unknown error"))
+                            }
+                        }
+
+                        get("/api/transfer/export") {
+                            try {
+                                val secretParam = call.request.queryParameters["secret"]
+                                if (secretParam.isNullOrBlank() || secretParam != serverSecret) {
+                                    call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized: Invalid secret"))
+                                    return@get
+                                }
+
+                                val dbProfiles =
+                                    deeprQueries.getAllProfiles().executeAsList().map {
+                                        ProfileData(
+                                            id = it.id,
+                                            name = it.name,
+                                            createdAt = it.createdAt,
+                                            themeMode = it.themeMode ?: "system",
+                                            colorTheme = it.colorTheme ?: "dynamic",
+                                            priority = it.priority,
+                                            isPrivate = it.isPrivate,
+                                        )
+                                    }
+
+                                val dbLinks =
+                                    deeprQueries.listDeeprAsc().executeAsList().map {
+                                        LinkExportData(
+                                            id = it.id,
+                                            link = it.link,
+                                            name = it.name,
+                                            createdAt = it.createdAt,
+                                            openedCount = it.openedCount,
+                                            isFavourite = it.isFavourite,
+                                            notes = it.notes ?: "",
+                                            thumbnail = it.thumbnail ?: "",
+                                            profileId = it.profileId,
+                                        )
+                                    }
+
+                                val dbTags =
+                                    deeprQueries.listAllTagsAsc().executeAsList().map {
+                                        TagExportData(
+                                            id = it.id,
+                                            name = it.name,
+                                            isPrivate = it.isPrivate,
+                                        )
+                                    }
+
+                                val dbLinkTags =
+                                    deeprQueries.listAllLinkTags().executeAsList().map {
+                                        LinkTagExportData(
+                                            linkId = it.linkId,
+                                            tagId = it.tagId,
+                                        )
+                                    }
+
+                                val exportPkg =
+                                    TransferExportPackage(
+                                        profiles = dbProfiles,
+                                        links = dbLinks,
+                                        tags = dbTags,
+                                        linkTags = dbLinkTags,
+                                    )
+
+                                call.respond(HttpStatusCode.OK, exportPkg)
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error exporting data for transfer", e)
+                                call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "Unknown error"))
                             }
                         }
 
@@ -817,40 +1069,121 @@ open class LocalServerRepositoryImpl(
         }
     }
 
-    /**
-     * Fetches link data from a remote sender via its QR transfer info and imports it into the local database.
-     * @param qrTransferInfo Connection details for the sender.
-     * @return [Result] indicating success or failure.
-     */
     override suspend fun fetchAndImportFromSender(qrTransferInfo: QRTransferInfo): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
-                val response: HttpResponse =
-                    httpClient.get {
-                        url {
-                            protocol = URLProtocol.HTTP
-                            host = qrTransferInfo.ip
-                            port = qrTransferInfo.port
-                            path("api/links")
+                if (qrTransferInfo.secret.isNotEmpty()) {
+                    val response: HttpResponse =
+                        httpClient.get {
+                            url {
+                                protocol = URLProtocol.HTTP
+                                host = qrTransferInfo.ip
+                                port = qrTransferInfo.port
+                                path("api/transfer/export")
+                                parameters.append("secret", qrTransferInfo.secret)
+                            }
+                            timeout {
+                                requestTimeoutMillis = 30000 // 30 seconds
+                            }
                         }
-                        timeout {
-                            requestTimeoutMillis = 30000 // 30 seconds
-                        }
+
+                    if (response.status.isSuccess().not()) {
+                        return@withContext Result.failure(
+                            Exception("Failed to fetch data: ${response.status}"),
+                        )
                     }
 
-                if (response.status.isSuccess().not()) {
-                    return@withContext Result.failure(
-                        Exception("Failed to fetch data: ${response.status}"),
-                    )
+                    val exportPkg: TransferExportPackage = response.body()
+                    importExportPackage(exportPkg)
+                } else {
+                    val response: HttpResponse =
+                        httpClient.get {
+                            url {
+                                protocol = URLProtocol.HTTP
+                                host = qrTransferInfo.ip
+                                port = qrTransferInfo.port
+                                path("api/links")
+                            }
+                            timeout {
+                                requestTimeoutMillis = 30000 // 30 seconds
+                            }
+                        }
+
+                    if (response.status.isSuccess().not()) {
+                        return@withContext Result.failure(
+                            Exception("Failed to fetch data: ${response.status}"),
+                        )
+                    }
+
+                    val exportedData: List<LinkResponse> = response.body()
+                    importToDatabase(exportedData)
                 }
-
-                val exportedData: List<LinkResponse> = response.body()
-
-                importToDatabase(exportedData)
 
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
+            }
+        }
+    }
+
+    private fun importExportPackage(pkg: TransferExportPackage) {
+        deeprQueries.transaction {
+            val profileIdMap = mutableMapOf<Long, Long>()
+            pkg.profiles.forEach { profile ->
+                val existing = deeprQueries.getProfileByName(profile.name, profile.isPrivate).executeAsOneOrNull()
+                if (existing != null) {
+                    profileIdMap[profile.id] = existing.id
+                } else {
+                    deeprQueries.insertProfileAutoPriority(profile.name, profile.isPrivate)
+                    val newProfile = deeprQueries.getProfileByName(profile.name, profile.isPrivate).executeAsOneOrNull()
+                    if (newProfile != null) {
+                        profileIdMap[profile.id] = newProfile.id
+                    }
+                }
+            }
+
+            val tagIdMap = mutableMapOf<Long, Long>()
+            pkg.tags.forEach { tag ->
+                val existing = deeprQueries.getTagByName(tag.name, tag.isPrivate).executeAsOneOrNull()
+                if (existing != null) {
+                    tagIdMap[tag.id] = existing.id
+                } else {
+                    deeprQueries.insertTag(tag.name, tag.isPrivate)
+                    val newTag = deeprQueries.getTagByName(tag.name, tag.isPrivate).executeAsOneOrNull()
+                    if (newTag != null) {
+                        tagIdMap[tag.id] = newTag.id
+                    }
+                }
+            }
+
+            val linkIdMap = mutableMapOf<Long, Long>()
+            pkg.links.forEach { link ->
+                val existingList = deeprQueries.getDeeprByLink(link.link).executeAsList()
+                if (existingList.isEmpty()) {
+                    val localProfileId = profileIdMap[link.profileId] ?: 1L
+                    deeprQueries.importDeepr(
+                        link = link.link,
+                        name = link.name,
+                        openedCount = link.openedCount,
+                        notes = link.notes,
+                        thumbnail = link.thumbnail,
+                        isFavourite = link.isFavourite,
+                        createdAt = link.createdAt,
+                        profileId = localProfileId,
+                    )
+                    val newId = deeprQueries.lastInsertRowId().executeAsOne()
+                    linkIdMap[link.id] = newId
+                } else {
+                    linkIdMap[link.id] = existingList.first().id
+                }
+            }
+
+            pkg.linkTags.forEach { relation ->
+                val localLinkId = linkIdMap[relation.linkId]
+                val localTagId = tagIdMap[relation.tagId]
+                if (localLinkId != null && localTagId != null) {
+                    deeprQueries.addTagToLink(linkId = localLinkId, tagId = localTagId)
+                }
             }
         }
     }
@@ -902,6 +1235,7 @@ open class LocalServerRepositoryImpl(
                 ip = ipAddress,
                 port = port,
                 appVersion = BuildConfig.VERSION_NAME,
+                secret = serverSecret,
             )
 
         return try {
@@ -1061,6 +1395,52 @@ data class QRTransferInfo(
     val ip: String,
     val port: Int,
     val appVersion: String,
+    val secret: String = "",
+)
+
+@Serializable
+data class TransferExportPackage(
+    val profiles: List<ProfileData>,
+    val links: List<LinkExportData>,
+    val tags: List<TagExportData>,
+    val linkTags: List<LinkTagExportData>,
+)
+
+@Serializable
+data class ProfileData(
+    val id: Long,
+    val name: String,
+    val createdAt: String,
+    val themeMode: String,
+    val colorTheme: String,
+    val priority: Long,
+    val isPrivate: Long,
+)
+
+@Serializable
+data class LinkExportData(
+    val id: Long,
+    val link: String,
+    val name: String,
+    val createdAt: String,
+    val openedCount: Long,
+    val isFavourite: Long,
+    val notes: String,
+    val thumbnail: String,
+    val profileId: Long,
+)
+
+@Serializable
+data class TagExportData(
+    val id: Long,
+    val name: String,
+    val isPrivate: Long,
+)
+
+@Serializable
+data class LinkTagExportData(
+    val linkId: Long,
+    val tagId: Long,
 )
 
 /**

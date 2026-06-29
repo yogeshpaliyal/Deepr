@@ -192,4 +192,9 @@
 
     <string name="api_get_profiles">Ottieni tutti i profili disponibili</string>
     <string name="api_add_profile">Aggiungi un nuovo profilo (JSON: {\"name\": \"nome\"})</string>
+    <string name="unlock_private_links">Sblocca Link Privati</string>
+    <string name="unlock_private_links_desc">Usa la biometria per accedere al profilo e ai link privati</string>
+    <string name="web_unlock_request_title">Richiesta sblocco browser</string>
+    <string name="web_unlock_request_desc">Tocca per sbloccare la sezione privata sul server web.</string>
+    <string name="lock_private_links">Blocca Link Privati</string>
 </resources>
