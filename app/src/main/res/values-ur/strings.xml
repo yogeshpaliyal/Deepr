@@ -127,4 +127,5 @@
     <string name="sync_status_invalid">⚠ فائل فارمیٹ غلط ہے</string>
     <string name="sync_status_no_file">کوئی ہم آہنگی فائل منتخب نہیں</string>
     <string name="sync_now_description">منتخب کردہ فائل میں ڈیپ لنکس کو دستی طور پر ہم آہنگ کریں</string>
+    <string name="all_tags">تمام ٹیگز</string>
 </resources>
