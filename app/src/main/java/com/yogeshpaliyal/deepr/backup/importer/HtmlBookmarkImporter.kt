@@ -2,9 +2,9 @@ package com.yogeshpaliyal.deepr.backup.importer
 
 import android.content.Context
 import android.net.Uri
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ImportResult
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.flow.firstOrNull
 import org.jsoup.Jsoup
@@ -18,8 +18,8 @@ import java.io.IOException
  */
 abstract class HtmlBookmarkImporter(
     protected val context: Context,
-    protected val deeprQueries: DeeprQueries,
-    protected val appPreferenceDataStore: AppPreferenceDataStore,
+    protected val linkRepository: LinkRepository,
+    protected val preferenceRepository: PreferenceRepository,
 ) : BookmarkImporter {
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
         var importedCount = 0
@@ -29,43 +29,24 @@ abstract class HtmlBookmarkImporter(
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 val document = Jsoup.parse(inputStream, "UTF-8", "")
                 val bookmarks = extractBookmarks(document)
+                val profileId = preferenceRepository.getSelectedProfileId.firstOrNull() ?: 1L
 
-                bookmarks.forEach { bookmark ->
-                    val existing = deeprQueries.getDeeprByLink(bookmark.url).executeAsOneOrNull()
-                    if (bookmark.url.isNotBlank() && existing == null) {
-                        try {
-                            val profileId = appPreferenceDataStore.getSelectedProfileId.firstOrNull() ?: 1L
-                            deeprQueries.transaction {
-                                deeprQueries.insertDeepr(
-                                    link = bookmark.url,
-                                    openedCount = 0L,
-                                    name = bookmark.title,
-                                    notes = bookmark.folder ?: "",
-                                    thumbnail = "",
-                                    profileId = profileId,
-                                )
+                val validBookmarks = bookmarks.filter { it.url.isNotBlank() }
+                skippedCount = bookmarks.size - validBookmarks.size
 
-                                // Add tags if present
-                                if (!bookmark.tags.isNullOrEmpty()) {
-                                    val linkId = deeprQueries.lastInsertRowId().executeAsOne()
-                                    bookmark.tags.forEach { tagName ->
-                                        deeprQueries.insertTag(tagName)
-                                        val tag =
-                                            deeprQueries.getTagByName(tagName).executeAsOneOrNull()
-                                        if (tag != null) {
-                                            deeprQueries.addTagToLink(linkId, tag.id)
-                                        }
-                                    }
-                                }
-                            }
-                            importedCount++
-                        } catch (_: Exception) {
-                            skippedCount++
-                        }
-                    } else {
-                        skippedCount++
+                val items =
+                    validBookmarks.map { bookmark ->
+                        LinkRepository.NewLinkWithTags(
+                            link = bookmark.url,
+                            name = bookmark.title,
+                            notes = bookmark.folder ?: "",
+                            profileId = profileId,
+                            tagNames = bookmark.tags ?: emptyList(),
+                        )
                     }
-                }
+                val results = linkRepository.insertLinksWithTags(items)
+                importedCount = results.count { it != null }
+                skippedCount += results.count { it == null }
             }
 
             return RequestResult.Success(ImportResult(importedCount, skippedCount))

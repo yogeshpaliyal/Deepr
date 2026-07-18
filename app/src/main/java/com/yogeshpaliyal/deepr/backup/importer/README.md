@@ -44,11 +44,12 @@ This design allows easy extension to support new import formats without modifyin
 ```kotlin
 class ImportRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
+    private val preferenceRepository: PreferenceRepository,
 ) : ImportRepository {
-    private val csvImporter = CsvBookmarkImporter(context, deeprQueries)
-    private val chromeImporter = ChromeBookmarkImporter(context, deeprQueries)
-    private val mozillaImporter = MozillaBookmarkImporter(context, deeprQueries)
+    private val csvImporter = CsvBookmarkImporter(context, linkRepository, preferenceRepository)
+    private val chromeImporter = ChromeBookmarkImporter(context, linkRepository, preferenceRepository)
+    private val mozillaImporter = MozillaBookmarkImporter(context, linkRepository, preferenceRepository)
 
     override fun getAvailableImporters(): List<BookmarkImporter> =
         listOf(csvImporter, chromeImporter, mozillaImporter)
@@ -71,10 +72,12 @@ To add support for a new bookmark format:
 ```kotlin
 class MyCustomImporter(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
 ) : BookmarkImporter {
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
-        // Your import logic here
+        // Your import logic here - build a List<LinkRepository.NewLinkWithTags>
+        // and call linkRepository.insertLinksWithTags(items) to persist it
+        // atomically (it already skips links that already exist).
     }
 
     override fun getDisplayName(): String = "My Custom Format"
@@ -87,7 +90,7 @@ class MyCustomImporter(
 2. Add it to `ImportRepositoryImpl`:
 
 ```kotlin
-private val customImporter = MyCustomImporter(context, deeprQueries)
+private val customImporter = MyCustomImporter(context, linkRepository)
 
 override fun getAvailableImporters(): List<BookmarkImporter> =
     listOf(csvImporter, chromeImporter, mozillaImporter, customImporter)

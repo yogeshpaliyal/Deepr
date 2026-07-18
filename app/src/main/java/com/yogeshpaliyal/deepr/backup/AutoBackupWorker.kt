@@ -3,17 +3,17 @@ package com.yogeshpaliyal.deepr.backup
 import android.content.Context
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksForBackup
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 class AutoBackupWorker(
     val context: Context,
-    val deeprQueries: DeeprQueries,
-    val preferenceDataStore: AppPreferenceDataStore,
+    val linkRepository: LinkRepository,
+    val preferenceRepository: PreferenceRepository,
 ) {
     private val csvWriter by lazy {
         CsvWriter()
@@ -22,22 +22,22 @@ class AutoBackupWorker(
     suspend fun doWork() {
         return withContext(Dispatchers.IO) {
             try {
-                val enabled = preferenceDataStore.getAutoBackupEnabled.first()
+                val enabled = preferenceRepository.getAutoBackupEnabled.first()
                 if (!enabled) {
                     return@withContext
                 }
 
-                val location = preferenceDataStore.getAutoBackupLocation.first()
+                val location = preferenceRepository.getAutoBackupLocation.first()
                 if (location.isEmpty()) {
                     return@withContext
                 }
 
-                val count = deeprQueries.countDeepr().executeAsOne()
+                val count = linkRepository.countAllLinks()
                 if (count == 0L) {
                     return@withContext
                 }
 
-                val dataToExport = deeprQueries.getLinksForBackup().executeAsList()
+                val dataToExport = linkRepository.getLinksForBackup()
                 if (dataToExport.isEmpty()) {
                     return@withContext
                 }
@@ -50,7 +50,7 @@ class AutoBackupWorker(
 
                 if (success) {
                     // Record backup time on successful completion
-                    preferenceDataStore.setLastBackupTime(System.currentTimeMillis())
+                    preferenceRepository.setLastBackupTime(System.currentTimeMillis())
                 }
             } catch (_: Exception) {
             }

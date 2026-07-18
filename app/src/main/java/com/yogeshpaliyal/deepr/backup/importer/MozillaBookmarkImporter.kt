@@ -1,8 +1,8 @@
 package com.yogeshpaliyal.deepr.backup.importer
 
 import android.content.Context
-import com.yogeshpaliyal.deepr.DeeprQueries
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import kotlinx.coroutines.flow.first
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -12,9 +12,9 @@ import org.jsoup.nodes.Element
  */
 class MozillaBookmarkImporter(
     context: Context,
-    deeprQueries: DeeprQueries,
-    appPreferenceDataStore: AppPreferenceDataStore,
-) : HtmlBookmarkImporter(context, deeprQueries, appPreferenceDataStore) {
+    linkRepository: LinkRepository,
+    preferenceRepository: PreferenceRepository,
+) : HtmlBookmarkImporter(context, linkRepository, preferenceRepository) {
     override fun getDisplayName(): String = "Mozilla/Firefox Bookmarks"
 
     override suspend fun extractBookmarks(document: Document): List<Bookmark> {
@@ -33,7 +33,7 @@ class MozillaBookmarkImporter(
             val lastModified = link.attr("last_modified")
             val shortcutUrl = link.attr("shortcuturl")
             val tags = link.attr("tags")
-            val profileId = appPreferenceDataStore.getSelectedProfileId.first()
+            val profileId = preferenceRepository.getSelectedProfileId.first()
             if (url.isNotBlank() && !url.startsWith("place:")) {
                 val tagList =
                     if (tags.isNotBlank()) {

@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -38,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,12 +49,12 @@ import java.util.Locale
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
     private val analyticsManager: AnalyticsManager,
-    private val preferenceDataStore: AppPreferenceDataStore,
+    private val preferenceRepository: PreferenceRepository,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
@@ -72,7 +73,7 @@ open class LocalServerRepositoryImpl(
     init {
         // Load saved port on initialization
         CoroutineScope(Dispatchers.IO).launch {
-            preferenceDataStore.getServerPort.collect { portString ->
+            preferenceRepository.getServerPort.collect { portString ->
                 val port = portString.toIntOrNull()
                 if (port != null && port in 1024..65535) {
                     _serverPort.update { port }
@@ -86,7 +87,7 @@ open class LocalServerRepositoryImpl(
     override suspend fun setServerPort(port: Int) {
         if (port in 1024..65535) {
             _serverPort.update { port }
-            preferenceDataStore.setServerPort(port.toString())
+            preferenceRepository.setServerPort(port.toString())
         }
     }
 
@@ -144,7 +145,7 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/profiles") {
                             try {
-                                val profiles = deeprQueries.getAllProfiles().executeAsList()
+                                val profiles = linkRepository.getAllProfilesOnce()
                                 val response =
                                     profiles.map { profile ->
                                         ProfileResponse(
@@ -166,7 +167,7 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                deeprQueries.insertProfile(request.name)
+                                linkRepository.insertProfile(request.name)
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),
@@ -185,7 +186,7 @@ open class LocalServerRepositoryImpl(
                                 val profileId =
                                     call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
                                 val links =
-                                    deeprQueries
+                                    linkRepository
                                         .getLinksAndTags(
                                             profileId,
                                             "",
@@ -199,7 +200,7 @@ open class LocalServerRepositoryImpl(
                                             "createdAt",
                                             "DESC",
                                             "createdAt",
-                                        ).executeAsList()
+                                        ).first()
                                 val response =
                                     links.map { link ->
                                         LinkResponse(
@@ -256,12 +257,12 @@ open class LocalServerRepositoryImpl(
                         get("/api/tags") {
                             try {
                                 // Get all tags from the database with their IDs
-                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val allTags = linkRepository.getAllTags().first()
                                 val response =
                                     allTags.map { tag ->
                                         // Count how many links use this tag
                                         val linkCount =
-                                            deeprQueries
+                                            linkRepository
                                                 .getLinksAndTags(
                                                     1L, // Default profile
                                                     "",
@@ -275,7 +276,7 @@ open class LocalServerRepositoryImpl(
                                                     "createdAt",
                                                     "DESC",
                                                     "createdAt",
-                                                ).executeAsList()
+                                                ).first()
                                                 .size
                                         TagResponse(
                                             id = tag.id,
@@ -417,34 +418,22 @@ open class LocalServerRepositoryImpl(
         }
     }
 
-    private fun importToDatabase(links: List<LinkResponse>) {
-        deeprQueries.transaction {
-            links.forEach { deeplink ->
-                if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
-                    deeprQueries.importDeepr(
-                        link = deeplink.link,
-                        name = deeplink.name,
-                        openedCount = deeplink.openedCount,
-                        notes = deeplink.notes,
-                        thumbnail = deeplink.thumbnail,
-                        isFavourite = deeplink.isFavourite,
-                        createdAt = deeplink.createdAt,
-                        profileId = 1L, // Default profile
-                    )
-
-                    val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                    deeplink.tags.forEach { tagName ->
-                        deeprQueries.insertTag(name = tagName)
-                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
-                        deeprQueries.addTagToLink(
-                            linkId = insertedId,
-                            tagId = tag.id,
-                        )
-                    }
-                }
+    private suspend fun importToDatabase(links: List<LinkResponse>) {
+        val items =
+            links.map { deeplink ->
+                LinkRepository.NewLinkWithTags(
+                    link = deeplink.link,
+                    name = deeplink.name,
+                    notes = deeplink.notes,
+                    thumbnail = deeplink.thumbnail,
+                    openedCount = deeplink.openedCount,
+                    isFavourite = deeplink.isFavourite,
+                    createdAt = deeplink.createdAt,
+                    profileId = 1L, // Default profile
+                    tagNames = deeplink.tags,
+                )
             }
-        }
+        linkRepository.insertLinksWithTags(items)
     }
 
     private fun generateQRCode(port: Int): String? {

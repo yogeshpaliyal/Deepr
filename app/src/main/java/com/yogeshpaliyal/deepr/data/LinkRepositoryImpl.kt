@@ -1,14 +1,20 @@
 package com.yogeshpaliyal.deepr.data
 
 import android.content.Context
-import app.cash.sqldelight.Query
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
+import com.yogeshpaliyal.deepr.Deepr
 import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.GetLinksForBackup
+import com.yogeshpaliyal.deepr.ListDeeprWithTagsAsc
 import com.yogeshpaliyal.deepr.Profile
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.backup.GoogleDriveAutoBackupWorker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class LinkRepositoryImpl(
@@ -37,7 +43,7 @@ class LinkRepositoryImpl(
         scheduleAutoBackup()
     }
 
-    override fun getAllProfiles(): Query<Profile> = deeprQueries.getAllProfiles()
+    override fun getAllProfiles(): Flow<List<Profile>> = deeprQueries.getAllProfiles().asFlow().mapToList(Dispatchers.IO)
 
     override suspend fun getProfileById(id: Long): Profile? =
         withContext(Dispatchers.IO) {
@@ -86,12 +92,16 @@ class LinkRepositoryImpl(
         scheduleAutoBackup()
     }
 
-    override fun countProfiles(): Query<Long> = deeprQueries.countProfiles()
+    override suspend fun countProfiles(): Long =
+        withContext(Dispatchers.IO) {
+            deeprQueries.countProfiles().executeAsOne()
+        }
 
     // Tag operations
-    override fun getAllTags(): Query<Tags> = deeprQueries.getAllTags()
+    override fun getAllTags(): Flow<List<Tags>> = deeprQueries.getAllTags().asFlow().mapToList(Dispatchers.IO)
 
-    override fun getAllTagsWithCount(profileId: Long): Query<GetAllTagsWithCount> = deeprQueries.getAllTagsWithCount(profileId)
+    override fun getAllTagsWithCount(profileId: Long): Flow<List<GetAllTagsWithCount>> =
+        deeprQueries.getAllTagsWithCount(profileId).asFlow().mapToList(Dispatchers.IO)
 
     override suspend fun getTagByName(tagName: String): Tags? =
         withContext(Dispatchers.IO) {
@@ -181,25 +191,28 @@ class LinkRepositoryImpl(
         sortField1: String,
         sortType2: String,
         sortField2: String,
-    ): Query<GetLinksAndTags> =
-        deeprQueries.getLinksAndTags(
-            profileId,
-            searchQuery1,
-            searchQuery2,
-            searchQuery3,
-            favouriteFilter1,
-            favouriteFilter2,
-            tagIdsString1,
-            tagIdsString2,
-            sortType1,
-            sortField1,
-            sortType2,
-            sortField2,
-        )
+    ): Flow<List<GetLinksAndTags>> =
+        deeprQueries
+            .getLinksAndTags(
+                profileId,
+                searchQuery1,
+                searchQuery2,
+                searchQuery3,
+                favouriteFilter1,
+                favouriteFilter2,
+                tagIdsString1,
+                tagIdsString2,
+                sortType1,
+                sortField1,
+                sortType2,
+                sortField2,
+            ).asFlow()
+            .mapToList(Dispatchers.IO)
 
-    override fun countOfLinks(profileId: Long): Query<Long> = deeprQueries.countOfLinks(profileId)
+    override fun countOfLinks(profileId: Long): Flow<Long> = deeprQueries.countOfLinks(profileId).asFlow().mapToOne(Dispatchers.IO)
 
-    override fun countOfFavouriteLinks(profileId: Long): Query<Long> = deeprQueries.countOfFavouriteLinks(profileId)
+    override fun countOfFavouriteLinks(profileId: Long): Flow<Long> =
+        deeprQueries.countOfFavouriteLinks(profileId).asFlow().mapToOne(Dispatchers.IO)
 
     override suspend fun insertDeepr(
         link: String,
@@ -264,5 +277,102 @@ class LinkRepositoryImpl(
         withContext(Dispatchers.IO) {
             deeprQueries.insertDeeprOpenLog(id)
         }
+    }
+
+    override suspend fun getDeeprByLink(link: String): Deepr? =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+        }
+
+    override suspend fun countAllLinks(): Long =
+        withContext(Dispatchers.IO) {
+            deeprQueries.countDeepr().executeAsOne()
+        }
+
+    override suspend fun getLinksForBackup(): List<GetLinksForBackup> =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getLinksForBackup().executeAsList()
+        }
+
+    override suspend fun getLinksForMarkdownSync(): List<ListDeeprWithTagsAsc> =
+        withContext(Dispatchers.IO) {
+            deeprQueries.listDeeprWithTagsAsc().executeAsList()
+        }
+
+    override suspend fun getAllProfilesOnce(): List<Profile> =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getAllProfiles().executeAsList()
+        }
+
+    override suspend fun getOrCreateProfileByName(name: String): Long =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getProfileByName(name).executeAsOneOrNull()?.id ?: run {
+                deeprQueries.insertProfile(name)
+                deeprQueries.lastInsertRowId().executeAsOne()
+            }
+        }
+
+    override suspend fun clearAllData() {
+        withContext(Dispatchers.IO) {
+            deeprQueries.transaction {
+                deeprQueries.deleteAllProfiles()
+                deeprQueries.deleteAllTags()
+            }
+        }
+        scheduleAutoBackup()
+    }
+
+    override suspend fun insertLinksWithTags(items: List<LinkRepository.NewLinkWithTags>): List<Long?> {
+        val results =
+            withContext(Dispatchers.IO) {
+                val insertedIds = mutableListOf<Long?>()
+                deeprQueries.transaction {
+                    items.forEach { item ->
+                        val existing = deeprQueries.getDeeprByLink(item.link).executeAsOneOrNull()
+                        if (existing != null) {
+                            insertedIds.add(null)
+                            return@forEach
+                        }
+
+                        if (item.createdAt != null) {
+                            deeprQueries.importDeepr(
+                                link = item.link,
+                                name = item.name,
+                                openedCount = item.openedCount,
+                                notes = item.notes,
+                                thumbnail = item.thumbnail,
+                                isFavourite = item.isFavourite,
+                                createdAt = item.createdAt,
+                                profileId = item.profileId,
+                            )
+                        } else {
+                            deeprQueries.insertDeepr(
+                                link = item.link,
+                                name = item.name,
+                                openedCount = item.openedCount,
+                                notes = item.notes,
+                                thumbnail = item.thumbnail,
+                                profileId = item.profileId,
+                            )
+                        }
+                        val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+
+                        item.tagNames.forEach { tagName ->
+                            deeprQueries.insertTag(tagName)
+                            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                            if (tag != null) {
+                                deeprQueries.addTagToLink(insertedId, tag.id)
+                            }
+                        }
+
+                        insertedIds.add(insertedId)
+                    }
+                }
+                insertedIds
+            }
+        if (results.any { it != null }) {
+            scheduleAutoBackup()
+        }
+        return results
     }
 }

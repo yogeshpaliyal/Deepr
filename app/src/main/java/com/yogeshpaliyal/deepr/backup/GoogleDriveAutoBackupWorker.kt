@@ -9,7 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.yogeshpaliyal.deepr.gdrive.DriveSyncManager
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,7 +25,7 @@ class GoogleDriveAutoBackupWorker(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams),
     KoinComponent {
-    private val preferenceDataStore: AppPreferenceDataStore by inject()
+    private val preferenceDataStore: PreferenceRepository by inject()
     private val driveSyncManager: DriveSyncManager by inject()
 
     override suspend fun doWork(): Result {

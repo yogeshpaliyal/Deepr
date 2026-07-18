@@ -64,7 +64,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetAllTagsWithCount
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
@@ -81,7 +80,6 @@ import compose.icons.tablericons.Search
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.Trash
 import kotlinx.coroutines.runBlocking
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 object TagSelectionScreen : TopLevelRoute {
@@ -101,7 +99,6 @@ object TagSelectionScreen : TopLevelRoute {
         val tagsWithCount by viewModel.allTagsWithCount.collectAsStateWithLifecycle()
         val context = LocalContext.current
         val navigator = LocalNavigator.current
-        val deeprQueries: DeeprQueries = koinInject()
         var isTagEditEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
         var isTagDeleteEnable by remember { mutableStateOf<GetAllTagsWithCount?>(null) }
         var tagEditError by remember { mutableStateOf<String?>(null) }
@@ -326,7 +323,7 @@ object TagSelectionScreen : TopLevelRoute {
                                                         Toast.LENGTH_SHORT,
                                                     ).show()
                                             } else {
-                                                deeprQueries.insertTag(trimmedTagName)
+                                                viewModel.insertTagOnly(trimmedTagName)
                                                 newTagName = ""
                                                 Toast
                                                     .makeText(

@@ -1,7 +1,7 @@
 package com.yogeshpaliyal.deepr.gdrive
 
 import android.content.Context
-import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.data.LinkRepository
 
 /**
  * Factory for creating DriveSyncManager instances.
@@ -10,6 +10,6 @@ import com.yogeshpaliyal.deepr.DeeprQueries
 interface DriveSyncManagerFactory {
     fun create(
         context: Context,
-        deeprQueries: DeeprQueries,
+        linkRepository: LinkRepository,
     ): DriveSyncManager
 }
