@@ -328,6 +328,24 @@ open class LocalServerRepositoryImpl(
                                 )
                             }
                         }
+
+                        post("/api/links/increment-count") {
+                            try {
+                                val id = call.request.queryParameters["id"]?.toLongOrNull()
+                                if (id != null) {
+                                    accountViewModel.incrementOpenedCount(id)
+                                    call.respond(HttpStatusCode.OK, SuccessResponse("Count incremented"))
+                                } else {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error incrementing count", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error incrementing count: ${e.message}"),
+                                )
+                            }
+                        }
                     }
                 }
 

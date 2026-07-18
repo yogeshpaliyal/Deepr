@@ -112,7 +112,7 @@ class AppPreferenceDataStore(
 
     val getThemeMode: Flow<String> =
         context.appDataStore.data.map { preferences ->
-            preferences[THEME_MODE] ?: "light" // Default to light theme
+            preferences[THEME_MODE] ?: "system" // Default to system theme
         }
 
     val getShowOpenCounter: Flow<Boolean> =

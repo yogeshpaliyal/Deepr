@@ -90,6 +90,7 @@ fun NoteViewDialog(
                 SelectionContainer {
                     ClickableText(
                         text = annotatedString,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                         onClick = { offset ->
                             // Check if clicked position has a URL annotation
                             annotatedString

@@ -1,0 +1,71 @@
+name: PR Comment
+
+on:
+  workflow_run:
+    workflows: ["PR Check"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment:
+    name: 'Comment on PR'
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: 💬 Comment on PR with APK Link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowRun = context.payload.workflow_run;
+            const runId = workflowRun.id;
+            const repo = context.repo;
+            
+            // Get the PR number from the workflow run
+            const prNumber = workflowRun.pull_requests[0]?.number;
+            
+            if (!prNumber) {
+              console.log('No PR number found, skipping comment');
+              return;
+            }
+            
+            // Check if we already commented on this PR for this run
+            const comments = await github.rest.issues.listComments({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber
+            });
+            
+            const existingComment = comments.data.find(comment => 
+              comment.body.includes(`actions/runs/${runId}`) &&
+              comment.body.includes('APK Build Complete')
+            );
+            
+            if (existingComment) {
+              console.log('Comment already exists for this run, skipping');
+              return;
+            }
+
+            const comment = `## 📱 APK Build Complete!
+
+            Your debug APK has been built successfully and is ready for testing.
+
+            ### 📥 Download APK
+            [Download app-debug.apk](https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId})
+
+            **Note:** Click the link above, scroll down to the "Artifacts" section, and download the \`app-debug\` artifact.
+
+            **Retention:** This artifact will be available for 3 days.`;
+
+            await github.rest.issues.createComment({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber,
+              body: comment
+            });
+            
+            console.log(`Comment added to PR #${prNumber}`);

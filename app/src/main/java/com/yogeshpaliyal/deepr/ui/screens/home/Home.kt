@@ -212,6 +212,7 @@ fun HomeScreen(
 ) {
     val viewModel: AccountViewModel = koinActivityViewModel()
     val currentViewType by viewModel.viewType.collectAsStateWithLifecycle()
+    val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
     val localNavigator = LocalNavigator.current
     val hapticFeedback = LocalHapticFeedback.current
     val tags = viewModel.allTagsWithCount.collectAsStateWithLifecycle()
@@ -265,7 +266,7 @@ fun HomeScreen(
             val normalizedLink = normalizeLink(sharedText.url)
             if (isValidDeeplink(normalizedLink)) {
                 selectedLink =
-                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "")
+                    createDeeprObject(link = normalizedLink, name = sharedText.title ?: "", profileId = currentProfile?.id ?: 1L)
             } else {
                 Toast
                     .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
@@ -455,7 +456,7 @@ fun HomeScreen(
                     clipboardLink = clipboardLink,
                     onAddClick = { url ->
                         resetClipboardLink?.invoke()
-                        localNavigator.add(AddLinkScreen(createDeeprObject(link = url)))
+                        localNavigator.add(AddLinkScreen(createDeeprObject(link = url, profileId = currentProfile?.id ?: 1L)))
                     },
                     onDismiss = {
                         resetClipboardLink?.invoke()
@@ -510,7 +511,7 @@ fun HomeScreen(
                 },
                 expanded = isExpanded,
                 onClick = {
-                    localNavigator.add(AddLinkScreen(createDeeprObject()))
+                    localNavigator.add(AddLinkScreen(createDeeprObject(profileId = currentProfile?.id ?: 1L)))
                 },
             )
         },
