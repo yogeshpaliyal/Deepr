@@ -261,6 +261,19 @@
                             </button>
                         </div>
 
+                        <!-- Favourites Filter -->
+                        <button
+                            id="favouritesFilter"
+                            type="button"
+                            data-active="false"
+                            class="px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                            Favourites
+                        </button>
+
                         <!-- Clear Filters -->
                         <button
                             id="clearFilters"
@@ -439,6 +452,60 @@
         </div>
     </div>
 
+    <!-- Generic Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeConfirmModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <h3 id="confirmModalTitle" class="text-lg font-semibold text-gray-800 mb-2">Are you sure?</h3>
+            <p id="confirmModalMessage" class="text-gray-600 text-sm mb-6"></p>
+            <div class="flex gap-3 justify-end">
+                <button
+                    type="button"
+                    onclick="closeConfirmModal()"
+                    class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    id="confirmModalConfirmBtn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Prompt Modal -->
+    <div id="promptModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closePromptModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <h3 id="promptModalTitle" class="text-lg font-semibold text-gray-800 mb-4">Rename</h3>
+            <input
+                type="text"
+                id="promptModalInput"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 mb-6"
+            >
+            <div class="flex gap-3 justify-end">
+                <button
+                    type="button"
+                    onclick="closePromptModal()"
+                    class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    id="promptModalConfirmBtn"
+                    class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables to store all links and available tags
         let allLinks = [];
@@ -446,6 +513,65 @@
         let selectedTags = []; // Now contains {id, name} objects
         let profiles = []; // Contains {id, name, createdAt} objects
         let selectedProfileId = 1; // Default profile
+
+        // Guards against duplicate in-flight requests from rapid double-clicks
+        const busyActions = new Set();
+        async function runOnce(key, action) {
+            if (busyActions.has(key)) return;
+            busyActions.add(key);
+            try {
+                await action();
+            } finally {
+                busyActions.delete(key);
+            }
+        }
+
+        // Generic confirm dialog (replaces window.confirm)
+        function showConfirmDialog(message, onConfirm, confirmLabel = 'Delete') {
+            document.getElementById('confirmModalMessage').textContent = message;
+            const btn = document.getElementById('confirmModalConfirmBtn');
+            btn.textContent = confirmLabel;
+            const freshBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(freshBtn, btn);
+            freshBtn.addEventListener('click', () => {
+                closeConfirmModal();
+                onConfirm();
+            });
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        // Generic prompt dialog (replaces window.prompt)
+        function showPromptDialog(title, initialValue, onConfirm) {
+            document.getElementById('promptModalTitle').textContent = title;
+            const input = document.getElementById('promptModalInput');
+            input.value = initialValue;
+            const btn = document.getElementById('promptModalConfirmBtn');
+            const freshBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(freshBtn, btn);
+            const submit = () => {
+                const value = input.value.trim();
+                closePromptModal();
+                if (!value || value === initialValue) return;
+                onConfirm(value);
+            };
+            freshBtn.addEventListener('click', submit);
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submit();
+                }
+            };
+            document.getElementById('promptModal').classList.remove('hidden');
+            setTimeout(() => { input.focus(); input.select(); }, 50);
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.add('hidden');
+        }
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -628,50 +754,51 @@
             `).join('');
         }
 
-        async function renameProfile(id, currentName) {
-            const newName = prompt('Rename profile:', currentName);
-            if (!newName || !newName.trim() || newName.trim() === currentName) return;
-            const profile = profiles.find(p => p.id === id);
-            try {
-                const response = await fetch(`/api/profiles/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: newName.trim(),
-                        themeMode: profile?.themeMode || 'system',
-                        colorTheme: profile?.colorTheme || 'dynamic',
-                    })
-                });
-                if (!response.ok) throw new Error('Failed to rename profile');
-                showToast('Profile renamed successfully!', 'success');
-                await loadProfiles();
-                renderManageProfilesList();
-            } catch (error) {
-                console.error('Error renaming profile:', error);
-                showToast('Failed to rename profile. Please try again.', 'error');
-            }
+        function renameProfile(id, currentName) {
+            showPromptDialog('Rename profile', currentName, async (newName) => {
+                const profile = profiles.find(p => p.id === id);
+                try {
+                    const response = await fetch(`/api/profiles/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: newName,
+                            themeMode: profile?.themeMode || 'system',
+                            colorTheme: profile?.colorTheme || 'dynamic',
+                        })
+                    });
+                    if (!response.ok) throw new Error('Failed to rename profile');
+                    showToast('Profile renamed successfully!', 'success');
+                    await loadProfiles();
+                    renderManageProfilesList();
+                } catch (error) {
+                    console.error('Error renaming profile:', error);
+                    showToast('Failed to rename profile. Please try again.', 'error');
+                }
+            });
         }
 
-        async function removeProfile(id, name) {
-            if (!confirm(`Delete profile "${name}" and all its links?`)) return;
-            try {
-                const response = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
-                if (!response.ok) {
-                    const error = await response.json().catch(() => null);
-                    throw new Error(error?.error || 'Failed to delete profile');
+        function removeProfile(id, name) {
+            showConfirmDialog(`Delete profile "${name}" and all its links?`, () => runOnce('del-profile-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => null);
+                        throw new Error(error?.error || 'Failed to delete profile');
+                    }
+                    showToast('Profile deleted successfully!', 'success');
+                    await loadProfiles();
+                    renderManageProfilesList();
+                    if (selectedProfileId === id) {
+                        selectedProfileId = profiles[0]?.id ?? 1;
+                        populateProfileSelect();
+                    }
+                    loadLinks();
+                } catch (error) {
+                    console.error('Error deleting profile:', error);
+                    showToast(error.message || 'Failed to delete profile. Please try again.', 'error');
                 }
-                showToast('Profile deleted successfully!', 'success');
-                await loadProfiles();
-                renderManageProfilesList();
-                if (selectedProfileId === id) {
-                    selectedProfileId = profiles[0]?.id ?? 1;
-                    populateProfileSelect();
-                }
-                loadLinks();
-            } catch (error) {
-                console.error('Error deleting profile:', error);
-                showToast(error.message || 'Failed to delete profile. Please try again.', 'error');
-            }
+            }));
         }
 
         // Manage Tags modal
@@ -712,39 +839,40 @@
             `).join('');
         }
 
-        async function renameTag(id, currentName) {
-            const newName = prompt('Rename tag:', currentName);
-            if (!newName || !newName.trim() || newName.trim() === currentName) return;
-            try {
-                const response = await fetch(`/api/tags/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: newName.trim() })
-                });
-                if (!response.ok) throw new Error('Failed to rename tag');
-                showToast('Tag renamed successfully!', 'success');
-                await loadAvailableTags();
-                renderManageTagsList();
-                await loadLinks();
-            } catch (error) {
-                console.error('Error renaming tag:', error);
-                showToast('Failed to rename tag. Please try again.', 'error');
-            }
+        function renameTag(id, currentName) {
+            showPromptDialog('Rename tag', currentName, async (newName) => {
+                try {
+                    const response = await fetch(`/api/tags/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    if (!response.ok) throw new Error('Failed to rename tag');
+                    showToast('Tag renamed successfully!', 'success');
+                    await loadAvailableTags();
+                    renderManageTagsList();
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error renaming tag:', error);
+                    showToast('Failed to rename tag. Please try again.', 'error');
+                }
+            });
         }
 
-        async function removeTag(id, name) {
-            if (!confirm(`Delete tag "${name}"? This will remove it from all links.`)) return;
-            try {
-                const response = await fetch(`/api/tags/${id}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error('Failed to delete tag');
-                showToast('Tag deleted successfully!', 'success');
-                await loadAvailableTags();
-                renderManageTagsList();
-                await loadLinks();
-            } catch (error) {
-                console.error('Error deleting tag:', error);
-                showToast('Failed to delete tag. Please try again.', 'error');
-            }
+        function removeTag(id, name) {
+            showConfirmDialog(`Delete tag "${name}"? This will remove it from all links.`, () => runOnce('del-tag-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/tags/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete tag');
+                    showToast('Tag deleted successfully!', 'success');
+                    await loadAvailableTags();
+                    renderManageTagsList();
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error deleting tag:', error);
+                    showToast('Failed to delete tag. Please try again.', 'error');
+                }
+            }));
         }
 
         // Tag management functions
@@ -846,8 +974,10 @@
             const tagFilter = document.getElementById('tagFilter');
             const sortBy = document.getElementById('sortBy');
             const sortOrder = document.getElementById('sortOrder');
+            const favouritesFilter = document.getElementById('favouritesFilter');
             const container = document.getElementById('linksContainer');
             const linkCount = document.getElementById('linkCount');
+            const favouritesOnly = favouritesFilter.dataset.active === 'true';
 
             // Apply filters
             const filteredLinks = allLinks.filter(link => {
@@ -855,7 +985,8 @@
                 const matchesSearch = link.name.toLowerCase().includes(searchTerm) ||
                                     link.link.toLowerCase().includes(searchTerm);
                 const matchesTag = tagFilter.value === '' || link.tags.includes(tagFilter.value);
-                return matchesSearch && matchesTag;
+                const matchesFavourite = !favouritesOnly || !!link.isFavourite;
+                return matchesSearch && matchesTag && matchesFavourite;
             });
 
             // Apply sorting
@@ -1002,30 +1133,33 @@
         }
 
         // Toggle a link's favourite state
-        async function toggleFavourite(id) {
-            try {
-                const response = await fetch(`/api/links/${id}/toggle-favourite`, { method: 'POST' });
-                if (!response.ok) throw new Error('Failed to toggle favourite');
-                await loadLinks();
-            } catch (error) {
-                console.error('Error toggling favourite:', error);
-                showToast('Failed to update favourite. Please try again.', 'error');
-            }
+        function toggleFavourite(id) {
+            runOnce('fav-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/links/${id}/toggle-favourite`, { method: 'POST' });
+                    if (!response.ok) throw new Error('Failed to toggle favourite');
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error toggling favourite:', error);
+                    showToast('Failed to update favourite. Please try again.', 'error');
+                }
+            });
         }
 
         // Delete a link (with confirmation)
-        async function deleteLink(id) {
-            if (!confirm('Are you sure you want to delete this link?')) return;
-            try {
-                const response = await fetch(`/api/links/${id}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error('Failed to delete link');
-                showToast('Link deleted successfully!', 'success');
-                await loadLinks();
-                await loadAvailableTags();
-            } catch (error) {
-                console.error('Error deleting link:', error);
-                showToast('Failed to delete link. Please try again.', 'error');
-            }
+        function deleteLink(id) {
+            showConfirmDialog('Are you sure you want to delete this link?', () => runOnce('del-link-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/links/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete link');
+                    showToast('Link deleted successfully!', 'success');
+                    await loadLinks();
+                    await loadAvailableTags();
+                } catch (error) {
+                    console.error('Error deleting link:', error);
+                    showToast('Failed to delete link. Please try again.', 'error');
+                }
+            }));
         }
 
         // Open the edit-link modal, pre-filled with the current link's data
@@ -1115,10 +1249,30 @@
             document.getElementById('tagFilter').value = '';
             document.getElementById('sortBy').value = 'createdAt';
             document.getElementById('sortOrder').dataset.order = 'desc';
+            setFavouritesFilterActive(false);
             updateSortOrderIcon();
             updateClearSearchButton();
             filterAndDisplayLinks();
             showToast('Filters cleared', 'info');
+        }
+
+        // Toggle the "Favourites only" filter
+        function toggleFavouritesFilter() {
+            const favouritesFilter = document.getElementById('favouritesFilter');
+            setFavouritesFilterActive(favouritesFilter.dataset.active !== 'true');
+            filterAndDisplayLinks();
+        }
+
+        function setFavouritesFilterActive(active) {
+            const favouritesFilter = document.getElementById('favouritesFilter');
+            favouritesFilter.dataset.active = active ? 'true' : 'false';
+            if (active) {
+                favouritesFilter.classList.remove('border-gray-200', 'text-gray-600', 'hover:bg-gray-50');
+                favouritesFilter.classList.add('border-yellow-400', 'bg-yellow-50', 'text-yellow-700');
+            } else {
+                favouritesFilter.classList.remove('border-yellow-400', 'bg-yellow-50', 'text-yellow-700');
+                favouritesFilter.classList.add('border-gray-200', 'text-gray-600', 'hover:bg-gray-50');
+            }
         }
 
         // Toggle sort order
@@ -1290,6 +1444,7 @@
             document.getElementById('sortBy').addEventListener('change', filterAndDisplayLinks);
             document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
             document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+            document.getElementById('favouritesFilter').addEventListener('click', toggleFavouritesFilter);
 
             // Profile controls
             document.getElementById('profileSelect').addEventListener('change', onProfileChange);
