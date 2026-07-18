@@ -126,6 +126,18 @@ interface LinkRepository {
 
     suspend fun deleteDeeprById(id: Long)
 
+    /** Deletes a link and removes any tags that were only used by that link. */
+    suspend fun deleteLinkAndOrphanedTags(id: Long)
+
+    /**
+     * Sets the exact set of tags for a link: removes tags no longer present in [tagNames],
+     * adds the rest (creating any tag that doesn't exist yet).
+     */
+    suspend fun setTagsForLink(
+        linkId: Long,
+        tagNames: List<String>,
+    )
+
     suspend fun incrementOpenedCount(id: Long)
 
     suspend fun resetOpenedCount(id: Long)
@@ -137,6 +149,8 @@ interface LinkRepository {
     // One-shot reads and bulk operations used outside live UI state
 
     suspend fun getDeeprByLink(link: String): Deepr?
+
+    suspend fun getDeeprById(id: Long): Deepr?
 
     suspend fun countAllLinks(): Long
 

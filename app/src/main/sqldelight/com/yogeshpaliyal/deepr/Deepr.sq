@@ -199,6 +199,9 @@ SELECT COUNT(*) FROM Deepr;
 getDeeprByLink:
 SELECT * FROM Deepr WHERE link = ?;
 
+getDeeprById:
+SELECT * FROM Deepr WHERE id = ?;
+
 
 -- Tag operations
 insertTag:

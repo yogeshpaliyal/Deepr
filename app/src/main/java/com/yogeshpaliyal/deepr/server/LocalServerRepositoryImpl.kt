@@ -30,8 +30,10 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -152,6 +154,8 @@ open class LocalServerRepositoryImpl(
                                             id = profile.id,
                                             name = profile.name,
                                             createdAt = profile.createdAt,
+                                            themeMode = profile.themeMode,
+                                            colorTheme = profile.colorTheme,
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)
@@ -347,6 +351,212 @@ open class LocalServerRepositoryImpl(
                                 )
                             }
                         }
+
+                        put("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@put
+                                }
+                                val existing = linkRepository.getDeeprById(id)
+                                if (existing == null) {
+                                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Link not found"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateLinkRequest>()
+                                linkRepository.updateDeeplink(
+                                    newLink = request.link,
+                                    newName = request.name,
+                                    notes = request.notes,
+                                    thumbnail = existing.thumbnail,
+                                    profileId = existing.profileId,
+                                    id = id,
+                                )
+                                linkRepository.setTagsForLink(id, request.tags)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating link: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@delete
+                                }
+                                linkRepository.deleteLinkAndOrphanedTags(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting link: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links/{id}/toggle-favourite") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@post
+                                }
+                                linkRepository.toggleFavourite(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Favourite toggled"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error toggling favourite", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error toggling favourite: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links/{id}/reset-count") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@post
+                                }
+                                linkRepository.resetOpenedCount(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Count reset"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error resetting count", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error resetting count: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/tags") {
+                            try {
+                                val request = call.receive<AddTagRequest>()
+                                val name = request.name.trim()
+                                if (name.isEmpty()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Tag name is required"))
+                                    return@post
+                                }
+                                if (linkRepository.getTagByName(name) != null) {
+                                    call.respond(HttpStatusCode.Conflict, ErrorResponse("Tag already exists"))
+                                    return@post
+                                }
+                                linkRepository.insertTag(name)
+                                val tag = linkRepository.getTagByName(name)
+                                call.respond(
+                                    HttpStatusCode.Created,
+                                    TagResponse(id = tag?.id ?: 0, name = name, count = 0),
+                                )
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error creating tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error creating tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        put("/api/tags/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateTagRequest>()
+                                val name = request.name.trim()
+                                if (name.isEmpty()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Tag name is required"))
+                                    return@put
+                                }
+                                linkRepository.updateTag(name, id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Tag updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/tags/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
+                                    return@delete
+                                }
+                                linkRepository.deleteTag(id)
+                                linkRepository.deleteTagRelations(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Tag deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        put("/api/profiles/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateProfileRequest>()
+                                linkRepository.updateProfile(request.name, request.themeMode, request.colorTheme, id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Profile updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating profile: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/profiles/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
+                                    return@delete
+                                }
+                                if (linkRepository.countProfiles() <= 1L) {
+                                    call.respond(
+                                        HttpStatusCode.BadRequest,
+                                        ErrorResponse("Cannot delete the only profile"),
+                                    )
+                                    return@delete
+                                }
+                                val currentSelectedId = preferenceRepository.getSelectedProfileId.first()
+                                linkRepository.deleteProfile(id)
+                                if (currentSelectedId == id) {
+                                    linkRepository.getAllProfilesOnce().firstOrNull()?.let { profile ->
+                                        preferenceRepository.setSelectedProfileId(profile.id)
+                                    }
+                                }
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Profile deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting profile: ${e.message}"),
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -522,14 +732,41 @@ data class AddLinkRequest(
 )
 
 @Serializable
+data class UpdateLinkRequest(
+    val link: String,
+    val name: String,
+    val notes: String = "",
+    val tags: List<String> = emptyList(),
+)
+
+@Serializable
 data class ProfileResponse(
     val id: Long,
     val name: String,
     val createdAt: String,
+    val themeMode: String = "system",
+    val colorTheme: String = "dynamic",
 )
 
 @Serializable
 data class AddProfileRequest(
+    val name: String,
+)
+
+@Serializable
+data class UpdateProfileRequest(
+    val name: String,
+    val themeMode: String = "system",
+    val colorTheme: String = "dynamic",
+)
+
+@Serializable
+data class AddTagRequest(
+    val name: String,
+)
+
+@Serializable
+data class UpdateTagRequest(
     val name: String,
 )
 

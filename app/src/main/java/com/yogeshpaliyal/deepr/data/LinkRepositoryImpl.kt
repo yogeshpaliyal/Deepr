@@ -254,6 +254,43 @@ class LinkRepositoryImpl(
         scheduleAutoBackup()
     }
 
+    override suspend fun deleteLinkAndOrphanedTags(id: Long) {
+        withContext(Dispatchers.IO) {
+            val tagsToDelete =
+                deeprQueries.getTagsForLink(id).executeAsList().filter { tag ->
+                    deeprQueries.hasTagLinks(tag.id).executeAsOne() == 1L
+                }
+            deeprQueries.deleteDeeprById(id)
+            deeprQueries.deleteLinkRelations(id)
+            tagsToDelete.forEach { tag -> deeprQueries.deleteTag(tag.id) }
+        }
+        scheduleAutoBackup()
+    }
+
+    override suspend fun setTagsForLink(
+        linkId: Long,
+        tagNames: List<String>,
+    ) {
+        withContext(Dispatchers.IO) {
+            val desiredNames = tagNames.map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            val currentTags = deeprQueries.getTagsForLink(linkId).executeAsList()
+            val currentNames = currentTags.map { it.name }.toSet()
+
+            currentTags
+                .filter { it.name !in desiredNames }
+                .forEach { tag -> deeprQueries.removeTagFromLink(linkId, tag.id) }
+
+            (desiredNames - currentNames).forEach { name ->
+                deeprQueries.insertTag(name)
+                val tag = deeprQueries.getTagByName(name).executeAsOneOrNull()
+                if (tag != null) {
+                    deeprQueries.addTagToLink(linkId, tag.id)
+                }
+            }
+        }
+        scheduleAutoBackup()
+    }
+
     override suspend fun incrementOpenedCount(id: Long) {
         withContext(Dispatchers.IO) {
             deeprQueries.incrementOpenedCount(id)
@@ -282,6 +319,11 @@ class LinkRepositoryImpl(
     override suspend fun getDeeprByLink(link: String): Deepr? =
         withContext(Dispatchers.IO) {
             deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
+        }
+
+    override suspend fun getDeeprById(id: Long): Deepr? =
+        withContext(Dispatchers.IO) {
+            deeprQueries.getDeeprById(id).executeAsOneOrNull()
         }
 
     override suspend fun countAllLinks(): Long =

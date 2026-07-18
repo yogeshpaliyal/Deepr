@@ -424,20 +424,7 @@ class AccountViewModel(
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val tagsToDelete = mutableListOf<Long>()
-
-            linkRepository.getTagsForLink(id).forEach { tag ->
-                val linkCount = linkRepository.hasTagLinks(tag.id)
-                if (linkCount == 1L) {
-                    tagsToDelete.add(tag.id)
-                }
-            }
-
-            linkRepository.deleteDeeprById(id)
-            linkRepository.deleteLinkRelations(id)
-            tagsToDelete.forEach { tagId ->
-                linkRepository.deleteTag(tagId)
-            }
+            linkRepository.deleteLinkAndOrphanedTags(id)
 
             analyticsManager.logEvent(
                 com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.DELETE_LINK,
