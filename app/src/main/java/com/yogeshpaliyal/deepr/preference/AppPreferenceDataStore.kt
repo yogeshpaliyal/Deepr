@@ -43,6 +43,7 @@ class AppPreferenceDataStore(
             booleanPreferencesKey("google_drive_auto_backup_enabled")
         private val CLIPBOARD_LINK_DETECTION_ENABLED =
             booleanPreferencesKey("clipboard_link_detection_enabled")
+        private val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
     }
 
     override val getSortingOrder: Flow<@SortType String> =
@@ -138,6 +139,11 @@ class AppPreferenceDataStore(
     override val getClipboardLinkDetectionEnabled: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[CLIPBOARD_LINK_DETECTION_ENABLED] ?: true // Default to enabled
+        }
+
+    override val getAppLockEnabled: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            preferences[APP_LOCK_ENABLED] ?: false // Default to disabled
         }
 
     override suspend fun setSortingOrder(order: @SortType String) {
@@ -257,6 +263,12 @@ class AppPreferenceDataStore(
     override suspend fun setClipboardLinkDetectionEnabled(enabled: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[CLIPBOARD_LINK_DETECTION_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setAppLockEnabled(enabled: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[APP_LOCK_ENABLED] = enabled
         }
     }
 }

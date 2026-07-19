@@ -1,6 +1,8 @@
 package com.yogeshpaliyal.deepr.ui.screens
 
+import android.app.KeyguardManager
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -60,6 +63,7 @@ import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
+import compose.icons.tablericons.Lock
 import compose.icons.tablericons.Moon
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
@@ -107,6 +111,8 @@ fun SettingsScreen(
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
+    val appLockEnabled by viewModel.appLockEnabled.collectAsStateWithLifecycle()
+    val keyguardManager = remember { context.getSystemService<KeyguardManager>() }
 
     // Collect profiles and silent save profile preference
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
@@ -317,6 +323,43 @@ fun SettingsScreen(
                         Switch(
                             checked = clipboardLinkDetectionEnabled,
                             onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
+                        )
+                    },
+                )
+            }
+
+            SettingsSection("Security") {
+                SettingsItem(
+                    TablerIcons.Lock,
+                    title = stringResource(R.string.app_lock),
+                    description = stringResource(R.string.app_lock_description),
+                    onClick = {
+                        if (appLockEnabled || keyguardManager?.isDeviceSecure == true) {
+                            viewModel.setAppLockEnabled(!appLockEnabled)
+                        } else {
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.app_lock_unavailable),
+                                    Toast.LENGTH_LONG,
+                                ).show()
+                        }
+                    },
+                    trailing = {
+                        Switch(
+                            checked = appLockEnabled,
+                            onCheckedChange = { enabled ->
+                                if (!enabled || keyguardManager?.isDeviceSecure == true) {
+                                    viewModel.setAppLockEnabled(enabled)
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            context.getString(R.string.app_lock_unavailable),
+                                            Toast.LENGTH_LONG,
+                                        ).show()
+                                }
+                            },
                         )
                     },
                 )

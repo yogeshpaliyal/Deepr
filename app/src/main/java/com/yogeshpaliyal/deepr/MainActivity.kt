@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr
 
+import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -33,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.getSystemService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -40,11 +43,13 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.yogeshpaliyal.deepr.preference.PreferenceRepository
+import com.yogeshpaliyal.deepr.security.AppLockState
 import com.yogeshpaliyal.deepr.ui.BaseScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.Screen
 import com.yogeshpaliyal.deepr.ui.TopLevelBackStack
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
+import com.yogeshpaliyal.deepr.ui.screens.AppLockScreen
 import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import com.yogeshpaliyal.deepr.ui.screens.home.TagSelectionScreen
@@ -72,6 +77,32 @@ data class ClipboardLink(
 
 class MainActivity : ComponentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
+
+    private val confirmCredentialLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                AppLockState.isUnlocked.value = true
+            }
+        }
+
+    private fun requestDeviceCredentialUnlock() {
+        val keyguardManager = getSystemService<KeyguardManager>()
+        if (keyguardManager?.isDeviceSecure != true) {
+            // No PIN/pattern/biometric configured on this device, nothing to gate against.
+            AppLockState.isUnlocked.value = true
+            return
+        }
+        val intent =
+            keyguardManager.createConfirmDeviceCredentialIntent(
+                getString(R.string.app_lock_prompt_title),
+                getString(R.string.app_lock_prompt_description),
+            )
+        if (intent != null) {
+            confirmCredentialLauncher.launch(intent)
+        } else {
+            AppLockState.isUnlocked.value = true
+        }
+    }
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(
@@ -127,11 +158,26 @@ class MainActivity : ComponentActivity() {
                     "dynamic"
                 }
 
+            val appLockEnabled by viewModel.appLockEnabled.collectAsStateWithLifecycle()
+            val isUnlocked by AppLockState.isUnlocked
+            val isLocked = appLockEnabled && !isUnlocked
+
+            LaunchedEffect(isLocked) {
+                if (isLocked) {
+                    requestDeviceCredentialUnlock()
+                }
+            }
+
             DeeprTheme(themeMode = themeMode, colorTheme = colorTheme) {
                 Surface {
+                    // Dashboard stays composed (preserving its nav back stack) even while
+                    // locked; the lock screen is drawn on top and fully obscures it.
                     val sharedText by sharingLink.collectAsStateWithLifecycle()
                     Dashboard(sharedText = sharedText) {
                         sharingLink.update { null }
+                    }
+                    if (isLocked) {
+                        AppLockScreen(onUnlockClick = ::requestDeviceCredentialUnlock)
                     }
                 }
             }

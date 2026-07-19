@@ -170,6 +170,7 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.lifecycle.process)
 
     "proImplementation"(platform(libs.firebase.bom))
     "proImplementation"(libs.firebase.analytics)

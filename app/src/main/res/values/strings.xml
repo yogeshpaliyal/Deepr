@@ -286,4 +286,14 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="close">Close</string>
+
+    <!-- App Lock (device credential authentication) -->
+    <string name="app_lock">App Lock</string>
+    <string name="app_lock_description">Require your device PIN, pattern, or biometric to open Deepr</string>
+    <string name="app_lock_unavailable">Set up a device PIN, pattern, or biometric lock in your system settings to use this feature</string>
+    <string name="app_lock_prompt_title">Unlock Deepr</string>
+    <string name="app_lock_prompt_description">Confirm your device credentials to continue</string>
+    <string name="app_lock_screen_title">Deepr is locked</string>
+    <string name="app_lock_screen_subtitle">Unlock with your device credentials to continue</string>
+    <string name="unlock">Unlock</string>
 </resources>

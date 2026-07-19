@@ -2,6 +2,9 @@ package com.yogeshpaliyal.deepr
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import app.cash.sqldelight.logs.LogSqliteDriver
@@ -22,6 +25,7 @@ import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
 import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.review.ReviewManager
 import com.yogeshpaliyal.deepr.review.ReviewManagerFactory
+import com.yogeshpaliyal.deepr.security.AppLockState
 import com.yogeshpaliyal.deepr.server.LocalServerRepository
 import com.yogeshpaliyal.deepr.server.LocalServerRepositoryImpl
 import com.yogeshpaliyal.deepr.server.LocalServerTransferLink
@@ -44,6 +48,16 @@ import org.koin.dsl.module
 class DeeprApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        // Re-lock the app whenever it leaves the foreground, so app-lock (when enabled)
+        // requires re-authentication each time the app is brought back.
+        ProcessLifecycleOwner.get().lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    AppLockState.isUnlocked.value = false
+                }
+            },
+        )
 
         val appModule =
             module {
