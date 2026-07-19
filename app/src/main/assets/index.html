@@ -89,6 +89,17 @@
                         </svg>
                         New Profile
                     </button>
+                    <button
+                        id="manageProfilesBtn"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-1"
+                        title="Manage Profiles"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Manage
+                    </button>
                 </div>
             </div>
         </header>
@@ -250,6 +261,19 @@
                             </button>
                         </div>
 
+                        <!-- Favourites Filter -->
+                        <button
+                            id="favouritesFilter"
+                            type="button"
+                            data-active="false"
+                            class="px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                            Favourites
+                        </button>
+
                         <!-- Clear Filters -->
                         <button
                             id="clearFilters"
@@ -259,6 +283,17 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
                             Clear
+                        </button>
+
+                        <!-- Manage Tags -->
+                        <button
+                            id="manageTagsBtn"
+                            class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 flex items-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5.586a1 1 0 01.707.293l6.414 6.414a1 1 0 010 1.414l-7.586 7.586a1 1 0 01-1.414 0L3.293 12.293A1 1 0 013 11.586V7a4 4 0 014-4z"></path>
+                            </svg>
+                            Manage Tags
                         </button>
                     </div>
                 </div>
@@ -324,6 +359,153 @@
         </div>
     </div>
 
+    <!-- Edit Link Modal -->
+    <div id="editLinkModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeEditLinkModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Edit Link</h3>
+            <form id="editLinkForm">
+                <input type="hidden" id="editLinkId">
+                <div class="mb-4">
+                    <label for="editLinkUrl" class="block text-sm font-medium text-gray-700 mb-2">Link URL</label>
+                    <input
+                        type="url"
+                        id="editLinkUrl"
+                        required
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div class="mb-4">
+                    <label for="editLinkName" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input
+                        type="text"
+                        id="editLinkName"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div class="mb-4">
+                    <label for="editLinkNotes" class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                    <input
+                        type="text"
+                        id="editLinkNotes"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div class="mb-4">
+                    <label for="editLinkTags" class="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
+                    <input
+                        type="text"
+                        id="editLinkTags"
+                        placeholder="tag1, tag2"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
+                    >
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button
+                        type="button"
+                        onclick="closeEditLinkModal()"
+                        class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        id="saveLinkBtn"
+                        class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Tags Modal -->
+    <div id="manageTagsModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeManageTagsModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Manage Tags</h3>
+                <button onclick="closeManageTagsModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="manageTagsList" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Manage Profiles Modal -->
+    <div id="manageProfilesModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeManageProfilesModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Manage Profiles</h3>
+                <button onclick="closeManageProfilesModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="manageProfilesList" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Generic Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeConfirmModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <h3 id="confirmModalTitle" class="text-lg font-semibold text-gray-800 mb-2">Are you sure?</h3>
+            <p id="confirmModalMessage" class="text-gray-600 text-sm mb-6"></p>
+            <div class="flex gap-3 justify-end">
+                <button
+                    type="button"
+                    onclick="closeConfirmModal()"
+                    class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    id="confirmModalConfirmBtn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Prompt Modal -->
+    <div id="promptModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closePromptModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <h3 id="promptModalTitle" class="text-lg font-semibold text-gray-800 mb-4">Rename</h3>
+            <input
+                type="text"
+                id="promptModalInput"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800 mb-6"
+            >
+            <div class="flex gap-3 justify-end">
+                <button
+                    type="button"
+                    onclick="closePromptModal()"
+                    class="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    id="promptModalConfirmBtn"
+                    class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables to store all links and available tags
         let allLinks = [];
@@ -331,6 +513,65 @@
         let selectedTags = []; // Now contains {id, name} objects
         let profiles = []; // Contains {id, name, createdAt} objects
         let selectedProfileId = 1; // Default profile
+
+        // Guards against duplicate in-flight requests from rapid double-clicks
+        const busyActions = new Set();
+        async function runOnce(key, action) {
+            if (busyActions.has(key)) return;
+            busyActions.add(key);
+            try {
+                await action();
+            } finally {
+                busyActions.delete(key);
+            }
+        }
+
+        // Generic confirm dialog (replaces window.confirm)
+        function showConfirmDialog(message, onConfirm, confirmLabel = 'Delete') {
+            document.getElementById('confirmModalMessage').textContent = message;
+            const btn = document.getElementById('confirmModalConfirmBtn');
+            btn.textContent = confirmLabel;
+            const freshBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(freshBtn, btn);
+            freshBtn.addEventListener('click', () => {
+                closeConfirmModal();
+                onConfirm();
+            });
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        // Generic prompt dialog (replaces window.prompt)
+        function showPromptDialog(title, initialValue, onConfirm) {
+            document.getElementById('promptModalTitle').textContent = title;
+            const input = document.getElementById('promptModalInput');
+            input.value = initialValue;
+            const btn = document.getElementById('promptModalConfirmBtn');
+            const freshBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(freshBtn, btn);
+            const submit = () => {
+                const value = input.value.trim();
+                closePromptModal();
+                if (!value || value === initialValue) return;
+                onConfirm(value);
+            };
+            freshBtn.addEventListener('click', submit);
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submit();
+                }
+            };
+            document.getElementById('promptModal').classList.remove('hidden');
+            setTimeout(() => { input.focus(); input.select(); }, 50);
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.add('hidden');
+        }
 
         // Toast notification system
         function showToast(message, type = 'success') {
@@ -478,6 +719,162 @@
             }
         }
 
+        // Manage Profiles modal
+        function openManageProfilesModal() {
+            renderManageProfilesList();
+            document.getElementById('manageProfilesModal').classList.remove('hidden');
+        }
+
+        function closeManageProfilesModal() {
+            document.getElementById('manageProfilesModal').classList.add('hidden');
+        }
+
+        function renderManageProfilesList() {
+            const container = document.getElementById('manageProfilesList');
+            if (profiles.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">No profiles yet.</p>`;
+                return;
+            }
+            container.innerHTML = profiles.map(profile => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-medium text-gray-800">${escapeHtml(profile.name)}</span>
+                    <div class="flex gap-2">
+                        <button onclick="renameProfile(${profile.id}, '${escapeHtml(profile.name)}')" class="p-1.5 text-gray-500 hover:bg-gray-200 rounded-lg transition-colors duration-200" title="Rename">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="removeProfile(${profile.id}, '${escapeHtml(profile.name)}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Delete">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renameProfile(id, currentName) {
+            showPromptDialog('Rename profile', currentName, async (newName) => {
+                const profile = profiles.find(p => p.id === id);
+                try {
+                    const response = await fetch(`/api/profiles/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: newName,
+                            themeMode: profile?.themeMode || 'system',
+                            colorTheme: profile?.colorTheme || 'dynamic',
+                        })
+                    });
+                    if (!response.ok) throw new Error('Failed to rename profile');
+                    showToast('Profile renamed successfully!', 'success');
+                    await loadProfiles();
+                    renderManageProfilesList();
+                } catch (error) {
+                    console.error('Error renaming profile:', error);
+                    showToast('Failed to rename profile. Please try again.', 'error');
+                }
+            });
+        }
+
+        function removeProfile(id, name) {
+            showConfirmDialog(`Delete profile "${name}" and all its links?`, () => runOnce('del-profile-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => null);
+                        throw new Error(error?.error || 'Failed to delete profile');
+                    }
+                    showToast('Profile deleted successfully!', 'success');
+                    await loadProfiles();
+                    renderManageProfilesList();
+                    if (selectedProfileId === id) {
+                        selectedProfileId = profiles[0]?.id ?? 1;
+                        populateProfileSelect();
+                    }
+                    loadLinks();
+                } catch (error) {
+                    console.error('Error deleting profile:', error);
+                    showToast(error.message || 'Failed to delete profile. Please try again.', 'error');
+                }
+            }));
+        }
+
+        // Manage Tags modal
+        function openManageTagsModal() {
+            renderManageTagsList();
+            document.getElementById('manageTagsModal').classList.remove('hidden');
+        }
+
+        function closeManageTagsModal() {
+            document.getElementById('manageTagsModal').classList.add('hidden');
+        }
+
+        function renderManageTagsList() {
+            const container = document.getElementById('manageTagsList');
+            if (availableTags.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">No tags yet.</p>`;
+                return;
+            }
+            container.innerHTML = availableTags.map(tag => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <span class="font-medium text-gray-800">${escapeHtml(tag.name)}</span>
+                        <span class="text-xs text-gray-500 ml-2">${tag.count} links</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="renameTag(${tag.id}, '${escapeHtml(tag.name)}')" class="p-1.5 text-gray-500 hover:bg-gray-200 rounded-lg transition-colors duration-200" title="Rename">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="removeTag(${tag.id}, '${escapeHtml(tag.name)}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Delete">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renameTag(id, currentName) {
+            showPromptDialog('Rename tag', currentName, async (newName) => {
+                try {
+                    const response = await fetch(`/api/tags/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    if (!response.ok) throw new Error('Failed to rename tag');
+                    showToast('Tag renamed successfully!', 'success');
+                    await loadAvailableTags();
+                    renderManageTagsList();
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error renaming tag:', error);
+                    showToast('Failed to rename tag. Please try again.', 'error');
+                }
+            });
+        }
+
+        function removeTag(id, name) {
+            showConfirmDialog(`Delete tag "${name}"? This will remove it from all links.`, () => runOnce('del-tag-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/tags/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete tag');
+                    showToast('Tag deleted successfully!', 'success');
+                    await loadAvailableTags();
+                    renderManageTagsList();
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error deleting tag:', error);
+                    showToast('Failed to delete tag. Please try again.', 'error');
+                }
+            }));
+        }
+
         // Tag management functions
         function addSelectedTag(tagName) {
             // Check if tag is already selected
@@ -577,8 +974,10 @@
             const tagFilter = document.getElementById('tagFilter');
             const sortBy = document.getElementById('sortBy');
             const sortOrder = document.getElementById('sortOrder');
+            const favouritesFilter = document.getElementById('favouritesFilter');
             const container = document.getElementById('linksContainer');
             const linkCount = document.getElementById('linkCount');
+            const favouritesOnly = favouritesFilter.dataset.active === 'true';
 
             // Apply filters
             const filteredLinks = allLinks.filter(link => {
@@ -586,7 +985,8 @@
                 const matchesSearch = link.name.toLowerCase().includes(searchTerm) ||
                                     link.link.toLowerCase().includes(searchTerm);
                 const matchesTag = tagFilter.value === '' || link.tags.includes(tagFilter.value);
-                return matchesSearch && matchesTag;
+                const matchesFavourite = !favouritesOnly || !!link.isFavourite;
+                return matchesSearch && matchesTag && matchesFavourite;
             });
 
             // Apply sorting
@@ -676,14 +1076,38 @@
                                     </div>
                                 ` : ''}
 
-                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
                                     <button
                                        onclick="handleOpenLink(${link.id}, '${escapeHtml(link.link)}')"
-                                       class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
+                                       class="flex-1 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                         </svg>
                                         Open Link
+                                    </button>
+                                    <button
+                                       onclick="toggleFavourite(${link.id})"
+                                       title="${link.isFavourite ? 'Remove favourite' : 'Mark as favourite'}"
+                                       class="p-2 rounded-lg transition-colors duration-200 ${link.isFavourite ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:bg-gray-100'}">
+                                        <svg class="w-4 h-4" fill="${link.isFavourite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                        </svg>
+                                    </button>
+                                    <button
+                                       onclick="openEditLinkModal(${link.id})"
+                                       title="Edit link"
+                                       class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button
+                                       onclick="deleteLink(${link.id})"
+                                       title="Delete link"
+                                       class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -705,6 +1129,95 @@
                 setTimeout(loadLinks, 1000);
             } catch (error) {
                 console.error('Error incrementing count:', error);
+            }
+        }
+
+        // Toggle a link's favourite state
+        function toggleFavourite(id) {
+            runOnce('fav-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/links/${id}/toggle-favourite`, { method: 'POST' });
+                    if (!response.ok) throw new Error('Failed to toggle favourite');
+                    await loadLinks();
+                } catch (error) {
+                    console.error('Error toggling favourite:', error);
+                    showToast('Failed to update favourite. Please try again.', 'error');
+                }
+            });
+        }
+
+        // Delete a link (with confirmation)
+        function deleteLink(id) {
+            showConfirmDialog('Are you sure you want to delete this link?', () => runOnce('del-link-' + id, async () => {
+                try {
+                    const response = await fetch(`/api/links/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete link');
+                    showToast('Link deleted successfully!', 'success');
+                    await loadLinks();
+                    await loadAvailableTags();
+                } catch (error) {
+                    console.error('Error deleting link:', error);
+                    showToast('Failed to delete link. Please try again.', 'error');
+                }
+            }));
+        }
+
+        // Open the edit-link modal, pre-filled with the current link's data
+        function openEditLinkModal(id) {
+            const link = allLinks.find(l => l.id === id);
+            if (!link) return;
+            document.getElementById('editLinkId').value = link.id;
+            document.getElementById('editLinkUrl').value = link.link;
+            document.getElementById('editLinkName').value = link.name;
+            document.getElementById('editLinkNotes').value = link.notes || '';
+            document.getElementById('editLinkTags').value = (link.tags || []).join(', ');
+            document.getElementById('editLinkModal').classList.remove('hidden');
+        }
+
+        function closeEditLinkModal() {
+            document.getElementById('editLinkModal').classList.add('hidden');
+        }
+
+        async function saveEditedLink(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('editLinkId').value;
+            const button = document.getElementById('saveLinkBtn');
+            const originalText = button.textContent;
+            button.textContent = 'Saving...';
+            button.disabled = true;
+
+            const tags = document.getElementById('editLinkTags').value
+                .split(',')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
+
+            try {
+                const response = await fetch(`/api/links/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        link: document.getElementById('editLinkUrl').value,
+                        name: document.getElementById('editLinkName').value,
+                        notes: document.getElementById('editLinkNotes').value,
+                        tags: tags,
+                    })
+                });
+
+                if (response.ok) {
+                    showToast('Link updated successfully!', 'success');
+                    closeEditLinkModal();
+                    await loadLinks();
+                    await loadAvailableTags();
+                } else {
+                    throw new Error('Failed to update link');
+                }
+            } catch (error) {
+                console.error('Error updating link:', error);
+                showToast('Failed to update link. Please try again.', 'error');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
             }
         }
 
@@ -736,10 +1249,30 @@
             document.getElementById('tagFilter').value = '';
             document.getElementById('sortBy').value = 'createdAt';
             document.getElementById('sortOrder').dataset.order = 'desc';
+            setFavouritesFilterActive(false);
             updateSortOrderIcon();
             updateClearSearchButton();
             filterAndDisplayLinks();
             showToast('Filters cleared', 'info');
+        }
+
+        // Toggle the "Favourites only" filter
+        function toggleFavouritesFilter() {
+            const favouritesFilter = document.getElementById('favouritesFilter');
+            setFavouritesFilterActive(favouritesFilter.dataset.active !== 'true');
+            filterAndDisplayLinks();
+        }
+
+        function setFavouritesFilterActive(active) {
+            const favouritesFilter = document.getElementById('favouritesFilter');
+            favouritesFilter.dataset.active = active ? 'true' : 'false';
+            if (active) {
+                favouritesFilter.classList.remove('border-gray-200', 'text-gray-600', 'hover:bg-gray-50');
+                favouritesFilter.classList.add('border-yellow-400', 'bg-yellow-50', 'text-yellow-700');
+            } else {
+                favouritesFilter.classList.remove('border-yellow-400', 'bg-yellow-50', 'text-yellow-700');
+                favouritesFilter.classList.add('border-gray-200', 'text-gray-600', 'hover:bg-gray-50');
+            }
         }
 
         // Toggle sort order
@@ -911,11 +1444,19 @@
             document.getElementById('sortBy').addEventListener('change', filterAndDisplayLinks);
             document.getElementById('sortOrder').addEventListener('click', toggleSortOrder);
             document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+            document.getElementById('favouritesFilter').addEventListener('click', toggleFavouritesFilter);
 
             // Profile controls
             document.getElementById('profileSelect').addEventListener('change', onProfileChange);
             document.getElementById('addProfileBtn').addEventListener('click', openAddProfileModal);
             document.getElementById('addProfileForm').addEventListener('submit', createProfile);
+            document.getElementById('manageProfilesBtn').addEventListener('click', openManageProfilesModal);
+
+            // Tag management controls
+            document.getElementById('manageTagsBtn').addEventListener('click', openManageTagsModal);
+
+            // Edit link modal
+            document.getElementById('editLinkForm').addEventListener('submit', saveEditedLink);
 
             // Tag input functionality
             const tagInput = document.getElementById('linkTags');

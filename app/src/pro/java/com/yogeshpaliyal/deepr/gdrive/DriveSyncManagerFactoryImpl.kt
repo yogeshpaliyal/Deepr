@@ -1,11 +1,11 @@
 package com.yogeshpaliyal.deepr.gdrive
 
 import android.content.Context
-import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.data.LinkRepository
 
 object DriveSyncManagerFactoryImpl : DriveSyncManagerFactory {
     override fun create(
         context: Context,
-        deeprQueries: DeeprQueries,
-    ): DriveSyncManager = DriveSyncManagerImpl(context, deeprQueries)
+        linkRepository: LinkRepository,
+    ): DriveSyncManager = DriveSyncManagerImpl(context, linkRepository)
 }

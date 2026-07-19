@@ -39,7 +39,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.ui.BaseScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.Screen
@@ -58,6 +58,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import org.koin.java.KoinJavaComponent.getKoin
 
 data class SharedLink(
     val url: String,
@@ -75,10 +77,10 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(
             newBase?.let { context ->
                 try {
-                    val preferenceDataStore = AppPreferenceDataStore(context)
+                    val preferenceRepository = getKoin().get<PreferenceRepository>()
                     val languageCode =
                         runBlocking {
-                            preferenceDataStore.getLanguageCode.first()
+                            preferenceRepository.getLanguageCode.first()
                         }
                     if (languageCode.isNotEmpty()) {
                         LanguageUtil.updateLocale(context, languageCode)
@@ -109,8 +111,8 @@ class MainActivity : ComponentActivity() {
                     val profileTheme by viewModel.currentProfileTheme.collectAsStateWithLifecycle()
                     profileTheme
                 } else {
-                    val preferenceDataStore = remember { AppPreferenceDataStore(this) }
-                    val globalTheme by preferenceDataStore.getThemeMode.collectAsStateWithLifecycle(
+                    val preferenceRepository: PreferenceRepository = koinInject()
+                    val globalTheme by preferenceRepository.getThemeMode.collectAsStateWithLifecycle(
                         initialValue = "system",
                     )
                     globalTheme

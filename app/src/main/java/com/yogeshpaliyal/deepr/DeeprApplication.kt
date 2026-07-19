@@ -19,6 +19,7 @@ import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.gdrive.DriveSyncManager
 import com.yogeshpaliyal.deepr.gdrive.DriveSyncManagerFactoryImpl
 import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.review.ReviewManager
 import com.yogeshpaliyal.deepr.review.ReviewManagerFactory
 import com.yogeshpaliyal.deepr.server.LocalServerRepository
@@ -78,7 +79,7 @@ class DeeprApplication : Application() {
                     database.deeprQueries
                 }
 
-                single { AppPreferenceDataStore(androidContext()) }
+                single<PreferenceRepository> { AppPreferenceDataStore(androidContext()) }
 
                 single<LinkRepository> { LinkRepositoryImpl(androidContext(), get()) }
 

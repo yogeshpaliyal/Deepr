@@ -5,9 +5,9 @@ import android.net.Uri
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import com.opencsv.exceptions.CsvException
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.backup.ImportResult
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.util.Constants
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.flow.first
@@ -18,17 +18,17 @@ import java.io.IOException
  */
 class CsvBookmarkImporter(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
-    private val appPreferenceDataStore: AppPreferenceDataStore,
+    private val linkRepository: LinkRepository,
+    private val preferenceRepository: PreferenceRepository,
 ) : BookmarkImporter {
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
-        var updatedCount = 0
         var skippedCount = 0
 
         try {
-            val defaultProfileId = appPreferenceDataStore.getSelectedProfileId.first()
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            val defaultProfileId = preferenceRepository.getSelectedProfileId.first()
+            val items = mutableListOf<LinkRepository.NewLinkWithTags>()
 
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.reader().use { reader ->
                     val customParser =
                         CSVParserBuilder()
@@ -60,53 +60,28 @@ class CsvBookmarkImporter(
                             val thumbnail = row.getOrNull(6) ?: ""
                             val isFavourite = row.getOrNull(7)?.toLongOrNull() ?: 0
                             val profileName = row.getOrNull(8)?.trim()?.takeIf { it.isNotBlank() }
-                            val existing = deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
-                            if (link.isNotBlank() && existing == null) {
-                                updatedCount++
-                                deeprQueries.transaction {
-                                    val profileID =
-                                        profileName?.let {
-                                            val profile = deeprQueries.getProfileByName(it).executeAsOneOrNull()
-                                            if (profile == null) {
-                                                deeprQueries.insertProfile(it)
-                                                deeprQueries.lastInsertRowId().executeAsOneOrNull()
-                                            } else {
-                                                profile.id
-                                            }
-                                        } ?: defaultProfileId
-                                    deeprQueries.importDeepr(
+
+                            if (link.isNotBlank()) {
+                                val profileId = profileName?.let { linkRepository.getOrCreateProfileByName(it) } ?: defaultProfileId
+                                val tagNames =
+                                    tagsString
+                                        .split(",")
+                                        .map { it.trim() }
+                                        .filter { it.isNotEmpty() }
+
+                                items.add(
+                                    LinkRepository.NewLinkWithTags(
                                         link = link,
-                                        openedCount = openedCount,
                                         name = name,
                                         notes = notes,
                                         thumbnail = thumbnail,
+                                        openedCount = openedCount,
                                         isFavourite = isFavourite,
                                         createdAt = createdAt,
-                                        profileId = profileID,
-                                    )
-                                    val linkId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                                    // Import tags if present
-                                    if (tagsString.isNotBlank()) {
-                                        val tagNames =
-                                            tagsString
-                                                .split(",")
-                                                .map { it.trim() }
-                                                .filter { it.isNotEmpty() }
-                                        tagNames.forEach { tagName ->
-                                            // Insert tag if it doesn't exist
-                                            deeprQueries.insertTag(tagName)
-                                            // Get tag ID and link it
-                                            val tag =
-                                                deeprQueries
-                                                    .getTagByName(tagName)
-                                                    .executeAsOneOrNull()
-                                            if (tag != null) {
-                                                deeprQueries.addTagToLink(linkId, tag.id)
-                                            }
-                                        }
-                                    }
-                                }
+                                        profileId = profileId,
+                                        tagNames = tagNames,
+                                    ),
+                                )
                             } else {
                                 skippedCount++
                             }
@@ -116,6 +91,10 @@ class CsvBookmarkImporter(
                     }
                 }
             }
+
+            val results = linkRepository.insertLinksWithTags(items)
+            val updatedCount = results.count { it != null }
+            skippedCount += results.count { it == null }
 
             return RequestResult.Success(ImportResult(updatedCount, skippedCount))
         } catch (e: IOException) {

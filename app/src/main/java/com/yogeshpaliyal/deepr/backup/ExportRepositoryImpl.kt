@@ -6,8 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,18 +19,18 @@ import java.util.Locale
 
 class ExportRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
 ) : ExportRepository {
     private val csvWriter by lazy {
         CsvWriter()
     }
 
     override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
-        val count = deeprQueries.countDeepr().executeAsOne()
+        val count = linkRepository.countAllLinks()
         if (count == 0L) {
             return RequestResult.Error(context.getString(R.string.no_data_to_export))
         }
-        val dataToExportInCsvFormat = deeprQueries.getLinksForBackup().executeAsList()
+        val dataToExportInCsvFormat = linkRepository.getLinksForBackup()
         if (dataToExportInCsvFormat.isEmpty()) {
             return RequestResult.Error(context.getString(R.string.no_data_available_export))
         }

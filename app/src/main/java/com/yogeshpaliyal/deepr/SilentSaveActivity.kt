@@ -9,7 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import kotlinx.coroutines.Dispatchers
@@ -26,8 +26,7 @@ import org.koin.android.ext.android.inject
 class SilentSaveActivity : ComponentActivity() {
     private val linkRepository: LinkRepository by inject()
     private val networkRepository: NetworkRepository by inject()
-    private val preferenceDataStore: AppPreferenceDataStore by inject()
-    private val deeprQueries: DeeprQueries by inject()
+    private val preferenceRepository: PreferenceRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,13 +79,10 @@ class SilentSaveActivity : ComponentActivity() {
         // Launch in application scope so it continues after activity finishes
         lifecycleScope.launch {
             try {
-                val profileId = preferenceDataStore.getSilentSaveProfileId.first()
+                val profileId = preferenceRepository.getSilentSaveProfileId.first()
 
                 // Check if link already exists
-                val existingLink =
-                    withContext(Dispatchers.IO) {
-                        deeprQueries.getDeeprByLink(link).executeAsOneOrNull()
-                    }
+                val existingLink = linkRepository.getDeeprByLink(link)
                 if (existingLink != null) {
                     showToast(appContext, appContext.getString(R.string.link_already_exists))
                     return@launch

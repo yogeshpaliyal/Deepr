@@ -17,7 +17,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.DeeprQueries
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.util.formatDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,7 +36,7 @@ private const val TAG = "DriveSyncManagerImpl"
 
 class DriveSyncManagerImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
 ) : DriveSyncManager {
     override val isAvailable: Boolean = true
 
@@ -96,45 +96,33 @@ class DriveSyncManagerImpl(
                         )
 
                     // Clear existing data
-                    deeprQueries.transaction {
-                        deeprQueries.deleteAllProfiles()
-                        deeprQueries.deleteAllTags()
-                    }
+                    linkRepository.clearAllData()
 
                     // Restore profiles
                     backedUpData.profiles.forEach { profileBackup ->
-                        deeprQueries.insertProfile(profileBackup.name)
+                        linkRepository.insertProfile(profileBackup.name)
                     }
 
                     val profileNameToIdMap =
-                        deeprQueries.getAllProfiles().executeAsList().associate { it.name to it.id }
+                        linkRepository.getAllProfilesOnce().associate { it.name to it.id }
 
                     // Restore links
-                    backedUpData.links.forEach { linkBackup ->
-                        val profileId = profileNameToIdMap[linkBackup.profileName]
-
-                        if (profileId != null) {
-                            deeprQueries.importDeepr(
+                    val items =
+                        backedUpData.links.mapNotNull { linkBackup ->
+                            val profileId = profileNameToIdMap[linkBackup.profileName] ?: return@mapNotNull null
+                            LinkRepository.NewLinkWithTags(
                                 link = linkBackup.link,
                                 name = linkBackup.name,
-                                createdAt = linkBackup.createdAt,
-                                openedCount = linkBackup.openedCount,
-                                isFavourite = if (linkBackup.isFavourite) 1L else 0L,
                                 notes = linkBackup.notes,
                                 thumbnail = linkBackup.thumbnail,
+                                openedCount = linkBackup.openedCount,
+                                isFavourite = if (linkBackup.isFavourite) 1L else 0L,
+                                createdAt = linkBackup.createdAt,
                                 profileId = profileId,
+                                tagNames = linkBackup.tags,
                             )
-                            val linkId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                            linkBackup.tags.forEach { tagName ->
-                                deeprQueries.insertTag(tagName)
-                                val tagId = deeprQueries.getTagByName(tagName).executeAsOneOrNull()?.id
-                                if (tagId != null) {
-                                    deeprQueries.addTagToLink(linkId, tagId)
-                                }
-                            }
                         }
-                    }
+                    linkRepository.insertLinksWithTags(items)
                     true
                 } else {
                     Log.w(TAG, "No backup file found for restore")
@@ -223,13 +211,13 @@ class DriveSyncManagerImpl(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    private fun createBackupFile(): File {
+    private suspend fun createBackupFile(): File {
         val profiles =
-            deeprQueries.getAllProfiles().executeAsList().map {
+            linkRepository.getAllProfilesOnce().map {
                 ProfileBackup(it.name, it.createdAt)
             }
         val links =
-            deeprQueries.getLinksForBackup().executeAsList().map {
+            linkRepository.getLinksForBackup().map {
                 LinkBackup(
                     link = it.link,
                     name = it.name,

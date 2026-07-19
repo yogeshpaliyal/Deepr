@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -30,14 +30,17 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,12 +51,12 @@ import java.util.Locale
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
+    private val linkRepository: LinkRepository,
     private val httpClient: HttpClient,
     private val accountViewModel: AccountViewModel,
     private val networkRepository: NetworkRepository,
     private val analyticsManager: AnalyticsManager,
-    private val preferenceDataStore: AppPreferenceDataStore,
+    private val preferenceRepository: PreferenceRepository,
 ) : LocalServerRepository {
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
@@ -72,7 +75,7 @@ open class LocalServerRepositoryImpl(
     init {
         // Load saved port on initialization
         CoroutineScope(Dispatchers.IO).launch {
-            preferenceDataStore.getServerPort.collect { portString ->
+            preferenceRepository.getServerPort.collect { portString ->
                 val port = portString.toIntOrNull()
                 if (port != null && port in 1024..65535) {
                     _serverPort.update { port }
@@ -86,7 +89,7 @@ open class LocalServerRepositoryImpl(
     override suspend fun setServerPort(port: Int) {
         if (port in 1024..65535) {
             _serverPort.update { port }
-            preferenceDataStore.setServerPort(port.toString())
+            preferenceRepository.setServerPort(port.toString())
         }
     }
 
@@ -144,13 +147,15 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/profiles") {
                             try {
-                                val profiles = deeprQueries.getAllProfiles().executeAsList()
+                                val profiles = linkRepository.getAllProfilesOnce()
                                 val response =
                                     profiles.map { profile ->
                                         ProfileResponse(
                                             id = profile.id,
                                             name = profile.name,
                                             createdAt = profile.createdAt,
+                                            themeMode = profile.themeMode,
+                                            colorTheme = profile.colorTheme,
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)
@@ -166,7 +171,7 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                deeprQueries.insertProfile(request.name)
+                                linkRepository.insertProfile(request.name)
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),
@@ -185,7 +190,7 @@ open class LocalServerRepositoryImpl(
                                 val profileId =
                                     call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
                                 val links =
-                                    deeprQueries
+                                    linkRepository
                                         .getLinksAndTags(
                                             profileId,
                                             "",
@@ -199,7 +204,7 @@ open class LocalServerRepositoryImpl(
                                             "createdAt",
                                             "DESC",
                                             "createdAt",
-                                        ).executeAsList()
+                                        ).first()
                                 val response =
                                     links.map { link ->
                                         LinkResponse(
@@ -256,12 +261,12 @@ open class LocalServerRepositoryImpl(
                         get("/api/tags") {
                             try {
                                 // Get all tags from the database with their IDs
-                                val allTags = deeprQueries.getAllTags().executeAsList()
+                                val allTags = linkRepository.getAllTags().first()
                                 val response =
                                     allTags.map { tag ->
                                         // Count how many links use this tag
                                         val linkCount =
-                                            deeprQueries
+                                            linkRepository
                                                 .getLinksAndTags(
                                                     1L, // Default profile
                                                     "",
@@ -275,7 +280,7 @@ open class LocalServerRepositoryImpl(
                                                     "createdAt",
                                                     "DESC",
                                                     "createdAt",
-                                                ).executeAsList()
+                                                ).first()
                                                 .size
                                         TagResponse(
                                             id = tag.id,
@@ -343,6 +348,212 @@ open class LocalServerRepositoryImpl(
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
                                     ErrorResponse("Error incrementing count: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        put("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@put
+                                }
+                                val existing = linkRepository.getDeeprById(id)
+                                if (existing == null) {
+                                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Link not found"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateLinkRequest>()
+                                linkRepository.updateDeeplink(
+                                    newLink = request.link,
+                                    newName = request.name,
+                                    notes = request.notes,
+                                    thumbnail = existing.thumbnail,
+                                    profileId = existing.profileId,
+                                    id = id,
+                                )
+                                linkRepository.setTagsForLink(id, request.tags)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating link: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/links/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@delete
+                                }
+                                linkRepository.deleteLinkAndOrphanedTags(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Link deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting link", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting link: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links/{id}/toggle-favourite") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@post
+                                }
+                                linkRepository.toggleFavourite(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Favourite toggled"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error toggling favourite", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error toggling favourite: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/links/{id}/reset-count") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid link ID"))
+                                    return@post
+                                }
+                                linkRepository.resetOpenedCount(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Count reset"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error resetting count", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error resetting count: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        post("/api/tags") {
+                            try {
+                                val request = call.receive<AddTagRequest>()
+                                val name = request.name.trim()
+                                if (name.isEmpty()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Tag name is required"))
+                                    return@post
+                                }
+                                if (linkRepository.getTagByName(name) != null) {
+                                    call.respond(HttpStatusCode.Conflict, ErrorResponse("Tag already exists"))
+                                    return@post
+                                }
+                                linkRepository.insertTag(name)
+                                val tag = linkRepository.getTagByName(name)
+                                call.respond(
+                                    HttpStatusCode.Created,
+                                    TagResponse(id = tag?.id ?: 0, name = name, count = 0),
+                                )
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error creating tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error creating tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        put("/api/tags/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateTagRequest>()
+                                val name = request.name.trim()
+                                if (name.isEmpty()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Tag name is required"))
+                                    return@put
+                                }
+                                linkRepository.updateTag(name, id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Tag updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/tags/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid tag ID"))
+                                    return@delete
+                                }
+                                linkRepository.deleteTag(id)
+                                linkRepository.deleteTagRelations(id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Tag deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting tag", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting tag: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        put("/api/profiles/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
+                                    return@put
+                                }
+                                val request = call.receive<UpdateProfileRequest>()
+                                linkRepository.updateProfile(request.name, request.themeMode, request.colorTheme, id)
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Profile updated successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error updating profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error updating profile: ${e.message}"),
+                                )
+                            }
+                        }
+
+                        delete("/api/profiles/{id}") {
+                            try {
+                                val id = call.parameters["id"]?.toLongOrNull()
+                                if (id == null) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
+                                    return@delete
+                                }
+                                if (linkRepository.countProfiles() <= 1L) {
+                                    call.respond(
+                                        HttpStatusCode.BadRequest,
+                                        ErrorResponse("Cannot delete the only profile"),
+                                    )
+                                    return@delete
+                                }
+                                val currentSelectedId = preferenceRepository.getSelectedProfileId.first()
+                                linkRepository.deleteProfile(id)
+                                if (currentSelectedId == id) {
+                                    linkRepository.getAllProfilesOnce().firstOrNull()?.let { profile ->
+                                        preferenceRepository.setSelectedProfileId(profile.id)
+                                    }
+                                }
+                                call.respond(HttpStatusCode.OK, SuccessResponse("Profile deleted successfully"))
+                            } catch (e: Exception) {
+                                Log.e("LocalServer", "Error deleting profile", e)
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse("Error deleting profile: ${e.message}"),
                                 )
                             }
                         }
@@ -417,34 +628,22 @@ open class LocalServerRepositoryImpl(
         }
     }
 
-    private fun importToDatabase(links: List<LinkResponse>) {
-        deeprQueries.transaction {
-            links.forEach { deeplink ->
-                if (deeprQueries.getDeeprByLink(deeplink.link).executeAsList().isEmpty()) {
-                    deeprQueries.importDeepr(
-                        link = deeplink.link,
-                        name = deeplink.name,
-                        openedCount = deeplink.openedCount,
-                        notes = deeplink.notes,
-                        thumbnail = deeplink.thumbnail,
-                        isFavourite = deeplink.isFavourite,
-                        createdAt = deeplink.createdAt,
-                        profileId = 1L, // Default profile
-                    )
-
-                    val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                    deeplink.tags.forEach { tagName ->
-                        deeprQueries.insertTag(name = tagName)
-                        val tag = deeprQueries.getTagByName(tagName).executeAsOne()
-                        deeprQueries.addTagToLink(
-                            linkId = insertedId,
-                            tagId = tag.id,
-                        )
-                    }
-                }
+    private suspend fun importToDatabase(links: List<LinkResponse>) {
+        val items =
+            links.map { deeplink ->
+                LinkRepository.NewLinkWithTags(
+                    link = deeplink.link,
+                    name = deeplink.name,
+                    notes = deeplink.notes,
+                    thumbnail = deeplink.thumbnail,
+                    openedCount = deeplink.openedCount,
+                    isFavourite = deeplink.isFavourite,
+                    createdAt = deeplink.createdAt,
+                    profileId = 1L, // Default profile
+                    tagNames = deeplink.tags,
+                )
             }
-        }
+        linkRepository.insertLinksWithTags(items)
     }
 
     private fun generateQRCode(port: Int): String? {
@@ -533,14 +732,41 @@ data class AddLinkRequest(
 )
 
 @Serializable
+data class UpdateLinkRequest(
+    val link: String,
+    val name: String,
+    val notes: String = "",
+    val tags: List<String> = emptyList(),
+)
+
+@Serializable
 data class ProfileResponse(
     val id: Long,
     val name: String,
     val createdAt: String,
+    val themeMode: String = "system",
+    val colorTheme: String = "dynamic",
 )
 
 @Serializable
 data class AddProfileRequest(
+    val name: String,
+)
+
+@Serializable
+data class UpdateProfileRequest(
+    val name: String,
+    val themeMode: String = "system",
+    val colorTheme: String = "dynamic",
+)
+
+@Serializable
+data class AddTagRequest(
+    val name: String,
+)
+
+@Serializable
+data class UpdateTagRequest(
     val name: String,
 )
 

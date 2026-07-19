@@ -1,29 +1,29 @@
 package com.yogeshpaliyal.deepr.server
 
 import android.content.Context
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
+import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.client.HttpClient
 
 class LocalServerTransferLink(
     context: Context,
-    deeprQueries: DeeprQueries,
+    linkRepository: LinkRepository,
     httpClient: HttpClient,
     accountViewModel: AccountViewModel,
     networkRepository: NetworkRepository,
-    preferenceDataStore: AppPreferenceDataStore,
+    preferenceRepository: PreferenceRepository,
     analyticsManager: AnalyticsManager,
 ) : LocalServerRepositoryImpl(
         context,
-        deeprQueries,
+        linkRepository,
         httpClient,
         accountViewModel,
         networkRepository,
         analyticsManager,
-        preferenceDataStore,
+        preferenceRepository,
     ) {
     override suspend fun startServer(port: Int) {
         super.startServer(port)

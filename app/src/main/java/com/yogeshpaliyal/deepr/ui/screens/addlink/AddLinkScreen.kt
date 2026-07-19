@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +67,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.journeyapps.barcodescanner.ScanOptions
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
@@ -89,6 +89,7 @@ import compose.icons.tablericons.Qrcode
 import compose.icons.tablericons.Tag
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,11 +97,11 @@ import org.koin.compose.koinInject
 fun AddLinkScreen(
     selectedLink: GetLinksAndTags,
     modifier: Modifier = Modifier,
-    deeprQueries: DeeprQueries = koinInject(),
     viewModel: AccountViewModel = koinInject(),
 ) {
     val context = LocalContext.current
     val navigator = LocalNavigator.current
+    val scope = rememberCoroutineScope()
     val fetchMetadataErrorText = stringResource(R.string.failed_to_fetch_metadata)
     val removeTagText = stringResource(R.string.remove_tag)
     val deeplinkExistsText = stringResource(R.string.deeplink_already_exists)
@@ -196,50 +197,52 @@ fun AddLinkScreen(
         }
     }
 
-    val save: (executeAfterSave: Boolean) -> Unit = save@{ executeAfterSave ->
-        // Normalize the link before saving
-        val normalizedLink = normalizeLink(deeprInfo.link)
+    val save: (executeAfterSave: Boolean) -> Unit = { executeAfterSave ->
+        scope.launch {
+            // Normalize the link before saving
+            val normalizedLink = normalizeLink(deeprInfo.link)
 
-        if (isCreate && deeprQueries.getDeeprByLink(normalizedLink).executeAsOneOrNull() != null) {
-            Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
-            return@save
-        }
+            if (isCreate && viewModel.isLinkDuplicate(normalizedLink)) {
+                Toast.makeText(context, deeplinkExistsText, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
 
-        // Remove unselected tags
-        val initialTagIds = initialSelectedTags.map { it.id }.toSet()
-        val currentTagIds = selectedTags.map { it.id }.toSet()
-        val tagsToRemove = initialTagIds - currentTagIds
-        tagsToRemove.forEach { tagId ->
-            viewModel.removeTagFromLink(deeprInfo.id, tagId)
-        }
+            // Remove unselected tags
+            val initialTagIds = initialSelectedTags.map { it.id }.toSet()
+            val currentTagIds = selectedTags.map { it.id }.toSet()
+            val tagsToRemove = initialTagIds - currentTagIds
+            tagsToRemove.forEach { tagId ->
+                viewModel.removeTagFromLink(deeprInfo.id, tagId)
+            }
 
-        if (deeprInfo.id == 0L) {
-            // New Account
-            viewModel.insertAccount(
-                normalizedLink,
-                deeprInfo.name,
-                executeAfterSave,
-                selectedTags,
-                deeprInfo.notes,
-                deeprInfo.thumbnail,
-                selectedProfileId,
-            )
-        } else {
-            // Edit
-            viewModel.updateDeeplink(
-                deeprInfo.id,
-                normalizedLink,
-                deeprInfo.name,
-                selectedTags,
-                deeprInfo.notes,
-                deeprInfo.thumbnail,
-                selectedProfileId,
-            )
+            if (deeprInfo.id == 0L) {
+                // New Account
+                viewModel.insertAccount(
+                    normalizedLink,
+                    deeprInfo.name,
+                    executeAfterSave,
+                    selectedTags,
+                    deeprInfo.notes,
+                    deeprInfo.thumbnail,
+                    selectedProfileId,
+                )
+            } else {
+                // Edit
+                viewModel.updateDeeplink(
+                    deeprInfo.id,
+                    normalizedLink,
+                    deeprInfo.name,
+                    selectedTags,
+                    deeprInfo.notes,
+                    deeprInfo.thumbnail,
+                    selectedProfileId,
+                )
+            }
+            if (executeAfterSave) {
+                openDeeplink(context, normalizedLink)
+            }
+            navigator.removeLast()
         }
-        if (executeAfterSave) {
-            openDeeplink(context, normalizedLink)
-        }
-        navigator.removeLast()
     }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -835,20 +838,7 @@ fun AddLinkScreen(
                         Button(
                             onClick = {
                                 if (isValidDeeplink(deeprInfo.link)) {
-                                    if (deeprQueries
-                                            .getDeeprByLink(deeprInfo.link)
-                                            .executeAsList()
-                                            .isNotEmpty()
-                                    ) {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                deeplinkExistsText,
-                                                Toast.LENGTH_SHORT,
-                                            ).show()
-                                    } else {
-                                        save(true)
-                                    }
+                                    save(true)
                                 } else {
                                     isError = true
                                 }
@@ -870,20 +860,7 @@ fun AddLinkScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     if (isValidDeeplink(deeprInfo.link)) {
-                                        if (deeprQueries
-                                                .getDeeprByLink(deeprInfo.link)
-                                                .executeAsList()
-                                                .isNotEmpty()
-                                        ) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    deeplinkExistsText,
-                                                    Toast.LENGTH_SHORT,
-                                                ).show()
-                                        } else {
-                                            save(false)
-                                        }
+                                        save(false)
                                     } else {
                                         isError = true
                                     }

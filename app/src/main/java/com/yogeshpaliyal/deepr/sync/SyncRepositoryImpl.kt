@@ -2,10 +2,10 @@ package com.yogeshpaliyal.deepr.sync
 
 import android.content.Context
 import androidx.core.net.toUri
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.ListDeeprWithTagsAsc
 import com.yogeshpaliyal.deepr.R
-import com.yogeshpaliyal.deepr.preference.AppPreferenceDataStore
+import com.yogeshpaliyal.deepr.data.LinkRepository
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -18,30 +18,30 @@ import java.util.Locale
 
 class SyncRepositoryImpl(
     private val context: Context,
-    private val deeprQueries: DeeprQueries,
-    private val preferenceDataStore: AppPreferenceDataStore,
+    private val linkRepository: LinkRepository,
+    private val preferenceRepository: PreferenceRepository,
 ) : SyncRepository {
     override suspend fun syncToMarkdown(): RequestResult<String> {
         return withContext(Dispatchers.IO) {
             try {
-                val syncEnabled = preferenceDataStore.getSyncEnabled.first()
+                val syncEnabled = preferenceRepository.getSyncEnabled.first()
                 if (!syncEnabled) {
                     return@withContext RequestResult.Error(context.getString(R.string.sync_disabled))
                 }
 
-                val filePath = preferenceDataStore.getSyncFilePath.first()
+                val filePath = preferenceRepository.getSyncFilePath.first()
                 if (filePath.isEmpty()) {
                     return@withContext RequestResult.Error(context.getString(R.string.sync_file_not_selected))
                 }
 
                 val res =
                     context.contentResolver.openOutputStream(filePath.toUri(), "wt")?.use {
-                        val count = deeprQueries.countDeepr().executeAsOne()
+                        val count = linkRepository.countAllLinks()
                         if (count == 0L) {
                             return@withContext RequestResult.Error(context.getString(R.string.no_data_to_export))
                         }
 
-                        val dataToSync = deeprQueries.listDeeprWithTagsAsc().executeAsList()
+                        val dataToSync = linkRepository.getLinksForMarkdownSync()
                         if (dataToSync.isEmpty()) {
                             return@withContext RequestResult.Error(context.getString(R.string.no_data_available_export))
                         }
@@ -91,7 +91,7 @@ class SyncRepositoryImpl(
 
     override suspend fun recordSyncTime() {
         val currentTime = System.currentTimeMillis()
-        preferenceDataStore.setLastSyncTime(currentTime)
+        preferenceRepository.setLastSyncTime(currentTime)
     }
 
     private fun writeMarkdownData(

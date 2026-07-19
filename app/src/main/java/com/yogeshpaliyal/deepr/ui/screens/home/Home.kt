@@ -97,7 +97,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.yogeshpaliyal.deepr.DeeprQueries
 import com.yogeshpaliyal.deepr.GetLinksAndTags
 import com.yogeshpaliyal.deepr.LocalClipboardLink
 import com.yogeshpaliyal.deepr.LocalSharedText
@@ -204,7 +203,6 @@ data class FilterTagItem(
 fun HomeScreen(
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
-    deeprQueries: DeeprQueries = koinInject(),
     analyticsManager: AnalyticsManager = koinInject(),
     mSelectedLink: GetLinksAndTags? = null,
     sharedText: SharedLink? = null,
