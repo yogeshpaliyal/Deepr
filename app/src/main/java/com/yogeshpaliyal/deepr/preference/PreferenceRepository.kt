@@ -24,6 +24,7 @@ interface PreferenceRepository {
     val getSilentSaveProfileId: Flow<Long>
     val getGoogleDriveAutoBackupEnabled: Flow<Boolean>
     val getClipboardLinkDetectionEnabled: Flow<Boolean>
+    val getAppLockEnabled: Flow<Boolean>
 
     suspend fun setSortingOrder(order: @SortType String)
 
@@ -64,4 +65,6 @@ interface PreferenceRepository {
     suspend fun setGoogleDriveAutoBackupEnabled(enabled: Boolean)
 
     suspend fun setClipboardLinkDetectionEnabled(enabled: Boolean)
+
+    suspend fun setAppLockEnabled(enabled: Boolean)
 }

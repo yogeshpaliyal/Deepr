@@ -647,6 +647,17 @@ class AccountViewModel(
         }
     }
 
+    // App lock (device credential) preference methods
+    val appLockEnabled =
+        preferenceRepository.getAppLockEnabled
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun setAppLockEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceRepository.setAppLockEnabled(enabled)
+        }
+    }
+
     // Auto backup preference methods
     val autoBackupEnabled =
         preferenceRepository.getAutoBackupEnabled
