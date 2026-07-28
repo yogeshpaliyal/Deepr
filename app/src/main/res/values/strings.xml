@@ -107,6 +107,8 @@
     <string name="import_deeplinks_description">Import links from CSV file</string>
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
+    <string name="export_to_html">Export to HTML</string>
+    <string name="export_to_html_description">Export links to HTML bookmarks file</string>
     <string name="shortcut_icon">Shortcut Icon</string>
     <string name="use_link_app_icon">Use link supporting app icon</string>
     <string name="use_deepr_app_icon">Use Deepr app icon</string>
