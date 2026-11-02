@@ -47,20 +47,24 @@ import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
+import com.yogeshpaliyal.deepr.ui.components.LinkActionSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ProfileSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
 import com.yogeshpaliyal.deepr.ui.components.SettingsItem
 import com.yogeshpaliyal.deepr.ui.components.SettingsSection
 import com.yogeshpaliyal.deepr.ui.components.ThemeSelectionDialog
+import com.yogeshpaliyal.deepr.ui.screens.home.LinkAction
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AlertTriangle
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.Click
 import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
+import compose.icons.tablericons.HandFinger
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Lock
@@ -110,6 +114,10 @@ fun SettingsScreen(
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val tapAction by viewModel.tapAction.collectAsStateWithLifecycle()
+    val longPressAction by viewModel.longPressAction.collectAsStateWithLifecycle()
+    var showTapActionDialog by remember { mutableStateOf(false) }
+    var showLongPressActionDialog by remember { mutableStateOf(false) }
     val clipboardLinkDetectionEnabled by viewModel.clipboardLinkDetectionEnabled.collectAsStateWithLifecycle()
     val appLockEnabled by viewModel.appLockEnabled.collectAsStateWithLifecycle()
     val keyguardManager = remember { context.getSystemService<KeyguardManager>() }
@@ -302,6 +310,24 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
+                    TablerIcons.Click,
+                    title = stringResource(R.string.tap_action),
+                    description = stringResource(tapAction.label),
+                    onClick = {
+                        showTapActionDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.HandFinger,
+                    title = stringResource(R.string.long_press_action),
+                    description = stringResource(longPressAction.label),
+                    onClick = {
+                        showLongPressActionDialog = true
+                    },
+                )
+
+                SettingsItem(
                     TablerIcons.Folders,
                     title = stringResource(R.string.silent_save_profile),
                     description =
@@ -487,6 +513,30 @@ fun SettingsScreen(
                     showThemeDialog = false
                 },
                 onDismiss = { showThemeDialog = false },
+            )
+        }
+
+        if (showTapActionDialog) {
+            LinkActionSelectionDialog(
+                title = stringResource(R.string.tap_action),
+                currentAction = tapAction,
+                onActionSelect = { action: LinkAction ->
+                    viewModel.setTapAction(action)
+                    showTapActionDialog = false
+                },
+                onDismiss = { showTapActionDialog = false },
+            )
+        }
+
+        if (showLongPressActionDialog) {
+            LinkActionSelectionDialog(
+                title = stringResource(R.string.long_press_action),
+                currentAction = longPressAction,
+                onActionSelect = { action: LinkAction ->
+                    viewModel.setLongPressAction(action)
+                    showLongPressActionDialog = false
+                },
+                onDismiss = { showLongPressActionDialog = false },
             )
         }
 

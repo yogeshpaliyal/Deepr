@@ -565,6 +565,8 @@ fun Content(
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
     val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val tapAction by viewModel.tapAction.collectAsStateWithLifecycle()
+    val longPressAction by viewModel.longPressAction.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showMoreSelectedItem by remember { mutableStateOf<GetLinksAndTags?>(null) }
     val analyticsManager = koinInject<AnalyticsManager>()
@@ -618,9 +620,18 @@ fun Content(
         )
     }
 
-    val onItemClick: (MenuItem) -> Unit = {
+    lateinit var onItemClick: (MenuItem) -> Unit
+    onItemClick = {
         showMoreSelectedItem = null
         when (it) {
+            is MenuItem.Tap -> {
+                onItemClick(tapAction.toMenuItem(it.item))
+            }
+
+            is MenuItem.LongPress -> {
+                onItemClick(longPressAction.toMenuItem(it.item))
+            }
+
             is Click -> {
                 viewModel.incrementOpenedCount(it.item.id)
                 openDeeplink(context, it.item.link)
@@ -666,6 +677,10 @@ fun Content(
             }
 
             is Copy -> {
+                analyticsManager.logEvent(
+                    AnalyticsEvents.COPY_LINK,
+                    mapOf(AnalyticsParams.LINK_ID to it.item.id),
+                )
                 val clipboard =
                     context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip =

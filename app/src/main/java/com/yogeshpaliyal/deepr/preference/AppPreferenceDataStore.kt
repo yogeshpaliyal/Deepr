@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.yogeshpaliyal.deepr.ui.screens.home.LinkAction
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +45,8 @@ class AppPreferenceDataStore(
         private val CLIPBOARD_LINK_DETECTION_ENABLED =
             booleanPreferencesKey("clipboard_link_detection_enabled")
         private val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
+        private val TAP_ACTION = stringPreferencesKey("tap_action")
+        private val LONG_PRESS_ACTION = stringPreferencesKey("long_press_action")
     }
 
     override val getSortingOrder: Flow<@SortType String> =
@@ -144,6 +147,16 @@ class AppPreferenceDataStore(
     override val getAppLockEnabled: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[APP_LOCK_ENABLED] ?: false // Default to disabled
+        }
+
+    override val getTapAction: Flow<LinkAction> =
+        context.appDataStore.data.map { preferences ->
+            LinkAction.fromKey(preferences[TAP_ACTION], LinkAction.DEFAULT_TAP)
+        }
+
+    override val getLongPressAction: Flow<LinkAction> =
+        context.appDataStore.data.map { preferences ->
+            LinkAction.fromKey(preferences[LONG_PRESS_ACTION], LinkAction.DEFAULT_LONG_PRESS)
         }
 
     override suspend fun setSortingOrder(order: @SortType String) {
@@ -269,6 +282,18 @@ class AppPreferenceDataStore(
     override suspend fun setAppLockEnabled(enabled: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[APP_LOCK_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setTapAction(action: LinkAction) {
+        context.appDataStore.edit { prefs ->
+            prefs[TAP_ACTION] = action.key
+        }
+    }
+
+    override suspend fun setLongPressAction(action: LinkAction) {
+        context.appDataStore.edit { prefs ->
+            prefs[LONG_PRESS_ACTION] = action.key
         }
     }
 }

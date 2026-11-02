@@ -1,5 +1,6 @@
 package com.yogeshpaliyal.deepr.preference
 
+import com.yogeshpaliyal.deepr.ui.screens.home.LinkAction
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.viewmodel.SortType
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,8 @@ interface PreferenceRepository {
     val getGoogleDriveAutoBackupEnabled: Flow<Boolean>
     val getClipboardLinkDetectionEnabled: Flow<Boolean>
     val getAppLockEnabled: Flow<Boolean>
+    val getTapAction: Flow<LinkAction>
+    val getLongPressAction: Flow<LinkAction>
 
     suspend fun setSortingOrder(order: @SortType String)
 
@@ -67,4 +70,8 @@ interface PreferenceRepository {
     suspend fun setClipboardLinkDetectionEnabled(enabled: Boolean)
 
     suspend fun setAppLockEnabled(enabled: Boolean)
+
+    suspend fun setTapAction(action: LinkAction)
+
+    suspend fun setLongPressAction(action: LinkAction)
 }
