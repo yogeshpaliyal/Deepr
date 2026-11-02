@@ -260,32 +260,15 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/tags") {
                             try {
-                                // Get all tags from the database with their IDs
-                                val allTags = linkRepository.getAllTags().first()
+                                val profileIdParam = call.request.queryParameters["profileId"]
+                                val profileId = profileIdParam?.toLongOrNull() ?: 1L
+                                val allTags = linkRepository.getAllTagsWithCount(profileId).first()
                                 val response =
                                     allTags.map { tag ->
-                                        // Count how many links use this tag
-                                        val linkCount =
-                                            linkRepository
-                                                .getLinksAndTags(
-                                                    1L, // Default profile
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    -1L,
-                                                    -1L,
-                                                    tag.id.toString(),
-                                                    tag.id.toString(),
-                                                    "DESC",
-                                                    "createdAt",
-                                                    "DESC",
-                                                    "createdAt",
-                                                ).first()
-                                                .size
                                         TagResponse(
                                             id = tag.id,
                                             name = tag.name,
-                                            count = linkCount,
+                                            count = tag.linkCount.toInt(),
                                         )
                                     }
                                 call.respond(HttpStatusCode.OK, response)

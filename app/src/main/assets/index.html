@@ -136,7 +136,7 @@
                             type="text"
                             id="linkName"
                             placeholder="My Awesome Link (Optional)"
-                            
+
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-800"
                         >
                     </div>
@@ -613,9 +613,13 @@
         // Load available tags from API
         async function loadAvailableTags() {
             try {
-                const response = await fetch('/api/tags');
-                const tags = await response.json();
-                availableTags = tags; // tags now have {id, name, count} format
+                const response = await fetch(`/api/tags?profileId=${selectedProfileId}`);
+                if (response.ok) {
+                    const tags = await response.json();
+                    availableTags = tags; // tags now have {id, name, count} format
+                } else {
+                    availableTags = [];
+                }
             } catch (error) {
                 console.error('Error loading tags:', error);
                 availableTags = [];
@@ -645,9 +649,10 @@
         }
 
         // Handle profile selection change
-        function onProfileChange() {
+        async function onProfileChange() {
             const profileSelect = document.getElementById('profileSelect');
             selectedProfileId = parseInt(profileSelect.value, 10);
+            await loadAvailableTags();
             loadLinks();
             showToast(`Switched to profile: ${profiles.find(p => p.id === selectedProfileId)?.name || 'Unknown'}`, 'info');
         }
