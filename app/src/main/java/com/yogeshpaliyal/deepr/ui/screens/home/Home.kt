@@ -564,7 +564,7 @@ fun Content(
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val showNotesInsteadOfCounter by viewModel.showNotesInsteadOfCounter.collectAsStateWithLifecycle()
     val tapAction by viewModel.tapAction.collectAsStateWithLifecycle()
     val longPressAction by viewModel.longPressAction.collectAsStateWithLifecycle()
     val showMoreBottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -733,7 +733,7 @@ fun Content(
             favouriteFilter = favouriteFilter,
             viewType = currentViewType,
             onItemClick = onItemClick,
-            showOpenCounter = showOpenCounter,
+            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
         )
     }
     showMoreSelectedItem?.let { account ->
@@ -910,6 +910,21 @@ fun Content(
                     }
                 }
 
+                if (showNotesInsteadOfCounter) {
+                    item {
+                        MenuListItem(
+                            text = stringResource(R.string.opened_count, account.openedCount),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            onClick = null,
+                            icon = null,
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
+                        )
+                    }
+                }
+
                 item {
                     Column(modifier = Modifier.padding(horizontal = 12.dp)) {
                         // Determine max tags to show based on expanded state
@@ -1018,7 +1033,7 @@ fun DeeprList(
     favouriteFilter: Int,
     modifier: Modifier = Modifier,
     viewType: @ViewType Int = ViewType.LIST,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     // Determine which empty state to show
     val isSearchActive = searchQuery.isNotBlank()
@@ -1128,7 +1143,7 @@ fun DeeprList(
                             onItemClick = onItemClick,
                             onTagClick = onTagClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }
@@ -1156,7 +1171,7 @@ fun DeeprList(
                             account = account,
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }
@@ -1180,7 +1195,7 @@ fun DeeprList(
                             account = account,
                             onItemClick = onItemClick,
                             isThumbnailEnable = isThumbnailEnable,
-                            showOpenCounter = showOpenCounter,
+                            showNotesInsteadOfCounter = showNotesInsteadOfCounter,
                         )
                     }
                 }

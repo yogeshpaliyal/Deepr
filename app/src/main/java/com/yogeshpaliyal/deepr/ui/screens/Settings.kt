@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.yogeshpaliyal.deepr.BuildConfig
 import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
@@ -62,42 +61,44 @@ import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Click
 import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
-import compose.icons.tablericons.ExternalLink
 import compose.icons.tablericons.Folders
 import compose.icons.tablericons.HandFinger
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Language
 import compose.icons.tablericons.Lock
 import compose.icons.tablericons.Moon
+import compose.icons.tablericons.Note
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Server
-import compose.icons.tablericons.Settings
 import compose.icons.tablericons.Share
 import compose.icons.tablericons.Star
 import compose.icons.tablericons.Upload
+import compose.icons.tablericons.User
 import org.koin.androidx.compose.koinViewModel
+import compose.icons.tablericons.Settings as TablerSettingsIcon
 
 object Settings : TopLevelRoute {
     override val icon: ImageVector
-        get() = TablerIcons.Settings
+        get() = TablerIcons.TablerSettingsIcon
     override val label: Int
         get() = R.string.settings
 
     @Composable
     override fun Content(windowInsets: WindowInsets) {
-        SettingsScreen(windowInsets)
+        SettingsScreen(windowInsets = windowInsets)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = koinViewModel(),
+    windowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
 ) {
     val context = LocalContext.current
     val navigatorContext = LocalNavigator.current
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     // Collect the shortcut icon preference state
     val useLinkBasedIcons by viewModel.useLinkBasedIcons.collectAsStateWithLifecycle()
@@ -113,7 +114,7 @@ fun SettingsScreen(
     // Collect default page preference state
     val defaultPageFavourites by viewModel.defaultPageFavouritesEnabled.collectAsStateWithLifecycle()
     val isThumbnailEnable by viewModel.isThumbnailEnable.collectAsStateWithLifecycle()
-    val showOpenCounter by viewModel.showOpenCounter.collectAsStateWithLifecycle()
+    val showNotesInsteadOfCounter by viewModel.showNotesInsteadOfCounter.collectAsStateWithLifecycle()
     val tapAction by viewModel.tapAction.collectAsStateWithLifecycle()
     val longPressAction by viewModel.longPressAction.collectAsStateWithLifecycle()
     var showTapActionDialog by remember { mutableStateOf(false) }
@@ -122,8 +123,10 @@ fun SettingsScreen(
     val appLockEnabled by viewModel.appLockEnabled.collectAsStateWithLifecycle()
     val keyguardManager = remember { context.getSystemService<KeyguardManager>() }
 
-    // Collect profiles and silent save profile preference
+    // Collect profiles, default profile and silent save profile preference
     val allProfiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+    val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
+    var showDefaultProfileDialog by remember { mutableStateOf(false) }
     val silentSaveProfileId by viewModel.silentSaveProfileId.collectAsStateWithLifecycle()
     var showSilentSaveProfileDialog by remember { mutableStateOf(false) }
 
@@ -137,8 +140,6 @@ fun SettingsScreen(
                         Text(stringResource(R.string.settings))
                     },
                     navigationIcon = {
-                        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-
                         IconButton(onClick = {
                             navigatorContext.removeLast()
                         }) {
@@ -176,11 +177,11 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("Data Management") {
+            SettingsSection(stringResource(R.string.data_management)) {
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.backup),
-                    description = "Export to CSV, Local file sync, Auto backup",
+                    description = stringResource(R.string.backup_description),
                     onClick = {
                         navigatorContext.add(BackupScreen)
                     },
@@ -189,16 +190,14 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Download,
                     title = stringResource(R.string.restore),
-                    description = "Import from CSV, Bookmarks, and other formats",
+                    description = stringResource(R.string.restore_description),
                     onClick = {
                         navigatorContext.add(RestoreScreen)
                     },
                 )
-            }
 
-            DriveSettingsItem()
+                DriveSettingsItem()
 
-            SettingsSection("Others") {
                 SettingsItem(
                     TablerIcons.Server,
                     title = stringResource(R.string.local_network_server),
@@ -206,56 +205,17 @@ fun SettingsScreen(
                         navigatorContext.add(LocalNetworkServer)
                     },
                 )
+            }
 
+            SettingsSection(stringResource(R.string.links_preferences)) {
                 SettingsItem(
-                    TablerIcons.Settings,
-                    title = stringResource(R.string.shortcut_icon),
+                    TablerIcons.User,
+                    title = stringResource(R.string.main_profile),
                     description =
-                        if (useLinkBasedIcons) {
-                            stringResource(
-                                R.string.use_link_app_icon,
-                            )
-                        } else {
-                            stringResource(R.string.use_deepr_app_icon)
-                        },
+                        allProfiles.find { it.id == defaultProfileId }?.name
+                            ?: stringResource(R.string.none),
                     onClick = {
-                        viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = useLinkBasedIcons,
-                            onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
-                        )
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Language,
-                    title = stringResource(R.string.language),
-                    description =
-                        if (languageCode.isEmpty()) {
-                            stringResource(R.string.system_default)
-                        } else {
-                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
-                                stringResource(R.string.system_default)
-                            }
-                        },
-                    onClick = {
-                        showLanguageDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Moon,
-                    title = stringResource(R.string.theme),
-                    description =
-                        when (themeMode) {
-                            "light" -> stringResource(R.string.theme_light)
-                            "dark" -> stringResource(R.string.theme_dark)
-                            else -> stringResource(R.string.system_default)
-                        },
-                    onClick = {
-                        showThemeDialog = true
+                        showDefaultProfileDialog = true
                     },
                 )
 
@@ -280,9 +240,31 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
+                    TablerIcons.TablerSettingsIcon,
+                    title = stringResource(R.string.shortcut_icon),
+                    description =
+                        if (useLinkBasedIcons) {
+                            stringResource(
+                                R.string.use_link_app_icon,
+                            )
+                        } else {
+                            stringResource(R.string.use_deepr_app_icon)
+                        },
+                    onClick = {
+                        viewModel.setUseLinkBasedIcons(!useLinkBasedIcons)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = useLinkBasedIcons,
+                            onCheckedChange = { viewModel.setUseLinkBasedIcons(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
                     TablerIcons.Photo,
-                    title = "Show thumbnails for links",
-                    description = "If enabled, thumbnails will be displayed for saved links where available",
+                    title = stringResource(R.string.show_thumbnails),
+                    description = stringResource(R.string.show_thumbnails_description),
                     onClick = {
                         viewModel.setIsThumbnailEnable(!isThumbnailEnable)
                     },
@@ -295,16 +277,16 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.ExternalLink,
-                    title = stringResource(R.string.show_open_counter),
-                    description = stringResource(R.string.show_open_counter_description),
+                    TablerIcons.Note,
+                    title = stringResource(R.string.switch_open_counter),
+                    description = stringResource(R.string.switch_open_counter_description),
                     onClick = {
-                        viewModel.setShowOpenCounter(!showOpenCounter)
+                        viewModel.setShowNotesInsteadOfCounter(!showNotesInsteadOfCounter)
                     },
                     trailing = {
                         Switch(
-                            checked = showOpenCounter,
-                            onCheckedChange = { viewModel.setShowOpenCounter(it) },
+                            checked = showNotesInsteadOfCounter,
+                            onCheckedChange = { viewModel.setShowNotesInsteadOfCounter(it) },
                         )
                     },
                 )
@@ -326,35 +308,40 @@ fun SettingsScreen(
                         showLongPressActionDialog = true
                     },
                 )
-
-                SettingsItem(
-                    TablerIcons.Folders,
-                    title = stringResource(R.string.silent_save_profile),
-                    description =
-                        allProfiles.find { it.id == silentSaveProfileId }?.name
-                            ?: stringResource(R.string.silent_save_profile_description),
-                    onClick = {
-                        showSilentSaveProfileDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Clipboard,
-                    title = stringResource(R.string.clipboard_link_detection),
-                    description = stringResource(R.string.clipboard_link_detection_description),
-                    onClick = {
-                        viewModel.setClipboardLinkDetectionEnabled(!clipboardLinkDetectionEnabled)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = clipboardLinkDetectionEnabled,
-                            onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
-                        )
-                    },
-                )
             }
 
-            SettingsSection("Security") {
+            SettingsSection(stringResource(R.string.app_preferences)) {
+                SettingsItem(
+                    TablerIcons.Language,
+                    title = stringResource(R.string.language),
+                    description =
+                        if (languageCode.isEmpty()) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
+                                stringResource(R.string.system_default)
+                            }
+                        },
+                    onClick = {
+                        showLanguageDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Moon,
+                    title = stringResource(R.string.theme),
+                    description =
+                        when (themeMode) {
+                            "light" -> stringResource(R.string.theme_light)
+                            "dark" -> stringResource(R.string.theme_dark)
+                            "amoled" -> stringResource(R.string.theme_amoled)
+                            else -> stringResource(R.string.system_default)
+                        },
+                    onClick = {
+                        showThemeDialog = true
+                    },
+                )
+
                 SettingsItem(
                     TablerIcons.Lock,
                     title = stringResource(R.string.app_lock),
@@ -389,16 +376,42 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                SettingsItem(
+                    TablerIcons.Clipboard,
+                    title = stringResource(R.string.clipboard_link_detection),
+                    description = stringResource(R.string.clipboard_link_detection_description),
+                    onClick = {
+                        viewModel.setClipboardLinkDetectionEnabled(!clipboardLinkDetectionEnabled)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = clipboardLinkDetectionEnabled,
+                            onCheckedChange = { viewModel.setClipboardLinkDetectionEnabled(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Folders,
+                    title = stringResource(R.string.silent_save_profile),
+                    description =
+                        allProfiles.find { it.id == silentSaveProfileId }?.name
+                            ?: stringResource(R.string.silent_save_profile_description),
+                    onClick = {
+                        showSilentSaveProfileDialog = true
+                    },
+                )
             }
 
-            SettingsSection("About") {
+            SettingsSection(stringResource(R.string.about)) {
                 val appName = stringResource(R.string.app_name)
                 // Report a problem or feedback via email on yogeshpaliyal.foss+shelfy@gmail.com
                 SettingsItem(
                     icon = TablerIcons.AlertTriangle,
-                    title = "Report a Problem / Feedback",
+                    title = stringResource(R.string.report_problem),
                     shouldShowLoading = false,
-                    description = "Help us improve by reporting issues or sharing feedback",
+                    description = stringResource(R.string.report_problem_description),
                     onClick = {
                         val emailIntent =
                             Intent(Intent.ACTION_SENDTO).apply {
@@ -425,8 +438,8 @@ fun SettingsScreen(
                 // Rate and review open playstore link
                 SettingsItem(
                     icon = TablerIcons.Star,
-                    title = "Rate & Review",
-                    description = "Rate us on the Play Store",
+                    title = stringResource(R.string.rate_review),
+                    description = stringResource(R.string.rate_review_description),
                     shouldShowLoading = false,
                     onClick = {
                         viewModel.requestReview(context as MainActivity)
@@ -436,16 +449,20 @@ fun SettingsScreen(
                 // Create share app item
                 SettingsItem(
                     icon = TablerIcons.Share,
-                    title = "Share $appName",
+                    title = stringResource(R.string.share_app, appName),
                     shouldShowLoading = false,
-                    description = "Share $appName with your friends",
+                    description = stringResource(R.string.share_app_description, appName),
                     onClick = {
                         val shareIntent =
                             Intent().apply {
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "Check out $appName - Your link organizer and Read Later App! Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                    context.getString(
+                                        R.string.share_app_message,
+                                        appName,
+                                        BuildConfig.APPLICATION_ID,
+                                    ),
                                 )
                                 type = "text/plain"
                             }
@@ -537,6 +554,20 @@ fun SettingsScreen(
                     showLongPressActionDialog = false
                 },
                 onDismiss = { showLongPressActionDialog = false },
+            )
+        }
+
+        // Default Profile Selection Dialog
+        if (showDefaultProfileDialog) {
+            ProfileSelectionDialog(
+                profiles = allProfiles,
+                currentProfileId = defaultProfileId ?: -1L,
+                onProfileSelect = { selectedProfileId ->
+                    viewModel.setDefaultProfileId(selectedProfileId)
+                    showDefaultProfileDialog = false
+                },
+                onDismiss = { showDefaultProfileDialog = false },
+                title = stringResource(R.string.main_profile),
             )
         }
 

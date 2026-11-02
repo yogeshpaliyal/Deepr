@@ -41,7 +41,7 @@ fun DeeprItemCompact(
     onItemClick: (MenuItem) -> Unit,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     DeeprItemSwipable(account, onItemClick, modifier) {
         Card(
@@ -103,7 +103,7 @@ fun DeeprItemCompact(
                             color = getDeeprItemTextColor(account.isFavourite),
                         )
 
-                        OpenCountAndTags(account, Modifier.fillMaxWidth(), showOpenCounter)
+                        OpenCountAndTags(account, Modifier.fillMaxWidth(), showNotesInsteadOfCounter)
                     }
                 }
 
