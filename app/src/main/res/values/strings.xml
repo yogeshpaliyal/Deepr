@@ -300,4 +300,9 @@
     <string name="app_lock_screen_title">Deepr is locked</string>
     <string name="app_lock_screen_subtitle">Unlock with your device credentials to continue</string>
     <string name="unlock">Unlock</string>
+<string name="format_optional">%1$s (%2$s)</string>
+    <string name="optional">Optional</string>
+    <string name="link_placeholder">https://example.com or app://deeplink</string>
+    <string name="preview">Preview</string>
+    <string name="unknown">Unknown</string>
 </resources>
