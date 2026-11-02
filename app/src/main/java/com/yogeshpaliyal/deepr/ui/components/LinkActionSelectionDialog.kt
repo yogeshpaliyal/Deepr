@@ -53,8 +53,7 @@ fun LinkActionSelectionDialog(
                                     selected = currentAction == action,
                                     onClick = { onActionSelect(action) },
                                     role = Role.RadioButton,
-                                )
-                                .padding(vertical = 8.dp),
+                                ).padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
