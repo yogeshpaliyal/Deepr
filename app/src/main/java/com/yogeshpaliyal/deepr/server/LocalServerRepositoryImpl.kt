@@ -196,6 +196,7 @@ open class LocalServerRepositoryImpl(
                                             "",
                                             "",
                                             "",
+                                            "",
                                             -1L,
                                             -1L,
                                             "",
@@ -269,6 +270,7 @@ open class LocalServerRepositoryImpl(
                                             linkRepository
                                                 .getLinksAndTags(
                                                     1L, // Default profile
+                                                    "",
                                                     "",
                                                     "",
                                                     "",
