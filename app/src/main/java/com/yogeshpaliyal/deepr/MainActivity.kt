@@ -168,6 +168,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            // Set main profile on launch
+            val defaultProfileId by viewModel.defaultProfileId.collectAsStateWithLifecycle()
+            val currentProfile by viewModel.currentProfile.collectAsStateWithLifecycle()
+            LaunchedEffect(defaultProfileId) {
+                if (defaultProfileId != null && defaultProfileId != currentProfile?.id) {
+                    viewModel.setSelectedProfile(defaultProfileId!!)
+                }
+            }
+
             DeeprTheme(themeMode = themeMode, colorTheme = colorTheme) {
                 Surface {
                     // Dashboard stays composed (preserving its nav back stack) even while

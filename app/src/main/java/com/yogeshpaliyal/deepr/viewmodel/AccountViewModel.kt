@@ -626,6 +626,16 @@ class AccountViewModel(
         }
     }
 
+    val showNotesInsteadOfCounter =
+        preferenceRepository.getShowNotesInsteadOfCounter
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun setShowNotesInsteadOfCounter(show: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceRepository.setShowNotesInsteadOfCounter(show)
+        }
+    }
+
     // Tap / long press action preference methods
     val tapAction =
         preferenceRepository.getTapAction
@@ -817,6 +827,16 @@ class AccountViewModel(
         preferenceRepository.getSilentSaveProfileId
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1L)
 
+    fun setDefaultProfileId(profileId: Long?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceRepository.setDefaultProfileId(profileId)
+        }
+    }
+
+    val defaultProfileId =
+        preferenceRepository.getDefaultProfileId
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     fun insertProfile(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.insertProfile(name)
@@ -853,6 +873,12 @@ class AccountViewModel(
                 if (nextProfile != null) {
                     setSelectedProfile(nextProfile.id)
                 }
+            }
+
+            // If deleting the main profile, reset it
+            val currentDefaultProfileId = preferenceRepository.getDefaultProfileId.first()
+            if (currentDefaultProfileId == id) {
+                preferenceRepository.setDefaultProfileId(null)
             }
 
             linkRepository.deleteProfile(id)

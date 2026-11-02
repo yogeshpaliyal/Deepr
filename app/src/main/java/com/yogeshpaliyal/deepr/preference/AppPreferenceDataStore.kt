@@ -38,6 +38,9 @@ class AppPreferenceDataStore(
         private val VIEW_TYPE = intPreferencesKey("view_type")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
         private val SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
+        private val SHOW_NOTES_INSTEAD_OF_COUNTER = booleanPreferencesKey("show_notes_instead_of_counter")
+        private val DEFAULT_PROFILE_ID = longPreferencesKey("default_profile_id")
+        private val LEGACY_SHOW_OPEN_COUNTER = booleanPreferencesKey("show_open_counter")
         private val SELECTED_PROFILE_ID = longPreferencesKey("selected_profile_id")
         private val SILENT_SAVE_PROFILE_ID = longPreferencesKey("silent_save_profile_id")
         private val GOOGLE_DRIVE_AUTO_BACKUP_ENABLED =
@@ -122,6 +125,22 @@ class AppPreferenceDataStore(
     override val getShowOpenCounter: Flow<Boolean> =
         context.appDataStore.data.map { preferences ->
             preferences[SHOW_OPEN_COUNTER] ?: true // Default to showing counter
+        }
+
+    override val getShowNotesInsteadOfCounter: Flow<Boolean> =
+        context.appDataStore.data.map { preferences ->
+            if (preferences.contains(SHOW_NOTES_INSTEAD_OF_COUNTER)) {
+                preferences[SHOW_NOTES_INSTEAD_OF_COUNTER] ?: false
+            } else if (preferences.contains(LEGACY_SHOW_OPEN_COUNTER)) {
+                !(preferences[LEGACY_SHOW_OPEN_COUNTER] ?: true)
+            } else {
+                false
+            }
+        }
+
+    override val getDefaultProfileId: Flow<Long?> =
+        context.appDataStore.data.map { preferences ->
+            preferences[DEFAULT_PROFILE_ID]
         }
 
     override val getSelectedProfileId: Flow<Long> =
@@ -252,6 +271,23 @@ class AppPreferenceDataStore(
     override suspend fun setShowOpenCounter(show: Boolean) {
         context.appDataStore.edit { prefs ->
             prefs[SHOW_OPEN_COUNTER] = show
+        }
+    }
+
+    override suspend fun setShowNotesInsteadOfCounter(show: Boolean) {
+        context.appDataStore.edit { prefs ->
+            prefs[SHOW_NOTES_INSTEAD_OF_COUNTER] = show
+            prefs.remove(LEGACY_SHOW_OPEN_COUNTER)
+        }
+    }
+
+    override suspend fun setDefaultProfileId(id: Long?) {
+        context.appDataStore.edit { prefs ->
+            if (id != null) {
+                prefs[DEFAULT_PROFILE_ID] = id
+            } else {
+                prefs.remove(DEFAULT_PROFILE_ID)
+            }
         }
     }
 

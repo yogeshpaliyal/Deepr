@@ -21,6 +21,8 @@ interface PreferenceRepository {
     val getServerPort: Flow<String>
     val getThemeMode: Flow<String>
     val getShowOpenCounter: Flow<Boolean>
+    val getShowNotesInsteadOfCounter: Flow<Boolean>
+    val getDefaultProfileId: Flow<Long?>
     val getSelectedProfileId: Flow<Long>
     val getSilentSaveProfileId: Flow<Long>
     val getGoogleDriveAutoBackupEnabled: Flow<Boolean>
@@ -60,6 +62,10 @@ interface PreferenceRepository {
     suspend fun setThemeMode(mode: String)
 
     suspend fun setShowOpenCounter(show: Boolean)
+
+    suspend fun setShowNotesInsteadOfCounter(show: Boolean)
+
+    suspend fun setDefaultProfileId(id: Long?)
 
     suspend fun setSelectedProfileId(profileId: Long)
 

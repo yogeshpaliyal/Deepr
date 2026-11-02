@@ -46,6 +46,7 @@ import com.yogeshpaliyal.deepr.ui.getDeeprItemBackgroundColor
 import com.yogeshpaliyal.deepr.ui.getDeeprItemTextColor
 import compose.icons.TablerIcons
 import compose.icons.tablericons.DotsVertical
+import compose.icons.tablericons.Note
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -122,7 +123,7 @@ fun DeeprItem(
     selectedTag: List<Tags>,
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
-    showOpenCounter: Boolean = true,
+    showNotesInsteadOfCounter: Boolean = false,
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
     val selectedTags =
@@ -166,7 +167,7 @@ fun DeeprItem(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         if (account.name.isNotEmpty()) {
@@ -231,12 +232,20 @@ fun DeeprItem(
                             }
                         }
 
-                        if (showOpenCounter) {
+                        if (!showNotesInsteadOfCounter) {
                             Text(
                                 text = stringResource(R.string.opened_count, account.openedCount),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = getDeeprItemTextColor(account.isFavourite),
                             )
+                        } else if (account.notes.isNotBlank()) {
+                            IconButton(onClick = { onItemClick(MenuItem.ViewNote(account)) }) {
+                                Icon(
+                                    TablerIcons.Note,
+                                    contentDescription = stringResource(R.string.note),
+                                    tint = getDeeprItemTextColor(account.isFavourite),
+                                )
+                            }
                         }
                     }
                 }
