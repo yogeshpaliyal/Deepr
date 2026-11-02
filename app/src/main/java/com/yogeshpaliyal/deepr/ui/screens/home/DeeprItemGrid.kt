@@ -52,10 +52,8 @@ fun DeeprItemGrid(
                 Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { onItemClick(MenuItem.Click(account)) },
-                        onLongClick = {
-                            onItemClick(MenuItem.Copy(account))
-                        },
+                        onClick = { onItemClick(MenuItem.Tap(account)) },
+                        onLongClick = { onItemClick(MenuItem.LongPress(account)) },
                     ),
         ) {
             Column(

@@ -16,6 +16,7 @@ import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.sync.SyncRepository
+import com.yogeshpaliyal.deepr.ui.screens.home.LinkAction
 import com.yogeshpaliyal.deepr.ui.screens.home.ViewType
 import com.yogeshpaliyal.deepr.util.RequestResult
 import kotlinx.coroutines.Dispatchers
@@ -622,6 +623,31 @@ class AccountViewModel(
     fun setShowOpenCounter(show: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             preferenceRepository.setShowOpenCounter(show)
+        }
+    }
+
+    // Tap / long press action preference methods
+    val tapAction =
+        preferenceRepository.getTapAction
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LinkAction.DEFAULT_TAP)
+
+    val longPressAction =
+        preferenceRepository.getLongPressAction
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                LinkAction.DEFAULT_LONG_PRESS,
+            )
+
+    fun setTapAction(action: LinkAction) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceRepository.setTapAction(action)
+        }
+    }
+
+    fun setLongPressAction(action: LinkAction) {
+        viewModelScope.launch(Dispatchers.IO) {
+            preferenceRepository.setLongPressAction(action)
         }
     }
 

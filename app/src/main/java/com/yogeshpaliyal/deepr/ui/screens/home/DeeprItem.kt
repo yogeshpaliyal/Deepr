@@ -1,9 +1,5 @@
 package com.yogeshpaliyal.deepr.ui.screens.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -37,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -106,6 +101,16 @@ sealed class MenuItem(
     class ViewNote(
         item: GetLinksAndTags,
     ) : MenuItem(item)
+
+    /** The entry itself was tapped; resolved to the user's configured [LinkAction]. */
+    class Tap(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
+
+    /** The entry itself was long pressed; resolved to the user's configured [LinkAction]. */
+    class LongPress(
+        item: GetLinksAndTags,
+    ) : MenuItem(item)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -118,14 +123,10 @@ fun DeeprItem(
     isThumbnailEnable: Boolean,
     modifier: Modifier = Modifier,
     showOpenCounter: Boolean = true,
-    analyticsManager: com.yogeshpaliyal.deepr.analytics.AnalyticsManager = org.koin.compose.koinInject(),
 ) {
     var tagsExpanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val selectedTags =
         remember(account.tagsNames) { account.tagsNames?.split(",")?.toMutableList() }
-
-    val linkCopied = stringResource(R.string.link_copied)
 
     DeeprItemSwipable(account, onItemClick, modifier) {
         Card(
@@ -138,18 +139,8 @@ fun DeeprItem(
                     .testTag("DeeprItem")
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { onItemClick(MenuItem.Click(account)) },
-                        onLongClick = {
-                            analyticsManager.logEvent(
-                                com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.COPY_LINK,
-                                mapOf(com.yogeshpaliyal.deepr.analytics.AnalyticsParams.LINK_ID to account.id),
-                            )
-                            val clipboard =
-                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText(linkCopied, account.link)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, linkCopied, Toast.LENGTH_SHORT).show()
-                        },
+                        onClick = { onItemClick(MenuItem.Tap(account)) },
+                        onLongClick = { onItemClick(MenuItem.LongPress(account)) },
                     ),
         ) {
             if (account.thumbnail.isNotEmpty() && isThumbnailEnable) {
