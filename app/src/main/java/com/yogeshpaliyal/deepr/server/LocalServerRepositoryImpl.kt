@@ -4,11 +4,13 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.yogeshpaliyal.deepr.BuildConfig
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.Tags
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.data.NetworkRepository
 import com.yogeshpaliyal.deepr.preference.PreferenceRepository
+import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -48,6 +50,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.NetworkInterface
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 open class LocalServerRepositoryImpl(
     private val context: Context,
@@ -58,6 +61,10 @@ open class LocalServerRepositoryImpl(
     private val analyticsManager: AnalyticsManager,
     private val preferenceRepository: PreferenceRepository,
 ) : LocalServerRepository {
+    companion object {
+        private val htmlCache = ConcurrentHashMap<Locale, String>()
+    }
+
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? =
         null
     private val _isRunning = MutableStateFlow(false)
@@ -123,12 +130,97 @@ open class LocalServerRepositoryImpl(
                     routing {
                         get("/") {
                             try {
+                                val languageCode = preferenceRepository.getLanguageCode.first()
+                                val localizedContext = LanguageUtil.updateLocale(context, languageCode)
+                                val locale =
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                        localizedContext.resources.configuration.locales[0]
+                                    } else {
+                                        @Suppress("DEPRECATION")
+                                        localizedContext.resources.configuration.locale
+                                    }
+
+                                val cached = htmlCache[locale]
+                                if (cached != null) {
+                                    call.respondText(cached, ContentType.Text.Html)
+                                    return@get
+                                }
+
                                 val htmlContent =
                                     context.assets
                                         .open("index.html")
                                         .bufferedReader()
                                         .use { it.readText() }
-                                call.respondText(htmlContent, ContentType.Text.Html)
+
+                                val stringMap =
+                                    mapOf(
+                                        "{{WEB_TITLE}}" to R.string.web_title,
+                                        "{{WEB_SUBTITLE}}" to R.string.web_subtitle,
+                                        "{{WEB_PROFILE_LABEL}}" to R.string.web_profile_label,
+                                        "{{WEB_NEW_PROFILE}}" to R.string.web_new_profile,
+                                        "{{WEB_MANAGE_PROFILES}}" to R.string.web_manage_profiles,
+                                        "{{WEB_MANAGE_TAGS}}" to R.string.web_manage_tags,
+                                        "{{WEB_MANAGE}}" to R.string.web_manage,
+                                        "{{WEB_ADD_NEW_LINK}}" to R.string.web_add_new_link,
+                                        "{{WEB_LINK_URL}}" to R.string.web_link_url,
+                                        "{{WEB_LINK_NAME}}" to R.string.web_link_name,
+                                        "{{WEB_NOTES_OPTIONAL}}" to R.string.web_notes_optional,
+                                        "{{WEB_TAGS_OPTIONAL}}" to R.string.web_tags_optional,
+                                        "{{WEB_ADD_LINK_BUTTON}}" to R.string.web_add_link_button,
+                                        "{{WEB_YOUR_LINKS}}" to R.string.web_your_links,
+                                        "{{WEB_REFRESH}}" to R.string.web_refresh,
+                                        "{{WEB_SEARCH_PLACEHOLDER}}" to R.string.web_search_placeholder,
+                                        "{{WEB_ALL_TAGS}}" to R.string.web_all_tags,
+                                        "{{WEB_SORT_DATE}}" to R.string.web_sort_date,
+                                        "{{WEB_SORT_NAME}}" to R.string.web_sort_name,
+                                        "{{WEB_SORT_OPENS}}" to R.string.web_sort_opens,
+                                        "{{WEB_CLEAR}}" to R.string.web_clear,
+                                        "{{WEB_FAVOURITES}}" to R.string.web_favourites,
+                                        "{{WEB_LOADING_LINKS}}" to R.string.web_loading_links,
+                                        "{{WEB_LOADING_DESCRIPTION}}" to R.string.web_loading_description,
+                                        "{{WEB_NO_LINKS}}" to R.string.web_no_links,
+                                        "{{WEB_NO_LINKS_DESCRIPTION}}" to R.string.web_no_links_description,
+                                        "{{WEB_NO_MATCHING}}" to R.string.web_no_matching,
+                                        "{{WEB_NO_MATCHING_DESCRIPTION}}" to R.string.web_no_matching_description,
+                                        "{{WEB_CREATE_PROFILE_TITLE}}" to R.string.web_create_profile_title,
+                                        "{{WEB_PROFILE_NAME_LABEL}}" to R.string.web_profile_name_label,
+                                        "{{WEB_CANCEL}}" to R.string.web_cancel,
+                                        "{{WEB_CREATE_PROFILE_BUTTON}}" to R.string.web_create_profile_button,
+                                        "{{WEB_EDIT_LINK}}" to R.string.web_edit_link,
+                                        "{{WEB_STATUS_CREATING}}" to R.string.web_status_creating,
+                                        "{{WEB_STATUS_ADDED}}" to R.string.web_status_added,
+                                        "{{WEB_SUCCESS_LINK_ADDED}}" to R.string.web_success_link_added,
+                                        "{{WEB_ERROR_ADD_LINK}}" to R.string.web_error_add_link,
+                                        "{{WEB_ERROR_LOADING}}" to R.string.web_error_loading,
+                                        "{{WEB_ERROR_REFRESH}}" to R.string.web_error_refresh,
+                                        "{{WEB_ERROR_FETCH}}" to R.string.web_error_fetch,
+                                        "{{WEB_MSG_SWITCHED}}" to R.string.web_msg_switched,
+                                        "{{WEB_MSG_FILTERED}}" to R.string.web_msg_filtered,
+                                        "{{WEB_MSG_FILTERS_CLEARED}}" to R.string.web_msg_filters_cleared,
+                                        "{{WEB_OPEN_LINK}}" to R.string.web_open_link,
+                                        "{{WEB_OPENS}}" to R.string.web_opens,
+                                        "{{WEB_LINK_URL_PLACEHOLDER}}" to R.string.link_placeholder,
+                                        "{{WEB_LINK_NAME_PLACEHOLDER}}" to R.string.enter_link_name,
+                                        "{{WEB_NOTES_PLACEHOLDER}}" to R.string.enter_notes,
+                                        "{{WEB_TAGS_PLACEHOLDER}}" to R.string.web_tags_placeholder,
+                                        "{{WEB_PROFILE_PLACEHOLDER}}" to R.string.enter_profile_name,
+                                    )
+
+                                var localizedHtml = htmlContent
+                                stringMap.forEach { (placeholder, resId) ->
+                                    val stringValue =
+                                        try {
+                                            localizedContext.getString(resId)
+                                        } catch (e: Exception) {
+                                            null
+                                        }
+                                    if (stringValue != null) {
+                                        localizedHtml = localizedHtml.replace(placeholder, stringValue)
+                                    }
+                                }
+
+                                htmlCache[locale] = localizedHtml
+                                call.respondText(localizedHtml, ContentType.Text.Html)
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error reading HTML asset", e)
                                 call.respondText(
