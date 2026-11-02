@@ -21,7 +21,7 @@
     <string name="create_tag">Tag erstellen</string>
     <string name="new_tag">Neuer Tag</string>
     <string name="no_links_saved_yet">Noch keine Links gespeichert</string>
-    <string name="save_your_link_below">Speichern Sie Ihren Link unten, um später schnell darauf zugreifen zu können.</string>
+    <string name="save_your_link_below">Speichern Sie Ihren Link unten, um später schnell darauf zugreifen zu können</string>
     <!-- Menu and Dialog Items -->
     <string name="more_options">Weitere Optionen</string>
     <string name="copy_link">Link kopieren</string>
@@ -82,7 +82,7 @@
     <!-- About Us Screen -->
     <string name="app_logo">App-Logo</string>
     <string name="version_format">Version %s</string>
-    <string name="app_description">Eine einfache App zum Speichern, Organisieren und Starten von Deeplinks.</string>
+    <string name="app_description">Eine einfache App zum Speichern, Organisieren und Starten von Deeplinks</string>
     <string name="author">Autor</string>
     <string name="author_name">Yogesh Choudhary</string>
     <string name="twitter">Twitter</string>
@@ -93,17 +93,17 @@
     <string name="save_deeplink">Deeplink speichern</string>
     <string name="save_deeplink_message">Deeplink speichern: %s ?</string>
     <string name="enter_link_name">Bitte geben Sie den Namen des Links ein</string>
-    <string name="enter_link_name_error">Bitte geben Sie den Namen des Links ein.</string>
+    <string name="enter_link_name_error">Bitte geben Sie den Namen des Links ein</string>
     <string name="save_and_execute">Speichern und ausführen</string>
     <!-- Home Screen -->
     <string name="enter_deeplink_command">Link eingeben</string>
-    <string name="invalid_empty_deeplink">Ungültiger oder leerer Deeplink.</string>
+    <string name="invalid_empty_deeplink">Ungültiger oder leerer Deeplink</string>
     <!-- Error Messages -->
     <string name="invalid_deeplink_toast">Ungültiger Deeplink: %s</string>
-    <string name="no_data_to_export">Keine Daten in der Datenbank zum Exportieren gefunden.</string>
-    <string name="no_data_available_export">Keine Daten zum Exportieren nach Mapping verfügbar.</string>
+    <string name="no_data_to_export">Keine Daten in der Datenbank zum Exportieren gefunden</string>
+    <string name="no_data_available_export">Keine Daten zum Exportieren nach Mapping verfügbar</string>
     <string name="export_success">Erfolgreich exportiert nach %s</string>
-    <string name="export_failed">Fehler beim Erstellen der CSV-Datei.</string>
+    <string name="export_failed">Fehler beim Erstellen der CSV-Datei</string>
     <!-- Sync Settings -->
     <string name="select_sync_file">Synchronisationsdatei auswählen</string>
     <string name="sync_now">Jetzt synchronisieren</string>
