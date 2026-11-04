@@ -45,6 +45,7 @@ import compose.icons.tablericons.FileText
 import compose.icons.tablericons.InfoCircle
 import compose.icons.tablericons.Refresh
 import compose.icons.tablericons.Upload
+import compose.icons.tablericons.World
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -74,6 +75,16 @@ fun BackupScreenContent(
         ) { uri ->
             uri?.let {
                 viewModel.exportCsvData(it)
+            }
+        }
+
+    // Launcher for picking HTML (bookmarks) export location
+    val htmlExportLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("text/html"),
+        ) { uri ->
+            uri?.let {
+                viewModel.exportHtmlData(it)
             }
         }
 
@@ -190,6 +201,19 @@ fun BackupScreenContent(
                                 Locale.US,
                             ).format(Date())
                         csvExportLauncher.launch("deepr_export_$timeStamp.csv")
+                    },
+                )
+                SettingsItem(
+                    TablerIcons.World,
+                    title = stringResource(R.string.export_html),
+                    description = stringResource(R.string.export_html_description),
+                    onClick = {
+                        val timeStamp =
+                            SimpleDateFormat(
+                                "yyyyMMdd_HHmmss",
+                                Locale.US,
+                            ).format(Date())
+                        htmlExportLauncher.launch("deepr_bookmarks_$timeStamp.html")
                     },
                 )
             }

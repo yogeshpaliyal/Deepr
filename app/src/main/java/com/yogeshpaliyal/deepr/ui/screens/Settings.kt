@@ -180,7 +180,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.backup),
-                    description = "Export to CSV, Local file sync, Auto backup",
+                    description = "Export to CSV or HTML, Local file sync, Auto backup",
                     onClick = {
                         navigatorContext.add(BackupScreen)
                     },

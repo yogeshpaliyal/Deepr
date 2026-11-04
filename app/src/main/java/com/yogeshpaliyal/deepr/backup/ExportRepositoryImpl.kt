@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import com.yogeshpaliyal.deepr.GetLinksForBackup
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.data.LinkRepository
 import com.yogeshpaliyal.deepr.util.RequestResult
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,25 +27,44 @@ class ExportRepositoryImpl(
         CsvWriter()
     }
 
-    override suspend fun exportToCsv(uri: Uri?): RequestResult<String> {
+    private val htmlBookmarkWriter by lazy {
+        HtmlBookmarkWriter()
+    }
+
+    override suspend fun exportToCsv(uri: Uri?): RequestResult<String> =
+        export(uri, extension = "csv", mimeType = "text/csv") { outputStream, data ->
+            csvWriter.writeToCsv(outputStream, data)
+        }
+
+    override suspend fun exportToHtml(uri: Uri?): RequestResult<String> =
+        export(uri, extension = "html", mimeType = "text/html") { outputStream, data ->
+            htmlBookmarkWriter.writeToHtml(outputStream, data)
+        }
+
+    private suspend fun export(
+        uri: Uri?,
+        extension: String,
+        mimeType: String,
+        write: (OutputStream, List<GetLinksForBackup>) -> Unit,
+    ): RequestResult<String> {
         val count = linkRepository.countAllLinks()
         if (count == 0L) {
             return RequestResult.Error(context.getString(R.string.no_data_to_export))
         }
-        val dataToExportInCsvFormat = linkRepository.getLinksForBackup()
-        if (dataToExportInCsvFormat.isEmpty()) {
+        val dataToExport = linkRepository.getLinksForBackup()
+        if (dataToExport.isEmpty()) {
             return RequestResult.Error(context.getString(R.string.no_data_available_export))
         }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val fileName = "deepr_export_$timeStamp.csv"
+        val fileName = "deepr_export_$timeStamp.$extension"
 
         return withContext(Dispatchers.IO) {
             // If URI is provided, export to that location
             if (uri != null) {
                 return@withContext try {
                     context.contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        write(outputStream, dataToExport)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -61,7 +82,7 @@ class ExportRepositoryImpl(
                 val contentValues =
                     ContentValues().apply {
                         put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                        put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                        put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
                         put(
                             MediaStore.MediaColumns.RELATIVE_PATH,
                             "${Environment.DIRECTORY_DOWNLOADS}/Deepr",
@@ -74,7 +95,7 @@ class ExportRepositoryImpl(
 
                 if (defaultUri != null) {
                     resolver.openOutputStream(defaultUri)?.use { outputStream ->
-                        csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                        write(outputStream, dataToExport)
                     }
                     RequestResult.Success(
                         context.getString(
@@ -96,7 +117,7 @@ class ExportRepositoryImpl(
                 val file = File(downloadsDir, fileName)
 
                 FileOutputStream(file).use { outputStream ->
-                    csvWriter.writeToCsv(outputStream, dataToExportInCsvFormat)
+                    write(outputStream, dataToExport)
                 }
                 RequestResult.Success(context.getString(R.string.export_success, file.absolutePath))
             }

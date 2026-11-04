@@ -107,6 +107,8 @@
     <string name="import_deeplinks_description">Import links from CSV file</string>
     <string name="export_deeplinks">Export links</string>
     <string name="export_deeplinks_description">Export links to CSV file</string>
+    <string name="export_html">Export as HTML</string>
+    <string name="export_html_description">Export links as an HTML bookmarks file that browsers can import</string>
     <string name="shortcut_icon">Shortcut Icon</string>
     <string name="use_link_app_icon">Use link supporting app icon</string>
     <string name="use_deepr_app_icon">Use Deepr app icon</string>
@@ -163,7 +165,7 @@
     <string name="no_data_to_export">No data found in the database to export.</string>
     <string name="no_data_available_export">No data available to export after mapping.</string>
     <string name="export_success">Successfully exported to %s</string>
-    <string name="export_failed">Failed to create CSV file.</string>
+    <string name="export_failed">Failed to create export file.</string>
 
     <!-- Sync Settings -->
     <string name="sync_to_file">Sync to Local File (Beta)</string>
