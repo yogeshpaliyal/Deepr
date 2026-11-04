@@ -29,6 +29,8 @@ sealed interface AppUpdateUiState {
 
     data class Downloading(
         val progress: Float?,
+        /** False for Play updates: Play owns that flow, so the app cannot stop it. */
+        val cancellable: Boolean,
     ) : AppUpdateUiState
 }
 
@@ -113,13 +115,14 @@ class AppUpdateViewModel(
         activity: Activity,
         update: AvailableUpdate,
     ) {
-        _state.value = AppUpdateUiState.Downloading(null)
+        val cancellable = update.downloadUrl != null
+        _state.value = AppUpdateUiState.Downloading(null, cancellable)
         updateJob?.cancel()
         updateJob =
             viewModelScope.launch {
                 try {
                     appUpdateManager.startUpdate(activity, update) { progress ->
-                        _state.value = AppUpdateUiState.Downloading(progress)
+                        _state.value = AppUpdateUiState.Downloading(progress, cancellable)
                     }
                     _state.value = AppUpdateUiState.Idle
                 } catch (e: CancellationException) {

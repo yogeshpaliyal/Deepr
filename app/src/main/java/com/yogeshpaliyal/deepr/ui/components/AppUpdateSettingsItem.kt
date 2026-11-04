@@ -153,11 +153,16 @@ internal fun AppUpdateDialogs(
                     }
                 },
                 confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = onCancelDownload) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                },
+                dismissButton =
+                    if (state.cancellable) {
+                        {
+                            TextButton(onClick = onCancelDownload) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }
+                    } else {
+                        null
+                    },
             )
         }
 
