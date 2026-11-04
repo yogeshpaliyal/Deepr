@@ -216,6 +216,17 @@ class MainActivity : ComponentActivity() {
 private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
     listOf(Dashboard2(), TagSelectionScreen, Settings)
 
+/**
+ * Whether [screen] is the same bottom navigation tab as this route.
+ *
+ * Tabs are matched by their label instead of their runtime class: R8 can merge
+ * structurally similar [TopLevelRoute] implementations (e.g. [Dashboard2] and
+ * [TagSelectionScreen]) into one class in release builds, which made a `::class`
+ * comparison treat Home and Tags as the same tab and highlight both.
+ */
+private fun TopLevelRoute.isSameTabAs(screen: BaseScreen): Boolean =
+    screen is TopLevelRoute && screen.label == label
+
 val LocalSharedText =
     compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
 
@@ -275,14 +286,13 @@ fun Dashboard(
                     modifier = modifier,
                     bottomBar = {
                         AnimatedVisibility(
-                            (TOP_LEVEL_ROUTES.any { it::class == current::class }),
+                            TOP_LEVEL_ROUTES.any { it.isSameTabAs(current) },
                             enter = slideInVertically(initialOffsetY = { it }),
                             exit = slideOutVertically(targetOffsetY = { it }),
                         ) {
                             BottomAppBar(scrollBehavior = scrollBehavior) {
                                 TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
-                                    val isSelected =
-                                        topLevelRoute::class == backStack.topLevelKey::class
+                                    val isSelected = topLevelRoute.isSameTabAs(backStack.topLevelKey)
                                     NavigationBarItem(
                                         selected = isSelected,
                                         onClick = {
