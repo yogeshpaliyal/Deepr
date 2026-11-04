@@ -34,12 +34,14 @@ class PlayStoreAppUpdateManager(
             when (info.updateAvailability()) {
                 UpdateAvailability.UPDATE_AVAILABLE,
                 UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS,
-                -> UpdateCheckResult.Available(
-                    AvailableUpdate(
-                        versionKey = info.availableVersionCode().toString(),
-                        versionName = null,
-                    ),
-                )
+                -> {
+                    val update =
+                        AvailableUpdate(
+                            versionKey = info.availableVersionCode().toString(),
+                            versionName = null,
+                        )
+                    UpdateCheckResult.Available(update)
+                }
 
                 else -> UpdateCheckResult.UpToDate
             }
