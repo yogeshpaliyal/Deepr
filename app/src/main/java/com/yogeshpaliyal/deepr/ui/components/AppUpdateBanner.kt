@@ -141,5 +141,6 @@ fun AppUpdateBanner(
         state = state,
         onStartUpdate = { update -> activity?.let { viewModel.startUpdate(it, update) } },
         onDismiss = viewModel::dismiss,
+        onCancelDownload = viewModel::cancelUpdate,
     )
 }

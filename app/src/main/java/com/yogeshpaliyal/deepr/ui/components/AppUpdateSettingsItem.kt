@@ -68,6 +68,7 @@ fun AppUpdateSettingsItem(
         state = state,
         onStartUpdate = { update -> activity?.let { viewModel.startUpdate(it, update) } },
         onDismiss = viewModel::dismiss,
+        onCancelDownload = viewModel::cancelUpdate,
     )
 }
 
@@ -95,6 +96,7 @@ internal fun AppUpdateDialogs(
     state: AppUpdateUiState,
     onStartUpdate: (AvailableUpdate) -> Unit,
     onDismiss: () -> Unit,
+    onCancelDownload: () -> Unit,
 ) {
     when (state) {
         is AppUpdateUiState.Available -> {
@@ -151,6 +153,11 @@ internal fun AppUpdateDialogs(
                     }
                 },
                 confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = onCancelDownload) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
             )
         }
 
