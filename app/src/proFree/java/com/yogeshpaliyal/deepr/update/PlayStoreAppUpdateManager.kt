@@ -2,11 +2,11 @@ package com.yogeshpaliyal.deepr.update
 
 import android.app.Activity
 import android.content.Context
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory as PlayAppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.requestAppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory as PlayAppUpdateManagerFactory
 
 /**
  * Uses the Google Play In-App Updates API with the immediate (full screen) flow:
