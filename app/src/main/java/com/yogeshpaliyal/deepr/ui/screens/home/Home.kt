@@ -109,6 +109,7 @@ import com.yogeshpaliyal.deepr.analytics.AnalyticsParams
 import com.yogeshpaliyal.deepr.ui.AddLinkScreen
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
+import com.yogeshpaliyal.deepr.ui.components.AppUpdateBanner
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
@@ -448,6 +449,8 @@ fun HomeScreen(
                         }
                     },
                 )
+
+                AppUpdateBanner()
 
                 // Clipboard link banner
                 ClipboardLinkBanner(

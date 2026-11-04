@@ -307,6 +307,7 @@
     <string name="update_available_generic">A new version of the app is available.</string>
     <string name="update_now">Update</string>
     <string name="update_later">Later</string>
+    <string name="dismiss_update_banner">Dismiss update</string>
     <string name="downloading_update">Downloading update</string>
     <string name="app_up_to_date">You are on the latest version</string>
     <string name="update_check_failed">Couldn\'t check for updates. Please try again later.</string>

@@ -47,6 +47,7 @@ class AppPreferenceDataStore(
         private val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
         private val TAP_ACTION = stringPreferencesKey("tap_action")
         private val LONG_PRESS_ACTION = stringPreferencesKey("long_press_action")
+        private val DISMISSED_UPDATE_VERSION = stringPreferencesKey("dismissed_update_version")
     }
 
     override val getSortingOrder: Flow<@SortType String> =
@@ -294,6 +295,17 @@ class AppPreferenceDataStore(
     override suspend fun setLongPressAction(action: LinkAction) {
         context.appDataStore.edit { prefs ->
             prefs[LONG_PRESS_ACTION] = action.key
+        }
+    }
+
+    override val getDismissedUpdateVersion: Flow<String> =
+        context.appDataStore.data.map { preferences ->
+            preferences[DISMISSED_UPDATE_VERSION] ?: ""
+        }
+
+    override suspend fun setDismissedUpdateVersion(versionKey: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[DISMISSED_UPDATE_VERSION] = versionKey
         }
     }
 }

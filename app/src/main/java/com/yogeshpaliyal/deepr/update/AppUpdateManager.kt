@@ -27,6 +27,8 @@ interface AppUpdateManager {
 }
 
 data class AvailableUpdate(
+    /** Stable id of the offered version, used to remember a dismissed update banner. */
+    val versionKey: String,
     val versionName: String?,
     val releaseNotes: String? = null,
     val downloadUrl: String? = null,

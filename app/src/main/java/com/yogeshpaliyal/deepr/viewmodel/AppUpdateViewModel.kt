@@ -3,6 +3,7 @@ package com.yogeshpaliyal.deepr.viewmodel
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yogeshpaliyal.deepr.preference.PreferenceRepository
 import com.yogeshpaliyal.deepr.update.AppUpdateManager
 import com.yogeshpaliyal.deepr.update.AvailableUpdate
 import com.yogeshpaliyal.deepr.update.InstallPermissionRequiredException
@@ -12,6 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -38,9 +40,16 @@ enum class AppUpdateMessage {
 
 class AppUpdateViewModel(
     private val appUpdateManager: AppUpdateManager,
+    private val preferenceRepository: PreferenceRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow<AppUpdateUiState>(AppUpdateUiState.Idle)
     val state: StateFlow<AppUpdateUiState> = _state.asStateFlow()
+
+    private val _bannerUpdate = MutableStateFlow<AvailableUpdate?>(null)
+
+    /** Update shown in the home screen banner, unless the user dismissed that version. */
+    val bannerUpdate: StateFlow<AvailableUpdate?> = _bannerUpdate.asStateFlow()
+    private var bannerCheckStarted = false
 
     private val _messages = Channel<AppUpdateMessage>(Channel.BUFFERED)
     val messages = _messages.receiveAsFlow()
@@ -64,6 +73,37 @@ class AppUpdateViewModel(
                     _messages.send(AppUpdateMessage.CHECK_FAILED)
                 }
             }
+        }
+    }
+
+    /** Silent check for the home screen banner; runs once per view model. */
+    fun checkForBannerUpdate(activity: Activity) {
+        if (bannerCheckStarted) return
+        bannerCheckStarted = true
+        viewModelScope.launch {
+            val result = appUpdateManager.checkForUpdate(activity)
+            if (result is UpdateCheckResult.Available) {
+                val dismissed = preferenceRepository.getDismissedUpdateVersion.first()
+                if (result.update.versionKey != dismissed) {
+                    _bannerUpdate.value = result.update
+                }
+            }
+        }
+    }
+
+    fun dismissBanner() {
+        val update = _bannerUpdate.value ?: return
+        _bannerUpdate.value = null
+        viewModelScope.launch {
+            preferenceRepository.setDismissedUpdateVersion(update.versionKey)
+        }
+    }
+
+    /** Opens the update dialog for the version shown in the banner. */
+    fun showBannerUpdate() {
+        val update = _bannerUpdate.value ?: return
+        if (_state.value == AppUpdateUiState.Idle) {
+            _state.value = AppUpdateUiState.Available(update)
         }
     }
 

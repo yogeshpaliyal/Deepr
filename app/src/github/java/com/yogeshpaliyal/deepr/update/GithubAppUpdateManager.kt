@@ -74,6 +74,7 @@ class GithubAppUpdateManager(
                 val apk = release.assets.firstOrNull { it.name.endsWith(".apk", ignoreCase = true) }
                 UpdateCheckResult.Available(
                     AvailableUpdate(
+                        versionKey = release.tagName,
                         versionName = release.tagName.removePrefix("v"),
                         releaseNotes = release.body?.takeIf { it.isNotBlank() },
                         downloadUrl = apk?.downloadUrl,

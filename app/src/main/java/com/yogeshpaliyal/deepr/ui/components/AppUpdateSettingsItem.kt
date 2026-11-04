@@ -25,11 +25,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.R
+import com.yogeshpaliyal.deepr.update.AvailableUpdate
 import com.yogeshpaliyal.deepr.viewmodel.AppUpdateMessage
 import com.yogeshpaliyal.deepr.viewmodel.AppUpdateUiState
 import com.yogeshpaliyal.deepr.viewmodel.AppUpdateViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CloudDownload
+import kotlinx.coroutines.flow.Flow
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -41,22 +43,10 @@ fun AppUpdateSettingsItem(
     modifier: Modifier = Modifier,
     viewModel: AppUpdateViewModel = koinViewModel(),
 ) {
-    val context = LocalContext.current
-    val activity = context as? Activity
+    val activity = LocalContext.current as? Activity
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel) {
-        viewModel.messages.collect { message ->
-            val text =
-                when (message) {
-                    AppUpdateMessage.UP_TO_DATE -> R.string.app_up_to_date
-                    AppUpdateMessage.CHECK_FAILED -> R.string.update_check_failed
-                    AppUpdateMessage.UPDATE_FAILED -> R.string.update_failed
-                    AppUpdateMessage.INSTALL_PERMISSION_REQUIRED -> R.string.update_install_permission_required
-                }
-            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
-        }
-    }
+    AppUpdateMessages(viewModel.messages)
 
     SettingsItem(
         icon = TablerIcons.CloudDownload,
@@ -74,11 +64,43 @@ fun AppUpdateSettingsItem(
         },
     )
 
-    when (val current = state) {
+    AppUpdateDialogs(
+        state = state,
+        onStartUpdate = { update -> activity?.let { viewModel.startUpdate(it, update) } },
+        onDismiss = viewModel::dismiss,
+    )
+}
+
+/** Shows update results (up to date, failures) as toasts. */
+@Composable
+internal fun AppUpdateMessages(messages: Flow<AppUpdateMessage>) {
+    val context = LocalContext.current
+    LaunchedEffect(messages) {
+        messages.collect { message ->
+            val text =
+                when (message) {
+                    AppUpdateMessage.UP_TO_DATE -> R.string.app_up_to_date
+                    AppUpdateMessage.CHECK_FAILED -> R.string.update_check_failed
+                    AppUpdateMessage.UPDATE_FAILED -> R.string.update_failed
+                    AppUpdateMessage.INSTALL_PERMISSION_REQUIRED -> R.string.update_install_permission_required
+                }
+            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+        }
+    }
+}
+
+/** "Update available" and "Downloading update" dialogs for the given [state]. */
+@Composable
+internal fun AppUpdateDialogs(
+    state: AppUpdateUiState,
+    onStartUpdate: (AvailableUpdate) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    when (state) {
         is AppUpdateUiState.Available -> {
-            val update = current.update
+            val update = state.update
             AlertDialog(
-                onDismissRequest = viewModel::dismiss,
+                onDismissRequest = onDismiss,
                 title = { Text(stringResource(R.string.update_available)) },
                 text = {
                     Column {
@@ -101,14 +123,12 @@ fun AppUpdateSettingsItem(
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = {
-                        activity?.let { viewModel.startUpdate(it, update) }
-                    }) {
+                    TextButton(onClick = { onStartUpdate(update) }) {
                         Text(stringResource(R.string.update_now))
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = viewModel::dismiss) {
+                    TextButton(onClick = onDismiss) {
                         Text(stringResource(R.string.update_later))
                     }
                 },
@@ -120,7 +140,7 @@ fun AppUpdateSettingsItem(
                 onDismissRequest = {},
                 title = { Text(stringResource(R.string.downloading_update)) },
                 text = {
-                    val progress = current.progress
+                    val progress = state.progress
                     if (progress != null) {
                         LinearProgressIndicator(
                             progress = { progress },
