@@ -224,8 +224,7 @@ private val TOP_LEVEL_ROUTES: List<TopLevelRoute> =
  * [TagSelectionScreen]) into one class in release builds, which made a `::class`
  * comparison treat Home and Tags as the same tab and highlight both.
  */
-private fun TopLevelRoute.isSameTabAs(screen: BaseScreen): Boolean =
-    screen is TopLevelRoute && screen.label == label
+private fun TopLevelRoute.isSameTabAs(screen: BaseScreen): Boolean = screen is TopLevelRoute && screen.label == label
 
 val LocalSharedText =
     compositionLocalOf<Pair<SharedLink?, () -> Unit>?> { null }
