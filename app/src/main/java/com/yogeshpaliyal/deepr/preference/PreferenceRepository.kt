@@ -28,6 +28,7 @@ interface PreferenceRepository {
     val getAppLockEnabled: Flow<Boolean>
     val getTapAction: Flow<LinkAction>
     val getLongPressAction: Flow<LinkAction>
+    val getDismissedUpdateVersion: Flow<String>
 
     suspend fun setSortingOrder(order: @SortType String)
 
@@ -74,4 +75,6 @@ interface PreferenceRepository {
     suspend fun setTapAction(action: LinkAction)
 
     suspend fun setLongPressAction(action: LinkAction)
+
+    suspend fun setDismissedUpdateVersion(versionKey: String)
 }

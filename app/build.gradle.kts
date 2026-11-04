@@ -176,6 +176,7 @@ dependencies {
     "proImplementation"(libs.firebase.analytics)
     "proImplementation"(libs.firebase.crashlytics.ndk)
     "proImplementation"(libs.play.review)
+    "proImplementation"(libs.play.app.update.ktx)
     "proImplementation"("com.google.android.gms:play-services-auth:21.5.0")
     "proImplementation"("com.google.api-client:google-api-client-android:2.8.1")
     "proImplementation"("com.google.apis:google-api-services-drive:v3-rev20230815-2.0.0")
@@ -184,6 +185,7 @@ dependencies {
     "freeImplementation"(libs.firebase.analytics)
     "freeImplementation"(libs.firebase.crashlytics.ndk)
     "freeImplementation"(libs.play.review)
+    "freeImplementation"(libs.play.app.update.ktx)
 }
 
 kotlinter {
