@@ -31,7 +31,10 @@ import com.yogeshpaliyal.deepr.server.LocalServerRepositoryImpl
 import com.yogeshpaliyal.deepr.server.LocalServerTransferLink
 import com.yogeshpaliyal.deepr.sync.SyncRepository
 import com.yogeshpaliyal.deepr.sync.SyncRepositoryImpl
+import com.yogeshpaliyal.deepr.update.AppUpdateManager
+import com.yogeshpaliyal.deepr.update.AppUpdateManagerFactory
 import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
+import com.yogeshpaliyal.deepr.viewmodel.AppUpdateViewModel
 import com.yogeshpaliyal.deepr.viewmodel.LocalServerViewModel
 import com.yogeshpaliyal.deepr.viewmodel.TransferLinkLocalServerViewModel
 import io.ktor.client.HttpClient
@@ -161,6 +164,12 @@ class DeeprApplication : Application() {
                 single<ReviewManager> {
                     ReviewManagerFactory.create()
                 }
+
+                single<AppUpdateManager> {
+                    AppUpdateManagerFactory.create(androidContext())
+                }
+
+                viewModelOf(::AppUpdateViewModel)
 
                 viewModel {
                     TransferLinkLocalServerViewModel(get())

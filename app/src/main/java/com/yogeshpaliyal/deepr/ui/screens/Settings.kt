@@ -46,6 +46,7 @@ import com.yogeshpaliyal.deepr.MainActivity
 import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.LocalNavigator
 import com.yogeshpaliyal.deepr.ui.TopLevelRoute
+import com.yogeshpaliyal.deepr.ui.components.AppUpdateSettingsItem
 import com.yogeshpaliyal.deepr.ui.components.LanguageSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.LinkActionSelectionDialog
 import com.yogeshpaliyal.deepr.ui.components.ProfileSelectionDialog
@@ -421,6 +422,8 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                AppUpdateSettingsItem()
 
                 // Rate and review open playstore link
                 SettingsItem(

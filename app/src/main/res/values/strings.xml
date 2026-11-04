@@ -300,4 +300,16 @@
     <string name="app_lock_screen_title">Deepr is locked</string>
     <string name="app_lock_screen_subtitle">Unlock with your device credentials to continue</string>
     <string name="unlock">Unlock</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="check_for_updates_description">Get the latest version of the app</string>
+    <string name="update_available">Update available</string>
+    <string name="update_available_version">Version %s is available.</string>
+    <string name="update_available_generic">A new version of the app is available.</string>
+    <string name="update_now">Update</string>
+    <string name="update_later">Later</string>
+    <string name="downloading_update">Downloading update</string>
+    <string name="app_up_to_date">You are on the latest version</string>
+    <string name="update_check_failed">Couldn\'t check for updates. Please try again later.</string>
+    <string name="update_failed">Couldn\'t install the update. Please try again later.</string>
+    <string name="update_install_permission_required">Allow installing apps from this source, then tap Update again.</string>
 </resources>

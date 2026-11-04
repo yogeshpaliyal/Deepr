@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.getSystemService
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -54,6 +55,7 @@ import com.yogeshpaliyal.deepr.ui.screens.Settings
 import com.yogeshpaliyal.deepr.ui.screens.home.Dashboard2
 import com.yogeshpaliyal.deepr.ui.screens.home.TagSelectionScreen
 import com.yogeshpaliyal.deepr.ui.theme.DeeprTheme
+import com.yogeshpaliyal.deepr.update.AppUpdateManager
 import com.yogeshpaliyal.deepr.util.LanguageUtil
 import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
@@ -61,7 +63,9 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.java.KoinJavaComponent.getKoin
@@ -77,6 +81,8 @@ data class ClipboardLink(
 
 class MainActivity : ComponentActivity() {
     val sharingLink = MutableStateFlow<SharedLink?>(null)
+
+    private val appUpdateManager: AppUpdateManager by inject()
 
     private val confirmCredentialLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -205,6 +211,14 @@ class MainActivity : ComponentActivity() {
                 else -> null
             }
         sharingLink.update { sharedText }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Lets the Play Store flavor resume an in-app update that was interrupted.
+        lifecycleScope.launch {
+            appUpdateManager.onResume(this@MainActivity)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {

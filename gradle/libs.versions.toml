@@ -32,6 +32,7 @@ kotlinter = "5.2.0"
 googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 playCore = "2.0.2"
+playAppUpdate = "2.1.0"
 orchestrator = "1.4.2"
 
 [libraries]
@@ -87,6 +88,7 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCo
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 play-review = { module = "com.google.android.play:review", version.ref = "playCore" }
+play-app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "playAppUpdate" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
