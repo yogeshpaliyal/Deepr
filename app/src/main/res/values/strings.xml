@@ -378,6 +378,7 @@
     <string name="current_profile">Current profile</string>
     <string name="all_profiles">All profiles</string>
     <string name="toggle_search">Search</string>
+    <string name="close_search">Close search</string>
     <string name="show_filtered_links">Show links</string>
     <plurals name="show_links_with_tags">
         <item quantity="one">Show links with %d tag</item>

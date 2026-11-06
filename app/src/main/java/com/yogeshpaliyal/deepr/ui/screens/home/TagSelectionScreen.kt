@@ -162,7 +162,10 @@ object TagSelectionScreen : TopLevelRoute {
                             ) {
                                 Icon(
                                     imageVector = TablerIcons.Search,
-                                    contentDescription = stringResource(R.string.toggle_search),
+                                    contentDescription =
+                                        stringResource(
+                                            if (isSearchVisible) R.string.close_search else R.string.toggle_search,
+                                        ),
                                 )
                             }
                         }

@@ -656,6 +656,9 @@ fun Content(
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_DELETE)
                 val item = it.item
                 pendingDeleteIds = pendingDeleteIds + item.id
+                // Commit any earlier deletion now instead of queueing this snackbar behind it,
+                // so Undo always refers to the link just deleted.
+                snackbarHostState.currentSnackbarData?.dismiss()
                 scope.launch {
                     var undone = false
                     try {
