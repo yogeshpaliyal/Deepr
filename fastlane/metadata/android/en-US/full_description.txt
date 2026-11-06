@@ -1,6 +1,6 @@
 Deepr saves links and app deep links so you can open them again in one tap.
 
-Paste a link, share one to Deepr from any app, or scan a QR code. Deepr fetches the title and preview image, and you can add tags and a note. Your links stay on your phone unless you choose to share them through the local server or back them up. No account is needed.
+Paste a link, share one to Deepr from any app, or scan a QR code. Deepr fetches the title and preview image, and you can add tags and a note. Your links stay on your phone unless you choose to share them through the local server or back them up. No account is needed, except for Google Drive backup in Deepr Pro.
 
 What you can do:
 - Open deep links straight into other apps, not just web pages
