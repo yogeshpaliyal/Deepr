@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -15,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.GetLinksAndTags
@@ -73,7 +73,7 @@ fun DeeprItemSwipable(
                         modifier =
                             Modifier
                                 .background(
-                                    Color.Gray.copy(alpha = 0.5f),
+                                    MaterialTheme.colorScheme.secondaryContainer,
                                 ).fillMaxSize()
                                 .clip(
                                     RoundedCornerShape(8.dp),
@@ -83,7 +83,7 @@ fun DeeprItemSwipable(
                         Icon(
                             imageVector = TablerIcons.Edit,
                             contentDescription = stringResource(R.string.edit),
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.padding(16.dp),
                         )
                     }
@@ -94,7 +94,7 @@ fun DeeprItemSwipable(
                         modifier =
                             Modifier
                                 .background(
-                                    Color.Red.copy(alpha = 0.5f),
+                                    MaterialTheme.colorScheme.errorContainer,
                                 ).fillMaxSize()
                                 .clip(
                                     RoundedCornerShape(8.dp),
@@ -104,15 +104,13 @@ fun DeeprItemSwipable(
                         Icon(
                             imageVector = TablerIcons.Trash,
                             contentDescription = stringResource(R.string.delete),
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.padding(16.dp),
                         )
                     }
                 }
 
-                else -> {
-                    Color.White
-                }
+                else -> {}
             }
         },
     ) {

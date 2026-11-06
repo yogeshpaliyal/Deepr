@@ -52,7 +52,7 @@ class DeeprIntegratedTest {
 
         // Enter a deeplink using placeholder text
         composeTestRule
-            .onNodeWithText("https://example.com or app://deeplink")
+            .onNodeWithText(getString(R.string.link_placeholder))
             .performTextInput("myapp://test")
 
         // Enter a name using label text
@@ -93,9 +93,9 @@ class DeeprIntegratedTest {
         // Wait for the edit dialog to appear
         composeTestRule.waitForIdle()
 
-        // Verify we're in edit mode by checking for the Edit title
+        // Verify we're in edit mode by checking for the Edit link title
         composeTestRule
-            .onNodeWithText(getString(R.string.edit))
+            .onNodeWithText(getString(R.string.edit_link))
             .assertIsDisplayed()
 
         // Clear and update the name
@@ -133,15 +133,7 @@ class DeeprIntegratedTest {
                 swipeLeft()
             }
 
-        // Wait for the delete action
-        composeTestRule.waitForIdle()
-
-        // Confirm deletion by clicking the Delete button in the dialog
-        composeTestRule
-            .onNodeWithText(getString(R.string.delete))
-            .performClick()
-
-        // Wait for deletion to complete
+        // Deletion is immediate (with an Undo snackbar), no confirmation dialog
         composeTestRule.waitForIdle()
 
         // Verify the link is no longer displayed
@@ -249,7 +241,7 @@ class DeeprIntegratedTest {
 
         // Enter deeplink using placeholder text
         composeTestRule
-            .onNodeWithText("https://example.com or app://deeplink")
+            .onNodeWithText(getString(R.string.link_placeholder))
             .performTextInput(link)
 
         // Enter name using label text
@@ -281,7 +273,7 @@ class DeeprIntegratedTest {
 
         // Enter deeplink using placeholder text
         composeTestRule
-            .onNodeWithText("https://example.com or app://deeplink")
+            .onNodeWithText(getString(R.string.link_placeholder))
             .performTextInput(link)
 
         // Enter name using label text

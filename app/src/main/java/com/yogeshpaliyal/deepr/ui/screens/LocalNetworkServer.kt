@@ -587,7 +587,7 @@ private fun ServerInfoCard(
                 }
                 Icon(
                     TablerIcons.Copy,
-                    contentDescription = "Copy",
+                    contentDescription = stringResource(R.string.copy),
                     tint = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.size(14.dp),
                 )

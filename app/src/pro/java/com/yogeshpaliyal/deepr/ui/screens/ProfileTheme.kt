@@ -24,8 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Profile
+import com.yogeshpaliyal.deepr.R
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Check
 import compose.icons.tablericons.MoonStars
@@ -49,7 +51,7 @@ fun ProfileTheme(
         // Theme Mode Section (Light/Dark/System)
         Column {
             Text(
-                text = "Theme Mode",
+                text = stringResource(R.string.theme_mode),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -103,7 +105,7 @@ fun ProfileTheme(
         // Color Theme Section
         Column {
             Text(
-                text = "Color Theme",
+                text = stringResource(R.string.color_theme),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -175,7 +177,7 @@ private fun ColorThemeItem(
             if (isSelected) {
                 Icon(
                     imageVector = TablerIcons.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(R.string.selected),
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )

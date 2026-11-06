@@ -174,7 +174,7 @@ fun DeeprItem(
                                 text = account.name,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = getDeeprItemTextColor(account.isFavourite),
                             )
                         }
@@ -242,7 +242,6 @@ fun DeeprItem(
                 }
 
                 Column {
-                    // Determine max tags to show based on expanded state
                     val maxTagsToShow = if (tagsExpanded) selectedTags?.size ?: 0 else 9
                     val visibleTags = selectedTags?.take(maxTagsToShow) ?: emptyList()
                     val hiddenTagsCount = (selectedTags?.size ?: 0) - visibleTags.size
@@ -264,7 +263,6 @@ fun DeeprItem(
                         }
                     }
 
-                    // Show "Load More" or "Show Less" button if there are more than 9 tags
                     if ((selectedTags?.size ?: 0) > 9) {
                         androidx.compose.material3.TextButton(
                             onClick = { tagsExpanded = !tagsExpanded },

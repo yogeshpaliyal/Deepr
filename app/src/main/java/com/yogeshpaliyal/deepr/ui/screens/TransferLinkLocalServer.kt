@@ -113,9 +113,8 @@ fun TransferLinkLocalServerScreen(
         rememberLauncherForActivityResult(
             QRScanner(),
         ) { result ->
-            if (result.contents == null) {
-                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
-            } else {
+            // A null result means the scan was cancelled, so there is nothing to report.
+            if (result.contents != null) {
                 viewModel.import(result.contents)
             }
         }

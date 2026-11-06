@@ -20,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yogeshpaliyal.deepr.Profile
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.ui.components.ProUpgradeDialog
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ChevronRight
@@ -39,13 +41,12 @@ fun ProfileTheme(
 
     Column(modifier = modifier) {
         Text(
-            text = "Theme",
+            text = stringResource(R.string.theme),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp),
         )
 
-        // Theme Customization Promo Card
         Row(
             modifier =
                 Modifier
@@ -70,7 +71,7 @@ fun ProfileTheme(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Theme Customization",
+                        text = stringResource(R.string.pro_feature_theme_title),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -82,7 +83,7 @@ fun ProfileTheme(
                             ),
                     ) {
                         Text(
-                            text = "PRO",
+                            text = stringResource(R.string.pro_badge),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Bold,
@@ -91,7 +92,7 @@ fun ProfileTheme(
                     }
                 }
                 Text(
-                    text = "Customize app colors with multiple theme options",
+                    text = stringResource(R.string.pro_feature_theme_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -99,7 +100,7 @@ fun ProfileTheme(
 
             Icon(
                 imageVector = TablerIcons.ChevronRight,
-                contentDescription = "Learn more",
+                contentDescription = stringResource(R.string.learn_more),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
