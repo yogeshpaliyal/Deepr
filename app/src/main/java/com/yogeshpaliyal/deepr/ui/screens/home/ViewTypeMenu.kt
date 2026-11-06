@@ -14,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.yogeshpaliyal.deepr.R
 import compose.icons.TablerIcons
 import compose.icons.tablericons.LayoutGrid
 import compose.icons.tablericons.LayoutList
@@ -35,7 +37,7 @@ fun ViewTypeMenu(
                     ViewType.COMPACT -> TablerIcons.LayoutRows
                     else -> TablerIcons.LayoutList
                 },
-                contentDescription = "View Type",
+                contentDescription = stringResource(R.string.view_type),
             )
         }
         DropdownMenu(
@@ -43,7 +45,7 @@ fun ViewTypeMenu(
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
-                text = { Text("List view") },
+                text = { Text(stringResource(R.string.view_type_list)) },
                 onClick = {
                     setViewType(ViewType.LIST)
                     expanded = false
@@ -65,7 +67,7 @@ fun ViewTypeMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text("Grid view") },
+                text = { Text(stringResource(R.string.view_type_grid)) },
                 onClick = {
                     setViewType(ViewType.GRID)
                     expanded = false
@@ -87,7 +89,7 @@ fun ViewTypeMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text("Compat view") },
+                text = { Text(stringResource(R.string.view_type_compact)) },
                 onClick = {
                     setViewType(ViewType.COMPACT)
                     expanded = false

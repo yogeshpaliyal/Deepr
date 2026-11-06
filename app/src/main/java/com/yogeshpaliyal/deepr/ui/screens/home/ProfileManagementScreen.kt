@@ -188,7 +188,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                     value = newProfileName,
                                     onValueChange = { newProfileName = it },
                                     modifier = Modifier.weight(1f),
-                                    placeholder = { Text("Enter profile name") },
+                                    placeholder = { Text(stringResource(R.string.profile_name_hint)) },
                                     singleLine = true,
                                     shape = RoundedCornerShape(16.dp),
                                     leadingIcon = {
@@ -284,7 +284,7 @@ object ProfileManagementScreen : TopLevelRoute {
                                     )
                                     Column {
                                         Text(
-                                            text = "Current Profile",
+                                            text = stringResource(R.string.current_profile),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                                         )
@@ -306,7 +306,7 @@ object ProfileManagementScreen : TopLevelRoute {
                     item {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "All Profiles",
+                            text = stringResource(R.string.all_profiles),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 4.dp),

@@ -96,7 +96,7 @@ fun RestoreScreenContent(
             Column {
                 TopAppBar(
                     title = {
-                        Text("Restore")
+                        Text(stringResource(R.string.restore))
                     },
                     navigationIcon = {
                         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -142,8 +142,8 @@ fun RestoreScreenContent(
                 availableImporters.forEach { importer ->
                     SettingsItem(
                         TablerIcons.Download,
-                        title = "Import from ${importer.getDisplayName()}",
-                        description = "Import bookmarks from ${importer.getDisplayName()} file",
+                        title = stringResource(R.string.import_from, importer.getDisplayName()),
+                        description = stringResource(R.string.import_from_description, importer.getDisplayName()),
                         onClick = {
                             selectedImporter = importer
                             importFileLauncher.launch(importer.getSupportedMimeTypes())

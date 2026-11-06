@@ -56,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -161,7 +162,7 @@ object TagSelectionScreen : TopLevelRoute {
                             ) {
                                 Icon(
                                     imageVector = TablerIcons.Search,
-                                    contentDescription = "Toggle Search",
+                                    contentDescription = stringResource(R.string.toggle_search),
                                 )
                             }
                         }
@@ -181,10 +182,10 @@ object TagSelectionScreen : TopLevelRoute {
                         icon = {
                             Icon(
                                 imageVector = TablerIcons.Eye,
-                                contentDescription = "View Filtered Links",
+                                contentDescription = null,
                             )
                         },
-                        text = { Text("View ${selectedTag.size} ${if (selectedTag.size == 1) "Tag" else "Tags"}") },
+                        text = { Text(pluralStringResource(R.plurals.show_links_with_tags, selectedTag.size, selectedTag.size)) },
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
@@ -281,7 +282,7 @@ object TagSelectionScreen : TopLevelRoute {
                                     value = newTagName,
                                     onValueChange = { newTagName = it },
                                     modifier = Modifier.weight(1f),
-                                    placeholder = { Text("Enter tag name") },
+                                    placeholder = { Text(stringResource(R.string.tag_name)) },
                                     singleLine = true,
                                     shape = RoundedCornerShape(16.dp),
                                     leadingIcon = {
@@ -460,14 +461,14 @@ object TagSelectionScreen : TopLevelRoute {
                             }
                             Spacer(modifier = Modifier.height(24.dp))
                             Text(
-                                text = "No tags yet",
+                                text = stringResource(R.string.no_tags_yet),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Create your first tag to organize your links",
+                                text = stringResource(R.string.no_tags_yet_description),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.outline,
                                 textAlign = TextAlign.Center,
@@ -567,7 +568,7 @@ object TagSelectionScreen : TopLevelRoute {
                                     tagEditError = null
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("Tag name") },
+                                label = { Text(stringResource(R.string.tag_name)) },
                                 singleLine = true,
                                 isError = tagEditError != null,
                                 supportingText = {
@@ -713,7 +714,12 @@ object TagSelectionScreen : TopLevelRoute {
                                             modifier = Modifier.size(16.dp),
                                         )
                                         Text(
-                                            text = "This tag is used by ${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                                            text =
+                                                pluralStringResource(
+                                                    R.plurals.tag_used_by_links,
+                                                    tag.linkCount.toInt(),
+                                                    tag.linkCount.toInt(),
+                                                ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onErrorContainer,
                                         )
@@ -841,7 +847,7 @@ private fun TagItem(
                         shape = RoundedCornerShape(6.dp),
                     ) {
                         Text(
-                            text = "${tag.linkCount} ${if (tag.linkCount == 1L) "link" else "links"}",
+                            text = pluralStringResource(R.plurals.link_count, tag.linkCount.toInt(), tag.linkCount.toInt()),
                             style = MaterialTheme.typography.labelSmall,
                             color =
                                 if (isSelected) {

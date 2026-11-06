@@ -114,7 +114,7 @@ fun TransferLinkLocalServerScreen(
             QRScanner(),
         ) { result ->
             if (result.contents == null) {
-                Toast.makeText(context, "No Data found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.no_links_to_send), Toast.LENGTH_SHORT).show()
             } else {
                 viewModel.import(result.contents)
             }

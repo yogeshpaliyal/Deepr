@@ -16,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.yogeshpaliyal.deepr.R
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Cloud
@@ -51,7 +53,7 @@ fun GoogleDrivePromoItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Google Drive Backup",
+                    text = stringResource(R.string.drive_promo_title),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -63,7 +65,7 @@ fun GoogleDrivePromoItem(
                         ),
                 ) {
                     Text(
-                        text = "PRO",
+                        text = stringResource(R.string.pro_badge),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontWeight = FontWeight.Bold,
@@ -72,7 +74,7 @@ fun GoogleDrivePromoItem(
                 }
             }
             Text(
-                text = "Backup & restore your links to Google Drive",
+                text = stringResource(R.string.drive_promo_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -80,7 +82,7 @@ fun GoogleDrivePromoItem(
 
         Icon(
             imageVector = TablerIcons.ChevronRight,
-            contentDescription = "Learn more",
+            contentDescription = stringResource(R.string.learn_more),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

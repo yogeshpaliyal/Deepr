@@ -127,7 +127,7 @@ fun SettingsItem(
         trailing?.invoke()
 
         if (onClick != null && trailing == null && !isLoading) {
-            Icon(imageVector = TablerIcons.ChevronRight, contentDescription = "Go")
+            Icon(imageVector = TablerIcons.ChevronRight, contentDescription = null)
         }
 
         if (isLoading) {

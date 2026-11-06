@@ -62,6 +62,10 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -113,7 +117,6 @@ import com.yogeshpaliyal.deepr.ui.components.AppUpdateBanner
 import com.yogeshpaliyal.deepr.ui.components.ClearInputIconButton
 import com.yogeshpaliyal.deepr.ui.components.ClipboardLinkBanner
 import com.yogeshpaliyal.deepr.ui.components.CreateShortcutDialog
-import com.yogeshpaliyal.deepr.ui.components.DeleteConfirmationDialog
 import com.yogeshpaliyal.deepr.ui.components.NoteViewDialog
 import com.yogeshpaliyal.deepr.ui.components.QrCodeDialog
 import com.yogeshpaliyal.deepr.ui.components.ServerStatusBar
@@ -268,7 +271,7 @@ fun HomeScreen(
                     createDeeprObject(link = normalizedLink, name = sharedText.title ?: "", profileId = currentProfile?.id ?: 1L)
             } else {
                 Toast
-                    .makeText(context, "Invalid deeplink from shared content", Toast.LENGTH_SHORT)
+                    .makeText(context, context.getString(R.string.invalid_shared_link), Toast.LENGTH_SHORT)
                     .show()
             }
             // Reset shared text even on error to prevent stuck state
@@ -385,7 +388,7 @@ fun HomeScreen(
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Below,
                                     ),
-                                tooltip = { PlainTooltip { Text("View Type") } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.view_type)) } },
                                 state = rememberTooltipState(),
                             ) {
                                 ViewTypeMenu(currentViewType, {
@@ -419,9 +422,12 @@ fun HomeScreen(
             )
         }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         contentWindowInsets = windowInsets,
         modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column(
                 modifier =
@@ -442,7 +448,6 @@ fun HomeScreen(
                 )
                 ServerStatusBar(
                     onServerStatusClick = {
-                        // Navigate to LocalNetworkServer screen when status bar is clicked
                         analyticsManager.logEvent(AnalyticsEvents.NAVIGATE_LOCAL_SERVER)
                         if (localNavigator.getLast() !is LocalNetworkServer) {
                             localNavigator.add(LocalNetworkServer)
@@ -452,7 +457,6 @@ fun HomeScreen(
 
                 AppUpdateBanner()
 
-                // Clipboard link banner
                 ClipboardLinkBanner(
                     clipboardLink = clipboardLink,
                     onAddClick = { url ->
@@ -538,6 +542,7 @@ fun HomeScreen(
                 currentViewType = currentViewType,
                 searchQuery = textFieldState.text.toString(),
                 favouriteFilter = favouriteFilter,
+                snackbarHostState = snackbarHostState,
                 editDeepr = {
                     localNavigator.add(AddLinkScreen(it))
                 },
@@ -562,6 +567,7 @@ fun Content(
     searchQuery: String,
     favouriteFilter: Int,
     viewModel: AccountViewModel,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     editDeepr: (GetLinksAndTags) -> Unit = {},
 ) {
@@ -586,7 +592,8 @@ fun Content(
     val context = LocalContext.current
     var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
     var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
-    var showDeleteConfirmDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
+    var pendingDeleteIds by remember { mutableStateOf(emptySet<Long>()) }
+    val scope = rememberCoroutineScope()
     var showNoteDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
     showShortcutDialog?.let { deepr ->
@@ -600,17 +607,6 @@ fun Content(
         QrCodeDialog(it) {
             showQrCodeDialog = null
         }
-    }
-
-    showDeleteConfirmDialog?.let { deepr ->
-        DeleteConfirmationDialog(
-            deepr = deepr,
-            onDismiss = { showDeleteConfirmDialog = null },
-            onConfirm = {
-                viewModel.deleteAccount(it.id)
-                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-            },
-        )
     }
 
     showNoteDialog?.let { deepr ->
@@ -646,7 +642,29 @@ fun Content(
 
             is Delete -> {
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_DELETE)
-                showDeleteConfirmDialog = it.item
+                val item = it.item
+                pendingDeleteIds = pendingDeleteIds + item.id
+                scope.launch {
+                    var undone = false
+                    try {
+                        val result =
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.link_deleted),
+                                actionLabel = context.getString(R.string.undo),
+                                duration = SnackbarDuration.Short,
+                            )
+                        undone = result == SnackbarResult.ActionPerformed
+                    } finally {
+                        // Delete for real unless the user tapped Undo, even if the screen
+                        // is left while the snackbar is still showing. The id stays hidden
+                        // after deletion so the row doesn't flash back before the list updates.
+                        if (undone) {
+                            pendingDeleteIds = pendingDeleteIds - item.id
+                        } else {
+                            viewModel.deleteAccount(item.id)
+                        }
+                    }
+                }
             }
 
             is Edit -> {
@@ -662,7 +680,7 @@ fun Content(
             is ResetCounter -> {
                 analyticsManager.logEvent(AnalyticsEvents.ITEM_MENU_RESET_COUNTER)
                 viewModel.resetOpenedCount(it.item.id)
-                Toast.makeText(context, "Opened count reset", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.opened_count_reset), Toast.LENGTH_SHORT).show()
             }
 
             is Shortcut -> {
@@ -726,7 +744,7 @@ fun Content(
                     .hazeSource(state = hazeState)
                     .padding(horizontal = 8.dp),
             contentPaddingValues = contentPaddingValues,
-            accounts = accounts!!,
+            accounts = accounts!!.filterNot { it.id in pendingDeleteIds },
             selectedTag = selectedTag,
             onTagClick = {
                 viewModel.setSelectedTagByName(it)

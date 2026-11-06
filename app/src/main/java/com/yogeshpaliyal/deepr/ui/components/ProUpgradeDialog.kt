@@ -23,12 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
+import com.yogeshpaliyal.deepr.R
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Check
 import compose.icons.tablericons.Crown
@@ -71,7 +73,6 @@ fun ProUpgradeDialog(
                         .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // Crown icon
                 Icon(
                     imageVector = TablerIcons.Crown,
                     contentDescription = null,
@@ -81,9 +82,8 @@ fun ProUpgradeDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Title
                 Text(
-                    text = "Upgrade to Deepr Pro",
+                    text = stringResource(R.string.pro_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -91,9 +91,8 @@ fun ProUpgradeDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Subtitle
                 Text(
-                    text = "Unlock powerful features to keep your links safe and synced",
+                    text = stringResource(R.string.pro_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -101,36 +100,22 @@ fun ProUpgradeDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Features list
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     ProFeatureItem(
-                        title = "Theme Customization",
-                        description = "Personalize with multiple color themes",
+                        title = stringResource(R.string.pro_feature_drive_title),
+                        description = stringResource(R.string.pro_feature_drive_description),
                     )
                     ProFeatureItem(
-                        title = "Google Drive Backup",
-                        description = "Securely backup your links to Google Drive",
-                    )
-                    ProFeatureItem(
-                        title = "Auto Backup",
-                        description = "Automatically backup when data changes",
-                    )
-                    ProFeatureItem(
-                        title = "Cloud Restore",
-                        description = "Restore your links from any device",
-                    )
-                    ProFeatureItem(
-                        title = "Priority Support",
-                        description = "Get faster responses to your queries",
+                        title = stringResource(R.string.pro_feature_theme_title),
+                        description = stringResource(R.string.pro_feature_theme_description),
                     )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Upgrade button
                 Button(
                     onClick = {
                         val intent =
@@ -149,17 +134,16 @@ fun ProUpgradeDialog(
                         modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Get Deepr Pro")
+                    Text(stringResource(R.string.pro_get))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Maybe later button
                 OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Maybe Later")
+                    Text(stringResource(R.string.pro_not_now))
                 }
             }
         }

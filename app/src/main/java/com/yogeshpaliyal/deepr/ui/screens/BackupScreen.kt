@@ -148,7 +148,7 @@ fun BackupScreenContent(
             Column {
                 TopAppBar(
                     title = {
-                        Text("Backup")
+                        Text(stringResource(R.string.backup))
                     },
                     navigationIcon = {
                         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl

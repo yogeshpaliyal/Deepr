@@ -177,11 +177,11 @@ fun SettingsScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection("Data Management") {
+            SettingsSection(stringResource(R.string.settings_section_data)) {
                 SettingsItem(
                     TablerIcons.Upload,
                     title = stringResource(R.string.backup),
-                    description = "Export to CSV or HTML, Local file sync, Auto backup",
+                    description = stringResource(R.string.backup_description),
                     onClick = {
                         navigatorContext.add(BackupScreen)
                     },
@@ -190,7 +190,7 @@ fun SettingsScreen(
                 SettingsItem(
                     TablerIcons.Download,
                     title = stringResource(R.string.restore),
-                    description = "Import from CSV, Bookmarks, and other formats",
+                    description = stringResource(R.string.restore_description),
                     onClick = {
                         navigatorContext.add(RestoreScreen)
                     },
@@ -199,12 +199,104 @@ fun SettingsScreen(
 
             DriveSettingsItem()
 
-            SettingsSection("Others") {
+            SettingsSection(stringResource(R.string.settings_section_appearance)) {
                 SettingsItem(
-                    TablerIcons.Server,
-                    title = stringResource(R.string.local_network_server),
+                    TablerIcons.Moon,
+                    title = stringResource(R.string.theme),
+                    description =
+                        when (themeMode) {
+                            "light" -> stringResource(R.string.theme_light)
+                            "dark" -> stringResource(R.string.theme_dark)
+                            else -> stringResource(R.string.system_default)
+                        },
                     onClick = {
-                        navigatorContext.add(LocalNetworkServer)
+                        showThemeDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Language,
+                    title = stringResource(R.string.language),
+                    description =
+                        if (languageCode.isEmpty()) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
+                                stringResource(R.string.system_default)
+                            }
+                        },
+                    onClick = {
+                        showLanguageDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Photo,
+                    title = stringResource(R.string.show_thumbnails),
+                    description = stringResource(R.string.show_thumbnails_description),
+                    onClick = {
+                        viewModel.setIsThumbnailEnable(!isThumbnailEnable)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = isThumbnailEnable,
+                            onCheckedChange = { viewModel.setIsThumbnailEnable(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.ExternalLink,
+                    title = stringResource(R.string.show_open_counter),
+                    description = stringResource(R.string.show_open_counter_description),
+                    onClick = {
+                        viewModel.setShowOpenCounter(!showOpenCounter)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = showOpenCounter,
+                            onCheckedChange = { viewModel.setShowOpenCounter(it) },
+                        )
+                    },
+                )
+            }
+
+            SettingsSection(stringResource(R.string.settings_section_links)) {
+                SettingsItem(
+                    TablerIcons.Star,
+                    title = stringResource(R.string.default_page),
+                    description =
+                        if (defaultPageFavourites) {
+                            stringResource(R.string.default_page_favourites)
+                        } else {
+                            stringResource(R.string.default_page_all)
+                        },
+                    onClick = {
+                        viewModel.setDefaultPageFavourites(!defaultPageFavourites)
+                    },
+                    trailing = {
+                        Switch(
+                            checked = defaultPageFavourites,
+                            onCheckedChange = { viewModel.setDefaultPageFavourites(it) },
+                        )
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.Click,
+                    title = stringResource(R.string.tap_action),
+                    description = stringResource(tapAction.label),
+                    onClick = {
+                        showTapActionDialog = true
+                    },
+                )
+
+                SettingsItem(
+                    TablerIcons.HandFinger,
+                    title = stringResource(R.string.long_press_action),
+                    description = stringResource(longPressAction.label),
+                    onClick = {
+                        showLongPressActionDialog = true
                     },
                 )
 
@@ -231,115 +323,6 @@ fun SettingsScreen(
                 )
 
                 SettingsItem(
-                    TablerIcons.Language,
-                    title = stringResource(R.string.language),
-                    description =
-                        if (languageCode.isEmpty()) {
-                            stringResource(R.string.system_default)
-                        } else {
-                            LanguageUtil.getLanguageNativeName(languageCode).ifEmpty {
-                                stringResource(R.string.system_default)
-                            }
-                        },
-                    onClick = {
-                        showLanguageDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Moon,
-                    title = stringResource(R.string.theme),
-                    description =
-                        when (themeMode) {
-                            "light" -> stringResource(R.string.theme_light)
-                            "dark" -> stringResource(R.string.theme_dark)
-                            else -> stringResource(R.string.system_default)
-                        },
-                    onClick = {
-                        showThemeDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Star,
-                    title = stringResource(R.string.default_page),
-                    description =
-                        if (defaultPageFavourites) {
-                            stringResource(R.string.default_page_favourites)
-                        } else {
-                            stringResource(R.string.default_page_all)
-                        },
-                    onClick = {
-                        viewModel.setDefaultPageFavourites(!defaultPageFavourites)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = defaultPageFavourites,
-                            onCheckedChange = { viewModel.setDefaultPageFavourites(it) },
-                        )
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Photo,
-                    title = "Show thumbnails for links",
-                    description = "If enabled, thumbnails will be displayed for saved links where available",
-                    onClick = {
-                        viewModel.setIsThumbnailEnable(!isThumbnailEnable)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = isThumbnailEnable,
-                            onCheckedChange = { viewModel.setIsThumbnailEnable(it) },
-                        )
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.ExternalLink,
-                    title = stringResource(R.string.show_open_counter),
-                    description = stringResource(R.string.show_open_counter_description),
-                    onClick = {
-                        viewModel.setShowOpenCounter(!showOpenCounter)
-                    },
-                    trailing = {
-                        Switch(
-                            checked = showOpenCounter,
-                            onCheckedChange = { viewModel.setShowOpenCounter(it) },
-                        )
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Click,
-                    title = stringResource(R.string.tap_action),
-                    description = stringResource(tapAction.label),
-                    onClick = {
-                        showTapActionDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.HandFinger,
-                    title = stringResource(R.string.long_press_action),
-                    description = stringResource(longPressAction.label),
-                    onClick = {
-                        showLongPressActionDialog = true
-                    },
-                )
-
-                SettingsItem(
-                    TablerIcons.Folders,
-                    title = stringResource(R.string.silent_save_profile),
-                    description =
-                        allProfiles.find { it.id == silentSaveProfileId }?.name
-                            ?: stringResource(R.string.silent_save_profile_description),
-                    onClick = {
-                        showSilentSaveProfileDialog = true
-                    },
-                )
-
-                SettingsItem(
                     TablerIcons.Clipboard,
                     title = stringResource(R.string.clipboard_link_detection),
                     description = stringResource(R.string.clipboard_link_detection_description),
@@ -353,9 +336,30 @@ fun SettingsScreen(
                         )
                     },
                 )
+
+                SettingsItem(
+                    TablerIcons.Folders,
+                    title = stringResource(R.string.silent_save_profile),
+                    description =
+                        allProfiles.find { it.id == silentSaveProfileId }?.name
+                            ?: stringResource(R.string.silent_save_profile_description),
+                    onClick = {
+                        showSilentSaveProfileDialog = true
+                    },
+                )
             }
 
-            SettingsSection("Security") {
+            SettingsSection(stringResource(R.string.settings_section_sharing)) {
+                SettingsItem(
+                    TablerIcons.Server,
+                    title = stringResource(R.string.local_network_server),
+                    onClick = {
+                        navigatorContext.add(LocalNetworkServer)
+                    },
+                )
+            }
+
+            SettingsSection(stringResource(R.string.settings_section_security)) {
                 SettingsItem(
                     TablerIcons.Lock,
                     title = stringResource(R.string.app_lock),
@@ -392,14 +396,13 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection("About") {
+            SettingsSection(stringResource(R.string.settings_section_about)) {
                 val appName = stringResource(R.string.app_name)
-                // Report a problem or feedback via email on yogeshpaliyal.foss+shelfy@gmail.com
                 SettingsItem(
                     icon = TablerIcons.AlertTriangle,
-                    title = "Report a Problem / Feedback",
+                    title = stringResource(R.string.report_problem),
                     shouldShowLoading = false,
-                    description = "Help us improve by reporting issues or sharing feedback",
+                    description = stringResource(R.string.report_problem_description),
                     onClick = {
                         val emailIntent =
                             Intent(Intent.ACTION_SENDTO).apply {
@@ -408,16 +411,16 @@ fun SettingsScreen(
                                     Intent.EXTRA_EMAIL,
                                     arrayOf("yogeshpaliyal.foss+deepr@gmail.com"),
                                 )
-                                putExtra(Intent.EXTRA_SUBJECT, "$appName App Feedback/Issue")
+                                putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.feedback_email_subject, appName))
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "Describe your issue or feedback here:\n App Version : ${BuildConfig.VERSION_NAME}\n",
+                                    context.getString(R.string.feedback_email_body, BuildConfig.VERSION_NAME),
                                 )
                             }
                         context.startActivity(
                             Intent.createChooser(
                                 emailIntent,
-                                "Send email via...",
+                                context.getString(R.string.send_email_via),
                             ),
                         )
                     },
@@ -425,37 +428,38 @@ fun SettingsScreen(
 
                 AppUpdateSettingsItem()
 
-                // Rate and review open playstore link
                 SettingsItem(
                     icon = TablerIcons.Star,
-                    title = "Rate & Review",
-                    description = "Rate us on the Play Store",
+                    title = stringResource(R.string.rate_app),
+                    description = stringResource(R.string.rate_app_description),
                     shouldShowLoading = false,
                     onClick = {
                         viewModel.requestReview(context as MainActivity)
                     },
                 )
 
-                // Create share app item
                 SettingsItem(
                     icon = TablerIcons.Share,
-                    title = "Share $appName",
+                    title = stringResource(R.string.share_app, appName),
                     shouldShowLoading = false,
-                    description = "Share $appName with your friends",
+                    description = stringResource(R.string.share_app_description),
                     onClick = {
                         val shareIntent =
                             Intent().apply {
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "Check out $appName - Your link organizer and Read Later App! Download it from https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                    context.getString(
+                                        R.string.share_app_message,
+                                        "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                    ),
                                 )
                                 type = "text/plain"
                             }
                         context.startActivity(
                             Intent.createChooser(
                                 shareIntent,
-                                "Share via",
+                                context.getString(R.string.share_via),
                             ),
                         )
                     },

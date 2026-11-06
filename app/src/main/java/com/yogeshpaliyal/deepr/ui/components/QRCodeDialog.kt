@@ -84,7 +84,7 @@ fun QrCodeDialog(
         },
         confirmButton = {
             OutlinedButton(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.close))
             }
         },
     )

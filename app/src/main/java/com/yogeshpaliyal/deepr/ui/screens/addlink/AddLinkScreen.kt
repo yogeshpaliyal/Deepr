@@ -253,7 +253,7 @@ fun AddLinkScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = if (isCreate) stringResource(R.string.create) else stringResource(R.string.edit),
+                        text = if (isCreate) stringResource(R.string.new_link) else stringResource(R.string.edit_link),
                     )
                 },
                 navigationIcon = {
@@ -312,7 +312,7 @@ fun AddLinkScreen(
                                 isError = false
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text("https://example.com or app://deeplink") },
+                            placeholder = { Text(stringResource(R.string.link_placeholder)) },
                             isError = isError,
                             supportingText = {
                                 if (isError) {
@@ -395,7 +395,7 @@ fun AddLinkScreen(
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
                                 Text(
-                                    text = "Preview",
+                                    text = stringResource(R.string.preview),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                 )
@@ -812,7 +812,6 @@ fun AddLinkScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Action Buttons
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -838,7 +837,7 @@ fun AddLinkScreen(
                         Button(
                             onClick = {
                                 if (isValidDeeplink(deeprInfo.link)) {
-                                    save(true)
+                                    save(false)
                                 } else {
                                     isError = true
                                 }
@@ -847,7 +846,7 @@ fun AddLinkScreen(
                             shape = RoundedCornerShape(12.dp),
                         ) {
                             Text(
-                                stringResource(R.string.save_and_execute),
+                                stringResource(R.string.save),
                                 modifier = Modifier.padding(vertical = 4.dp),
                             )
                         }
@@ -860,7 +859,7 @@ fun AddLinkScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     if (isValidDeeplink(deeprInfo.link)) {
-                                        save(false)
+                                        save(true)
                                     } else {
                                         isError = true
                                     }
@@ -868,7 +867,7 @@ fun AddLinkScreen(
                                 shape = RoundedCornerShape(12.dp),
                             ) {
                                 Text(
-                                    stringResource(R.string.save),
+                                    stringResource(R.string.save_and_execute),
                                     modifier = Modifier.padding(vertical = 4.dp),
                                 )
                             }

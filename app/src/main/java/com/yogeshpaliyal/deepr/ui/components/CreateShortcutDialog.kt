@@ -10,8 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogeshpaliyal.deepr.GetLinksAndTags
+import com.yogeshpaliyal.deepr.R
 import com.yogeshpaliyal.deepr.analytics.AnalyticsManager
 import com.yogeshpaliyal.deepr.util.createShortcut
 import com.yogeshpaliyal.deepr.util.getShortcut
@@ -40,12 +42,18 @@ fun CreateShortcutDialog(
         }
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("${if (existingShortcut == null) "Create" else "Edit"} Shortcut") },
+            title = {
+                Text(
+                    stringResource(
+                        if (existingShortcut == null) R.string.create_shortcut_title else R.string.edit_shortcut_title,
+                    ),
+                )
+            },
             text = {
                 TextField(
                     value = shortcutName,
                     onValueChange = { shortcutName = it },
-                    label = { Text("Shortcut Name") },
+                    label = { Text(stringResource(R.string.shortcut_name)) },
                     placeholder = { Text(text = deepr.link) },
                     suffix =
                         if (shortcutName.isEmpty()) {
@@ -79,12 +87,12 @@ fun CreateShortcutDialog(
                     },
                     enabled = shortcutName.isNotBlank(),
                 ) {
-                    Text(if (existingShortcut == null) "Create" else "Edit")
+                    Text(stringResource(if (existingShortcut == null) R.string.create else R.string.save))
                 }
             },
             dismissButton = {
                 Button(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )

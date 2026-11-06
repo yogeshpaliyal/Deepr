@@ -1,1 +1,1 @@
-Simplify link handling. Save, organize, and open links with ease.
+Save links and app deep links. Open them in one tap.
