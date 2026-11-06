@@ -251,7 +251,7 @@
     <string name="transfer_link_server">Send links to another device</string>
     <string name="transfer_link_to_another_device">Send links to another device (beta)</string>
     <string name="transfer_link_server_instructions">1. Turn on the server above.\n2. Connect both devices to the same Wi-Fi.\n3. On the other device, go to Import links and scan this QR code.</string>
-    <string name="scan_qr_to_get_data">Scan on the other device to copy these links</string>
+    <string name="scan_qr_to_get_data">Scan a QR code to receive links from another device</string>
 
     <!-- Profiles -->
     <string name="profiles">Profiles</string>
@@ -339,7 +339,6 @@
     <string name="link_deleted">Link deleted</string>
     <string name="opened_count_reset">Open count reset</string>
     <string name="invalid_shared_link">That doesn\'t look like a link</string>
-    <string name="no_links_to_send">No links to send yet</string>
     <string name="view_type">Layout</string>
     <string name="view_type_list">List</string>
     <string name="view_type_grid">Grid</string>

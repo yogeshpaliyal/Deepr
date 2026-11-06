@@ -93,9 +93,9 @@ class DeeprIntegratedTest {
         // Wait for the edit dialog to appear
         composeTestRule.waitForIdle()
 
-        // Verify we're in edit mode by checking for the Edit title
+        // Verify we're in edit mode by checking for the Edit link title
         composeTestRule
-            .onNodeWithText(getString(R.string.edit))
+            .onNodeWithText(getString(R.string.edit_link))
             .assertIsDisplayed()
 
         // Clear and update the name

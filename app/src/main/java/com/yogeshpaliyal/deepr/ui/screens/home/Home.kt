@@ -593,6 +593,18 @@ fun Content(
     var showShortcutDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
     var showQrCodeDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
     var pendingDeleteIds by remember { mutableStateOf(emptySet<Long>()) }
+    var committedDeleteIds by remember { mutableStateOf(emptySet<Long>()) }
+
+    // Once a committed deletion is reflected in the list, stop hiding its id: SQLite may
+    // reuse it for a link saved later (e.g. through the local server).
+    LaunchedEffect(accounts) {
+        val presentIds = accounts.orEmpty().mapTo(HashSet()) { it.id }
+        val retired = committedDeleteIds.filterNot { it in presentIds }.toSet()
+        if (retired.isNotEmpty()) {
+            pendingDeleteIds = pendingDeleteIds - retired
+            committedDeleteIds = committedDeleteIds - retired
+        }
+    }
     val scope = rememberCoroutineScope()
     var showNoteDialog by remember { mutableStateOf<GetLinksAndTags?>(null) }
 
@@ -657,10 +669,11 @@ fun Content(
                     } finally {
                         // Delete for real unless the user tapped Undo, even if the screen
                         // is left while the snackbar is still showing. The id stays hidden
-                        // after deletion so the row doesn't flash back before the list updates.
+                        // until the list update arrives, so the row doesn't flash back.
                         if (undone) {
                             pendingDeleteIds = pendingDeleteIds - item.id
                         } else {
+                            committedDeleteIds = committedDeleteIds + item.id
                             viewModel.deleteAccount(item.id)
                         }
                     }
