@@ -86,6 +86,19 @@ Want to contribute to translations? [Contribute](https://hosted.weblate.org/enga
 </a>
 
 
+## 📊 Stats
+
+GitHub release downloads, stars, forks and open issues are saved once a day to the
+[`stats` branch](https://github.com/yogeshpaliyal/Deepr/tree/stats) by the `Stats snapshot`
+workflow (`.github/workflows/stats.yml`). The data comes only from GitHub's own APIs; the app
+itself has no analytics or tracking.
+
+Repo views, clones and referrers are optional. GitHub's traffic API can't be read with the
+default Actions token, so to collect them create a fine-grained personal access token with
+**Administration: Read-only** access to this repository and save it as the `TRAFFIC_TOKEN`
+repository secret. Without it, the workflow skips the traffic files and records everything else.
+
+
 ---
 
 <div align="center">

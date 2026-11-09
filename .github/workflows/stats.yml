@@ -1,0 +1,63 @@
+name: Stats snapshot
+
+# Saves download counts, stars and (optionally) traffic to the `stats` branch.
+# Runs daily, on demand, and right before master-apk.yml replaces the "latest-master" APK
+# (re-uploading an asset resets its download counter).
+on:
+  schedule:
+    - cron: "17 3 * * *" # 08:47 IST
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      TRAFFIC_TOKEN:
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    # Never let two snapshots push to the stats branch at once.
+    concurrency:
+      group: stats-branch
+      cancel-in-progress: false
+    steps:
+      - name: Check out the collector script
+        uses: actions/checkout@v4
+        with:
+          path: src
+          sparse-checkout: .github/scripts
+
+      - name: Check out the stats branch
+        uses: actions/checkout@v4
+        with:
+          path: data
+          fetch-depth: 1
+
+      - name: Switch to (or create) the stats branch
+        working-directory: data
+        run: |
+          if git ls-remote --exit-code --heads origin stats >/dev/null; then
+            git fetch --depth=1 origin stats
+            git switch -c stats FETCH_HEAD
+          else
+            git switch --orphan stats
+          fi
+
+      - name: Collect
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: python3 src/.github/scripts/collect_stats.py data
+
+      - name: Commit and push
+        working-directory: data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "No changes"; exit 0; }
+          git commit -q -m "Stats snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin HEAD:stats
