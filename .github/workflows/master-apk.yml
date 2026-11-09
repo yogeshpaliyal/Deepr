@@ -6,7 +6,18 @@ on:
       - master
 
 jobs:
+  # Record the "latest-master" APK's download count before it is replaced
+  # (re-uploading an asset resets its counter).
+  snapshot:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/stats.yml
+    secrets: inherit
+
   build:
+    needs: snapshot
+    # A failed snapshot must never block a release.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
