@@ -306,16 +306,16 @@ class AccountViewModel(
         }
     }
 
-    /**
-     * Filters by this tag only, replacing any other selected tags. Tapping the tag that is
-     * already the only selected one clears the filter. Use [setSelectedTagByName] to
-     * combine tags instead.
-     */
     // Only the latest tap applies, even if an earlier lookup finishes later. The request
     // counter is only touched on the main thread, and the check and update below run on
     // the main thread with no suspension in between.
     private var latestTagSwitchRequest = 0
 
+    /**
+     * Filters by this tag only, replacing any other selected tags. Tapping the tag that is
+     * already the only selected one clears the filter. Use [setSelectedTagByName] to
+     * combine tags instead.
+     */
     fun switchToTagByName(tagName: String) {
         val request = ++latestTagSwitchRequest
         viewModelScope.launch(Dispatchers.Main.immediate) {
