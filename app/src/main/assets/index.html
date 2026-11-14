@@ -920,7 +920,9 @@
 
         function showSuggestions(input) {
             const suggestions = document.getElementById('tagSuggestions');
-            const inputValue = input.value.toLowerCase().trim();
+            const typedValue = input.value.trim();
+            const inputValue = typedValue.toLowerCase();
+            activeSuggestionIndex = -1;
 
             if (!inputValue) {
                 hideSuggestions();
@@ -938,25 +940,25 @@
             if (filteredTags.length === 0) {
                 // Show option to create new tag
                 suggestions.innerHTML = `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(typedValue)}')">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                        Create new tag: <strong>${escapeHtml(typedValue)}</strong>
                     </div>
                 `;
             } else {
                 suggestions.innerHTML = filteredTags.map(tagObj => `
-                    <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addSelectedTag('${escapeHtml(tagObj.name)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addSelectedTag('${escapeHtml(tagObj.name)}')">
                         <span>${escapeHtml(tagObj.name)}</span>
                         <span class="text-xs text-gray-500">${tagObj.count} links</span>
                     </div>
                 `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
-                    <div class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(inputValue)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(typedValue)}')">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        Create new tag: <strong>${escapeHtml(inputValue)}</strong>
+                        Create new tag: <strong>${escapeHtml(typedValue)}</strong>
                     </div>
                 ` : '');
             }
@@ -966,6 +968,38 @@
 
         function hideSuggestions() {
             document.getElementById('tagSuggestions').classList.add('hidden');
+            activeSuggestionIndex = -1;
+        }
+
+        // Keyboard navigation in the tag suggestions list
+        let activeSuggestionIndex = -1;
+
+        function getSuggestionOptions() {
+            const suggestions = document.getElementById('tagSuggestions');
+            if (suggestions.classList.contains('hidden')) return [];
+            return Array.from(suggestions.querySelectorAll('[data-tag-option]'));
+        }
+
+        function highlightSuggestion(index) {
+            const options = getSuggestionOptions();
+            if (options.length === 0) return;
+            activeSuggestionIndex = (index + options.length) % options.length;
+            options.forEach((option, i) => {
+                option.classList.toggle('bg-gray-100', i === activeSuggestionIndex);
+            });
+            options[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+        }
+
+        // Adds whatever is typed in the tag field (comma separated) as selected tags
+        function commitTypedTags() {
+            const tagInput = document.getElementById('linkTags');
+            tagInput.value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag.length > 0)
+                .forEach(tag => addSelectedTag(tag));
+            tagInput.value = '';
+            hideSuggestions();
         }
 
         // Filter and display links
@@ -1344,6 +1378,8 @@
 
         async function addLink(event) {
             event.preventDefault();
+            // A tag typed but not picked from the list should still be saved
+            commitTypedTags();
 
             const urlInput = document.getElementById('linkUrl');
             const nameInput = document.getElementById('linkName');
@@ -1467,9 +1503,25 @@
             });
 
             tagInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    e.preventDefault();
-                    addSelectedTag(this.value.trim());
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    if (getSuggestionOptions().length === 0 && this.value.trim()) {
+                        showSuggestions(this);
+                    }
+                    if (getSuggestionOptions().length > 0) {
+                        e.preventDefault();
+                        const step = e.key === 'ArrowDown' ? 1 : -1;
+                        const start = activeSuggestionIndex === -1 && step === -1 ? 0 : activeSuggestionIndex;
+                        highlightSuggestion(start + step);
+                    }
+                } else if (e.key === 'Enter' || e.key === ',') {
+                    const options = getSuggestionOptions();
+                    if (e.key === 'Enter' && activeSuggestionIndex >= 0 && options[activeSuggestionIndex]) {
+                        e.preventDefault();
+                        options[activeSuggestionIndex].click();
+                    } else if (this.value.trim()) {
+                        e.preventDefault();
+                        commitTypedTags();
+                    }
                 } else if (e.key === 'Escape') {
                     hideSuggestions();
                 }
