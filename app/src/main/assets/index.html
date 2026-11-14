@@ -1516,6 +1516,9 @@
                 // Any edit makes the highlighted suggestion stale until the list is re-rendered
                 activeSuggestionIndex = -1;
                 getSuggestionOptions().forEach(option => option.classList.remove('bg-gray-100'));
+                if (!this.value.trim()) {
+                    hideSuggestions();
+                }
                 debouncedShowSuggestions(this);
             });
 
@@ -1541,7 +1544,7 @@
                 if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                     // Render suggestions for the current text now, so arrows never move
                     // through a stale list that the pending debounced render would replace
-                    if (this.value.trim() && this.value.trim() !== lastSuggestionInput) {
+                    if (this.value.trim() !== lastSuggestionInput) {
                         showSuggestions(this);
                     }
                     if (getSuggestionOptions().length > 0) {
