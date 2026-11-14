@@ -132,6 +132,11 @@ fun normalizeLink(link: String): String {
         return trimmedLink
     }
 
+    // Opaque links such as mailto:me@example.com or about:config keep their scheme
+    if (hasOpaqueScheme(trimmedLink)) {
+        return trimmedLink
+    }
+
     // If it looks like a URL (contains a dot and doesn't start with a scheme),
     // prepend https://
     if (trimmedLink.contains(".")) {
@@ -144,6 +149,27 @@ fun normalizeLink(link: String): String {
 
 // RFC 3986 scheme followed by the rest of the link.
 private val schemeRegex = Regex("^([a-zA-Z][a-zA-Z0-9+.-]*):(.*)$", RegexOption.DOT_MATCHES_ALL)
+
+// Schemes whose body is normally just digits, e.g. tel:123.
+private val numericBodySchemes = setOf("tel", "sms", "smsto", "mms", "mmsto")
+
+/**
+ * True for links like about:config or mailto:me@example.com. False for "host:port" input
+ * such as localhost:8080 or example.com:8080/path, where the part before ':' is a host.
+ */
+private fun hasOpaqueScheme(link: String): Boolean {
+    val match = schemeRegex.find(link) ?: return false
+    val scheme = match.groupValues[1]
+    val rest = match.groupValues[2]
+    if (rest.startsWith("//")) return false
+    if (rest.isBlank() || rest.first().isWhitespace()) return false
+    // A dotted "scheme" is a host name (example.com:8080)
+    if (scheme.contains('.')) return false
+    if (scheme.lowercase() in numericBodySchemes) return true
+    // A numeric body is a port (localhost:8080, localhost:8080/path?x=1#top)
+    val firstSegment = rest.takeWhile { it != '/' && it != '?' && it != '#' }
+    return !firstSegment.all { it.isDigit() }
+}
 
 fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
@@ -159,8 +185,7 @@ fun isValidDeeplink(link: String): Boolean {
 
     // Opaque link such as about:config or mailto:me@example.com.
     // Reject "host:port" input like "localhost:8080", which is not a scheme.
-    if (rest.isBlank() || rest.first().isWhitespace()) return false
-    return !rest.takeWhile { it != '/' }.all { it.isDigit() }
+    return hasOpaqueScheme(normalizedLink)
 }
 
 fun formatDateTime(milliseconds: Long?): String {

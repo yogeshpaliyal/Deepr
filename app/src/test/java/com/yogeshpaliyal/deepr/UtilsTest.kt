@@ -80,6 +80,14 @@ class UtilsTest {
         assertTrue(isValidDeeplink("about:config?filter=browser.tabs"))
         assertTrue(isValidDeeplink("mailto:someone@example.com"))
         assertTrue(isValidDeeplink("tel:+911234567890"))
+        assertTrue(isValidDeeplink("tel:123"))
+    }
+
+    @Test
+    fun normalizeLink_preservesOpaqueSchemes() {
+        assertEquals("mailto:someone@example.com", normalizeLink("mailto:someone@example.com"))
+        assertEquals("about:config?filter=browser.tabs", normalizeLink("about:config?filter=browser.tabs"))
+        assertEquals("about:config", normalizeLink("about:config"))
     }
 
     @Test
@@ -88,6 +96,8 @@ class UtilsTest {
         assertFalse(isValidDeeplink("   "))
         assertFalse(isValidDeeplink("localhost"))
         assertFalse(isValidDeeplink("localhost:8080"))
+        assertFalse(isValidDeeplink("localhost:8080?x=1"))
+        assertFalse(isValidDeeplink("localhost:8080#section"))
         assertFalse(isValidDeeplink("hello world"))
         assertFalse(isValidDeeplink("https://"))
         assertFalse(isValidDeeplink("about:"))

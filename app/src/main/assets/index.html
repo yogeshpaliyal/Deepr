@@ -922,7 +922,11 @@
             const suggestions = document.getElementById('tagSuggestions');
             const typedValue = input.value.trim();
             const inputValue = typedValue.toLowerCase();
-            activeSuggestionIndex = -1;
+            // Keep a keyboard selection made before a debounced render for the same text
+            if (typedValue !== lastSuggestionInput) {
+                activeSuggestionIndex = -1;
+            }
+            lastSuggestionInput = typedValue;
 
             if (!inputValue) {
                 hideSuggestions();
@@ -940,7 +944,7 @@
             if (filteredTags.length === 0) {
                 // Show option to create new tag
                 suggestions.innerHTML = `
-                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" onclick="addSelectedTag('${escapeHtml(typedValue)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border-b" data-tag-value="${escapeAttr(typedValue)}">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -949,12 +953,12 @@
                 `;
             } else {
                 suggestions.innerHTML = filteredTags.map(tagObj => `
-                    <div data-tag-option class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" onclick="addSelectedTag('${escapeHtml(tagObj.name)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center" data-tag-value="${escapeAttr(tagObj.name)}">
                         <span>${escapeHtml(tagObj.name)}</span>
                         <span class="text-xs text-gray-500">${tagObj.count} links</span>
                     </div>
                 `).join('') + (inputValue && !filteredTags.some(t => t.name.toLowerCase() === inputValue) ? `
-                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onclick="addSelectedTag('${escapeHtml(typedValue)}')">
+                    <div data-tag-option class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" data-tag-value="${escapeAttr(typedValue)}">
                         <svg class="w-4 h-4 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -964,15 +968,20 @@
             }
 
             suggestions.classList.remove('hidden');
+            if (activeSuggestionIndex >= 0) {
+                highlightSuggestion(activeSuggestionIndex);
+            }
         }
 
         function hideSuggestions() {
             document.getElementById('tagSuggestions').classList.add('hidden');
             activeSuggestionIndex = -1;
+            lastSuggestionInput = null;
         }
 
         // Keyboard navigation in the tag suggestions list
         let activeSuggestionIndex = -1;
+        let lastSuggestionInput = null;
 
         function getSuggestionOptions() {
             const suggestions = document.getElementById('tagSuggestions');
@@ -1462,6 +1471,11 @@
             return div.innerHTML;
         }
 
+        // Escapes text for use inside a double-quoted HTML attribute
+        function escapeAttr(text) {
+            return escapeHtml(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Search input with debounce
@@ -1502,7 +1516,17 @@
                 debouncedShowSuggestions(this);
             });
 
+            // Suggestion options carry the tag name as data, not as inline JavaScript
+            document.getElementById('tagSuggestions').addEventListener('click', function(e) {
+                const option = e.target.closest('[data-tag-option]');
+                if (option) {
+                    addSelectedTag(option.dataset.tagValue);
+                }
+            });
+
             tagInput.addEventListener('keydown', function(e) {
+                // Leave keys alone while an IME (e.g. Japanese, Chinese) is composing text
+                if (e.isComposing || e.keyCode === 229) return;
                 if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                     if (getSuggestionOptions().length === 0 && this.value.trim()) {
                         showSuggestions(this);
