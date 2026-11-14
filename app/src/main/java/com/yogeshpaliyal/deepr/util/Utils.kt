@@ -142,17 +142,25 @@ fun normalizeLink(link: String): String {
     return trimmedLink
 }
 
+// RFC 3986 scheme followed by the rest of the link.
+private val schemeRegex = Regex("^([a-zA-Z][a-zA-Z0-9+.-]*):(.*)$", RegexOption.DOT_MATCHES_ALL)
+
 fun isValidDeeplink(link: String): Boolean {
     if (link.isBlank()) return false
-    return try {
-        val normalizedLink = normalizeLink(link)
-        val uri = normalizedLink.toUri()
-        val hasValidScheme = uri.scheme != null && uri.scheme!!.isNotBlank()
-        val hasValidAuthority = uri.authority != null && uri.authority!!.isNotBlank()
-        hasValidScheme && hasValidAuthority
-    } catch (_: Exception) {
-        false
+    val normalizedLink = normalizeLink(link)
+    val match = schemeRegex.find(normalizedLink) ?: return false
+    val rest = match.groupValues[2]
+
+    if (rest.startsWith("//")) {
+        // Hierarchical link such as https://example.com or app://open: needs an authority.
+        val authority = rest.substring(2).takeWhile { it != '/' && it != '?' && it != '#' }
+        return authority.isNotBlank()
     }
+
+    // Opaque link such as about:config or mailto:me@example.com.
+    // Reject "host:port" input like "localhost:8080", which is not a scheme.
+    if (rest.isBlank() || rest.first().isWhitespace()) return false
+    return !rest.takeWhile { it != '/' }.all { it.isDigit() }
 }
 
 fun formatDateTime(milliseconds: Long?): String {
