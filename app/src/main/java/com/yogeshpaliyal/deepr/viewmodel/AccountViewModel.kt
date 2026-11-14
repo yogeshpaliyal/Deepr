@@ -565,7 +565,8 @@ class AccountViewModel(
             when (val result = importRepository.importBookmarks(uri, importer)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
-                        "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
+                        "Import complete! Added: ${result.data.importedCount}, " +
+                            "Updated: ${result.data.updatedCount}, Skipped: ${result.data.skippedCount}",
                     )
                 }
 
