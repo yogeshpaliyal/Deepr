@@ -14,6 +14,7 @@
     <string name="edit">Edit</string>
     <string name="sorting">Sorting</string>
     <string name="qr_scanner">Scan QR code</string>
+    <string name="combine_tag_filter">Combine with selected tags</string>
     <string name="paste_from_clipboard">Paste from clipboard</string>
     <string name="clipboard_empty">Clipboard is empty</string>
     <string name="tags">Tags</string>

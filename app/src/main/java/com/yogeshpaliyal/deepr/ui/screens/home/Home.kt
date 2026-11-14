@@ -15,6 +15,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -89,6 +90,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -501,11 +503,32 @@ fun HomeScreen(
                     }
 
                     items(finalTagsInfo ?: listOf()) {
-                        FilterChip(it.isSelected, {
-                            viewModel.setSelectedTagByName(it.name)
-                        }, label = {
-                            Text(it.name + " (${it.count})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        // Tap shows only this tag, long press adds it to the selected tags.
+                        val chipShape = RoundedCornerShape(percent = 50)
+                        Box(modifier = Modifier.animateItem()) {
+                            FilterChip(
+                                selected = it.isSelected,
+                                onClick = {},
+                                label = { Text(it.name + " (${it.count})") },
+                                shape = chipShape,
+                            )
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .matchParentSize()
+                                        .clip(chipShape)
+                                        .combinedClickable(
+                                            onLongClickLabel = stringResource(R.string.combine_tag_filter),
+                                            onLongClick = {
+                                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                viewModel.setSelectedTagByName(it.name)
+                                            },
+                                            onClick = {
+                                                viewModel.switchToTagByName(it.name)
+                                            },
+                                        ),
+                            )
+                        }
                     }
                 }
             }
@@ -772,7 +795,7 @@ fun Content(
             accounts = accounts!!.filterNot { it.id in pendingDeleteIds },
             selectedTag = selectedTag,
             onTagClick = {
-                viewModel.setSelectedTagByName(it)
+                viewModel.switchToTagByName(it)
             },
             isThumbnailEnable = isThumbnailEnable,
             searchQuery = searchQuery,
@@ -974,7 +997,7 @@ fun Content(
                                     elevation = null,
                                     selected = isSelected,
                                     onClick = {
-                                        viewModel.setSelectedTagByName(tag)
+                                        viewModel.switchToTagByName(tag)
                                         showMoreSelectedItem = null
                                     },
                                     label = { Text(tag.trim()) },

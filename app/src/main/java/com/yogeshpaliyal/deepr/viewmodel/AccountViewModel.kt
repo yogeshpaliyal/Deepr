@@ -306,6 +306,31 @@ class AccountViewModel(
         }
     }
 
+    /**
+     * Filters by this tag only, replacing any other selected tags. Tapping the tag that is
+     * already the only selected one clears the filter. Use [setSelectedTagByName] to
+     * combine tags instead.
+     */
+    fun switchToTagByName(tagName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val tag = linkRepository.getTagByName(tagName) ?: return@launch
+            val current = _selectedTagFilter.value
+            if (current.size == 1 && current.first().id == tag.id) {
+                setTagFilter(null)
+            } else {
+                _favouriteFilter.update { -1 }
+                _selectedTagFilter.update { listOf(tag) }
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SELECT_TAG_FILTER,
+                    mapOf(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_ID to tag.id,
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_NAME to tag.name,
+                    ),
+                )
+            }
+        }
+    }
+
     fun fetchMetaData(
         link: String,
         onLinkMetaDataFound: (LinkInfo?) -> Unit,
