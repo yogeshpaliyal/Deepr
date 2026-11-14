@@ -81,6 +81,7 @@ class UtilsTest {
         assertTrue(isValidDeeplink("mailto:someone@example.com"))
         assertTrue(isValidDeeplink("tel:+911234567890"))
         assertTrue(isValidDeeplink("tel:123"))
+        assertTrue(isValidDeeplink("mailto:?subject=Hello"))
     }
 
     @Test

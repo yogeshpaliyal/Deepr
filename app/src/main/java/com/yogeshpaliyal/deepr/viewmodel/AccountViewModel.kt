@@ -311,9 +311,15 @@ class AccountViewModel(
      * already the only selected one clears the filter. Use [setSelectedTagByName] to
      * combine tags instead.
      */
+    // Only the latest tap applies, even if an earlier lookup finishes later.
+    @Volatile
+    private var latestTagSwitchRequest = 0
+
     fun switchToTagByName(tagName: String) {
+        val request = ++latestTagSwitchRequest
         viewModelScope.launch(Dispatchers.IO) {
             val tag = linkRepository.getTagByName(tagName) ?: return@launch
+            if (request != latestTagSwitchRequest) return@launch
             val current = _selectedTagFilter.value
             if (current.size == 1 && current.first().id == tag.id) {
                 setTagFilter(null)

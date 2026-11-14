@@ -97,6 +97,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -504,20 +510,27 @@ fun HomeScreen(
 
                     items(finalTagsInfo ?: listOf()) {
                         // Tap shows only this tag, long press adds it to the selected tags.
+                        // The overlay handles touch and accessibility; the chip is only visual.
                         val chipShape = RoundedCornerShape(percent = 50)
+                        val chipLabel = it.name + " (${it.count})"
                         Box(modifier = Modifier.animateItem()) {
                             FilterChip(
                                 selected = it.isSelected,
                                 onClick = {},
-                                label = { Text(it.name + " (${it.count})") },
+                                label = { Text(chipLabel) },
                                 shape = chipShape,
+                                modifier = Modifier.clearAndSetSemantics {},
                             )
                             Box(
                                 modifier =
                                     Modifier
                                         .matchParentSize()
                                         .clip(chipShape)
-                                        .combinedClickable(
+                                        .semantics {
+                                            contentDescription = chipLabel
+                                            selected = it.isSelected
+                                            role = Role.Checkbox
+                                        }.combinedClickable(
                                             onLongClickLabel = stringResource(R.string.combine_tag_filter),
                                             onLongClick = {
                                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)

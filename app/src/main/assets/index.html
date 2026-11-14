@@ -907,7 +907,7 @@
                     ${escapeHtml(tag.name)}
                     <button
                         type="button"
-                        onclick="removeSelectedTag('${escapeHtml(tag.name)}')"
+                        data-remove-tag="${escapeAttr(tag.name)}"
                         class="ml-1 text-primary-600 hover:text-primary-800 transition-colors duration-200"
                     >
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -1514,6 +1514,14 @@
 
             tagInput.addEventListener('input', function() {
                 debouncedShowSuggestions(this);
+            });
+
+            // Selected tag chips carry the tag name as data, not as inline JavaScript
+            document.getElementById('selectedTags').addEventListener('click', function(e) {
+                const button = e.target.closest('[data-remove-tag]');
+                if (button) {
+                    removeSelectedTag(button.dataset.removeTag);
+                }
             });
 
             // Suggestion options carry the tag name as data, not as inline JavaScript

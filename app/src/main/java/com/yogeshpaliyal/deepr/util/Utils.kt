@@ -168,7 +168,7 @@ private fun hasOpaqueScheme(link: String): Boolean {
     if (scheme.lowercase() in numericBodySchemes) return true
     // A numeric body is a port (localhost:8080, localhost:8080/path?x=1#top)
     val firstSegment = rest.takeWhile { it != '/' && it != '?' && it != '#' }
-    return !firstSegment.all { it.isDigit() }
+    return firstSegment.isEmpty() || !firstSegment.all { it.isDigit() }
 }
 
 fun isValidDeeplink(link: String): Boolean {
