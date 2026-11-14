@@ -82,6 +82,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -310,8 +311,14 @@ fun HomeScreen(
         viewModel.search(textFieldState.text.toString())
     }
 
-    // Scroll to top when filters change
+    // Scroll to top when filters change. The last applied filter is saved so that coming
+    // back to this screen (e.g. after editing a link) keeps the current scroll position.
+    var lastScrolledFilter by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(favouriteFilter, selectedTag) {
+        val filterKey = "$favouriteFilter|" + selectedTag.joinToString(",") { it.id.toString() }
+        val previousFilter = lastScrolledFilter
+        lastScrolledFilter = filterKey
+        if (previousFilter == null || previousFilter == filterKey) return@LaunchedEffect
         try {
             when (listState) {
                 is LazyStaggeredGridState -> listState.scrollToItem(0)
@@ -536,7 +543,9 @@ fun HomeScreen(
                         start = contentPadding.calculateLeftPadding(layoutDirection),
                         end = contentPadding.calculateRightPadding(layoutDirection),
                         top = contentPadding.calculateTopPadding() + 8.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+                        // Leave room for the floating "Add link" button so the last item's
+                        // menu stays reachable.
+                        bottom = contentPadding.calculateBottomPadding() + 88.dp,
                     ),
                 selectedTag = selectedTag,
                 currentViewType = currentViewType,
