@@ -1513,6 +1513,9 @@
             const debouncedShowSuggestions = debounce((input) => showSuggestions(input), 200);
 
             tagInput.addEventListener('input', function() {
+                // Any edit makes the highlighted suggestion stale until the list is re-rendered
+                activeSuggestionIndex = -1;
+                getSuggestionOptions().forEach(option => option.classList.remove('bg-gray-100'));
                 debouncedShowSuggestions(this);
             });
 
