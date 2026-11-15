@@ -1,5 +1,7 @@
 package com.yogeshpaliyal.deepr.ui.screens.addlink
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
@@ -80,6 +82,7 @@ import com.yogeshpaliyal.deepr.viewmodel.AccountViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Check
+import compose.icons.tablericons.Clipboard
 import compose.icons.tablericons.Download
 import compose.icons.tablericons.Link
 import compose.icons.tablericons.Note
@@ -328,6 +331,32 @@ fun AddLinkScreen(
                                                 isError = false
                                             },
                                         )
+                                    } else {
+                                        IconButton(onClick = {
+                                            val clipboard =
+                                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            val pasted =
+                                                clipboard.primaryClip
+                                                    ?.takeIf { it.itemCount > 0 }
+                                                    ?.getItemAt(0)
+                                                    ?.coerceToText(context)
+                                                    ?.toString()
+                                                    ?.trim()
+                                            if (pasted.isNullOrEmpty()) {
+                                                Toast
+                                                    .makeText(context, context.getString(R.string.clipboard_empty), Toast.LENGTH_SHORT)
+                                                    .show()
+                                            } else {
+                                                deeprInfo = deeprInfo.copy(link = pasted)
+                                                isError = false
+                                            }
+                                        }) {
+                                            Icon(
+                                                imageVector = TablerIcons.Clipboard,
+                                                contentDescription = stringResource(R.string.paste_from_clipboard),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
                                     }
                                     IconButton(onClick = {
                                         qrScanner.launch(ScanOptions())

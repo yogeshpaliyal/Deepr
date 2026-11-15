@@ -13,6 +13,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,9 +83,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -94,6 +97,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -310,8 +319,14 @@ fun HomeScreen(
         viewModel.search(textFieldState.text.toString())
     }
 
-    // Scroll to top when filters change
+    // Scroll to top when filters change. The last applied filter is saved so that coming
+    // back to this screen (e.g. after editing a link) keeps the current scroll position.
+    var lastScrolledFilter by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(favouriteFilter, selectedTag) {
+        val filterKey = "$favouriteFilter|" + selectedTag.joinToString(",") { it.id.toString() }
+        val previousFilter = lastScrolledFilter
+        lastScrolledFilter = filterKey
+        if (previousFilter == null || previousFilter == filterKey) return@LaunchedEffect
         try {
             when (listState) {
                 is LazyStaggeredGridState -> listState.scrollToItem(0)
@@ -494,11 +509,39 @@ fun HomeScreen(
                     }
 
                     items(finalTagsInfo ?: listOf()) {
-                        FilterChip(it.isSelected, {
-                            viewModel.setSelectedTagByName(it.name)
-                        }, label = {
-                            Text(it.name + " (${it.count})")
-                        }, modifier = Modifier.animateItem(), shape = RoundedCornerShape(percent = 50))
+                        // Tap shows only this tag, long press adds it to the selected tags.
+                        // The overlay handles touch and accessibility; the chip is only visual.
+                        val chipShape = RoundedCornerShape(percent = 50)
+                        val chipLabel = it.name + " (${it.count})"
+                        Box(modifier = Modifier.animateItem()) {
+                            FilterChip(
+                                selected = it.isSelected,
+                                onClick = {},
+                                label = { Text(chipLabel) },
+                                shape = chipShape,
+                                modifier = Modifier.clearAndSetSemantics {},
+                            )
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .matchParentSize()
+                                        .clip(chipShape)
+                                        .semantics {
+                                            contentDescription = chipLabel
+                                            selected = it.isSelected
+                                            role = Role.Checkbox
+                                        }.combinedClickable(
+                                            onLongClickLabel = stringResource(R.string.combine_tag_filter),
+                                            onLongClick = {
+                                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                viewModel.setSelectedTagByName(it.name)
+                                            },
+                                            onClick = {
+                                                viewModel.switchToTagByName(it.name)
+                                            },
+                                        ),
+                            )
+                        }
                     }
                 }
             }
@@ -536,7 +579,9 @@ fun HomeScreen(
                         start = contentPadding.calculateLeftPadding(layoutDirection),
                         end = contentPadding.calculateRightPadding(layoutDirection),
                         top = contentPadding.calculateTopPadding() + 8.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+                        // Leave room for the floating "Add link" button so the last item's
+                        // menu stays reachable.
+                        bottom = contentPadding.calculateBottomPadding() + 88.dp,
                     ),
                 selectedTag = selectedTag,
                 currentViewType = currentViewType,
@@ -763,7 +808,7 @@ fun Content(
             accounts = accounts!!.filterNot { it.id in pendingDeleteIds },
             selectedTag = selectedTag,
             onTagClick = {
-                viewModel.setSelectedTagByName(it)
+                viewModel.switchToTagByName(it)
             },
             isThumbnailEnable = isThumbnailEnable,
             searchQuery = searchQuery,
@@ -965,7 +1010,7 @@ fun Content(
                                     elevation = null,
                                     selected = isSelected,
                                     onClick = {
-                                        viewModel.setSelectedTagByName(tag)
+                                        viewModel.switchToTagByName(tag)
                                         showMoreSelectedItem = null
                                     },
                                     label = { Text(tag.trim()) },

@@ -1,7 +1,10 @@
 package com.yogeshpaliyal.deepr
 
+import com.yogeshpaliyal.deepr.util.isValidDeeplink
 import com.yogeshpaliyal.deepr.util.normalizeLink
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -61,5 +64,44 @@ class UtilsTest {
             "https://example.com:8080/path",
             normalizeLink("example.com:8080/path"),
         )
+    }
+
+    @Test
+    fun isValidDeeplink_acceptsHierarchicalLinks() {
+        assertTrue(isValidDeeplink("https://example.com"))
+        assertTrue(isValidDeeplink("example.com/path"))
+        assertTrue(isValidDeeplink("app://deeplink"))
+        assertTrue(isValidDeeplink("intent://scan/#Intent;scheme=zxing;end"))
+    }
+
+    @Test
+    fun isValidDeeplink_acceptsOpaqueLinks() {
+        assertTrue(isValidDeeplink("about:config"))
+        assertTrue(isValidDeeplink("about:config?filter=browser.tabs"))
+        assertTrue(isValidDeeplink("mailto:someone@example.com"))
+        assertTrue(isValidDeeplink("tel:+911234567890"))
+        assertTrue(isValidDeeplink("tel:123"))
+        assertTrue(isValidDeeplink("mailto:?subject=Hello"))
+    }
+
+    @Test
+    fun normalizeLink_preservesOpaqueSchemes() {
+        assertEquals("mailto:someone@example.com", normalizeLink("mailto:someone@example.com"))
+        assertEquals("about:config?filter=browser.tabs", normalizeLink("about:config?filter=browser.tabs"))
+        assertEquals("about:config", normalizeLink("about:config"))
+    }
+
+    @Test
+    fun isValidDeeplink_rejectsInvalidLinks() {
+        assertFalse(isValidDeeplink(""))
+        assertFalse(isValidDeeplink("   "))
+        assertFalse(isValidDeeplink("localhost"))
+        assertFalse(isValidDeeplink("localhost:8080"))
+        assertFalse(isValidDeeplink("localhost:8080?x=1"))
+        assertFalse(isValidDeeplink("localhost:8080#section"))
+        assertFalse(isValidDeeplink("hello world"))
+        assertFalse(isValidDeeplink("https://"))
+        assertFalse(isValidDeeplink("about:"))
+        assertFalse(isValidDeeplink("1abc:foo"))
     }
 }

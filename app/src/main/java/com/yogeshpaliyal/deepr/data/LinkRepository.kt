@@ -184,4 +184,18 @@ interface LinkRepository {
      * @return the inserted id per item, or null if that item was skipped (duplicate link).
      */
     suspend fun insertLinksWithTags(items: List<NewLinkWithTags>): List<Long?>
+
+    /**
+     * Inserts each item, or merges it into the Deepr that already has the same `link`.
+     * Merging only adds information: missing tags are added, and an empty name, notes or
+     * thumbnail is filled in. Values the user already has are never overwritten.
+     * The whole batch runs in a single DB transaction.
+     */
+    suspend fun insertOrMergeLinksWithTags(items: List<NewLinkWithTags>): MergeResult
+
+    data class MergeResult(
+        val insertedCount: Int,
+        val updatedCount: Int,
+        val unchangedCount: Int,
+    )
 }

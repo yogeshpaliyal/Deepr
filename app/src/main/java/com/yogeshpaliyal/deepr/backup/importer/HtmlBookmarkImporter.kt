@@ -23,6 +23,7 @@ abstract class HtmlBookmarkImporter(
 ) : BookmarkImporter {
     override suspend fun import(uri: Uri): RequestResult<ImportResult> {
         var importedCount = 0
+        var updatedCount = 0
         var skippedCount = 0
 
         try {
@@ -44,12 +45,14 @@ abstract class HtmlBookmarkImporter(
                             tagNames = bookmark.tags ?: emptyList(),
                         )
                     }
-                val results = linkRepository.insertLinksWithTags(items)
-                importedCount = results.count { it != null }
-                skippedCount += results.count { it == null }
+                // Links that already exist get new tags and empty fields filled in (#473)
+                val result = linkRepository.insertOrMergeLinksWithTags(items)
+                importedCount = result.insertedCount
+                updatedCount = result.updatedCount
+                skippedCount += result.unchangedCount
             }
 
-            return RequestResult.Success(ImportResult(importedCount, skippedCount))
+            return RequestResult.Success(ImportResult(importedCount, skippedCount, updatedCount = updatedCount))
         } catch (e: IOException) {
             return RequestResult.Error("Error reading file: ${e.message}")
         } catch (e: Exception) {

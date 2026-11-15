@@ -7,4 +7,5 @@ data class ImportResult(
     val importedCount: Int,
     val skippedCount: Int,
     val errorMessage: String? = null,
+    val updatedCount: Int = 0,
 )

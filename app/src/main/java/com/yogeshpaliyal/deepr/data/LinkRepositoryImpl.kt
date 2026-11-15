@@ -375,39 +375,7 @@ class LinkRepositoryImpl(
                             insertedIds.add(null)
                             return@forEach
                         }
-
-                        if (item.createdAt != null) {
-                            deeprQueries.importDeepr(
-                                link = item.link,
-                                name = item.name,
-                                openedCount = item.openedCount,
-                                notes = item.notes,
-                                thumbnail = item.thumbnail,
-                                isFavourite = item.isFavourite,
-                                createdAt = item.createdAt,
-                                profileId = item.profileId,
-                            )
-                        } else {
-                            deeprQueries.insertDeepr(
-                                link = item.link,
-                                name = item.name,
-                                openedCount = item.openedCount,
-                                notes = item.notes,
-                                thumbnail = item.thumbnail,
-                                profileId = item.profileId,
-                            )
-                        }
-                        val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
-
-                        item.tagNames.forEach { tagName ->
-                            deeprQueries.insertTag(tagName)
-                            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
-                            if (tag != null) {
-                                deeprQueries.addTagToLink(insertedId, tag.id)
-                            }
-                        }
-
-                        insertedIds.add(insertedId)
+                        insertedIds.add(insertNewLink(item))
                     }
                 }
                 insertedIds
@@ -416,5 +384,106 @@ class LinkRepositoryImpl(
             scheduleAutoBackup()
         }
         return results
+    }
+
+    override suspend fun insertOrMergeLinksWithTags(items: List<LinkRepository.NewLinkWithTags>): LinkRepository.MergeResult {
+        val result =
+            withContext(Dispatchers.IO) {
+                var inserted = 0
+                var updated = 0
+                var unchanged = 0
+                deeprQueries.transaction {
+                    items.forEach { item ->
+                        val existing = deeprQueries.getDeeprByLink(item.link).executeAsList().firstOrNull()
+                        if (existing == null) {
+                            insertNewLink(item)
+                            inserted++
+                            return@forEach
+                        }
+
+                        var changed = false
+
+                        // Fill only empty fields; a name equal to the link is a placeholder.
+                        val newName =
+                            if ((existing.name.isBlank() || existing.name == existing.link) && item.name.isNotBlank()) {
+                                item.name
+                            } else {
+                                existing.name
+                            }
+                        val newNotes = existing.notes.ifBlank { item.notes }
+                        val newThumbnail = existing.thumbnail.ifBlank { item.thumbnail }
+                        if (newName != existing.name || newNotes != existing.notes || newThumbnail != existing.thumbnail) {
+                            deeprQueries.updateDeeplink(
+                                existing.link,
+                                newName,
+                                newNotes,
+                                newThumbnail,
+                                existing.profileId,
+                                existing.id,
+                            )
+                            changed = true
+                        }
+
+                        val existingTagNames =
+                            deeprQueries
+                                .getTagsForLink(existing.id)
+                                .executeAsList()
+                                .mapTo(HashSet()) { it.name }
+                        item.tagNames
+                            .filter { it.isNotBlank() && it !in existingTagNames }
+                            .distinct()
+                            .forEach { tagName ->
+                                deeprQueries.insertTag(tagName)
+                                val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+                                if (tag != null) {
+                                    deeprQueries.addTagToLink(existing.id, tag.id)
+                                    changed = true
+                                }
+                            }
+
+                        if (changed) updated++ else unchanged++
+                    }
+                }
+                LinkRepository.MergeResult(inserted, updated, unchanged)
+            }
+        if (result.insertedCount > 0 || result.updatedCount > 0) {
+            scheduleAutoBackup()
+        }
+        return result
+    }
+
+    // Must be called inside a deeprQueries transaction.
+    private fun insertNewLink(item: LinkRepository.NewLinkWithTags): Long {
+        if (item.createdAt != null) {
+            deeprQueries.importDeepr(
+                link = item.link,
+                name = item.name,
+                openedCount = item.openedCount,
+                notes = item.notes,
+                thumbnail = item.thumbnail,
+                isFavourite = item.isFavourite,
+                createdAt = item.createdAt,
+                profileId = item.profileId,
+            )
+        } else {
+            deeprQueries.insertDeepr(
+                link = item.link,
+                name = item.name,
+                openedCount = item.openedCount,
+                notes = item.notes,
+                thumbnail = item.thumbnail,
+                profileId = item.profileId,
+            )
+        }
+        val insertedId = deeprQueries.lastInsertRowId().executeAsOne()
+
+        item.tagNames.forEach { tagName ->
+            deeprQueries.insertTag(tagName)
+            val tag = deeprQueries.getTagByName(tagName).executeAsOneOrNull()
+            if (tag != null) {
+                deeprQueries.addTagToLink(insertedId, tag.id)
+            }
+        }
+        return insertedId
     }
 }

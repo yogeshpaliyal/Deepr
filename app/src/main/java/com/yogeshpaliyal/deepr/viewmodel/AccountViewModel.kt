@@ -306,6 +306,38 @@ class AccountViewModel(
         }
     }
 
+    // Only the latest tap applies, even if an earlier lookup finishes later. The request
+    // counter is only touched on the main thread, and the check and update below run on
+    // the main thread with no suspension in between.
+    private var latestTagSwitchRequest = 0
+
+    /**
+     * Filters by this tag only, replacing any other selected tags. Tapping the tag that is
+     * already the only selected one clears the filter. Use [setSelectedTagByName] to
+     * combine tags instead.
+     */
+    fun switchToTagByName(tagName: String) {
+        val request = ++latestTagSwitchRequest
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            val tag = withContext(Dispatchers.IO) { linkRepository.getTagByName(tagName) } ?: return@launch
+            if (request != latestTagSwitchRequest) return@launch
+            val current = _selectedTagFilter.value
+            if (current.size == 1 && current.first().id == tag.id) {
+                setTagFilter(null)
+            } else {
+                _favouriteFilter.update { -1 }
+                _selectedTagFilter.update { listOf(tag) }
+                analyticsManager.logEvent(
+                    com.yogeshpaliyal.deepr.analytics.AnalyticsEvents.SELECT_TAG_FILTER,
+                    mapOf(
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_ID to tag.id,
+                        com.yogeshpaliyal.deepr.analytics.AnalyticsParams.TAG_NAME to tag.name,
+                    ),
+                )
+            }
+        }
+    }
+
     fun fetchMetaData(
         link: String,
         onLinkMetaDataFound: (LinkInfo?) -> Unit,
@@ -565,7 +597,8 @@ class AccountViewModel(
             when (val result = importRepository.importBookmarks(uri, importer)) {
                 is RequestResult.Success -> {
                     importResultChannel.send(
-                        "Import complete! Added: ${result.data.importedCount}, Skipped (duplicates): ${result.data.skippedCount}",
+                        "Import complete! Added: ${result.data.importedCount}, " +
+                            "Updated: ${result.data.updatedCount}, Skipped: ${result.data.skippedCount}",
                     )
                 }
 
