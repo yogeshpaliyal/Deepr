@@ -1,6 +1,6 @@
 # Deepr stats
 
-Updated 2026-11-15T03:44:23+00:00 by the `Stats snapshot` workflow on [yogeshpaliyal/Deepr](https://github.com/yogeshpaliyal/Deepr).
+Updated 2026-11-15T03:51:40+00:00 by the `Stats snapshot` workflow on [yogeshpaliyal/Deepr](https://github.com/yogeshpaliyal/Deepr).
 Collected from GitHub's APIs only; the Deepr app contains no tracking.
 
 | Metric | Value |
@@ -43,5 +43,6 @@ Collected from GitHub's APIs only; the Deepr app contains no tracking.
 | v1.0.4 | 19 |
 | v1.0.3 | 15 |
 | v1.0.7 | 14 |
+| v1.0.30 | 0 |
 
 Raw data: `downloads.csv`, `repo.csv`.
