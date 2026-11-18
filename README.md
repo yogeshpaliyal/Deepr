@@ -1,11 +1,11 @@
 # Deepr stats
 
-Updated 2026-11-18T02:47:45+00:00 by the `Stats snapshot` workflow on [yogeshpaliyal/Deepr](https://github.com/yogeshpaliyal/Deepr).
+Updated 2026-11-18T11:36:55+00:00 by the `Stats snapshot` workflow on [yogeshpaliyal/Deepr](https://github.com/yogeshpaliyal/Deepr).
 Collected from GitHub's APIs only; the Deepr app contains no tracking.
 
 | Metric | Value |
 | --- | --- |
-| Total APK downloads (all releases) | 7768 |
+| Total APK downloads (all releases) | 7782 |
 | Stars | 302 (+0 in 7 days) |
 | Forks | 24 |
 | Open issues and PRs | 42 |
@@ -19,11 +19,11 @@ Collected from GitHub's APIs only; the Deepr app contains no tracking.
 | v1.0.26 | 659 |
 | v1.0.25 | 399 |
 | v1.0.11 | 356 |
+| v1.0.30 | 325 |
 | v1.0.24 | 317 |
-| v1.0.30 | 316 |
 | v1.0.23 | 268 |
 | v1.0.20 | 259 |
-| v1.0.29 | 249 |
+| v1.0.29 | 251 |
 | v1.0.17 | 244 |
 | v1.0.13 | 230 |
 | v1.0.21 | 221 |
@@ -35,8 +35,8 @@ Collected from GitHub's APIs only; the Deepr app contains no tracking.
 | v1.0.14 | 106 |
 | v1.0.10 | 71 |
 | v1.0.6 | 54 |
+| latest-master | 36 |
 | v1.0.5 | 34 |
-| latest-master | 33 |
 | v1.0.8 | 30 |
 | v1.0.2 | 30 |
 | v1.0.15 | 23 |
