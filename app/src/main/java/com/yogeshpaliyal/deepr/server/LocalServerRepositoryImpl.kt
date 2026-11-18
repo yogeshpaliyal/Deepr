@@ -171,7 +171,16 @@ open class LocalServerRepositoryImpl(
                         post("/api/profiles") {
                             try {
                                 val request = call.receive<AddProfileRequest>()
-                                linkRepository.insertProfile(request.name)
+                                val name = request.name.trim()
+                                if (name.isBlank()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Profile name cannot be blank"))
+                                    return@post
+                                }
+                                if (linkRepository.getProfileByName(name) != null) {
+                                    call.respond(HttpStatusCode.Conflict, ErrorResponse("Profile with this name already exists"))
+                                    return@post
+                                }
+                                linkRepository.insertProfile(name)
                                 call.respond(
                                     HttpStatusCode.Created,
                                     SuccessResponse("Profile created successfully"),
@@ -187,8 +196,18 @@ open class LocalServerRepositoryImpl(
 
                         get("/api/links") {
                             try {
+                                val profileIdParam = call.request.queryParameters["profileId"]
                                 val profileId =
-                                    call.request.queryParameters["profileId"]?.toLongOrNull() ?: 1L
+                                    if (profileIdParam != null) {
+                                        val parsed = profileIdParam.toLongOrNull()
+                                        if (parsed == null || parsed <= 0) {
+                                            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profileId: $profileIdParam"))
+                                            return@get
+                                        }
+                                        parsed
+                                    } else {
+                                        1L
+                                    }
                                 val links =
                                     linkRepository
                                         .getLinksAndTags(
@@ -235,9 +254,18 @@ open class LocalServerRepositoryImpl(
                         post("/api/links") {
                             try {
                                 val request = call.receive<AddLinkRequest>()
+                                val linkUrl = request.link.trim()
+                                if (linkUrl.isBlank()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Link URL cannot be empty"))
+                                    return@post
+                                }
+                                if (request.profileId <= 0) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profileId"))
+                                    return@post
+                                }
                                 // Insert the link without tags first
                                 accountViewModel.insertAccount(
-                                    link = request.link,
+                                    link = linkUrl,
                                     name = request.name,
                                     executed = false,
                                     tagsList = request.tags.map { it.toDbTag() },
@@ -511,12 +539,22 @@ open class LocalServerRepositoryImpl(
                         put("/api/profiles/{id}") {
                             try {
                                 val id = call.parameters["id"]?.toLongOrNull()
-                                if (id == null) {
+                                if (id == null || id <= 0) {
                                     call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid profile ID"))
                                     return@put
                                 }
                                 val request = call.receive<UpdateProfileRequest>()
-                                linkRepository.updateProfile(request.name, request.themeMode, request.colorTheme, id)
+                                val name = request.name.trim()
+                                if (name.isBlank()) {
+                                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("Profile name cannot be blank"))
+                                    return@put
+                                }
+                                val existing = linkRepository.getProfileById(id)
+                                if (existing == null) {
+                                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Profile not found"))
+                                    return@put
+                                }
+                                linkRepository.updateProfile(name, request.themeMode, request.colorTheme, id)
                                 call.respond(HttpStatusCode.OK, SuccessResponse("Profile updated successfully"))
                             } catch (e: Exception) {
                                 Log.e("LocalServer", "Error updating profile", e)
